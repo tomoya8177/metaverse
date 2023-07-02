@@ -11,6 +11,7 @@ import nodemailer from 'nodemailer';
 export const POST = async ({ request }) => {
 	const body = await request.json();
 	let testAccount = await nodemailer.createTestAccount();
+	/*
 	let transporter = nodemailer.createTransport({
 		host: EtherealHost,
 		port: 587,
@@ -28,15 +29,17 @@ export const POST = async ({ request }) => {
 		text: body.body, // plain text body
 		html: body.body // html body
 	});
+	*/
 	let transporter2 = nodemailer.createTransport({
 		host: MailerHost,
 		port: 465,
 		secure: true, // true for 465, false for other ports
 		auth: {
-			user: MailerUser, // generated ethereal user
-			pass: MailerPassword // generated ethereal password
+			user: MailerUser, 
+			pass: MailerPassword 
 		}
 	});
+	console.log('sending mail to', body.to)
 	let info2 = await transporter2.sendMail({
 		from: 'imai@narra.jp', // sender address
 		to: body.to, // list of receivers

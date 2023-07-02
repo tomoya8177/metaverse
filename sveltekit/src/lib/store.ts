@@ -1,4 +1,5 @@
 import { writable } from 'svelte/store';
+import type { Event } from './Classes/Event';
 
 export const UserStore = writable({
 	id: '',
@@ -6,7 +7,8 @@ export const UserStore = writable({
 	email: '',
 	avatarURL: null,
 	lastRoom: '',
-	lastPosition: ''
+	lastPosition: '',
+	isAdmin: false
 });
 export const RigStore = writable({
 	position: {
@@ -20,10 +22,7 @@ export const RigStore = writable({
 		z: 0
 	}
 });
-export const EventStore = writable({
-	id: '',
-	slug: ''
-});
+export const EventStore = writable({} as Event);
 export type xyz = {
 	x: number;
 	y: number;

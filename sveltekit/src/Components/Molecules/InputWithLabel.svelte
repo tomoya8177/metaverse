@@ -10,6 +10,7 @@
 		| 'date'
 		| 'time'
 		| 'textarea'
+		| 'switch'
 		| 'select' = 'text';
 	export let selects: { name: string | undefined; value: string | number | undefined }[] = [];
 	export let disabled: boolean = false;
@@ -19,7 +20,7 @@
 
 <div class="field">
 	<label class="label">
-		{#if type != 'checkbox'}
+		{#if type != 'checkbox' && type!='switch'}
 			{label}
 		{/if}
 		{#if required}
@@ -44,6 +45,11 @@
 			{:else if type == 'checkbox'}
 				<label>
 					<input type="checkbox" bind:checked={value} {disabled} />
+					{label}
+				</label>
+			{:else if type == 'switch'}
+				<label>
+					<input type="checkbox" role="switch" bind:checked={value} {disabled} />
 					{label}
 				</label>
 			{:else if type == 'select'}

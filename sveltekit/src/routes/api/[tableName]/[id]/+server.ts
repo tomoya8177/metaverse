@@ -1,11 +1,13 @@
 import { Auth } from '$lib/backend/auth.js';
 import { createUpdateQuery } from '$lib/backend/createUpdateQuery.js';
 import { db } from '$lib/backend/db.js';
+import { isLocalhost } from '$lib/backend/isLocalhost.js';
 
 export async function GET({ params, cookies, request }) {
-	const isLocalhost = request.headers.get('host') === 'localhost';
-
-	if (!isLocalhost && !(await Auth.check(cookies.get('login'))).result) {
+	if (
+		!isLocalhost(request.headers.get('host')) &&
+		!(await Auth.check(cookies.get('login'))).result
+	) {
 		//return new Response('not authorized', { status: 401 });
 	}
 	console.log(`select * from ${params.tableName} where id='${params.id}'`);
@@ -15,8 +17,10 @@ export async function GET({ params, cookies, request }) {
 }
 
 export async function PUT({ request, params, cookies }) {
-	const isLocalhost = request.headers.get('host') === 'localhost';
-	if (isLocalhost && !(await Auth.check(cookies.get('login'))).result) {
+	if (
+		!isLocalhost(request.headers.get('host')) &&
+		!(await Auth.check(cookies.get('login'))).result
+	) {
 		return new Response('not authorized', { status: 401 });
 	}
 	const updates = await createUpdateQuery(request, params);

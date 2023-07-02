@@ -42,6 +42,10 @@
 		busy = false;
 	};
 	const onLoginClicked = async () => {
+		if(!email){
+			alert('Please enter your email address');
+			return;
+		}
 		busy = true;
 		const existingUser = await axios
 			.post('/api/login/checkExisting', { email })

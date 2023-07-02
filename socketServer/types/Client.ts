@@ -4,6 +4,9 @@ export type Client = {
   clientId: string;
   userId: string;
   position?: {
-    position: XYZ
+    position: XYZ;
     rotation: XYZ;
-  }
+  };
+  startAt: string;
+  endAt: string;
+};

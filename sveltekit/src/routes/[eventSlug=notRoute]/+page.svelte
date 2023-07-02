@@ -11,12 +11,14 @@
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/Classes/Me';
 	import { Users } from '$lib/Classes/Users';
-	onMount(() => {
+	import { VideoChat } from '$lib/Classes/VideoChat';
+	let videoChat: VideoChat;
+	onMount(async () => {
 		console.log({ io });
 		console.log($UserStore.id);
 		io.emit('userId', $UserStore.id); // Send the message
 		io.emit('enterRoom', $EventStore.id); // Send the message
-		setTimeout(() => {
+		setTimeout(async () => {
 			const me = new Me($UserStore.id);
 			Users.add(me);
 			if ($UserStore.lastRoom === $EventStore.id && $UserStore.lastPosition) {
@@ -28,8 +30,16 @@
 				//not setting nickname for Me
 				io.emit('position', { position: lastPosition.position, rotation: lastPosition.rotation });
 			}
-			me.twilioConnect($EventStore.id);
+			//me.twilioConnect($EventStore.id);
 			//me.cometChat($EventStore, $UserStore.nickname);
+			videoChat = new VideoChat($EventStore, $UserStore.id);
+			if ($EventStore.allowAudio) {
+				await videoChat.connect();
+				videoChat.enableAudio();
+				if ($EventStore.allowVideo) {
+					videoChat.enableVideo();
+				}
+			}
 		}, 1000);
 	});
 	io.on('userLeftRoom', (data) => {
