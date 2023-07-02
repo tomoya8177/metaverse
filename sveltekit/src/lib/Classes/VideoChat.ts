@@ -13,7 +13,7 @@ export class VideoChat {
 		this.roomId = event.id;
 		this.audioOnly = !event.allowAudio || !event.allowVideo;
 	}
-	async connect() {
+	async connect(withVideo: boolean = true) {
 		//connect to twilio room
 		const result = await axios.post('/api/twilio-token', {
 			userId: this.userId,
@@ -24,7 +24,7 @@ export class VideoChat {
 		console.log('connecting to twilio room', result.data.token);
 		createLocalTracks({
 			audio: true,
-			video: { height: 300, frameRate: 24, width: 300 },
+			video: withVideo ? { height: 300, frameRate: 24, width: 300 } : false,
 			bandwidthProfile: {
 				video: {
 					mode: 'grid',
@@ -47,6 +47,7 @@ export class VideoChat {
 			})
 			.then((room) => {
 				this.room = room;
+				console.log({ room });
 				this.localParticipant = room.localParticipant;
 				console.log(`Successfully joined a Room: ${room}`);
 				const disconnectButton = document.createElement('button');

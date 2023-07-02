@@ -34,7 +34,7 @@
 			//me.cometChat($EventStore, $UserStore.nickname);
 			videoChat = new VideoChat($EventStore, $UserStore.id);
 			if ($EventStore.allowAudio) {
-				await videoChat.connect();
+				await videoChat.connect($EventStore.allowVideo);
 				videoChat.enableAudio();
 				if ($EventStore.allowVideo) {
 					videoChat.enableVideo();
@@ -101,6 +101,15 @@
 		nav-mesh
 		visible="false"
 		color="#7BC8A4"
+	/>
+	<a-plane
+		id="screenchare-container"
+		width="8"
+		height="6"
+		position="0 4 -10"
+		rotation="0 0 0"
+		color="#7BC8A4"
+		material="side: double;"
 	/>
 </a-scene>
 <div id="media-container">Medias</div>
