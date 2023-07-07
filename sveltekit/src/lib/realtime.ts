@@ -1,5 +1,6 @@
+import { SOCKET_SERVER_HOST } from '$env/static/private';
 import ioClient from 'socket.io-client';
-const ENDPOINT = 'http://localhost:3000';
+const ENDPOINT = SOCKET_SERVER_HOST;
 
 const socket = ioClient(ENDPOINT);
 
