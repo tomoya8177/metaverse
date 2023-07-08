@@ -16,7 +16,6 @@ export async function GET({ request, params, cookies }) {
 
 export async function POST({ request, params, cookies }) {
 	const isLocalhost = request.headers.get('host')?.includes('localhost');
-	console.log({ headers: request.headers.get('host'), isLocalhost });
 	if (!isLocalhost && !(await Auth.check(cookies.get('login'))).result) {
 		return new Response('not authorized', { status: 401 });
 	}

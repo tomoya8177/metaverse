@@ -24,7 +24,6 @@ export async function PUT({ request, params, cookies }) {
 		return new Response('not authorized', { status: 401 });
 	}
 	const updates = await createUpdateQuery(request, params);
-	console.log({ updates });
 	const result = await db.query(
 		`update ${params.tableName} set ${updates} where id='${params.id}'`
 	);

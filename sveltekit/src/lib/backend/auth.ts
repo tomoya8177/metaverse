@@ -27,9 +27,7 @@ class auth {
 		} catch (err) {
 			return failResponse;
 		}
-		console.log({ userId: decoded.userId }); // bar
 		const users = await db.query(`select * from users where id='${decoded.userId}'`);
-		console.log({ users: users[0] });
 		if (users.length == 0) return failResponse;
 		let personas: Student[] | User[] | null = [];
 		return {
