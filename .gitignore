@@ -1,6 +1,8 @@
-sveltekit/.env
-sveltekit/node_modules
 socketServer/node_modules
+socketServer/lib/config.ts
+
+sveltekit/node_modules
+sveltekit/.env
 sveltekit/build
 sveltekit/.svelte-kit
 sveltekit/package

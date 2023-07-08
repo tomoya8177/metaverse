@@ -82,7 +82,7 @@ io.on("connection", (socket: any) => {
     console.log("disconnected");
     const position = clients.find((c) => c.clientId === socket.id)?.position;
     try {
-      await axios.put(`http://localhost:5173/api/users/${userId}`, {
+      await axios.put(`${API_ENDPOINT}/api/users/${userId}`, {
         lastRoom: roomId,
         lastPosition: JSON.stringify(position),
       });
@@ -99,7 +99,7 @@ io.on("connection", (socket: any) => {
     console.log({ client });
     try {
       console.log("posting");
-      await axios.post(`http://localhost:5173/api/sessions`, {
+      await axios.post(`${API_ENDPOINT}/api/sessions`, {
         user: client.userId,
         startAt: client.startAt,
         endAt: client.endAt,
