@@ -1,7 +1,7 @@
 import { unescapeHTML } from '$lib/escapeHTML';
 import type { xyz } from '$lib/store';
 import type { Entity } from 'aframe';
-import type { RemoteVideoTrack } from 'twilio-video';
+import type { RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
 export class Unit {
 	userId: string;
 	el: Entity;
@@ -148,5 +148,12 @@ export class Unit {
 	hideCamera() {
 		const video = document.getElementById('cameraCircleOf' + this.userId);
 		video?.parentNode?.removeChild(video);
+	}
+	attachAudio(track: RemoteAudioTrack) {
+		const audio = document.createElement('a-entity');
+		audio.setAttribute('sound', 'src:#' + track.sid + ';autoplay:true;volume:0.5');
+		audio.setAttribute('position', '0 1.5 0');
+		audio.setAttribute('rotation', '0 180 0');
+		this.avatarContainer.appendChild(audio);
 	}
 }

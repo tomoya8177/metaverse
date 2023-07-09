@@ -1,5 +1,5 @@
 <script lang="ts">
-	import TextChatMessage from '../../Components/Molecules/TextChatMessage.svelte';
+	import TextChatMessage from '../Molecules/TextChatMessage.svelte';
 
 	import 'aframe';
 	import 'aframe-environment-component';
@@ -12,8 +12,8 @@
 	import '$lib/AframeComponents';
 	import { VideoChat } from '$lib/Classes/VideoChat';
 	import { Message } from '$lib/Classes/Message';
-	import InputWithLabel from '../../Components/Molecules/InputWithLabel.svelte';
-	import Icon from '../../Components/Atom/Icon.svelte';
+	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
+	import Icon from '../Atom/Icon.svelte';
 	import { escapeHTML } from '$lib/escapeHTML';
 	import { Users } from '$lib/Classes/Users';
 	let messages: Message[] = [];
@@ -28,8 +28,16 @@
 		//me.cometChat($EventStore, $UserStore.nickname);
 		videoChat = new VideoChat($EventStore, $UserStore.id);
 		if ($EventStore.allowAudio) {
-			await videoChat.connect($EventStore.allowVideo);
-			$UserStore.onMute = false;
+			try {
+				await videoChat.connect($EventStore.allowVideo);
+				$UserStore.onMute = false;
+			} catch (e) {
+				console.log(e);
+				$UserStore.onMute = true;
+				alert(
+					`You don't have a microphone connected. Please connect a microphone and refresh the page to join the audio chat.`
+				);
+			}
 		}
 		messages = await axios
 			.get('/api/messages?event=' + $EventStore.id + '&pinned=1')
@@ -81,8 +89,13 @@
 			<button
 				class="circle-button dim"
 				on:click={() => {
-					videoChat.unmuteMyAudio();
-					$UserStore.onMute = false;
+					try {
+						videoChat.unmuteMyAudio();
+						$UserStore.onMute = false;
+					} catch (e) {
+						console.log(e);
+						alert(`Couldn't get access to the microphone`);
+					}
 				}}
 			>
 				<Icon icon="mic_off" />
@@ -104,8 +117,13 @@
 			<button
 				class="circle-button dim"
 				on:click={async () => {
-					if (await videoChat.startMyVideo()) {
-						$UserStore.onVideoMute = false;
+					try {
+						if (await videoChat.startMyVideo()) {
+							$UserStore.onVideoMute = false;
+						}
+					} catch (e) {
+						console.log(e);
+						alert(`Couldn't get access to the Camera`);
 					}
 				}}
 			>
@@ -145,6 +163,7 @@
 						}
 					} catch (e) {
 						console.log(e);
+						alert(`Couldn't get access to the Screen`);
 					}
 				}}
 			>

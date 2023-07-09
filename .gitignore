@@ -1,4 +1,5 @@
 socketServer/node_modules
+
 socketServer/lib/config.ts
 
 sveltekit/node_modules

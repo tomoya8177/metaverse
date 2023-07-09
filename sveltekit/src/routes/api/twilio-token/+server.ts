@@ -25,6 +25,5 @@ export const POST = async ({ request }) => {
 	token.addGrant(videoGrant);
 
 	// Serialize the token to a JWT string
-	console.log(token.toJwt());
 	return new Response(JSON.stringify({ result: true, token: token.toJwt() }));
 };

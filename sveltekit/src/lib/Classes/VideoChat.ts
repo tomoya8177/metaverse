@@ -6,12 +6,10 @@ import {
 	type RemoteTrack,
 	RemoteVideoTrack,
 	LocalVideoTrackPublication,
-	Participant,
 	RemoteParticipant,
 	Room,
-	type LocalTrack,
-	LocalTrackPublication,
-	LocalAudioTrackPublication
+	LocalAudioTrackPublication,
+	RemoteAudioTrack
 } from 'twilio-video';
 import type { Event } from './Event';
 import axios from 'axios';
@@ -38,13 +36,7 @@ export class VideoChat {
 		if (!result.data.result) return;
 		const localTracks = await createLocalTracks({
 			audio: true,
-			video: false,
-
-			networkQuality: { local: 1, remote: 1 },
-			noiseCancellationOptions: {
-				sdkAssetsPath: 'path/to/hosted/krisp/audio/plugin/dist',
-				vendor: 'krisp'
-			}
+			video: false
 		});
 		this.room = await connect(result.data.token, {
 			name: this.roomId,
@@ -206,29 +198,27 @@ function handleRemoteTrackEnabled(track: RemoteTrack) {
 		/* Hide the avatar image and show the associated <video> element. */
 	});
 }
-function attachTrack(track: RemoteVideoTrack) {
+function attachTrack(track: RemoteVideoTrack | RemoteAudioTrack) {
 	let container = document.querySelector('a-assets');
 
 	console.log({ track });
 	const el = track.attach();
 	el.id = track.sid;
 	container?.appendChild(el);
+	const unit = Users.find(track.name.replace('screenOf', '').replace('cameraOf', ''));
+	if (!unit) return;
 	if (track.name.includes('cameraOf')) {
-		console.log('yes on camera of', Users);
-		const unit = Users.find(track.name.replace('cameraOf', ''));
-		console.log('matchedUnit', { unit });
-		if (!unit) return;
 		unit.showCamera(track);
 	} else if (track.name.includes('screenOf')) {
 		el.addEventListener('loadedmetadata', () => {
-			console.log('yes on screen of', Users);
-			const unit = Users.find(track.name.replace('screenOf', ''));
-			console.log('matchedUnit', { unit });
 			if (!unit) return;
 			console.log({ track });
 
 			unit.showScreen(track);
 		});
+	} else {
+		//assuming this is audio
+		unit.attachAudio(track as RemoteAudioTrack);
 	}
 }
 function detatchTrack(track: RemoteTrack) {

@@ -10,7 +10,6 @@ export async function GET({ params, cookies, request }) {
 	) {
 		//return new Response('not authorized', { status: 401 });
 	}
-	console.log(`select * from ${params.tableName} where id='${params.id}'`);
 	const rows = await db.query(`select * from ${params.tableName} where id='${params.id}'`);
 
 	return new Response(JSON.stringify(rows[0]));

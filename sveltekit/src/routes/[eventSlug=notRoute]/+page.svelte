@@ -1,6 +1,4 @@
 <script lang="ts">
-	import SceneUIs from './SceneUIs.svelte';
-
 	import 'aframe';
 	import 'aframe-environment-component';
 	import 'aframe-extras';
@@ -13,6 +11,7 @@
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/Classes/Me';
 	import { Users } from '$lib/Classes/Users';
+	import SceneUIs from '../../Components/Organisms/SceneUIs.svelte';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -25,13 +24,17 @@
 		}
 	});
 	let sceneLoaded = false;
+	let me: Me | null = null;
 	const onSceneLoaded = () => {
-		const me = new Me($UserStore.id);
+		me = new Me($UserStore.id);
 		Users.add(me);
 		if ($UserStore.lastRoom === $EventStore.id && $UserStore.lastPosition) {
 			const lastPosition = JSON.parse($UserStore.lastPosition);
 			me.position = { ...lastPosition.position };
 			me.rotation = { ...lastPosition.rotation };
+			if (!me.avatarURL) {
+				//no avatar set
+			}
 			me.avatarURL =
 				$UserStore.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 			//not setting nickname for Me
@@ -64,7 +67,8 @@
 	io.on('userInRoom', async (data) => {
 		if (data.from == $UserStore.id) return;
 		//new uer joined
-		io.emit('position', { position: $RigStore.position, rotation: $RigStore.rotation });
+		if (!me) return;
+		io.emit('position', { position: me.position, rotation: me.rotation });
 		//user el not created yer
 		const user = await axios.get('/api/users/' + data.from).then((res) => res.data);
 		if (document.getElementById(data.from)) return;

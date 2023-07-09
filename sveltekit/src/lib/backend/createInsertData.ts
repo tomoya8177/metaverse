@@ -3,7 +3,6 @@ import { fixBoolean } from './fixBoolean';
 
 export const createInsertData = async (params: any, body, id: string): Promise<string> => {
 	const fields = await db.fields(params.tableName);
-	console.log(fields);
 	for (const field of fields) {
 		if (
 			(field.Type.includes('int') || field.Type.includes('varchar') || field.Type == 'text') &&

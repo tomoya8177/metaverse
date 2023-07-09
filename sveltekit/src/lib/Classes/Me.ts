@@ -7,6 +7,8 @@ export class Me extends Unit {
 	constructor(userId: string) {
 		super(userId);
 		this.el.setAttribute('movement-controls', 'constrainToNavMesh: true;camera: #camera;');
+		this.el.setAttribute('touch-controls', '');
+		this.el.setAttribute('gamepad-controls', '');
 		//this.el.setAttribute('wasd-controls', '');
 		this.el.setAttribute('look-controls', '');
 		this.el.setAttribute('update-position', '');
