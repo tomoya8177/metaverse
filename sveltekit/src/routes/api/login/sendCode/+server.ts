@@ -24,7 +24,6 @@ export async function POST({ request }): Promise<Response> {
 
 	const result = await axios.post(`http://localhost:${port}/api/email`, {
 		to: user.email, // list of receivers
-		cc: 'imai@narra.jp',
 		subject: 'Confirmation Code', // Subject line
 		body: emailBody, // plain text emailBody
 		html: nl2br(emailBody) //

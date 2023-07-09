@@ -11,4 +11,7 @@ export type User = {
 	organizations?: Organization[];
 	userRoles?: UserRole[];
 	createdAt: string;
+	onMute: boolean;
+	onVideoMute: boolean;
+	onScreenShare: boolean;
 };

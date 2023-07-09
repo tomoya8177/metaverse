@@ -1,4 +1,6 @@
 <script lang="ts">
+	import SceneUIs from './SceneUIs.svelte';
+
 	import 'aframe';
 	import 'aframe-environment-component';
 	import 'aframe-extras';
@@ -11,36 +13,37 @@
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/Classes/Me';
 	import { Users } from '$lib/Classes/Users';
-	import { VideoChat } from '$lib/Classes/VideoChat';
-	let videoChat: VideoChat;
+
+	AFRAME.registerComponent('on-scene-loaded', {
+		init: function () {
+			console.log('scene loaded');
+			this.el.addEventListener('loaded', () => {
+				console.log('scene loaded');
+				//this.el.sceneEl?.enterVR();
+				onSceneLoaded();
+			});
+		}
+	});
+	let sceneLoaded = false;
+	const onSceneLoaded = () => {
+		const me = new Me($UserStore.id);
+		Users.add(me);
+		if ($UserStore.lastRoom === $EventStore.id && $UserStore.lastPosition) {
+			const lastPosition = JSON.parse($UserStore.lastPosition);
+			me.position = { ...lastPosition.position };
+			me.rotation = { ...lastPosition.rotation };
+			me.avatarURL =
+				$UserStore.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
+			//not setting nickname for Me
+			io.emit('position', { position: lastPosition.position, rotation: lastPosition.rotation });
+		}
+		sceneLoaded = true;
+		//me.twilioConnect($EventStore.id)
+	};
+
 	onMount(async () => {
-		console.log({ io });
-		console.log($UserStore.id);
 		io.emit('userId', $UserStore.id); // Send the message
 		io.emit('enterRoom', $EventStore.id); // Send the message
-		setTimeout(async () => {
-			const me = new Me($UserStore.id);
-			Users.add(me);
-			if ($UserStore.lastRoom === $EventStore.id && $UserStore.lastPosition) {
-				const lastPosition = JSON.parse($UserStore.lastPosition);
-				me.position = { ...lastPosition.position };
-				me.rotation = { ...lastPosition.rotation };
-				me.avatarURL =
-					$UserStore.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
-				//not setting nickname for Me
-				io.emit('position', { position: lastPosition.position, rotation: lastPosition.rotation });
-			}
-			//me.twilioConnect($EventStore.id);
-			//me.cometChat($EventStore, $UserStore.nickname);
-			videoChat = new VideoChat($EventStore, $UserStore.id);
-			if ($EventStore.allowAudio) {
-				await videoChat.connect($EventStore.allowVideo);
-				videoChat.enableAudio();
-				if ($EventStore.allowVideo) {
-					videoChat.enableVideo();
-				}
-			}
-		}, 1000);
 	});
 	io.on('userLeftRoom', (data) => {
 		if (data.from == $UserStore.id) return;
@@ -69,6 +72,7 @@
 		userUnit.nickname = user.nickname;
 		userUnit.avatarURL =
 			user.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
+		console.log('user in room', userUnit);
 		Users.add(userUnit);
 	});
 	io.on('position', (data: { from: string; position: { position: xyz; rotation: xyz } }) => {
@@ -80,14 +84,21 @@
 	});
 </script>
 
-<a-scene id="scene" renderer="gammaOutput: true">
+<a-scene
+	on-scene-loaded
+	renderer="colorManagement: true"
+	id="scene"
+	colorManagement="true"
+	vr-mode-ui="enabled: false"
+	ar-mode-ui="enabled: false"
+	cursor="rayOrigin: mouse"
+	raycaster="objects: .clickable"
+>
+	<a-assets />
 	<a-entity
 		environment="
         preset:forest;
-        shadow:true;
         ground:canyon;
-				skyColor:#ccf;
-				horizonColor:#fff;
         groundYScale:20
         "
 	/>
@@ -112,16 +123,6 @@
 		material="side: double;"
 	/>
 </a-scene>
-<div id="media-container">Medias</div>
-
-<style>
-	#media-container {
-		position: absolute;
-		top: 0;
-		right: 0;
-		width: 400px;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.5);
-		color: white;
-	}
-</style>
+{#if sceneLoaded}
+	<SceneUIs />
+{/if}

@@ -4,7 +4,8 @@ import {
 	EtherealHost,
 	MailerHost,
 	MailerUser,
-	MailerPassword
+	MailerPassword,
+	FROM_EMAIL
 } from '$env/static/private';
 import nodemailer from 'nodemailer';
 
@@ -35,13 +36,13 @@ export const POST = async ({ request }) => {
 		port: 465,
 		secure: true, // true for 465, false for other ports
 		auth: {
-			user: MailerUser, 
-			pass: MailerPassword 
+			user: MailerUser,
+			pass: MailerPassword
 		}
 	});
-	console.log('sending mail to', body.to)
+	console.log('sending mail to', body.to);
 	let info2 = await transporter2.sendMail({
-		from: 'imai@narra.jp', // sender address
+		from: FROM_EMAIL, // sender address
 		to: body.to, // list of receivers
 		cc: body.cc,
 		subject: body.subject, // Subject line

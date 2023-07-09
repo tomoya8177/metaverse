@@ -3,14 +3,9 @@
 	import { onMount } from 'svelte';
 	import axios from 'axios';
 	import { EventStore, UserStore } from '$lib/store';
-	import InputWithLabel from '../../Components/Molecules/InputWithLabel.svelte';
-	import { cookies } from '$lib/frontend/cookies';
 	import Login from '../../Components/Organisms/Login.svelte';
 	import { fade } from 'svelte/transition';
-	import Icon from '../../Components/Atom/Icon.svelte';
-	import { io } from '$lib/realtime';
 	import { checkLogin } from '$lib/frontend/checkLogin';
-	import ModalCloseButton from '../../Components/Atom/ModalCloseButton.svelte';
 	import Navigation from '../../Components/Organisms/Navigation.svelte';
 	import { Event } from '$lib/Classes/Event';
 	let loggedIn: boolean | null = null;

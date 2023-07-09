@@ -20,7 +20,7 @@
 
 <div class="field">
 	<label class="label">
-		{#if type != 'checkbox' && type!='switch'}
+		{#if type != 'checkbox' && type != 'switch'}
 			{label}
 		{/if}
 		{#if required}
@@ -64,3 +64,9 @@
 		</div>
 	</label>
 </div>
+
+<style>
+	.textarea {
+		margin-bottom: 0px;
+	}
+</style>

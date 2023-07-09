@@ -30,7 +30,7 @@
 			res
 		});
 		if (res.data.result) {
-			cookies.set('login', res.data.login);
+			cookies.set('login', res.data.login, { expires: 30 });
 			location.reload();
 		} else {
 			//wrong code
@@ -42,7 +42,7 @@
 		busy = false;
 	};
 	const onLoginClicked = async () => {
-		if(!email){
+		if (!email) {
 			alert('Please enter your email address');
 			return;
 		}

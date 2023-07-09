@@ -1,7 +1,9 @@
 import { writable } from 'svelte/store';
 import type { Event } from './Classes/Event';
+import { emptyUser } from './preset/EmptyUser';
 
 export const UserStore = writable({
+	...emptyUser,
 	id: '',
 	nickname: '',
 	email: '',
