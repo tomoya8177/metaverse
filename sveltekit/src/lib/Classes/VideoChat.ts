@@ -94,24 +94,8 @@ export class VideoChat {
 		this.room.on('participantConnected', (participant: RemoteParticipant) => {
 			console.log(`A remote Participant connected: ${participant}`);
 			const me = Users.find(this.userId);
-			participant.tracks.forEach((publication) => {
-				if (publication.isSubscribed && publication.track) {
-					handleRemoteTrackDisabled(publication.track);
-				}
-			});
 
-			participant.on('trackSubscribed', (track) => {
-				console.log('track subscribed', track);
-				if (track.kind === 'data') {
-					handleRemoteDataTrackSubscribed(track as RemoteDataTrack);
-				} else {
-					attachTrack(track as RemoteVideoTrack);
-				}
-			});
-			participant.on('trackUnsubscribed', (track) => {
-				detatchTrack(track);
-				console.log('track unsubscribed', track);
-			});
+			listenToSubscriptions(participant);
 		});
 
 		// Log your Client's LocalParticipant in the Room
@@ -120,19 +104,7 @@ export class VideoChat {
 		// Log any Participants already connected to the Room
 		this.room.participants.forEach((participant: RemoteParticipant) => {
 			console.log(`Participant "${participant.identity}" is connected to the Room`);
-
-			participant.on('trackSubscribed', (track) => {
-				console.log('track subscribed', track);
-				if (track.kind === 'data') {
-					handleRemoteDataTrackSubscribed(track as RemoteDataTrack);
-				} else {
-					attachTrack(track as RemoteVideoTrack);
-				}
-			});
-			participant.on('trackUnsubscribed', (track) => {
-				console.log('track unsubscribed', track);
-				detatchTrack(track);
-			});
+			listenToSubscriptions(participant);
 		});
 
 		this.room.on('participantDisconnected', (participant: RemoteParticipant) => {
@@ -165,10 +137,11 @@ export class VideoChat {
 		delete this.listeners[key];
 	}
 
-	async startMyAudio() {
+	async startMyAudio(): Promise<boolean> {
 		await this.createTrack('audio');
-		if (!this.audioTrack) return;
+		if (!this.audioTrack) return false;
 		const publication = await this.localParticipant.publishTrack(this.audioTrack);
+		return true;
 	}
 	async startShareScreen(): Promise<boolean> {
 		//create video track of screen from usermedia
@@ -222,45 +195,47 @@ export class VideoChat {
 }
 export const videoChat = new VideoChat();
 
-const handleRemoteDataTrackSubscribed = (track: RemoteDataTrack) => {
-	const me = Users.find(videoChat.userId);
-	videoChat.sendMessage({
-		key: 'handshake',
-		user: {
-			id: me.userId
-		},
-		position: me.position,
-		rotation: { ...me.rotation }
+const listenToSubscriptions = (participant: RemoteParticipant) => {
+	participant.on('trackSubscribed', (track) => {
+		handleRemoteTrackSubscribed(track as RemoteTrack);
 	});
-	track.on('message', (message: string) => {
-		if (typeof message !== 'string') return;
-		const parsed = JSON.parse(message);
-		videoChat.listeners[parsed.key]?.(parsed);
+	participant.on('trackUnsubscribed', (track) => {
+		console.log('track unsubscribed', track);
+		handleRemoteTrackUnsubscribed(track as RemoteTrack);
 	});
 };
 
-function handleRemoteTrackDisabled(track: RemoteTrack) {
-	console.log({ track }, 'disabled');
-	track.on('disabled', () => {
-		/* Hide the associated <video> element and show an avatar image. */
-		if (track.kind == 'video') {
-			alert('video muted');
-			if (track.name.includes('cameraOf')) {
-				const unit = Users.find(track.name.replace('cameraOf', ''));
-				if (!unit) return;
-				console.log('hiding camera');
-				unit.hideCamera();
-			}
-		}
-		if (track.kind == 'audio') {
-		}
-	});
-}
+const handleRemoteTrackUnsubscribed = (track: RemoteTrack) => {
+	if (track.kind === 'data') return;
+	detatchTrack(track as RemoteVideoTrack | RemoteAudioTrack);
+};
+
+const handleRemoteTrackSubscribed = (track: RemoteTrack) => {
+	if (track.kind === 'data') {
+		//for data
+		const me = Users.find(videoChat.userId);
+		if (!me) return;
+		videoChat.sendMessage({
+			key: 'handshake',
+			user: {
+				id: me.userId
+			},
+			position: me.position,
+			rotation: me.rotation
+		});
+		track.on('message', (message: string) => {
+			if (typeof message !== 'string') return;
+			const parsed = JSON.parse(message);
+			videoChat.listeners[parsed.key]?.(parsed);
+		});
+	} else {
+		//for video and audio
+		attachTrack(track as RemoteVideoTrack | RemoteAudioTrack);
+	}
+};
 
 function attachTrack(track: RemoteVideoTrack | RemoteAudioTrack) {
 	let container = document.querySelector('a-assets');
-
-	console.log({ track });
 	const el = track.attach();
 	el.id = track.sid;
 	container?.appendChild(el);

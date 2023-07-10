@@ -160,7 +160,7 @@ export class Unit {
 		audio.setAttribute('rotation', '0 180 0');
 		this.avatarContainer.appendChild(audio);
 	}
-	detatchAudio() {
+	detachAudio() {
 		const audio = document.querySelector('a-entity[sound]');
 		audio?.parentNode?.removeChild(audio);
 	}
