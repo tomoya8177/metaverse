@@ -30,3 +30,8 @@ export type xyz = {
 	y: number;
 	z: number;
 };
+export const FocusObjectStore = writable({
+	open: false,
+	el: null,
+	name: ''
+});

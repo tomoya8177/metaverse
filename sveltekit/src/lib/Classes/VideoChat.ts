@@ -22,6 +22,7 @@ import axios from 'axios';
 import { Users } from './Users';
 import type { Unit } from './Unit';
 import type { User } from '$lib/types/User';
+import { welcomeUnit } from '$lib/frontend/messageListeners';
 
 export class VideoChat {
 	userId: string = '';
@@ -94,8 +95,24 @@ export class VideoChat {
 		this.room.on('participantConnected', (participant: RemoteParticipant) => {
 			console.log(`A remote Participant connected: ${participant}`);
 			const me = Users.find(this.userId);
+			participant.tracks.forEach((publication) => {
+				if (publication.isSubscribed && publication.track) {
+					handleRemoteTrackDisabled(publication.track);
+				}
+			});
 
-			listenToSubscriptions(participant);
+			participant.on('trackSubscribed', (track) => {
+				console.log('track subscribed', track);
+				if (track.kind === 'data') {
+					handleRemoteDataTrackSubscribed(track as RemoteDataTrack);
+				} else {
+					attachTrack(track as RemoteVideoTrack);
+				}
+			});
+			participant.on('trackUnsubscribed', (track) => {
+				detatchTrack(track);
+				console.log('track unsubscribed', track);
+			});
 		});
 
 		// Log your Client's LocalParticipant in the Room
@@ -104,14 +121,27 @@ export class VideoChat {
 		// Log any Participants already connected to the Room
 		this.room.participants.forEach((participant: RemoteParticipant) => {
 			console.log(`Participant "${participant.identity}" is connected to the Room`);
-			listenToSubscriptions(participant);
+
+			participant.on('trackSubscribed', (track) => {
+				console.log('track subscribed', track);
+				if (track.kind === 'data') {
+					handleRemoteDataTrackSubscribed(track as RemoteDataTrack);
+				} else {
+					attachTrack(track as RemoteVideoTrack);
+				}
+			});
+			participant.on('trackUnsubscribed', (track) => {
+				console.log('track unsubscribed', track);
+				detatchTrack(track);
+			});
 		});
 
 		this.room.on('participantDisconnected', (participant: RemoteParticipant) => {
 			console.log(`Participant disconnected: ${participant.identity}`);
 			// Detach the local media elements
 			const unit = Users.find(participant.identity);
-			unit?.leave();
+			if (!unit) return;
+			unit.leave();
 			Users.remove(participant.identity);
 			participant.tracks.forEach((publication: RemoteTrackPublication) => {
 				if (!publication.track || publication.track.kind == 'data') return;
@@ -121,6 +151,7 @@ export class VideoChat {
 		});
 
 		this.room.on('disconnected', (room: Room) => {
+			alert('leaving');
 			//alert('someone left the room');
 			// Detach the local media elements
 			this.localParticipant.tracks.forEach((publication: LocalVideoTrackPublication) => {
@@ -137,13 +168,12 @@ export class VideoChat {
 		delete this.listeners[key];
 	}
 
-	async startMyAudio(): Promise<boolean> {
+	async startMyAudio() {
 		await this.createTrack('audio');
-		if (!this.audioTrack) return false;
+		if (!this.audioTrack) return;
 		const publication = await this.localParticipant.publishTrack(this.audioTrack);
-		return true;
 	}
-	async startShareScreen(): Promise<boolean> {
+	async startShareScreen(): Promise<false | string> {
 		//create video track of screen from usermedia
 		await this.createTrack('screen');
 		if (!this.screenTrack) {
@@ -152,22 +182,14 @@ export class VideoChat {
 		if (this.localParticipant.screenTrack) {
 			this.localParticipant.screenTrack.stop();
 		}
-		const localMediaContainer = document.getElementById('myScreenPreview');
-		const el = this.screenTrack.attach();
-		el.addEventListener('loadedmetadata', () => {
-			if (!this.screenTrack) {
-				return false;
-			}
-			console.log('loadedmetadata', this.screenTrack.dimensions);
-			if (!this.screenTrack.dimensions.height || !this.screenTrack.dimensions.width) return;
-			el.style.width = '8rem';
-			el.style.height =
-				(8 * this.screenTrack.dimensions.height) / this.screenTrack.dimensions.width + 'rem';
-		});
-		localMediaContainer?.appendChild(el);
 		const publication = await this.localParticipant.publishTrack(this.screenTrack);
+		const localMediaContainer = document.querySelector('a-assets');
+		const el = this.screenTrack.attach();
+		console.log(this.screenTrack);
+		el.id = publication.trackSid;
+		localMediaContainer?.appendChild(el);
 		console.log('Successfully published your screen:', publication);
-		return true;
+		return publication.trackSid;
 	}
 
 	async startMyVideo(): Promise<boolean> {
@@ -191,72 +213,80 @@ export class VideoChat {
 				publication.unpublish();
 			}
 		);
+		if (type == 'camera') {
+			const localMediaContainer = document.getElementById('myCameraPreview');
+			if (!localMediaContainer) return;
+			localMediaContainer.innerHTML = '';
+		}
 	}
 }
 export const videoChat = new VideoChat();
 
-const listenToSubscriptions = (participant: RemoteParticipant) => {
-	participant.on('trackSubscribed', (track) => {
-		handleRemoteTrackSubscribed(track as RemoteTrack);
+const handleRemoteDataTrackSubscribed = (track: RemoteDataTrack) => {
+	const me = Users.find(videoChat.userId);
+	videoChat.sendMessage({
+		key: 'handshake',
+		user: {
+			id: me.userId
+		},
+		position: me.position,
+		rotation: { ...me.rotation }
 	});
-	participant.on('trackUnsubscribed', (track) => {
-		console.log('track unsubscribed', track);
-		handleRemoteTrackUnsubscribed(track as RemoteTrack);
+	track.on('message', (message: string) => {
+		if (typeof message !== 'string') return;
+		const parsed = JSON.parse(message);
+		videoChat.listeners[parsed.key]?.(parsed);
 	});
 };
 
-const handleRemoteTrackUnsubscribed = (track: RemoteTrack) => {
-	if (track.kind === 'data') return;
-	detatchTrack(track as RemoteVideoTrack | RemoteAudioTrack);
-};
+function handleRemoteTrackDisabled(track: RemoteTrack) {
+	console.log({ track }, 'disabled');
+	track.on('disabled', () => {
+		/* Hide the associated <video> element and show an avatar image. */
+		if (track.kind == 'video') {
+			alert('video muted');
+			if (track.name.includes('cameraOf')) {
+				const unit = Users.find(track.name.replace('cameraOf', ''));
+				if (!unit) return;
+				console.log('hiding camera');
+				unit.hideCamera();
+			}
+		}
+		if (track.kind == 'audio') {
+		}
+	});
+}
 
-const handleRemoteTrackSubscribed = (track: RemoteTrack) => {
-	if (track.kind === 'data') {
-		//for data
-		const me = Users.find(videoChat.userId);
-		if (!me) return;
-		videoChat.sendMessage({
-			key: 'handshake',
-			user: {
-				id: me.userId
-			},
-			position: me.position,
-			rotation: me.rotation
-		});
-		track.on('message', (message: string) => {
-			if (typeof message !== 'string') return;
-			const parsed = JSON.parse(message);
-			videoChat.listeners[parsed.key]?.(parsed);
-		});
-	} else {
-		//for video and audio
-		attachTrack(track as RemoteVideoTrack | RemoteAudioTrack);
+const attachTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
+	let unit = Users.find(
+		track.name.replace('screenOf', '').replace('audioOf', '').replace('cameraOf', '')
+	);
+	if (!unit) {
+		console.log('oh no, no unit found');
+		unit = await welcomeUnit(
+			track.name.replace('screenOf', '').replace('audioOf', '').replace('cameraOf', '')
+		);
 	}
-};
-
-function attachTrack(track: RemoteVideoTrack | RemoteAudioTrack) {
+	console.log({ track });
 	let container = document.querySelector('a-assets');
+
 	const el = track.attach();
 	el.id = track.sid;
 	container?.appendChild(el);
-	const unit = Users.find(
-		track.name.replace('screenOf', '').replace('audioOf', '').replace('cameraOf', '')
-	);
-	if (!unit) return;
 	if (track.name.includes('cameraOf')) {
 		unit.showCamera(track as RemoteVideoTrack);
 	} else if (track.name.includes('screenOf')) {
 		el.addEventListener('loadedmetadata', () => {
+			console.log('metadata loaded');
 			if (!unit) return;
-			console.log({ track });
 
-			unit.showScreen(track as RemoteVideoTrack);
+			unit.showScreen(track as RemoteVideoTrack, track.sid);
 		});
 	} else if (track.name.includes('audioOf')) {
 		//assuming this is audio
 		unit.attachAudio(track as RemoteAudioTrack);
 	}
-}
+};
 function detatchTrack(track: RemoteTrack) {
 	console.log('detatching track', track);
 	const el = document.getElementById(track.sid);

@@ -5,7 +5,7 @@
 	import 'aframe-environment-component';
 	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, UserStore } from '$lib/store';
+	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 
 	import '$lib/AframeComponents';
@@ -16,6 +16,8 @@
 	import { escapeHTML } from '$lib/escapeHTML';
 	import { Users } from '$lib/Classes/Users';
 	import type { User } from '$lib/types/User';
+	import { editableObject } from '$lib/Classes/EditableObject';
+	import type { Me } from '$lib/Classes/Me';
 	let messages: Message[] = [];
 	let newMessagePinned = false;
 	let newMessageBody = '';
@@ -32,13 +34,20 @@
 			scrolToBottom(element);
 		}, 100);
 	};
-	onMount(async () => {
-		messages = await axios
-			.get('/api/messages?event=' + $EventStore.id + '&pinned=1')
-			.then((res) => res.data);
+	const loadMessages = async (existings: Message[] = []) => {
+		messages = [
+			...(await axios
+				.get('/api/messages?event=' + $EventStore.id + '&pinned=1')
+				.then((res) => res.data)),
+			...existings
+		].filter((thing, index, self) => self.findIndex((t) => t.id === thing.id) === index);
+		console.log({ messages });
 		authors = await axios
-			.get('/api/users?ids=in:' + messages.map((m) => m.user).join(','))
+			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
 			.then((res) => res.data);
+	};
+	onMount(async () => {
+		//loadMessages();
 		//onKeyDown
 		document.onkeydown = (e) => {
 			//check if any input has the focus
@@ -91,20 +100,22 @@
 		}, 100);
 	};
 	let textChatOpen = false;
-	$: {
+	$: trigger(textChatOpen);
+	const trigger = (textChatOpen: boolean) => {
 		if (textChatOpen) {
 			//focus on the textarea
+			loadMessages(messages);
 			setTimeout(() => {
 				const element = document.getElementById('chat-textarea')?.querySelector('textarea');
 				if (!element) {
-					console.log('not found');
 					return;
 				}
-				console.log('found');
 				element.focus();
 			}, 100);
 		}
-	}
+	};
+	let rotation = 0;
+	export let me: Me | null = null;
 </script>
 
 <div class="action-buttons">
@@ -161,8 +172,7 @@
 				class="circle-button"
 				on:click={() => {
 					videoChat.unpublishMyTrack('camera');
-
-					document.getElementById('myCameraPreview')?.children[0].remove();
+					me?.hideCamera();
 					$UserStore.onVideoMute = true;
 				}}
 			>
@@ -174,7 +184,7 @@
 				class="circle-button"
 				on:click={() => {
 					videoChat.unpublishMyTrack('screen');
-					document.getElementById('myScreenPreview')?.children[0].remove();
+					me?.hideScreen();
 					$UserStore.onScreenShare = false;
 				}}
 			>
@@ -185,8 +195,12 @@
 				class="circle-button dim"
 				on:click={async () => {
 					try {
-						if (await videoChat.startShareScreen()) {
-							$UserStore.onScreenShare = true;
+						const publicationTrackSid = await videoChat.startShareScreen();
+						if (publicationTrackSid) {
+							if (videoChat.screenTrack && me) {
+								me.showScreen(videoChat.screenTrack, publicationTrackSid);
+								$UserStore.onScreenShare = true;
+							}
 						}
 					} catch (e) {
 						console.log(e);
@@ -240,6 +254,60 @@
 		<div id="myScreenPreview" />
 	</div>
 </div>
+{#if $FocusObjectStore?.open}
+	<div class="editingPane">
+		<div style="display:flex">
+			<div style="flex:1">
+				{editableObject.name || ''}
+			</div>
+			<div>
+				<a
+					href={'#'}
+					on:click={() => {
+						$FocusObjectStore.open = false;
+					}}
+				>
+					<Icon icon="close" />
+				</a>
+			</div>
+		</div>
+		<InputWithLabel
+			label="Scale"
+			value={editableObject.scaleX || 1}
+			type="range"
+			step={0.1}
+			min={0.5}
+			max={2}
+			onChange={(e) => {
+				editableObject.onScaleUpdated();
+				editableObject.scaleX = 1;
+			}}
+			onInput={(e) => {
+				const value = Number(e.target.value);
+				editableObject.onScaleUpdate(value);
+			}}
+		/>
+
+		<InputWithLabel
+			label={`Rotation (${rotation})`}
+			value={editableObject.x}
+			type="range"
+			step={5}
+			min={-45}
+			max={45}
+			onChange={(e) => {
+				editableObject.onRotationUpdated();
+				editableObject.x = 0;
+				rotation = 0;
+			}}
+			onInput={(e) => {
+				const value = Number(e.target.value);
+				editableObject.onRotationUpdate(value);
+				rotation = value;
+			}}
+		/>
+	</div>
+{/if}
 
 <style>
 	.videoPreview {
@@ -290,5 +358,12 @@
 		background-color: rgba(0, 0, 0, 0.5);
 		color: white;
 		display: grid;
+	}
+	.editingPane {
+		padding: 0.4rem;
+		border-radius: 0.4rem;
+		position: absolute;
+		background: rgba(0, 0, 0, 0.5);
+		z-index: 100;
 	}
 </style>

@@ -1,7 +1,7 @@
 import { unescapeHTML } from '$lib/escapeHTML';
 import type { xyz } from '$lib/store';
 import type { Entity } from 'aframe';
-import type { RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
+import type { LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
 export class Unit {
 	userId: string;
 	el: Entity;
@@ -84,61 +84,32 @@ export class Unit {
 			text.parentNode?.removeChild(text);
 		}, Math.max(message.length * 500, 5000));
 	}
-	showCamera(track: RemoteVideoTrack) {
+	showCamera(track: RemoteVideoTrack | LocalVideoTrack) {
 		const video = document.createElement('a-circle');
 		video.setAttribute('material', 'src:#' + track.sid + ';shader:flat;side:double;');
 		video.setAttribute('id', 'cameraCircleOf' + this.userId);
 		video.setAttribute('position', '0 1.6 -0.3');
 		video.setAttribute('rotation', '0 180 0');
 		video.setAttribute('radius', '0.2');
-		video.setAttribute('dragndrop', '');
 		this.avatarContainer.appendChild(video);
 	}
-	showScreen(track: RemoteVideoTrack) {
-		console.log({ track });
+	showScreen(track: RemoteVideoTrack | LocalVideoTrack, sid: string) {
 		const video = document.createElement('a-plane');
 		video.setAttribute('side', 'double');
 		video.setAttribute('id', 'screenPlaneOf' + this.userId);
-		video.setAttribute('position', '0 2 -0.35');
-		video.setAttribute('rotation', '0 180 0');
+		video.setAttribute(
+			'position',
+			`${this.position.x} ${this.position.y + 1.5} ${this.position.z}`
+		);
+		video.setAttribute('rotation', `0 ${this.rotation.y + 180} 0`);
 		video.setAttribute('width', '1');
-		video.setAttribute('material', 'src:#' + track.sid + ';shader: flat; side:double');
-		console.log(track.dimensions);
+		console.log({ sid });
+		video.setAttribute('material', 'src:#' + sid + ';shader: flat; side:double');
+		video.setAttribute('editable-object', '');
 		if (track.dimensions?.width && track.dimensions?.height) {
 			video.setAttribute('height', (track.dimensions?.height / track.dimensions?.width).toString());
 		}
-		this.avatarContainer.appendChild(video);
-
-		const screenTransformer = document.createElement('a-entity');
-		for (let i = 0; i < 2; i++) {
-			const cone = document.createElement('a-cone');
-			const offsetter = document.createElement('a-entity');
-			const offsetAmount = Number(video.getAttribute('height')) / 2 + 0.2;
-			cone.setAttribute('color', 'yellow');
-			cone.setAttribute('position', '0 ' + offsetAmount + ' 0');
-			cone.setAttribute('radius-bottom', '0.1');
-			cone.setAttribute('radius-top', '0');
-			cone.setAttribute('height', '0.2');
-			cone.classList.add('clickable');
-			const direction = i ? 'down' : 'up';
-			cone.setAttribute('click-to-move-screen', 'direction:' + direction);
-			offsetter.appendChild(cone);
-
-			offsetter.setAttribute('rotation', '0 0 ' + i * 180);
-			screenTransformer.appendChild(offsetter);
-
-			const button = document.createElement('a-entity');
-			button.setAttribute('geometry', 'primitive:plane;width:0.3;height:0.15');
-			button.setAttribute('material', 'color:yellow;shader:flat;side:double;');
-			const text = i ? 'Shrink' : 'Enlarge';
-			button.setAttribute('text', 'value:' + text + '; width:1.2; align:center;color:black');
-			button.setAttribute('click-to-resize-screen', 'direction:' + direction);
-			button.classList.add('clickable');
-			const xOffset = i ? 0.3 : -0.3;
-			button.setAttribute('position', xOffset.toString() + ' ' + offsetAmount + ' 0');
-			screenTransformer.appendChild(button);
-		}
-		video.appendChild(screenTransformer);
+		scene.appendChild(video);
 	}
 	hideScreen() {
 		const video = document.getElementById('screenPlaneOf' + this.userId);

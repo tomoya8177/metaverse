@@ -11,11 +11,16 @@
 		| 'time'
 		| 'textarea'
 		| 'switch'
+		| 'range'
 		| 'select' = 'text';
 	export let selects: { name: string | undefined; value: string | number | undefined }[] = [];
 	export let disabled: boolean = false;
 	export let required: boolean = false;
 	export let onChange: () => void = () => {};
+	export let onInput: () => void = () => {};
+	export let step = 1;
+	export let min = 0;
+	export let max = 100;
 </script>
 
 <div class="field">
@@ -42,6 +47,17 @@
 				<input on:change={onChange} type="password" bind:value {disabled} />
 			{:else if type == 'textarea'}
 				<textarea on:change={onChange} class="textarea" bind:value {disabled} />
+			{:else if type == 'range'}
+				<input
+					type="range"
+					{min}
+					{step}
+					{max}
+					bind:value
+					id="range"
+					on:change={onChange}
+					on:input={onInput}
+				/>
 			{:else if type == 'checkbox'}
 				<label>
 					<input type="checkbox" bind:checked={value} {disabled} />

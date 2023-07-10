@@ -2,23 +2,19 @@
 	import 'aframe';
 	import 'aframe-environment-component';
 	import 'aframe-extras';
-	import { onMount } from 'svelte';
-	import { EventStore, RigStore, UserStore, type xyz } from '$lib/store';
-	import axios from 'axios';
-	import { Unit } from '$lib/Classes/Unit';
+	import { onDestroy, onMount } from 'svelte';
+	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/Classes/Me';
 	import { Users } from '$lib/Classes/Users';
 	import SceneUIs from '../../Components/Organisms/SceneUIs.svelte';
 	import { videoChat } from '$lib/Classes/VideoChat';
+	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
-			console.log('scene loaded');
 			this.el.addEventListener('loaded', () => {
-				console.log('scene loaded');
-				//this.el.sceneEl?.enterVR();
 				onSceneLoaded();
 			});
 		}
@@ -34,55 +30,37 @@
 			me.position = { ...lastPosition.position };
 			me.rotation = { ...lastPosition.rotation };
 			if (!me.avatarURL) {
-				//no avatar set
 			}
 			me.avatarURL =
 				$UserStore.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
-			//not setting nickname for Me
-			//io.emit('position', { position: lastPosition.position, rotation: lastPosition.rotation });
 		}
 		sceneLoaded = true;
 		//me.twilioConnect($EventStore.id)
 		videoChat.init($UserStore, $EventStore);
 		await videoChat.connect();
-
-		videoChat.listenTo('handshake', async (data) => {
-			console.log('received handshake', data);
-			const userUnit = await welcomeUnit(data.user.id);
-			if (!userUnit) return;
-			userUnit.position = data.position;
-			userUnit.rotation = data.rotation;
-		});
-		videoChat.listenTo('position', async (data) => {
-			let unit = Users.find(data.user.id);
-			if (!unit) {
-				console.log('position received, but no unit here');
-				unit = await welcomeUnit(data.user.id);
-			}
-			if (!unit) return;
-			unit.position = data.position;
-			unit.rotation = data.rotation;
-		});
-		videoChat.listenTo('updateProfile', (data) => {
-			const unit = Users.find(data.user.id);
-			if (!unit) return;
-			unit.nickname = data.nickname;
-		});
-	};
-	const welcomeUnit = async (unitId: string) => {
-		const unit = await axios.get('/api/users/' + unitId).then((res) => res.data);
-		console.log({ unit });
-		//let's check again before appending duplicate unit
-		if (Users.find(unit.id)) return Users.find(unit.id);
-		const userUnit = new Unit(unit.id);
-		userUnit.nickname = unit.nickname;
-		userUnit.avatarURL =
-			unit.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
-		Users.add(userUnit);
-		return userUnit;
+		messageListeners();
 	};
 
-	onMount(async () => {});
+	FocusObjectStore.subscribe((obj) => {
+		if (!obj.open) return;
+		setTimeout(() => {
+			const editingPane = document.querySelector('.editingPane') as HTMLElement;
+			if (!editingPane) return;
+			editingPane.style.left = mousePos.x + 'px';
+			editingPane.style.top = mousePos.y + 'px';
+		}, 100);
+	});
+	let mousePos = { x: 0, y: 0 };
+	const setMousePos = (e) => {
+		mousePos = { x: e.clientX, y: e.clientY };
+	};
+	onMount(async () => {
+		window.addEventListener('mouseup', setMousePos);
+	});
+	onDestroy(() => {
+		window.removeEventListener('mouseup', setMousePos);
+		messageUnlisteners();
+	});
 </script>
 
 <a-scene
@@ -93,9 +71,17 @@
 	vr-mode-ui="enabled: false"
 	ar-mode-ui="enabled: false"
 	cursor="rayOrigin: mouse"
-	raycaster="objects: .clickable"
 >
 	<a-assets />
+	<a-cursor raycaster="objects: .clickable" />
+	<a-plane
+		id="rayCatcher"
+		width="20"
+		height="20"
+		position="0 -100 0"
+		rotation="0 0 0"
+		visible="false"
+	/>
 	<a-entity
 		environment="
         preset:forest;
@@ -115,7 +101,9 @@
 		color="#7BC8A4"
 	/>
 	<a-plane
-		id="screenchare-container"
+		id="screenshare-container"
+		class="clickable"
+		editable-object
 		width="8"
 		height="6"
 		position="0 4 -10"
@@ -125,5 +113,5 @@
 	/>
 </a-scene>
 {#if sceneLoaded}
-	<SceneUIs />
+	<SceneUIs {me} />
 {/if}
