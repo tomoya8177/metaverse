@@ -2,7 +2,6 @@
 	import 'aframe';
 	import 'aframe-environment-component';
 	import 'aframe-extras';
-	import { io } from '$lib/realtime';
 	import { onMount } from 'svelte';
 	import { EventStore, RigStore, UserStore, type xyz } from '$lib/store';
 	import axios from 'axios';
@@ -22,21 +21,23 @@
 	import type { User } from '$lib/types/User';
 
 	export let message: Message;
-	export let onDelete: (id: number) => void;
-	let author: User;
+	export let onDelete: (id: string) => void;
+	export let author: User | null;
 	onMount(async () => {
-		author = await axios.get('/api/users/' + message.user).then((res) => res.data);
+		//author = await axios.get('/api/users/' + message.user).then((res) => res.data);
 	});
 </script>
 
 {#if message}
 	<div style="position:relative;display:flex;gap:0.1rem;margin-bottom:0.4rem">
 		<div style="flex:1">
-			<div style="font-size:0.9rem;">
-				<a>
-					{author?.nickname || ''}
-				</a>
-			</div>
+			{#if author}
+				<div style="font-size:0.9rem;">
+					<a>
+						{author.nickname || ''}
+					</a>
+				</div>
+			{/if}
 			{@html nl2br(message.body)}
 			<div style="font-size:0.7rem;text-align:right;width:100%">
 				{DateTime.fromISO(message.createdAt).setZone().toRelative()}
@@ -44,6 +45,7 @@
 		</div>
 
 		<a
+			href={'#'}
 			style:opacity={message.pinned ? 1 : 0.5}
 			on:click={async () => {
 				message = await axios
@@ -55,6 +57,7 @@
 		</a>
 		{#if message.user == $UserStore.id}
 			<a
+				href={'#'}
 				on:click={async () => {
 					await axios.delete('/api/messages/' + message.id);
 					onDelete(message.id);

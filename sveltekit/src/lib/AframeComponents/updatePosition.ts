@@ -1,5 +1,5 @@
 import { Users } from '$lib/Classes/Users';
-import { io } from '$lib/realtime';
+import { videoChat } from '$lib/Classes/VideoChat';
 import type { xyz } from '$lib/store';
 import 'aframe';
 AFRAME.registerComponent('update-position', {
@@ -25,11 +25,18 @@ AFRAME.registerComponent('update-position', {
 		) {
 			this.lastPosition = { ...this.me.position };
 			this.lastRotation = { ...this.me.rotation };
-			console.log('sending position');
-			io.emit('position', {
+			videoChat.sendMessage({
+				key: 'position',
+				user: {
+					id: this.me.userId
+				},
 				position: this.me.position,
 				rotation: { ...this.me.rotation }
 			});
+			// io.emit('position', {
+			// 	position: this.me.position,
+			// 	rotation: { ...this.me.rotation }
+			// });
 		}
 	}
 });

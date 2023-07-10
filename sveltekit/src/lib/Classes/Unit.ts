@@ -29,7 +29,6 @@ export class Unit {
 			text = document.createElement('a-text');
 			text.setAttribute('position', '0 2 0');
 			text.setAttribute('rotation', '0 180 0');
-			text.setAttribute('side', 'double');
 			text.setAttribute('align', 'center');
 			this.avatarContainer.appendChild(text);
 		}
@@ -151,9 +150,18 @@ export class Unit {
 	}
 	attachAudio(track: RemoteAudioTrack) {
 		const audio = document.createElement('a-entity');
-		audio.setAttribute('sound', 'src:#' + track.sid + ';autoplay:true;volume:0.5');
+		audio.setAttribute(
+			'sound',
+			'src:#' +
+				track.sid +
+				'; autoplay : true; volume : 1; refDistance : 3; rolloffFactor : 1; maxDistance : 20;'
+		);
 		audio.setAttribute('position', '0 1.5 0');
 		audio.setAttribute('rotation', '0 180 0');
 		this.avatarContainer.appendChild(audio);
+	}
+	detatchAudio() {
+		const audio = document.querySelector('a-entity[sound]');
+		audio?.parentNode?.removeChild(audio);
 	}
 }

@@ -4,7 +4,7 @@ export type User = {
 	id: string;
 	nickname: string;
 	email: string;
-	avatarURL: string;
+	avatarURL: string | null;
 	lastRoom: string;
 	lastPosition: string;
 	isAdmin: boolean;

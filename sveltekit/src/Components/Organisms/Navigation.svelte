@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { cookies } from '$lib/frontend/cookies';
-	import { io } from '$lib/realtime';
 	import { UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { fade } from 'svelte/transition';
 	import Icon from '../Atom/Icon.svelte';
+	import { videoChat } from '$lib/Classes/VideoChat';
 	export let title: string = '';
 	const onLogoutClicked = () => {
 		cookies.remove('login');
@@ -46,13 +46,19 @@
 		busy = false;
 		emailDialogOpen = false;
 	};
-	let newNickname = '';
+	let newNickname = $UserStore.nickname;
 	const onUpdateProfileDoClicked = async () => {
 		busy = true;
 		const res = await axios.put('/api/users/' + $UserStore.id, {
 			nickname: newNickname
 		});
-		io.emit('updateProfile', { nickname: newNickname, id: $UserStore.id });
+		$UserStore.nickname = newNickname;
+		//		io.emit('updateProfile', { nickname: newNickname, id: $UserStore.id });
+		videoChat.sendMessage({
+			key: 'updateProfile',
+			nickname: newNickname,
+			user: { id: $UserStore.id }
+		});
 
 		busy = false;
 		profileDialogOpen = false;

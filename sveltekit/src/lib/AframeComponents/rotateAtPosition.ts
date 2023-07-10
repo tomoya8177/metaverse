@@ -13,7 +13,6 @@ AFRAME.registerComponent('rotate-at-position', {
 			if (!model) return;
 			model.traverse((node) => {
 				if (node.name == 'Neck') {
-					console.log('neck found', node);
 					this.neck = node;
 				}
 			}, true);
