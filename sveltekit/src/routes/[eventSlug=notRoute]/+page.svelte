@@ -11,6 +11,7 @@
 	import SceneUIs from '../../Components/Organisms/SceneUIs.svelte';
 	import { videoChat } from '$lib/Classes/VideoChat';
 	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
+	import ProfileEditInputs from '../../Components/Organisms/ProfileEditInputs.svelte';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -20,6 +21,7 @@
 		}
 	});
 	let sceneLoaded = false;
+	let readyToConnect = false;
 	let me: Me | null = null;
 	const onSceneLoaded = async () => {
 		me = new Me($UserStore.id);
@@ -62,6 +64,21 @@
 	});
 </script>
 
+{#if !readyToConnect}
+	<dialog open>
+		<article>
+			<h3>Entering Room</h3>
+			<p>Make sure you are looking great!</p>
+			<ProfileEditInputs
+				label="Enter"
+				onUpdateDone={() => {
+					readyToConnect = true;
+				}}
+				user={$UserStore}
+			/>
+		</article>
+	</dialog>
+{/if}
 <a-scene
 	on-scene-loaded
 	renderer="colorManagement: true"

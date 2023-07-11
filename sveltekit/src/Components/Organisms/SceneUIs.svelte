@@ -118,8 +118,6 @@
 	export let me: Me | null = null;
 </script>
 
-<div id="media-container" />
-
 <div class="action-buttons">
 	<button data-tooltip="T" class="circle-button" on:click={onTextChatClicked}>
 		<Icon icon="chat" />

@@ -305,7 +305,6 @@ export const attachTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) =>
 
 	//let's return for now
 	//return;
-	if (!confirm('attach track?')) return;
 	if (track.name.includes('cameraOf')) {
 		unit.showCamera(track as RemoteVideoTrack);
 	} else if (track.name.includes('screenOf')) {

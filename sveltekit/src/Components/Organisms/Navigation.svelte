@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ProfileEditInputs from './ProfileEditInputs.svelte';
+
 	import { cookies } from '$lib/frontend/cookies';
 	import { UserStore } from '$lib/store';
 	import axios from 'axios';
@@ -126,10 +128,12 @@
 				}}
 			/>
 			<h3>Change Profile</h3>
-			<InputWithLabel label="Nickname" bind:value={newNickname} />
-			<button aria-busy={busy} on:click={() => onUpdateProfileDoClicked()} disabled={busy}>
-				Change
-			</button>
+			<ProfileEditInputs
+				user={$UserStore}
+				onUpdateDone={() => {
+					profileDialogOpen = false;
+				}}
+			/>
 		</article>
 	</dialog>
 {/if}
