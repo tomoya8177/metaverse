@@ -29,11 +29,11 @@
 			const lastPosition = JSON.parse($UserStore.lastPosition);
 			me.position = { ...lastPosition.position };
 			me.rotation = { ...lastPosition.rotation };
-			if (!me.avatarURL) {
-			}
-			me.avatarURL =
-				$UserStore.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		}
+		if (!me.avatarURL) {
+		}
+		me.avatarURL =
+			$UserStore.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		sceneLoaded = true;
 		//me.twilioConnect($EventStore.id)
 		videoChat.init($UserStore, $EventStore);

@@ -273,6 +273,10 @@ const attachTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
 	const el = track.attach();
 	el.id = track.sid;
 	container?.appendChild(el);
+
+	//let's return for now
+	//return;
+	if (!confirm('attach track?')) return;
 	if (track.name.includes('cameraOf')) {
 		unit.showCamera(track as RemoteVideoTrack);
 	} else if (track.name.includes('screenOf')) {
