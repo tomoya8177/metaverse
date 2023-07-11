@@ -118,6 +118,8 @@
 	export let me: Me | null = null;
 </script>
 
+<div id="media-container" />
+
 <div class="action-buttons">
 	<button data-tooltip="T" class="circle-button" on:click={onTextChatClicked}>
 		<Icon icon="chat" />
@@ -246,6 +248,9 @@
 		{/if}
 	</div>
 {/if}
+<div id="cameraPreviews">
+	<video class="remoteVideo" style="display:none" />
+</div>
 <div class="videoPreview">
 	<div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>
 		<div id="myCameraPreview" />
@@ -310,6 +315,29 @@
 {/if}
 
 <style>
+	#cameraPreviews {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 8rem;
+		display: flex;
+		flex-wrap: wrap;
+	}
+	.remoteVideo {
+		width: 8rem;
+		height: 8rem;
+		object-fit: cover;
+		border-radius: 1rem;
+		box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+	}
+	#media-container {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
 	.videoPreview {
 		position: absolute;
 		display: flex;
