@@ -33,12 +33,11 @@
 		if (!me.avatarURL) {
 		}
 		me.avatarURL =
-			$UserStore.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
+			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		sceneLoaded = true;
 		//me.twilioConnect($EventStore.id)
 		videoChat.init($UserStore, $EventStore);
 		await videoChat.connect();
-		messageListeners();
 	};
 
 	FocusObjectStore.subscribe((obj) => {

@@ -91,6 +91,8 @@ export class Unit {
 		video.setAttribute('position', '0 1.6 -0.3');
 		video.setAttribute('rotation', '0 180 0');
 		video.setAttribute('radius', '0.2');
+		video.classList.add('clickable');
+		video.setAttribute('click-to-refresh-video', '');
 		this.avatarContainer.appendChild(video);
 	}
 	showScreen(track: RemoteVideoTrack | LocalVideoTrack, sid: string) {

@@ -15,14 +15,32 @@ import {
 	createLocalAudioTrack,
 	LocalTrackPublication,
 	RemoteDataTrack,
-	RemoteTrackPublication
+	RemoteTrackPublication,
+	Participant
 } from 'twilio-video';
 import type { Event } from './Event';
 import axios from 'axios';
 import { Users } from './Users';
 import type { Unit } from './Unit';
 import type { User } from '$lib/types/User';
-import { welcomeUnit } from '$lib/frontend/messageListeners';
+import { messageListeners, welcomeUnit } from '$lib/frontend/messageListeners';
+import { UserStore } from '$lib/store';
+
+let user: User;
+UserStore.subscribe((u) => {
+	user = u;
+});
+
+const dataTrackPublished: {
+	promise: Promise<void>;
+	resolve?: () => void;
+	reject?: () => void;
+} = {};
+
+dataTrackPublished.promise = new Promise((resolve, reject) => {
+	dataTrackPublished.resolve = resolve;
+	dataTrackPublished.reject = reject;
+});
 
 export class VideoChat {
 	userId: string = '';
@@ -44,8 +62,10 @@ export class VideoChat {
 		this.audioOnly = !event.allowAudio || !event.allowVideo;
 	}
 	sendMessage(message: any) {
-		if (!this.dataTrack) return alert('not connected to room');
-		this.dataTrack.send(JSON.stringify(message));
+		dataTrackPublished.promise.then(() => {
+			if (!this.dataTrack) return alert('not connected to room');
+			this.dataTrack.send(JSON.stringify(message));
+		});
 	}
 	async createTrack(type: 'data' | 'audio' | 'video' | 'screen') {
 		switch (type) {
@@ -91,23 +111,40 @@ export class VideoChat {
 		});
 		this.localParticipant = this.room.localParticipant;
 		console.log(`Successfully joined a Room: ${this.room}`);
+		// Log your Client's LocalParticipant in the Room
+		console.log(`Connected to the Room as LocalParticipant "${this.localParticipant.identity}"`);
+		this.localParticipant.on('trackPublished', (publication) => {
+			console.log('some track published');
+			if (publication.track === this.dataTrack) {
+				console.log('data track published');
+				//only then,
+				dataTrackPublished.resolve();
+			}
+		});
 
+		this.localParticipant.on('trackPublicationFailed', (error, track) => {
+			if (track === this.dataTrack) {
+				console.log('data track publish failed');
+				dataTrackPublished.reject(error);
+			}
+		});
+		//new participant joined
 		this.room.on('participantConnected', (participant: RemoteParticipant) => {
 			console.log(`A remote Participant connected: ${participant}`);
-			const me = Users.find(this.userId);
-			participant.tracks.forEach((publication) => {
-				if (publication.isSubscribed && publication.track) {
-					handleRemoteTrackDisabled(publication.track);
-				}
-			});
 
 			participant.on('trackSubscribed', (track) => {
 				console.log('track subscribed', track);
 				if (track.kind === 'data') {
-					handleRemoteDataTrackSubscribed(track as RemoteDataTrack);
+					messageListeners();
+
+					this.setupDataTrackListener(track as RemoteDataTrack);
+					this.sendHandshake();
 				} else {
 					attachTrack(track as RemoteVideoTrack);
 				}
+			});
+			participant.on('trackSubscriptionFailed', (error, track) => {
+				console.error('Track subscription failed:', error);
 			});
 			participant.on('trackUnsubscribed', (track) => {
 				detatchTrack(track);
@@ -115,17 +152,15 @@ export class VideoChat {
 			});
 		});
 
-		// Log your Client's LocalParticipant in the Room
-		console.log(`Connected to the Room as LocalParticipant "${this.localParticipant.identity}"`);
-
 		// Log any Participants already connected to the Room
 		this.room.participants.forEach((participant: RemoteParticipant) => {
-			console.log(`Participant "${participant.identity}" is connected to the Room`);
-
+			console.log(`Participant "${participant.identity}" is in the Room`);
 			participant.on('trackSubscribed', (track) => {
 				console.log('track subscribed', track);
 				if (track.kind === 'data') {
-					handleRemoteDataTrackSubscribed(track as RemoteDataTrack);
+					messageListeners();
+					this.setupDataTrackListener(track as RemoteDataTrack);
+					this.sendHandshake();
 				} else {
 					attachTrack(track as RemoteVideoTrack);
 				}
@@ -166,6 +201,16 @@ export class VideoChat {
 	}
 	dontListenTo(key: string) {
 		delete this.listeners[key];
+	}
+	get tracks() {
+		//return all subscribed remote tracks
+		const tracks: RemoteTrack[] = [];
+		this.room.participants.forEach((participant) => {
+			participant.tracks.forEach((publication) => {
+				if (publication.track) tracks.push(publication.track);
+			});
+		});
+		return tracks;
 	}
 
 	async startMyAudio() {
@@ -219,53 +264,37 @@ export class VideoChat {
 			localMediaContainer.innerHTML = '';
 		}
 	}
+	sendHandshake = () => {
+		const me = Users.find(videoChat.userId);
+		console.log('sending handshake');
+		this.sendMessage({
+			key: 'handshake',
+			user,
+			position: me.position,
+			rotation: me.rotation
+		});
+	};
+	setupDataTrackListener = (track: RemoteDataTrack) => {
+		track.on('message', (message: string) => {
+			if (typeof message !== 'string') return;
+			try {
+				const parsed = JSON.parse(message);
+				this.listeners[parsed.key]?.(parsed);
+			} catch (e) {
+				console.log('error parsing message', message);
+			}
+		});
+	};
 }
 export const videoChat = new VideoChat();
 
-const handleRemoteDataTrackSubscribed = (track: RemoteDataTrack) => {
-	const me = Users.find(videoChat.userId);
-	videoChat.sendMessage({
-		key: 'handshake',
-		user: {
-			id: me.userId
-		},
-		position: me.position,
-		rotation: { ...me.rotation }
-	});
-	track.on('message', (message: string) => {
-		if (typeof message !== 'string') return;
-		const parsed = JSON.parse(message);
-		videoChat.listeners[parsed.key]?.(parsed);
-	});
-};
-
-function handleRemoteTrackDisabled(track: RemoteTrack) {
-	console.log({ track }, 'disabled');
-	track.on('disabled', () => {
-		/* Hide the associated <video> element and show an avatar image. */
-		if (track.kind == 'video') {
-			alert('video muted');
-			if (track.name.includes('cameraOf')) {
-				const unit = Users.find(track.name.replace('cameraOf', ''));
-				if (!unit) return;
-				console.log('hiding camera');
-				unit.hideCamera();
-			}
-		}
-		if (track.kind == 'audio') {
-		}
-	});
-}
-
-const attachTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
-	let unit = Users.find(
-		track.name.replace('screenOf', '').replace('audioOf', '').replace('cameraOf', '')
-	);
+export const attachTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
+	const userId = track.name.replace('screenOf', '').replace('audioOf', '').replace('cameraOf', '');
+	let unit = Users.find(userId);
 	if (!unit) {
 		console.log('oh no, no unit found');
-		unit = await welcomeUnit(
-			track.name.replace('screenOf', '').replace('audioOf', '').replace('cameraOf', '')
-		);
+		const user = await axios.get('/api/users/' + userId).then((res) => res.data);
+		unit = welcomeUnit(user);
 	}
 	console.log({ track });
 	let container = document.querySelector('a-assets');
@@ -291,21 +320,22 @@ const attachTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
 		unit.attachAudio(track as RemoteAudioTrack);
 	}
 };
-function detatchTrack(track: RemoteTrack) {
+export const detatchTrack = (track: RemoteTrack) => {
 	console.log('detatching track', track);
 	const el = document.getElementById(track.sid);
 	if (el) el.remove();
 	const unit = Users.find(
 		track.name.replace('cameraOf', '').replace('screenOf', '').replace('audioOf', '')
 	);
+	if (!unit) {
+		console.log('oh no, no unit found');
+		return;
+	}
 	if (track.name.includes('cameraOf')) {
-		if (!unit) return;
 		unit.hideCamera();
 	} else if (track.name.includes('screenOf')) {
-		if (!unit) return;
 		unit.hideScreen();
 	} else if (track.name.includes('audioOf')) {
-		if (!unit) return;
 		unit.detachAudio();
 	}
-}
+};

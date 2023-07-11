@@ -1,7 +1,11 @@
 import { Users } from '$lib/Classes/Users';
 import { videoChat } from '$lib/Classes/VideoChat';
-import type { xyz } from '$lib/store';
+import { UserStore, type xyz } from '$lib/store';
 import 'aframe';
+let user: User;
+UserStore.subscribe((u) => {
+	user = u;
+});
 AFRAME.registerComponent('update-position', {
 	init: function () {
 		this.me = Users.find(this.el.id);
@@ -27,9 +31,7 @@ AFRAME.registerComponent('update-position', {
 			this.lastRotation = { ...this.me.rotation };
 			videoChat.sendMessage({
 				key: 'position',
-				user: {
-					id: this.me.userId
-				},
+				user,
 				position: this.me.position,
 				rotation: { ...this.me.rotation }
 			});

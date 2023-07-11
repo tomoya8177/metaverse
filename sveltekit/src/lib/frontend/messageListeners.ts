@@ -1,11 +1,13 @@
 import { Unit } from '$lib/Classes/Unit';
 import { Users } from '$lib/Classes/Users';
 import { videoChat } from '$lib/Classes/VideoChat';
+import type { User } from '$lib/types/User';
 import axios from 'axios';
 
 export const messageListeners = () => {
 	videoChat.listenTo('handshake', async (data) => {
-		const userUnit = await welcomeUnit(data.user.id);
+		console.log('handshale received from ', data.user.nickname);
+		const userUnit = welcomeUnit(data.user);
 		if (!userUnit) return;
 		userUnit.position = data.position;
 		userUnit.rotation = data.rotation;
@@ -13,9 +15,9 @@ export const messageListeners = () => {
 	videoChat.listenTo('position', async (data) => {
 		let unit = Users.find(data.user.id);
 		if (!unit) {
-			unit = await welcomeUnit(data.user.id);
+			unit = welcomeUnit(data.user);
 		}
-		if (!unit) return;
+		if (!unit) return; // lets return until unit handshake complete
 		unit.position = data.position;
 		unit.rotation = data.rotation;
 	});
@@ -33,15 +35,15 @@ export const messageListeners = () => {
 	});
 };
 
-export const welcomeUnit = async (unitId: string): Promise<Unit> => {
-	const unit = await axios.get('/api/users/' + unitId).then((res) => res.data);
-	console.log({ unit });
-	//let's check again before appending duplicate unit
-	if (Users.find(unit.id)) return Users.find(unit.id);
-	const userUnit = new Unit(unit.id);
-	userUnit.nickname = unit.nickname;
+export const welcomeUnit = (user: User): Unit => {
+	const ifExisting = Users.find(user.id);
+	if (ifExisting) {
+		return ifExisting;
+	}
+	const userUnit = new Unit(user.id);
+	userUnit.nickname = user.nickname;
 	userUnit.avatarURL =
-		unit.avatarURL || 'preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
+		user.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 	Users.add(userUnit);
 	return userUnit;
 };
