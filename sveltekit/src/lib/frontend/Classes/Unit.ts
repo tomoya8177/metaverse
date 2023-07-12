@@ -144,7 +144,8 @@ export class Unit {
 				video.setAttribute('scale', parsedComponents.scale);
 			}
 		}
-		scene.appendChild(video);
+		const scene: Entity = document.querySelector('a-scene');
+		scene?.appendChild(video);
 	}
 	hideScreen() {
 		const video = document.getElementById('screenPlaneOf' + this.userId);
