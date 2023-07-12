@@ -1,25 +1,16 @@
 <script lang="ts">
-	import ChatBox from './ChatBox.svelte';
-
-	import TextChatMessage from '../Molecules/TextChatMessage.svelte';
+	import AudioButton from './AudioButton.svelte';
 
 	import 'aframe';
 	import 'aframe-environment-component';
 	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
-	import axios from 'axios';
+	import { EventStore, UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
-	import { videoChat } from '$lib/Classes/VideoChat';
-	import type { Message } from '$lib/Classes/Message';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
-	import { escapeHTML } from '$lib/escapeHTML';
-	import { Users } from '$lib/Classes/Users';
-	import type { User } from '$lib/types/User';
-	import { editableObject } from '$lib/Classes/EditableObject';
-	import type { Me } from '$lib/Classes/Me';
+	import type { Me } from '$lib/frontend/Classes/Me';
+	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	export let textChatOpen = false;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
@@ -59,32 +50,7 @@
 	<Icon icon="chat" />
 </button>
 {#if $EventStore.allowAudio}
-	{#if $UserStore.onMute}
-		<button
-			class="circle-button dim"
-			on:click={async () => {
-				try {
-					await videoChat.startMyAudio();
-					$UserStore.onMute = false;
-				} catch (e) {
-					console.log(e);
-					alert(`Couldn't get access to the microphone.`);
-				}
-			}}
-		>
-			<Icon icon="mic_off" />
-		</button>
-	{:else}
-		<button
-			class="circle-button"
-			on:click={() => {
-				videoChat.unpublishMyTrack('audio');
-				$UserStore.onMute = true;
-			}}
-		>
-			<Icon icon="mic" />
-		</button>
-	{/if}
+	<AudioButton />
 {/if}
 {#if $EventStore.allowVideo}
 	{#if $UserStore.onVideoMute}

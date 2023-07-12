@@ -1,7 +1,7 @@
-import { Users } from '$lib/Classes/Users';
 import axios from 'axios';
 import { welcomeUnit } from './messageListeners';
 import type { RemoteAudioTrack, RemoteTrack, RemoteVideoTrack } from 'twilio-video';
+import { Users } from './Classes/Users';
 
 export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
 	const remoteUserId = track.name

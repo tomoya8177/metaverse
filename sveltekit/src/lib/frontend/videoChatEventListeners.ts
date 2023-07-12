@@ -10,9 +10,9 @@ import type {
 	Room
 } from 'twilio-video';
 import { messageListeners } from './messageListeners';
-import { videoChat } from '$lib/Classes/VideoChat';
-import { Users } from '$lib/Classes/Users';
 import { attachRemoteTrack, detatchTrack } from './videoChatTrackAttacher';
+import { Users } from './Classes/Users';
+import { videoChat } from './Classes/VideoChat';
 
 export const onNewParticipantConnected = (room: Room) => {
 	room.on('participantConnected', (participant: RemoteParticipant) => {

@@ -55,6 +55,7 @@ export class VideoChat {
 	audioPingInterval: any;
 	cameraPingInterval: any;
 	screenPingInterval: any;
+	connected: boolean = false;
 	constructor() {
 		//do nothing,
 	}
@@ -115,6 +116,7 @@ export class VideoChat {
 			tracks: [this.dataTrack]
 		});
 		this.localParticipant = this.room.localParticipant;
+		this.connected = true;
 		// Log your Client's LocalParticipant in the Room
 		this.localParticipant.on('trackPublished', (publication: LocalTrackPublication) => {
 			if (publication.track === this.dataTrack) {

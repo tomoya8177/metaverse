@@ -12,17 +12,30 @@
 	import axios from 'axios';
 
 	import '$lib/AframeComponents';
-	import { videoChat } from '$lib/Classes/VideoChat';
-	import type { Message } from '$lib/Classes/Message';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
-	import { escapeHTML } from '$lib/escapeHTML';
-	import { Users } from '$lib/Classes/Users';
 	import type { User } from '$lib/types/User';
-	import { editableObject } from '$lib/Classes/EditableObject';
-	import type { Me } from '$lib/Classes/Me';
+	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
+	import type { Message } from '$lib/frontend/Classes/Message';
+	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	import { Users } from '$lib/frontend/Classes/Users';
+	import { editableObject } from '$lib/frontend/Classes/EditableObject';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
+	};
+	let messages: Message[] = [];
+	let authors: User[] = [];
+	const loadMessages = async (existings: Message[] = []) => {
+		messages = [
+			...(await axios
+				.get('/api/messages?event=' + $EventStore.id + '&pinned=1')
+				.then((res) => res.data)),
+			...existings
+		].filter((thing, index, self) => self.findIndex((t) => t.id === thing.id) === index);
+		console.log({ messages });
+		authors = await axios
+			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
+			.then((res) => res.data);
 	};
 	const onTextChatClicked = () => {
 		textChatOpen = !textChatOpen;
@@ -45,11 +58,35 @@
 			onTextChatClicked();
 		}
 	};
+	const scrollChatToBottom = () => {
+		const element = document.querySelector('.chat-box > div');
+		console.log({ element });
+		if (!element) return;
+		scrollToBottom(element);
+	};
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
+		loadMessages(messages);
+		videoChat.listenTo('textMessage', async (data) => {
+			console.log('received textMessage', data);
+			messages = [...messages, data];
+			const existingAuthor = authors.find((a) => a.id === data.user);
+			if (!existingAuthor) {
+				const author = await axios.get(`/api/users/${data.user}`).then((res) => res.data);
+				authors = [...authors, author];
+			}
+			if (data.user !== $UserStore.id) {
+				const unit = Users.find(data.user);
+				if (unit) unit.say(data.body);
+			}
+			setTimeout(() => {
+				scrollChatToBottom();
+			}, 100);
+		});
 	});
 	onDestroy(() => {
 		document.removeEventListener('keydown', onKeyDown);
+		videoChat.dontListenTo('textMessage');
 	});
 
 	let textChatOpen = false;
@@ -127,44 +164,6 @@
 {/if}
 
 <style>
-	#cameraPreviews {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 8rem;
-		display: flex;
-		flex-wrap: wrap;
-	}
-	.remoteVideo {
-		width: 8rem;
-		height: 8rem;
-		object-fit: cover;
-		border-radius: 1rem;
-		box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
-	}
-	#media-container {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-	}
-	.videoPreview {
-		position: absolute;
-		display: flex;
-		gap: 0.8rem;
-		bottom: 6rem;
-		right: 1rem;
-		position: absolute;
-		box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
-		width: 8rem;
-		height: 8rem;
-		border-radius: 50%;
-		overflow: hidden;
-		align-self: center;
-	}
-
 	.action-buttons {
 		position: absolute;
 		bottom: 1rem;

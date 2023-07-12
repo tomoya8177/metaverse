@@ -10,6 +10,7 @@
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { onMount } from 'svelte';
 	import { Users } from '$lib/frontend/Classes/Users';
+	import { fade } from 'svelte/transition';
 	export let onUpdateDone: () => void;
 	export let me: Me;
 	let busy = false;
@@ -37,6 +38,7 @@
 	};
 	export let user: User;
 	export let label: string = 'Update';
+	let avatarSelectOpen = false;
 </script>
 
 <InputWithLabel label="Nickname" bind:value={user.nickname} />
@@ -48,21 +50,29 @@
 		{/key}
 	{/if}
 </div>
-Choose Avatar
-<figure>
-	<div style="display:flex;gap:0.2rem;">
-		{#each PresetAvatars as avatar}
-			<div style="width:180px">
-				<img src={avatar.thumbnailURL} />
-				<button
-					on:click={() => {
-						$UserStore.avatarURL = avatar.url;
-					}}>Select</button
-				>
-			</div>
-		{/each}
-	</div>
-</figure>
+<button
+	on:click={() => {
+		avatarSelectOpen = !avatarSelectOpen;
+	}}>{avatarSelectOpen ? 'OK' : 'Change Avatar'}</button
+>
+
+{#if avatarSelectOpen}
+	<figure transition:fade>
+		<div style="display:flex;gap:0.2rem;">
+			{#each PresetAvatars as avatar}
+				<div style="width:180px">
+					<img src={avatar.thumbnailURL} alt="" />
+					<button
+						on:click={() => {
+							$UserStore.avatarURL = avatar.url;
+						}}>Select</button
+					>
+				</div>
+			{/each}
+		</div>
+	</figure>
+{/if}
+<slot />
 <button aria-busy={busy} on:click={() => onUpdateProfileDoClicked()} disabled={busy}>
 	{label}
 </button>

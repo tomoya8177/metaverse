@@ -12,6 +12,7 @@
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
 	import ProfileEditInputs from '../../Components/Organisms/ProfileEditInputs.svelte';
+	import AudioButton from '../../Components/Organisms/AudioButton.svelte';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -34,8 +35,6 @@
 			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		sceneLoaded = true;
 		//me.twilioConnect($EventStore.id)
-		videoChat.init($UserStore, $EventStore);
-		await videoChat.connect();
 	};
 
 	FocusObjectStore.subscribe((obj) => {
@@ -68,11 +67,19 @@
 			<ProfileEditInputs
 				{me}
 				label="Enter"
-				onUpdateDone={() => {
+				onUpdateDone={async () => {
 					readyToConnect = true;
+					if (!videoChat.connected) {
+						videoChat.init($UserStore, $EventStore);
+						await videoChat.connect();
+					}
 				}}
 				user={$UserStore}
-			/>
+			>
+				<div>Audio</div>
+				Your Audio is {#if $UserStore.onMute}Muted{:else}On{/if}
+				<AudioButton />
+			</ProfileEditInputs>
 		</article>
 	</dialog>
 {/if}
