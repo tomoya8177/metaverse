@@ -1,4 +1,4 @@
-import { attachTrack, detatchTrack, videoChat } from '$lib/Classes/VideoChat';
+import { attachTrack, detatchTrack, videoChat } from '$lib/frontend/Classes/VideoChat';
 import 'aframe';
 import type { RemoteVideoTrack } from 'twilio-video';
 

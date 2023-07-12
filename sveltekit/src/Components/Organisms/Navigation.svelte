@@ -8,7 +8,7 @@
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { fade } from 'svelte/transition';
 	import Icon from '../Atom/Icon.svelte';
-	import { videoChat } from '$lib/Classes/VideoChat';
+	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	export let title: string = '';
 	const onLogoutClicked = () => {
 		cookies.remove('login');

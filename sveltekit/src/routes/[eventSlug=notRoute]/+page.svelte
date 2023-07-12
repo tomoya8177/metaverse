@@ -6,10 +6,10 @@
 	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
-	import { Me } from '$lib/Classes/Me';
-	import { Users } from '$lib/Classes/Users';
+	import { Me } from '$lib/frontend/Classes/Me';
+	import { Users } from '$lib/frontend/Classes/Users';
 	import SceneUIs from '../../Components/Organisms/SceneUIs.svelte';
-	import { videoChat } from '$lib/Classes/VideoChat';
+	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
 	import ProfileEditInputs from '../../Components/Organisms/ProfileEditInputs.svelte';
 
@@ -27,11 +27,7 @@
 		me = new Me($UserStore.id);
 		console.log({ me });
 		Users.add(me);
-		if ($UserStore.lastRoom === $EventStore.id && $UserStore.lastPosition) {
-			const lastPosition = JSON.parse($UserStore.lastPosition);
-			me.position = { ...lastPosition.position };
-			me.rotation = { ...lastPosition.rotation };
-		}
+		await me.setLastPosition($EventStore);
 		if (!me.avatarURL) {
 		}
 		me.avatarURL =
@@ -70,6 +66,7 @@
 			<h3>Entering Room</h3>
 			<p>Make sure you are looking great!</p>
 			<ProfileEditInputs
+				{me}
 				label="Enter"
 				onUpdateDone={() => {
 					readyToConnect = true;

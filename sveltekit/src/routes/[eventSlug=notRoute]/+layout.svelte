@@ -7,7 +7,7 @@
 	import { fade } from 'svelte/transition';
 	import { checkLogin } from '$lib/frontend/checkLogin';
 	import Navigation from '../../Components/Organisms/Navigation.svelte';
-	import { Event } from '$lib/Classes/Event';
+	import { Event } from '$lib/frontend/Classes/Event';
 	let loggedIn: boolean | null = null;
 	let event: any = null;
 	let noEvent = false;

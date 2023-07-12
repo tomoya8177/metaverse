@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
-	import { Event } from '$lib/Classes/Event';
+	import { Event } from '$lib/frontend/Classes/Event';
 	import axios from 'axios';
 	import ModalCloseButton from '../../../Components/Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';

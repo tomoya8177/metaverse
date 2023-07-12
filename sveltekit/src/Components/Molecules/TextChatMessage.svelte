@@ -5,19 +5,19 @@
 	import { onMount } from 'svelte';
 	import { EventStore, RigStore, UserStore, type xyz } from '$lib/store';
 	import axios from 'axios';
-	import { Unit } from '$lib/Classes/Unit';
+	import { Unit } from '$lib/frontend/Classes/Unit';
 
 	import '$lib/AframeComponents';
-	import { Me } from '$lib/Classes/Me';
-	import { Users } from '$lib/Classes/Users';
-	import { VideoChat } from '$lib/Classes/VideoChat';
+	import { Me } from '$lib/frontend/Classes/Me';
+	import { Users } from '$lib/frontend/Classes/Users';
+	import { VideoChat } from '$lib/frontend/Classes/VideoChat';
 	import { nl2br } from '$lib/frontend/nl2br';
-	import type { Message } from '$lib/Classes/Message';
+	import type { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import InputWithLabel from './InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
 	import { fade, slide } from 'svelte/transition';
-	import { escapeHTML } from '$lib/escapeHTML';
+	import { escapeHTML } from '$lib/math/escapeHTML';
 	import type { User } from '$lib/types/User';
 
 	export let message: Message;

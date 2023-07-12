@@ -9,35 +9,23 @@
 	import axios from 'axios';
 
 	import '$lib/AframeComponents';
-	import { videoChat } from '$lib/Classes/VideoChat';
-	import type { Message } from '$lib/Classes/Message';
+	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	import type { Message } from '$lib/frontend/Classes/Message';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
-	import { escapeHTML } from '$lib/escapeHTML';
-	import { Users } from '$lib/Classes/Users';
+	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { Users } from '$lib/frontend/Classes/Users';
 	import type { User } from '$lib/types/User';
-	import { editableObject } from '$lib/Classes/EditableObject';
-	import type { Me } from '$lib/Classes/Me';
-	let messages: Message[] = [];
+	import { editableObject } from '$lib/frontend/Classes/EditableObject';
+	import type { Me } from '$lib/frontend/Classes/Me';
+	export let messages: Message[] = [];
 	let newMessagePinned = false;
 	let newMessageBody = '';
-	let authors: User[] = [];
+	export let authors: User[] = [];
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
 
-	const loadMessages = async (existings: Message[] = []) => {
-		messages = [
-			...(await axios
-				.get('/api/messages?event=' + $EventStore.id + '&pinned=1')
-				.then((res) => res.data)),
-			...existings
-		].filter((thing, index, self) => self.findIndex((t) => t.id === thing.id) === index);
-		console.log({ messages });
-		authors = await axios
-			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
-			.then((res) => res.data);
-	};
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (document.activeElement?.tagName === 'TEXTAREA' && e.key === 'Enter' && e.shiftKey) {
 			onMessageSendClicked();
@@ -45,22 +33,12 @@
 		}
 	};
 	onMount(async () => {
-		loadMessages();
+		//loadMessages();
 		//onKeyDown
 		document.addEventListener('keydown', onKeyDown);
-		videoChat.listenTo('textMessage', (data) => {
-			console.log('received textMessage', data);
-			messages = [...messages, data];
-			if (data.user !== $UserStore.id) {
-				const unit = Users.find(data.user);
-				if (!unit) return;
-				unit.say(data.body);
-			}
-		});
 	});
 	onDestroy(() => {
 		document.removeEventListener('keydown', onKeyDown);
-		videoChat.dontListenTo('textMessage');
 	});
 
 	const onMessageSendClicked = async () => {

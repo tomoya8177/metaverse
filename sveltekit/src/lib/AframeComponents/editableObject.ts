@@ -1,5 +1,5 @@
-import { editableObject } from '$lib/Classes/EditableObject';
-import { videoChat } from '$lib/Classes/VideoChat';
+import { editableObject } from '$lib/frontend/Classes/EditableObject';
+import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { FocusObjectStore, UserStore } from '$lib/store';
 import 'aframe';
 import { scale } from 'svelte/transition';

@@ -1,5 +1,5 @@
-import { Users } from '$lib/Classes/Users';
-import { videoChat } from '$lib/Classes/VideoChat';
+import { Users } from '$lib/frontend/Classes/Users';
+import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { UserStore, type xyz } from '$lib/store';
 import 'aframe';
 let user: User;

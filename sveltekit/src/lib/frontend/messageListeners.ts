@@ -1,6 +1,6 @@
-import { Unit } from '$lib/Classes/Unit';
-import { Users } from '$lib/Classes/Users';
-import { videoChat } from '$lib/Classes/VideoChat';
+import { Unit } from '$lib/frontend/Classes/Unit';
+import { Users } from '$lib/frontend/Classes/Users';
+import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import type { User } from '$lib/types/User';
 import axios from 'axios';
 
@@ -25,6 +25,7 @@ export const messageListeners = () => {
 		const unit = Users.find(data.user.id);
 		if (!unit) return;
 		unit.nickname = data.nickname;
+		unit.avatarURL = data.avatarURL;
 	});
 	videoChat.listenTo('objectPosition', (data) => {
 		const object = document.getElementById(data.object.id);

@@ -11,25 +11,42 @@
 	import axios from 'axios';
 
 	import '$lib/AframeComponents';
-	import { videoChat } from '$lib/Classes/VideoChat';
-	import type { Message } from '$lib/Classes/Message';
+	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	import type { Message } from '$lib/frontend/Classes/Message';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
-	import { escapeHTML } from '$lib/escapeHTML';
-	import { Users } from '$lib/Classes/Users';
+	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { Users } from '$lib/frontend/Classes/Users';
 	import type { User } from '$lib/types/User';
-	import { editableObject } from '$lib/Classes/EditableObject';
-	import type { Me } from '$lib/Classes/Me';
-	const scrolToBottom = (element: Element) => {
-		element.scrollTop = element.scrollHeight;
+	import { editableObject } from '$lib/frontend/Classes/EditableObject';
+	import type { Me } from '$lib/frontend/Classes/Me';
+	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
+
+	let messages: Message[] = [];
+	let authors: User[] = [];
+	const loadMessages = async (existings: Message[] = []) => {
+		messages = [
+			...(await axios
+				.get('/api/messages?event=' + $EventStore.id + '&pinned=1')
+				.then((res) => res.data)),
+			...existings
+		].filter((thing, index, self) => self.findIndex((t) => t.id === thing.id) === index);
+		console.log({ messages });
+		authors = await axios
+			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
+			.then((res) => res.data);
+	};
+	const scrollChatToBottom = () => {
+		const element = document.querySelector('.chat-box > div');
+		console.log({ element });
+		if (!element) return;
+		scrollToBottom(element);
 	};
 	const onTextChatClicked = () => {
 		textChatOpen = !textChatOpen;
 		if (!textChatOpen) return;
 		setTimeout(() => {
-			const element = document.querySelector('.chat-box > div');
-			if (!element) return;
-			scrolToBottom(element);
+			scrollChatToBottom();
 		}, 100);
 	};
 
@@ -46,9 +63,27 @@
 	};
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
+		loadMessages(messages);
+		videoChat.listenTo('textMessage', async (data) => {
+			console.log('received textMessage', data);
+			messages = [...messages, data];
+			const existingAuthor = authors.find((a) => a.id === data.user);
+			if (!existingAuthor) {
+				const author = await axios.get(`/api/users/${data.user}`).then((res) => res.data);
+				authors = [...authors, author];
+			}
+			if (data.user !== $UserStore.id) {
+				const unit = Users.find(data.user);
+				if (unit) unit.say(data.body);
+			}
+			setTimeout(() => {
+				scrollChatToBottom();
+			}, 100);
+		});
 	});
 	onDestroy(() => {
 		document.removeEventListener('keydown', onKeyDown);
+		videoChat.dontListenTo('textMessage');
 	});
 
 	let textChatOpen = false;
@@ -153,7 +188,7 @@
 	{/if}
 </div>
 {#if textChatOpen}
-	<ChatBox />
+	<ChatBox bind:messages bind:authors />
 {/if}
 <div id="cameraPreviews">
 	<video class="remoteVideo" style="display:none" />
@@ -195,6 +230,7 @@
 				editableObject.scaleX = 1;
 			}}
 			onInput={(e) => {
+				if (!e.target) return;
 				const value = Number(e.target.value);
 				editableObject.onScaleUpdate(value);
 			}}
@@ -213,6 +249,7 @@
 				rotation = 0;
 			}}
 			onInput={(e) => {
+				if (!e.target) return;
 				const value = Number(e.target.value);
 				editableObject.onRotationUpdate(value);
 				rotation = value;
@@ -238,13 +275,7 @@
 		border-radius: 1rem;
 		box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
 	}
-	#media-container {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 100%;
-	}
+
 	.videoPreview {
 		position: absolute;
 		display: flex;
@@ -281,19 +312,7 @@
 		display: flex;
 		gap: 0.4rem;
 	}
-	.chat-box {
-		max-height: calc(100vh - 9rem);
-		overflow: auto;
-		width: 26rem;
-		position: absolute;
-		padding: 1rem;
-		border-radius: 1rem;
-		bottom: 6rem;
-		right: 0;
-		background-color: rgba(0, 0, 0, 0.5);
-		color: white;
-		display: grid;
-	}
+
 	.editingPane {
 		padding: 0.4rem;
 		border-radius: 0.4rem;

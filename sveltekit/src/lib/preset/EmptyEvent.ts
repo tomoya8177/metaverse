@@ -1,4 +1,4 @@
-import type { Event } from '$lib/Classes/Event';
+import type { Event } from '$lib/frontend/Classes/Event';
 
 export const EmptyEvent: Event = {
 	id: '',
