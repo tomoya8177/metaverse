@@ -10,7 +10,7 @@
 
 	import '$lib/AframeComponents';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
-	import type { Message } from '$lib/frontend/Classes/Message';
+	import { Message } from '$lib/frontend/Classes/Message';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
 	import { escapeHTML } from '$lib/math/escapeHTML';
@@ -43,22 +43,41 @@
 
 	const onMessageSendClicked = async () => {
 		if (newMessageBody.trim() === '') return;
+		busy = true;
 		const newMessage = {
 			body: escapeHTML(newMessageBody),
 			user: $UserStore.id,
 			event: $EventStore.id,
 			pinned: newMessagePinned
 		};
-		const createdMessage = await axios.post('/api/messages', newMessage).then((res) => res.data);
-		messages = [...messages, createdMessage];
-		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
-		newMessageBody = '';
+		await sendChatMessage(new Message(newMessage));
+		if (newMessageBody.includes('@Mentor')) {
+			newMessageBody = '';
+			//send message to mentor
+			const response = await axios.post('/chat', newMessage).then((res) => res.data);
+			console.log(response);
+			const aiMessage = new Message({
+				body: escapeHTML(response.kwargs.content),
+				user: 'Mentor',
+				event: $EventStore.id,
+				pinned: false
+			});
+			newMessageBody = '';
+			await sendChatMessage(aiMessage);
+		}
+		busy = false;
 		setTimeout(() => {
 			const element = document.querySelector('.chat-box > div');
 			if (!element) return;
 			scrolToBottom(element);
 		}, 100);
 	};
+	const sendChatMessage = async (message: Message) => {
+		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
+		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
+		messages = [...messages, createdMessage];
+	};
+	let busy = false;
 </script>
 
 <div class="chat-box">
@@ -66,7 +85,7 @@
 		{#each messages.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)) as message}
 			<TextChatMessage
 				{message}
-				author={authors.find((a) => a.id === message.user) || null}
+				author={authors.find((a) => a.id === message.user) || { nickname: 'AI' }}
 				onDelete={(messageId) => {
 					messages = messages.filter((m) => m.id !== messageId);
 				}}
@@ -82,10 +101,8 @@
 			<InputWithLabel label="" type="textarea" bind:value={newMessageBody} />
 		</div>
 		<div>
-			<button
-				data-tooltip="Shift + Enter"
-				style="margin-bottom:0rem"
-				on:click={onMessageSendClicked}>Send</button
+			<button aria-busy={busy} style="margin-bottom:0rem" on:click={onMessageSendClicked}
+				>Send</button
 			>
 		</div>
 	</div>

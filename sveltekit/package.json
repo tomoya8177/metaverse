@@ -41,6 +41,7 @@
 		"axios": "^1.4.0",
 		"js-cookie": "^3.0.5",
 		"jsonwebtoken": "^9.0.0",
+		"langchain": "^0.0.107",
 		"luxon": "^3.3.0",
 		"mysql2": "^3.4.2",
 		"nodemailer": "^6.9.3",
