@@ -105,13 +105,13 @@ export class Unit {
 		);
 		video.setAttribute('rotation', `0 ${this.rotation.y + 180} 0`);
 		video.setAttribute('width', '1');
-		console.log({ sid });
 		video.setAttribute('material', 'src:#' + sid + ';shader: flat; side:double');
 		video.setAttribute('editable-object', '');
 		if (track.dimensions?.width && track.dimensions?.height) {
 			video.setAttribute('height', (track.dimensions?.height / track.dimensions?.width).toString());
 		}
-		scene.appendChild(video);
+		const scene: Entity = document.querySelector('a-scene');
+		scene?.appendChild(video);
 	}
 	hideScreen() {
 		const video = document.getElementById('screenPlaneOf' + this.userId);
