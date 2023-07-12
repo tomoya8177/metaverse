@@ -34,7 +34,7 @@ export class Me extends Unit {
 			.then((res) => res.data.sort((a, b) => (a.startAt < b.startAt ? 1 : -1)));
 		console.log({ sessions });
 
-		if (!sessions) return;
+		if (!sessions || !sessions.length) return;
 		const parsedComponents = JSON.parse(sessions[0].components);
 		if (!parsedComponents || !parsedComponents.position) return;
 		console.log({ parsedComponents });
