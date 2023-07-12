@@ -76,9 +76,20 @@
 				}}
 				user={$UserStore}
 			>
+				<hr />
 				<div>Audio</div>
-				Your Audio is {#if $UserStore.onMute}Muted{:else}On{/if}
-				<AudioButton />
+				<div style="display:flex;gap:1rem;">
+					<div style="flex:1;align-self:center">
+						Your Audio is {#if $UserStore.onMute}Muted{:else}On{/if}
+					</div>
+					<div
+						style="align-self: center;
+					height: 3rem;"
+					>
+						<AudioButton />
+					</div>
+				</div>
+				<hr />
 			</ProfileEditInputs>
 		</article>
 	</dialog>

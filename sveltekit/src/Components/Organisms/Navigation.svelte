@@ -84,6 +84,9 @@
 					</div>
 				</summary>
 				<ul role="listbox">
+					<li>
+						<button class="warning">Leave Room</button>
+					</li>
 					<li><a href={'#'} on:click={changeEmailClicked}> Change Email </a></li>
 					<li>
 						<a href={'#'} on:click={changeProfileClicked}> Change Profile </a>

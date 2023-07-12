@@ -44,11 +44,13 @@
 <InputWithLabel label="Nickname" bind:value={user.nickname} />
 <div>
 	<div>Avatar</div>
-	{#if $UserStore.avatarURL}
-		{#key $UserStore.avatarURL}
-			<AvatarPreview url={$UserStore.avatarURL} />
-		{/key}
-	{/if}
+	<div style="margin-left:auto; margin-right:auto;width:180px;margin-bottom:0.4rem;">
+		{#if $UserStore.avatarURL}
+			{#key $UserStore.avatarURL}
+				<AvatarPreview url={$UserStore.avatarURL} />
+			{/key}
+		{/if}
+	</div>
 </div>
 <button
 	on:click={() => {
@@ -58,10 +60,10 @@
 
 {#if avatarSelectOpen}
 	<figure transition:fade>
-		<div style="display:flex;gap:0.2rem;">
+		<div style="display:flex;gap:0.4rem;">
 			{#each PresetAvatars as avatar}
 				<div style="width:180px">
-					<img src={avatar.thumbnailURL} alt="" />
+					<img src={avatar.thumbnailURL} alt="" style="margin-bottom:0.4rem;" />
 					<button
 						on:click={() => {
 							$UserStore.avatarURL = avatar.url;
