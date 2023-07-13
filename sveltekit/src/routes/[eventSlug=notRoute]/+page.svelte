@@ -1,5 +1,5 @@
 <script lang="ts">
-	import EnterRoomDialog from './EnterRoomDialog.svelte';
+	import EnterRoomDialog from '../../Components/Organisms/EnterRoomDialog.svelte';
 
 	import 'aframe';
 	import 'aframe-environment-component';
@@ -30,6 +30,7 @@
 	let me: Me | null = null;
 	const onSceneLoaded = async () => {
 		me = new Me($UserStore.id);
+		me.nickname = $UserStore.nickname;
 		console.log({ me });
 		Users.add(me);
 		await me.setLastPosition($EventStore);
@@ -117,6 +118,7 @@
 		rotation="0 0 0"
 		color="#7BC8A4"
 		material="side: double;"
+		name="Plane"
 	/>
 </a-scene>
 {#if sceneLoaded}

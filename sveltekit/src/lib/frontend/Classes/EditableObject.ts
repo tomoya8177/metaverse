@@ -4,53 +4,60 @@ import { videoChat } from './VideoChat';
 
 class EditableObject {
 	el: Entity | null = null;
-	scale: number = 1;
-	rotation: number = 0;
 	name: string = '';
-	x: number = 0;
-	scaleX: number = 1;
+	id: string = '';
+	transportMode: 'position' | 'rotation' | 'scale' = 'position';
+	constructor() {
+		window.addEventListener('keydown', (evt) => {
+			if (evt.key == 'Shift') {
+				//rotation
+				this.transportMode = 'rotation';
+			} else if (evt.key == 'Control') {
+				//scale
+				this.transportMode = 'scale';
+			} else if (evt.key == 'Escape') {
+				console.log('escape');
+				//scale
+				this.transportMode = 'position';
+				this.setEntity(null);
+			}
+		});
+		window.addEventListener('keyup', (evt) => {
+			if (evt.key == 'Shift') {
+				//rotation
+				this.transportMode = 'position';
+			} else if (evt.key == 'Control') {
+				//scale
+				this.transportMode = 'position';
+			}
+		});
+	}
+
 	setEntity(entity: Entity) {
 		this.el = entity;
-		this.rotation = entity.getAttribute('rotation').y;
-		this.scale = entity.getAttribute('scale').x;
+		this.id = entity?.id || '';
+		FocusObjectStore.set({
+			open: false,
+			el: this.el,
+			name: this.el?.tagName.replace('A-', '') || '',
+			id: this.el?.id || ''
+		});
 	}
 	openMenu() {
 		FocusObjectStore.set({
 			open: true,
 			el: this.el,
-			name: this.el?.name || ''
+			name: this.el?.tagName.replace('A-', '') || '',
+			id: this.el?.id || ''
 		});
 	}
-	onScaleUpdate(scale: number) {
-		const targetScale = this.scale * scale;
-		this.el?.setAttribute('scale', `${targetScale} ${targetScale} ${targetScale}`);
-	}
-	onScaleUpdated() {
-		this.scale = this.el?.getAttribute('scale').x;
-		videoChat.sendMessage({
-			key: 'objectPosition',
-			object: {
-				id: this.el.id
-			},
-			position: this.el.getAttribute('position'),
-			rotation: this.el.getAttribute('rotation'),
-			scale: this.el.getAttribute('scale')
-		});
-	}
-	onRotationUpdate(y: number) {
-		const targetRotation = y + this.rotation;
-		this.el?.setAttribute('rotation', `0 ${targetRotation} 0`);
-	}
-	onRotationUpdated() {
-		this.rotation = this.el.getAttribute('rotation').y;
-		videoChat.sendMessage({
-			key: 'objectPosition',
-			object: {
-				id: this.el.id
-			},
-			position: this.el.getAttribute('position'),
-			rotation: this.el.getAttribute('rotation'),
-			scale: this.el.getAttribute('scale')
+	remove() {
+		this.el.parentNode?.removeChild(this.el);
+		FocusObjectStore.set({
+			open: false,
+			el: null,
+			name: '',
+			id: ''
 		});
 	}
 }

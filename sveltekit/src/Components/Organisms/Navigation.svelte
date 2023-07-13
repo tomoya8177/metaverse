@@ -2,7 +2,7 @@
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
 
 	import { cookies } from '$lib/frontend/cookies';
-	import { EventStore, UserStore } from '$lib/store';
+	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -10,6 +10,9 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { Users, UsersStore } from '$lib/frontend/Classes/Users';
+	import type { Unit } from '$lib/frontend/Classes/Unit';
+	import { editableObject } from '$lib/frontend/Classes/EditableObject';
 	export let title: string = '';
 	const onLogoutClicked = () => {
 		videoChat.leave();
@@ -59,6 +62,16 @@
 		EventStore.set(EmptyEvent);
 		location.href = '/';
 	};
+	console.log({ $FocusObjectStore });
+	const onDeleteClicked = async () => {
+		if (!confirm('Are you sure that you want to delete this object?')) return;
+		await axios.delete('/api/sessions/' + $FocusObjectStore.id);
+		videoChat.sendMessage({
+			key: 'objectDelete',
+			id: $FocusObjectStore.id
+		});
+		editableObject.remove();
+	};
 </script>
 
 <nav>
@@ -69,6 +82,42 @@
 	</ul>
 	<ul />
 	<ul>
+		{#if $FocusObjectStore.el}
+			<li>
+				<details role="list" dir="rtl">
+					<summary aria-haspopup="listbox" role="link">
+						<div>
+							<Icon icon="deployed_code" />
+							{$FocusObjectStore.name}
+						</div>
+					</summary>
+					<ul role="listbox">
+						<li>
+							<button on:click={onDeleteClicked} class="secondary">Delete</button>
+						</li>
+					</ul>
+				</details>
+			</li>
+		{/if}
+		<li>
+			<details role="list" dir="rtl">
+				<summary aria-haspopup="listbox" role="link">
+					<div>
+						<Icon icon="groups" />
+						Users (
+						{$UsersStore.length}
+						)
+					</div>
+				</summary>
+				<ul role="listbox">
+					{#each $UsersStore || [] as unit}
+						<li>
+							{unit.nickname}
+						</li>
+					{/each}
+				</ul>
+			</details>
+		</li>
 		<li>
 			<details role="list" dir="rtl">
 				<summary aria-haspopup="listbox" role="link">

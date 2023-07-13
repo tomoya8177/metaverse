@@ -8,11 +8,11 @@
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
-	import SceneUIs from '../../Components/Organisms/SceneUIs.svelte';
+	import SceneUIs from './SceneUIs.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
-	import ProfileEditInputs from '../../Components/Organisms/ProfileEditInputs.svelte';
-	import AudioButton from '../../Components/Organisms/AudioButton.svelte';
+	import ProfileEditInputs from './ProfileEditInputs.svelte';
+	import AudioButton from './AudioButton.svelte';
 	import axios from 'axios';
 	import type { Organization } from '$lib/types/Organization';
 

@@ -7,12 +7,15 @@
 	import '$lib/AframeComponents';
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	let busy = false;
 </script>
 
 {#if $UserStore.onMute}
 	<button
+		aria-busy={busy}
 		class="circle-button dim"
 		on:click={async () => {
+			busy = true;
 			try {
 				if (!videoChat.connected) {
 					videoChat.init($UserStore, $EventStore);
@@ -24,9 +27,12 @@
 				console.log(e);
 				alert(`Couldn't get access to the microphone.`);
 			}
+			busy = false;
 		}}
 	>
-		<Icon icon="mic_off" />
+		{#if !busy}
+			<Icon icon="mic_off" />
+		{/if}
 	</button>
 {:else}
 	<button

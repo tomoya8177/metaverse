@@ -106,64 +106,13 @@
 	<div id="myCameraPreview" />
 </div>
 
-{#if $FocusObjectStore?.open}
-	<div class="editingPane">
-		<div style="display:flex">
-			<div style="flex:1">
-				{editableObject.name || ''}
-			</div>
-			<div>
-				<a
-					href={'#'}
-					on:click={() => {
-						$FocusObjectStore.open = false;
-					}}
-				>
-					<Icon icon="close" />
-				</a>
-			</div>
-		</div>
-		<InputWithLabel
-			label="Scale"
-			value={editableObject.scaleX || 1}
-			type="range"
-			step={0.1}
-			min={0.5}
-			max={2}
-			onChange={(e) => {
-				editableObject.onScaleUpdated();
-				editableObject.scaleX = 1;
-			}}
-			onInput={(e) => {
-				if (!e.target) return;
-				const value = Number(e.target.value);
-				editableObject.onScaleUpdate(value);
-			}}
-		/>
-
-		<InputWithLabel
-			label={`Rotation (${rotation})`}
-			value={editableObject.x}
-			type="range"
-			step={5}
-			min={-45}
-			max={45}
-			onChange={(e) => {
-				editableObject.onRotationUpdated();
-				editableObject.x = 0;
-				rotation = 0;
-			}}
-			onInput={(e) => {
-				if (!e.target) return;
-				const value = Number(e.target.value);
-				editableObject.onRotationUpdate(value);
-				rotation = value;
-			}}
-		/>
-	</div>
-{/if}
-
 <style>
+	.transform-buttons {
+		position: absolute;
+		top: 1rem;
+		display: flex;
+		gap: 0.4rem;
+	}
 	.action-buttons {
 		position: absolute;
 		bottom: 1rem;

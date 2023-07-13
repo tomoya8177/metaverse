@@ -33,7 +33,11 @@ export class Unit {
 		const scene = document.querySelector('a-scene');
 		scene?.appendChild(this.el);
 	}
+	get nickname(): string {
+		return this.nicknameData;
+	}
 	set nickname(nickname: string) {
+		this.nicknameData = nickname;
 		let text = this.el.querySelector('a-text');
 		if (!text) {
 			text = document.createElement('a-text');

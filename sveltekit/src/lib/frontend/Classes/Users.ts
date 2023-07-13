@@ -1,13 +1,13 @@
-import { writable } from 'svelte/store';
+import { writable, type Writable } from 'svelte/store';
 import type { Unit } from './Unit';
 import type { User } from '$lib/types/User';
 
-const UsersStore = writable([] as Unit[]);
+export const UsersStore = writable([] as Unit[]);
 
 class users {
 	users: Unit[] = [];
 	constructor() {}
-	subscribe() {
+	subscribe(value: (value: Unit[]) => void) {
 		return UsersStore.subscribe((value) => (this.users = value));
 	}
 	add(user: Unit) {

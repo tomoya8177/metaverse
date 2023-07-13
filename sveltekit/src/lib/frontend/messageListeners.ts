@@ -34,6 +34,12 @@ export const messageListeners = () => {
 		object.setAttribute('rotation', data.rotation);
 		object.setAttribute('scale', data.scale);
 	});
+	videoChat.listenTo('objectDelete', (data) => {
+		console.log('delete revceived', data);
+		const object = document.getElementById(data.id);
+		if (!object) return;
+		object.parentNode?.removeChild(object);
+	});
 };
 
 export const welcomeUnit = (user: User): Unit => {
