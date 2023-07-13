@@ -13,11 +13,13 @@
 	import { Message } from '$lib/frontend/Classes/Message';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
-	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import type { User } from '$lib/types/User';
 	import { editableObject } from '$lib/frontend/Classes/EditableObject';
 	import type { Me } from '$lib/frontend/Classes/Me';
+	import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
+	import { LocalAudioTrack, createLocalAudioTrack } from 'twilio-video';
 	export let messages: Message[] = [];
 	let newMessagePinned = false;
 	let newMessageBody = '';
@@ -63,7 +65,8 @@
 				pinned: false
 			});
 			newMessageBody = '';
-			await sendChatMessage(aiMessage);
+			const createdMessage = await sendChatMessage(aiMessage);
+			speechSynthesis.speak(new SpeechSynthesisUtterance(unescapeHTML(createdMessage.body)));
 		}
 		busy = false;
 		setTimeout(() => {
@@ -76,6 +79,7 @@
 		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
 		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
 		messages = [...messages, createdMessage];
+		return createdMessage;
 	};
 	let busy = false;
 </script>

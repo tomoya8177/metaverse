@@ -3,6 +3,9 @@ import { AIMessage, HumanMessage, SystemMessage } from 'langchain/schema';
 import { OPENAI_API_KEY } from '$env/static/private';
 import axios from 'axios';
 import { db } from '$lib/backend/db.js';
+import VoiceResponse from 'twilio/lib/twiml/VoiceResponse.js';
+import { Room, connect, createLocalAudioTrack, LocalAudioTrack } from 'twilio-video';
+
 export const POST = async ({ request }) => {
 	const body = await request.json();
 	const chat = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-3.5-turbo' });
@@ -25,6 +28,7 @@ export const POST = async ({ request }) => {
 		new HumanMessage(body.body)
 	]);
 	console.log(responseB);
+
 	// AIMessage { text: "J'aime programmer." }
 	return new Response(JSON.stringify(responseB));
 
