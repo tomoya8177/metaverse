@@ -8,6 +8,7 @@
 	import { checkLogin } from '$lib/frontend/checkLogin';
 	import Navigation from '../../Components/Organisms/Navigation.svelte';
 	import { Event } from '$lib/frontend/Classes/Event';
+	import type { UserRole } from '$lib/types/UserRole';
 	let loggedIn: boolean | null = null;
 	let event: any = null;
 	let noEvent = false;
@@ -21,7 +22,21 @@
 			.then((res) => res.data);
 		console.log({ events });
 		if (events.length) {
-			EventStore.set(new Event(events[0]));
+			const event = new Event(events[0]);
+			if (!event.isPublic) {
+				const userRole: UserRole = await axios
+					.get(`/api/userRoles?user=${$UserStore.id}&organization=${event.organization}`)
+					.then((res) => res.data[0]);
+				if (!userRole) {
+					noEvent = true;
+					return;
+				}
+				if (!event.isOpen && !event.allowedUsersArray.includes($UserStore.id)) {
+					noEvent = true;
+					return;
+				}
+			}
+			EventStore.set(new Event(event));
 			console.log($EventStore);
 		} else {
 			noEvent = true;
@@ -47,7 +62,7 @@
 		<div style="display:flex;width:100vw;height:100vh">
 			<div style="align-self:center;width:100%;text-align:center">
 				NO EVENT FOUND
-				<p>Please make sure you have the correct URL!</p>
+				<p>Please make sure you have the correct URL and you have the right to enter the event!</p>
 			</div>
 		</div>
 	{/if}

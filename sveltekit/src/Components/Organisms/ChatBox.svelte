@@ -66,8 +66,10 @@
 			});
 			newMessageBody = '';
 			const createdMessage = await sendChatMessage(aiMessage);
-			speechSynthesis.speak(new SpeechSynthesisUtterance(unescapeHTML(createdMessage.body)));
+			const utterance = new SpeechSynthesisUtterance(unescapeHTML(createdMessage.body));
+			speechSynthesis.speak(utterance);
 		}
+		newMessageBody = '';
 		busy = false;
 		setTimeout(() => {
 			const element = document.querySelector('.chat-box > div');

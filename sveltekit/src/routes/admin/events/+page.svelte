@@ -8,6 +8,9 @@
 	import { onMount } from 'svelte';
 	import Icon from '../../../Components/Atom/Icon.svelte';
 	import { fade } from 'svelte/transition';
+	import type { User } from '$lib/types/User';
+	import type { Organization } from '$lib/types/Organization';
+	import type { UserRole } from '$lib/types/UserRole';
 
 	let events: Event[] = [];
 	let paginated: Event[] = [];
@@ -40,16 +43,16 @@
 		});
 		events = events.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 	});
-	$: console.log(paginated, events);
+
 	const onCreateClicked = async () => {
-		if (!editEvent.validate()) return;
+		if (!(await editEvent.validate())) return;
 		editEvent.allowedUsers = JSON.stringify(editEvent.allowedUsersArray);
 		const newEvent = await axios.post('/api/events', editEvent).then((res) => res.data);
 		events = [...events, new Event(newEvent)].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 		modalOpen = false;
 	};
 	const onUpdateClicked = async () => {
-		if (!editEvent.validate()) return;
+		if (!(await editEvent.validate())) return;
 		editEvent.allowedUsers = JSON.stringify(editEvent.allowedUsersArray);
 		const updatedEvent = await axios
 			.put('/api/events/' + editEvent.id, editEvent)
@@ -62,12 +65,23 @@
 		});
 		modalOpen = false;
 	};
+	const onDeleteClicked = async () => {
+		if (!confirm('Are you sure you want to delete this event?')) return;
+		await axios.delete('/api/events/' + editEvent.id);
+		events = events.filter((event) => event.id != editEvent.id);
+		await axios.delete('/api/sessions?event=' + editEvent.id);
+		await axios.delete('/api/messages?event=' + editEvent.id);
+		modalOpen = false;
+	};
 </script>
 
 <h3>Events</h3>
 <button
 	on:click={() => {
-		editEvent = new Event(EmptyEvent);
+		editEvent = new Event({
+			...EmptyEvent,
+			slug: crypto.randomUUID()
+		});
 		editMode = 'create';
 		modalOpen = true;
 	}}
@@ -87,6 +101,7 @@
 	</thead>
 	<tbody>
 		{#each paginated as event}
+			{@const organization = organizations.find((org) => org.id == event.organization)}
 			<tr>
 				<td>
 					<a href={`/${event.slug}`} role="button" class="outline circle-button">
@@ -95,7 +110,7 @@
 				</td>
 				<td> {event.title}</td>
 				<td>{event.slug}</td>
-				<td>{event.organizationTitle}</td>
+				<td>{organization?.title}</td>
 				<td>
 					<button
 						on:click={() => {
@@ -169,6 +184,14 @@
 					}}
 				>
 					Update
+				</button>
+				<button
+					class="secondary"
+					on:click={() => {
+						onDeleteClicked();
+					}}
+				>
+					Delete
 				</button>
 			{/if}
 		</article>

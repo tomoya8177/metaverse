@@ -1,4 +1,6 @@
 <script lang="ts">
+	import EnterRoomDialog from './EnterRoomDialog.svelte';
+
 	import 'aframe';
 	import 'aframe-environment-component';
 	import 'aframe-extras';
@@ -13,6 +15,8 @@
 	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
 	import ProfileEditInputs from '../../Components/Organisms/ProfileEditInputs.svelte';
 	import AudioButton from '../../Components/Organisms/AudioButton.svelte';
+	import axios from 'axios';
+	import type { Organization } from '$lib/types/Organization';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -50,8 +54,12 @@
 	const setMousePos = (e) => {
 		mousePos = { x: e.clientX, y: e.clientY };
 	};
+	let organization: Organization | null = null;
 	onMount(async () => {
 		window.addEventListener('mouseup', setMousePos);
+		organization = await axios
+			.get('/api/organizations/' + $EventStore.organization)
+			.then((res) => res.data);
 	});
 	onDestroy(() => {
 		window.removeEventListener('mouseup', setMousePos);
@@ -60,39 +68,7 @@
 </script>
 
 {#if !readyToConnect}
-	<dialog open>
-		<article>
-			<h3>Entering Room</h3>
-			<p>Make sure you are looking great!</p>
-			<ProfileEditInputs
-				{me}
-				label="Enter"
-				onUpdateDone={async () => {
-					readyToConnect = true;
-					if (!videoChat.connected) {
-						videoChat.init($UserStore, $EventStore);
-						await videoChat.connect();
-					}
-				}}
-				user={$UserStore}
-			>
-				<hr />
-				<div>Audio</div>
-				<div style="display:flex;gap:1rem;">
-					<div style="flex:1;align-self:center">
-						Your Audio is {#if $UserStore.onMute}Muted{:else}On{/if}
-					</div>
-					<div
-						style="align-self: center;
-					height: 3rem;"
-					>
-						<AudioButton />
-					</div>
-				</div>
-				<hr />
-			</ProfileEditInputs>
-		</article>
-	</dialog>
+	<EnterRoomDialog {me} bind:readyToConnect />
 {/if}
 <a-scene
 	on-scene-loaded

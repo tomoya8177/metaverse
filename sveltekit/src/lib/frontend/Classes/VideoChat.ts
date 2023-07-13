@@ -223,5 +223,10 @@ export class VideoChat {
 			this.audioPingInterval.end();
 		}
 	}
+	leave() {
+		if (this.connected) {
+			this.room?.disconnect();
+		}
+	}
 }
 export const videoChat = new VideoChat();

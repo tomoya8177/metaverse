@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 export class Event {
 	id: string;
 	slug: string;
@@ -11,7 +13,7 @@ export class Event {
 	organizationTitle?: string;
 	allowedUsersArray: string[];
 	createdAt: string;
-	constructor(obj: Event) {
+	constructor(obj) {
 		this.id = obj.id;
 		this.slug = obj.slug;
 		this.title = obj.title;
@@ -30,7 +32,7 @@ export class Event {
 			this.allowedUsersArray = JSON.parse(this.allowedUsers);
 		}
 	}
-	validate(): boolean {
+	async validate(): Promise<boolean> {
 		if (!this.title) {
 			alert('Please enter a title for the event.');
 			return false;
@@ -43,10 +45,16 @@ export class Event {
 			alert('Please enter a slug for the event.');
 			return false;
 		}
+		const existingEventWithSlug = await axios
+			.get('/api/events?slug=' + this.slug)
+			.then((res) => res.data);
+		if (existingEventWithSlug.length && existingEventWithSlug[0].id != this.id) {
+			alert('Slug already exists');
+			return false;
+		}
 		return true;
 	}
 	get capacity(): number {
-		if (this.allowAudio) return 50;
-		return 100;
+		return 50;
 	}
 }

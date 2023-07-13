@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { UserStore } from '$lib/store';
+	import { EventStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -11,6 +11,7 @@
 	import { onMount } from 'svelte';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { fade } from 'svelte/transition';
+	import { EmptyEvent } from '$lib/preset/EmptyEvent';
 	export let onUpdateDone: () => void;
 	export let me: Me;
 	let busy = false;
@@ -39,6 +40,11 @@
 	export let user: User;
 	export let label: string = 'Update';
 	let avatarSelectOpen = false;
+	const onLeaveClicked = () => {
+		videoChat.leave();
+		EventStore.set(EmptyEvent);
+		location.href = '/';
+	};
 </script>
 
 <InputWithLabel label="Nickname" bind:value={user.nickname} />
@@ -78,6 +84,7 @@
 <button aria-busy={busy} on:click={() => onUpdateProfileDoClicked()} disabled={busy}>
 	{label}
 </button>
+<button class="secondary" on:click={onLeaveClicked}>Leave</button>
 
 <style>
 	img {

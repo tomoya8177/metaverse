@@ -167,7 +167,7 @@
 	.action-buttons {
 		position: absolute;
 		bottom: 1rem;
-		right: 0;
+		right: 1rem;
 		display: flex;
 		gap: 0.4rem;
 	}

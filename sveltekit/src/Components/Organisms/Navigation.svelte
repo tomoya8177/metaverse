@@ -2,15 +2,18 @@
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
 
 	import { cookies } from '$lib/frontend/cookies';
-	import { UserStore } from '$lib/store';
+	import { EventStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { fade } from 'svelte/transition';
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	import { EmptyEvent } from '$lib/preset/EmptyEvent';
 	export let title: string = '';
 	const onLogoutClicked = () => {
+		videoChat.leave();
+		EventStore.set(EmptyEvent);
 		cookies.remove('login');
 		location.reload();
 	};
@@ -49,21 +52,12 @@
 		emailDialogOpen = false;
 	};
 	let newNickname = $UserStore.nickname;
-	const onUpdateProfileDoClicked = async () => {
-		busy = true;
-		const res = await axios.put('/api/users/' + $UserStore.id, {
-			nickname: newNickname
-		});
-		$UserStore.nickname = newNickname;
-		//		io.emit('updateProfile', { nickname: newNickname, id: $UserStore.id });
-		videoChat.sendMessage({
-			key: 'updateProfile',
-			nickname: newNickname,
-			user: { id: $UserStore.id }
-		});
 
-		busy = false;
-		profileDialogOpen = false;
+	const onLeaveClicked = () => {
+		if (!confirm('Are you sure that you want to leave this room?')) return;
+		videoChat.leave();
+		EventStore.set(EmptyEvent);
+		location.href = '/';
 	};
 </script>
 
@@ -84,9 +78,11 @@
 					</div>
 				</summary>
 				<ul role="listbox">
-					<li>
-						<button class="warning">Leave Room</button>
-					</li>
+					{#if $EventStore?.id}
+						<li>
+							<button on:click={onLeaveClicked} class="warning">Leave Room</button>
+						</li>
+					{/if}
 					<li><a href={'#'} on:click={changeEmailClicked}> Change Email </a></li>
 					<li>
 						<a href={'#'} on:click={changeProfileClicked}> Change Profile </a>
