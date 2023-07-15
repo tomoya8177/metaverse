@@ -23,6 +23,7 @@
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
+	let virtuaMentorReady = false;
 	let messages: Message[] = [];
 	let authors: User[] = [];
 	const loadMessages = async (existings: Message[] = []) => {
@@ -67,6 +68,13 @@
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
 		loadMessages(messages);
+		axios.get('/chat/' + $EventStore.id).then((res) => {
+			//this is okay to be delaied
+			virtuaMentorReady = true;
+			console.log('chat setup', res);
+		}); //ping to wake up the server
+		console.log('listening to incoming message');
+		console.log({ videoChat });
 		videoChat.listenTo('textMessage', async (data) => {
 			console.log('received textMessage', data);
 			messages = [...messages, data];
@@ -99,7 +107,7 @@
 	<ActionButtons bind:textChatOpen {me} />
 </div>
 {#if textChatOpen}
-	<ChatBox bind:messages bind:authors />
+	<ChatBox bind:messages bind:authors {virtuaMentorReady} />
 {/if}
 
 <div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>

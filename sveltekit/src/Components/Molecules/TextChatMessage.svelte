@@ -25,6 +25,12 @@
 	export let author: User | null;
 	onMount(async () => {
 		//author = await axios.get('/api/users/' + message.user).then((res) => res.data);
+		const interval = setInterval(() => {
+			if (!message.isTalking) return;
+			if (speechSynthesis.speaking) return;
+			message.isTalking = false;
+			clearInterval(interval);
+		}, 1000);
 	});
 </script>
 
@@ -36,6 +42,20 @@
 					<a>
 						{author.nickname || ''}
 					</a>
+					{#if message.isTalking}
+						<a
+							transition:fade
+							href={'#'}
+							style="margin-left:0.2rem"
+							title="Speaking"
+							on:click={() => {
+								speechSynthesis.cancel();
+								message.isTalking = false;
+							}}
+						>
+							<Icon icon="campaign" />
+						</a>
+					{/if}
 				</div>
 			{/if}
 			{@html nl2br(message.body)}
@@ -55,7 +75,7 @@
 		>
 			<Icon icon="push_pin" />
 		</a>
-		{#if message.user == $UserStore.id}
+		{#if message.user == $UserStore.id || message.user == 'Mentor'}
 			<a
 				href={'#'}
 				on:click={async () => {

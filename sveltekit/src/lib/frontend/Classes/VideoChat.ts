@@ -70,7 +70,7 @@ export class VideoChat {
 			return alert('not initialized correctly');
 		dataTrackPublished.promise.then(() => {
 			if (!this.dataTrack) return alert('not connected to room');
-			console.log('sending message', message);
+			console.log('really sending');
 			this.dataTrack.send(JSON.stringify(message));
 		});
 	}
@@ -145,7 +145,7 @@ export class VideoChat {
 		onDisconnected(this.room, this.localParticipant);
 	}
 	listenTo(key: string, callback: (data: any) => void) {
-		if (!this.dataTrack) return;
+		//if (!this.dataTrack) return;
 		this.listeners[key] = callback;
 	}
 	dontListenTo(key: string) {

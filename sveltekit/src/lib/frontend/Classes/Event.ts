@@ -13,6 +13,8 @@ export class Event {
 	organizationTitle?: string;
 	allowedUsersArray: string[];
 	createdAt: string;
+	virtuaMentorName: string;
+	virtuaMentorPrompt: string;
 	constructor(obj) {
 		this.id = obj.id;
 		this.slug = obj.slug;
@@ -25,6 +27,8 @@ export class Event {
 		this.isOpen = obj.isOpen;
 		this.createdAt = obj.createdAt;
 		this.organizationTitle = obj.organizationTitle;
+		this.virtuaMentorName = obj.virtuaMentorName;
+		this.virtuaMentorPrompt = obj.virtuaMentorPrompt;
 		if (this.allowedUsers == '') {
 			this.allowedUsersArray = [];
 		} else {

@@ -17,6 +17,8 @@
 	import AudioButton from '../../Components/Organisms/AudioButton.svelte';
 	import axios from 'axios';
 	import type { Organization } from '$lib/types/Organization';
+	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
+	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -61,6 +63,11 @@
 		organization = await axios
 			.get('/api/organizations/' + $EventStore.organization)
 			.then((res) => res.data);
+		const models = await axios.get('/api/objects?event=' + $EventStore.id).then((res) => res.data);
+		models.forEach((model: SharedObject) => {
+			const sharedObject = new SharedObject(model);
+			sharedObjects.add(sharedObject);
+		});
 	});
 	onDestroy(() => {
 		window.removeEventListener('mouseup', setMousePos);

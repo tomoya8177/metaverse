@@ -14,6 +14,7 @@ AFRAME.registerComponent('editable-object', {
 		this.initialPos = null;
 		this.cursorEl = document.querySelector('[raycaster]');
 		this.rayCatcher = document.getElementById('rayCatcher');
+
 		this.el.addEventListener('mousedown', (e) => {
 			editableObject.transportMode = 'position';
 			this.camera = document.getElementById('camera');
@@ -51,7 +52,6 @@ AFRAME.registerComponent('editable-object', {
 			this.rig.setAttribute('look-controls', 'enabled:true');
 			this.state = 'idle';
 			this.initialPos = null;
-			editableObject.openMenu();
 		});
 	},
 	tick: function (e) {
@@ -62,6 +62,7 @@ AFRAME.registerComponent('editable-object', {
 					(intersection: any) => intersection.object.el.id == 'rayCatcher'
 				)?.point;
 				if (!intersection) return;
+				//convert intersection to local coordinates
 				if (this.initialPos) {
 					const diff = {
 						x: intersection.x - this.initialPos.x,

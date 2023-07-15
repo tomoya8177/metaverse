@@ -1,6 +1,7 @@
 import { FocusObjectStore } from '$lib/store';
 import type { Entity } from 'aframe';
 import { videoChat } from './VideoChat';
+import { sharedObjects } from './SharedObjects';
 
 class EditableObject {
 	el: Entity | null = null;
@@ -34,30 +35,16 @@ class EditableObject {
 	}
 
 	setEntity(entity: Entity) {
+		console.log('setting entity');
 		this.el = entity;
 		this.id = entity?.id || '';
+		const file = sharedObjects.get(this.id);
 		FocusObjectStore.set({
+			file: file,
 			open: false,
 			el: this.el,
-			name: this.el?.tagName.replace('A-', '') || '',
+			name: this.el.getAttribute('name') || this.el?.tagName.replace('A-', '') || '',
 			id: this.el?.id || ''
-		});
-	}
-	openMenu() {
-		FocusObjectStore.set({
-			open: true,
-			el: this.el,
-			name: this.el?.tagName.replace('A-', '') || '',
-			id: this.el?.id || ''
-		});
-	}
-	remove() {
-		this.el.parentNode?.removeChild(this.el);
-		FocusObjectStore.set({
-			open: false,
-			el: null,
-			name: '',
-			id: ''
 		});
 	}
 }

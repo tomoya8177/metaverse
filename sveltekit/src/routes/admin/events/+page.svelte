@@ -169,6 +169,12 @@
 			<div style="margin-top:1rem;margin-bottom:1rem">
 				Capacity: {editEvent.capacity}
 			</div>
+			<InputWithLabel label="VirtuaMentor's Name" bind:value={editEvent.virtuaMentorName} />
+			<InputWithLabel
+				type="textarea"
+				label="Prompt for VirtuaMentor"
+				bind:value={editEvent.virtuaMentorPrompt}
+			/>
 			{#if editMode == 'create'}
 				<button
 					on:click={() => {

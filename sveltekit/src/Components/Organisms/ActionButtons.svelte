@@ -11,6 +11,11 @@
 	import Icon from '../Atom/Icon.svelte';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	import { uploader } from '$lib/frontend/Classes/Uploader';
+	import * as filestack from 'filestack-js';
+	import axios from 'axios';
+	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
+	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	export let textChatOpen = false;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
@@ -111,6 +116,46 @@
 			<Icon icon="stop_screen_share" />
 		</button>
 	{/if}
+	<button
+		class="circle-button"
+		on:click={() =>
+			uploader.launchPicker((res) => {
+				//when done
+				console.log(res);
+				res.filesUploaded.forEach(async (file) => {
+					const createdFile = await axios
+						.post('/api/objects', {
+							event: $EventStore.id,
+							type: file.mimetype,
+							url: file.url,
+							title: file.filename,
+							handle: file.handle,
+							user: $UserStore.id,
+							size: file.size,
+							editable: 1,
+							components: JSON.stringify({
+								position: me?.position,
+								rotation: {
+									x: 0,
+									y: 0,
+									z: 0
+								},
+								scale: {
+									x: 1,
+									y: 1,
+									z: 1
+								}
+							})
+						})
+						.then((res) => res.data);
+					console.log({ createdFile });
+					const object = new SharedObject(createdFile);
+					sharedObjects.add(object);
+				});
+			})}
+	>
+		<Icon icon="add" />
+	</button>
 {/if}
 
 <style>

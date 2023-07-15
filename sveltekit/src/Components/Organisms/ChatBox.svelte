@@ -20,16 +20,15 @@
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
 	import { LocalAudioTrack, createLocalAudioTrack } from 'twilio-video';
+	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
+	export let virtuaMentorReady = false;
 	export let messages: Message[] = [];
 	let newMessagePinned = false;
 	let newMessageBody = '';
-	export let authors: User[] = [];
-	const scrolToBottom = (element: Element) => {
-		element.scrollTop = element.scrollHeight;
-	};
+	export let authors: User[];
 
 	const onKeyDown = (e: KeyboardEvent) => {
-		if (document.activeElement?.tagName === 'TEXTAREA' && e.key === 'Enter' && e.shiftKey) {
+		if (document.activeElement?.tagName === 'TEXTAREA' && e.key === 'Enter' && e.ctrlKey) {
 			onMessageSendClicked();
 			return;
 		}
@@ -37,14 +36,33 @@
 	onMount(async () => {
 		//loadMessages();
 		//onKeyDown
+		// io.emit('setEventId', {
+		// 	eventId: $EventStore.id,
+		// 	userId: $UserStore.id
+		// });
 		document.addEventListener('keydown', onKeyDown);
 	});
 	onDestroy(() => {
 		document.removeEventListener('keydown', onKeyDown);
 	});
 
+	// io.on('answer', async (answer) => {
+	// 	const aiMessage = new Message({
+	// 		body: escapeHTML(answer),
+	// 		user: 'Mentor',
+	// 		event: $EventStore.id,
+	// 		pinned: false
+	// 	});
+	// 	newMessageBody = '';
+	// 	const createdMessage = await sendChatMessage(aiMessage);
+	// 	const utterance = new SpeechSynthesisUtterance(unescapeHTML(createdMessage.body));
+	// 	speechSynthesis.speak(utterance);
+	// });
 	const onMessageSendClicked = async () => {
 		if (newMessageBody.trim() === '') return;
+		if (newMessageForMentor) {
+			newMessageBody = newMessageBody + ' @Mentor';
+		}
 		busy = true;
 		const newMessage = {
 			body: escapeHTML(newMessageBody),
@@ -53,37 +71,50 @@
 			pinned: newMessagePinned
 		};
 		await sendChatMessage(new Message(newMessage));
+		busy = false;
 		if (newMessageBody.includes('@Mentor')) {
+			//io.emit('question', newMessageBody);
 			newMessageBody = '';
 			//send message to mentor
-			const response = await axios.post('/chat', newMessage).then((res) => res.data);
+			const response = await axios
+				.post('/chat/' + $EventStore.id, newMessage)
+				.then((res) => res.data);
 			console.log(response);
 			const aiMessage = new Message({
-				body: escapeHTML(response.kwargs.content),
+				body: escapeHTML(response.response || response.text),
 				user: 'Mentor',
 				event: $EventStore.id,
-				pinned: false
+				pinned: false,
+				isTalking: true
 			});
 			newMessageBody = '';
-			const createdMessage = await sendChatMessage(aiMessage);
+			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
 			const utterance = new SpeechSynthesisUtterance(unescapeHTML(createdMessage.body));
 			speechSynthesis.speak(utterance);
+		} else {
+			//io.emit('statement', newMessageBody);
 		}
 		newMessageBody = '';
-		busy = false;
 		setTimeout(() => {
 			const element = document.querySelector('.chat-box > div');
 			if (!element) return;
-			scrolToBottom(element);
+			scrollToBottom(element);
 		}, 100);
 	};
 	const sendChatMessage = async (message: Message) => {
 		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
 		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
-		messages = [...messages, createdMessage];
+		messages = [
+			...messages,
+			{ ...createdMessage, isTalking: createdMessage.user === 'Mentor' ? true : false }
+		];
+		authors = await axios
+			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
+			.then((res) => res.data);
 		return createdMessage;
 	};
 	let busy = false;
+	let newMessageForMentor = false;
 </script>
 
 <div class="chat-box">
@@ -99,7 +130,15 @@
 		{/each}
 	</div>
 	<hr />
-	<div style="text-align:right">
+	<div style="display:flex; gap:1rem;">
+		<div style="text-align:right;flex:1">
+			<InputWithLabel
+				label="@Mentor"
+				disabled={!virtuaMentorReady}
+				type="switch"
+				bind:value={newMessageForMentor}
+			/>
+		</div>
 		<InputWithLabel label="Pinned" type="switch" bind:value={newMessagePinned} />
 	</div>
 	<div style="display:flex;gap:0.4rem">

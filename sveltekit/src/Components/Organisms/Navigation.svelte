@@ -13,6 +13,13 @@
 	import { Users, UsersStore } from '$lib/frontend/Classes/Users';
 	import type { Unit } from '$lib/frontend/Classes/Unit';
 	import { editableObject } from '$lib/frontend/Classes/EditableObject';
+	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+	import {
+		PUBLIC_FileStackAPIKey,
+		PUBLIC_FileStackPolicy,
+		PUBLIC_FileStackSignature
+	} from '$env/static/public';
+	import { uploader } from '$lib/frontend/Classes/Uploader';
 	export let title: string = '';
 	const onLogoutClicked = () => {
 		videoChat.leave();
@@ -65,12 +72,20 @@
 	console.log({ $FocusObjectStore });
 	const onDeleteClicked = async () => {
 		if (!confirm('Are you sure that you want to delete this object?')) return;
-		await axios.delete('/api/sessions/' + $FocusObjectStore.id);
+
+		const file = sharedObjects.get($FocusObjectStore.id);
+		console.log({ file });
+		await axios.delete('/api/objects/' + file.id);
+		uploader.client.remove(file.handle, {
+			policy: PUBLIC_FileStackPolicy,
+			signature: PUBLIC_FileStackSignature
+		});
+		file.remove();
 		videoChat.sendMessage({
 			key: 'objectDelete',
 			id: $FocusObjectStore.id
 		});
-		editableObject.remove();
+		editableObject.setEntity(null);
 	};
 </script>
 
