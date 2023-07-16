@@ -136,19 +136,20 @@
 		console.log({ recognition }, 'started');
 		recognition.addEventListener('result', (e) => {
 			console.log(e.results);
-			const transcript = Array.from(e.results)
-				.map((result) => result[0])
-				.map((result) => result.transcript.replace('at mentor', '@Mentor'))
-				.join('');
+			const transcript = e.results[0][0].transcript;
+			// const transcript = Array.from(e.results)
+			// 	.map((result) => result[0])
+			// 	.map((result) => result.transcript.replace('at mentor', '@Mentor'))
+			// 	.join('');
 			newMessageBody = transcript;
 			if (e.results[0].isFinal) {
 				onMessageSendClicked();
 				//reset recognition results
-				onMicClicked();
+				// onMicClicked();
 
-				setTimeout(() => {
-					onMicClicked();
-				}, 1000);
+				// setTimeout(() => {
+				// 	onMicClicked();
+				// }, 1000);
 			}
 		});
 		recognition.onerror = (event) => {
@@ -164,9 +165,10 @@
 	const createRecognition = () => {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		recognition = new SpeechRecognition();
-		recognition.interimResults = true;
+		recognition.interimResults = false;
 		recognition.lang = 'en-US';
-		recognition.continuous = true;
+		recognition.continuous = false;
+		//Setting interimResults to true
 	};
 </script>
 
