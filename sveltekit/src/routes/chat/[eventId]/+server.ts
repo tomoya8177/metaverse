@@ -30,7 +30,7 @@ import {
 	HumanMessagePromptTemplate,
 	MessagesPlaceholder,
 	SystemMessagePromptTemplate
-} from 'langchain/dist/prompts';
+} from 'langchain/prompts';
 
 //Get for initialising chat
 export const GET = async ({ params, request }) => {
