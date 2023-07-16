@@ -1,6 +1,10 @@
 import { ChatOpenAI } from 'langchain/chat_models/openai';
 import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
-import { ConversationalRetrievalQAChain, loadQAStuffChain } from 'langchain/chains';
+import {
+	ConversationalRetrievalQAChain,
+	ConversationChain,
+	loadQAStuffChain
+} from 'langchain/chains';
 import { AIMessage, HumanMessage, SystemMessage } from 'langchain/schema';
 import { OPENAI_API_KEY } from '$env/static/private';
 import { db } from '$lib/backend/db.js';
@@ -17,86 +21,121 @@ import { loadDocument } from '$lib/backend/loadDocument.js';
 import type { User } from '$lib/types/User.js';
 import type { Message } from '$lib/frontend/Classes/Message.js';
 import type { DocumentForAI } from '$lib/types/DocumentForAI.js';
-
-const storedChats: {
-	eventId: string;
-	chatHistory: ChatMessageHistory;
-	chain: ConversationalRetrievalQAChain | null;
-}[] = [];
+import { virtuaMentorPrompt } from '$lib/preset/VirtuaMentorPrompt.js';
+import { storedChats } from '$lib/memory/StoredChats.js';
+import type { UserRole } from '$lib/types/UserRole.js';
+import type { Event } from '$lib/frontend/Classes/Event.js';
+import {
+	ChatPromptTemplate,
+	HumanMessagePromptTemplate,
+	MessagesPlaceholder,
+	SystemMessagePromptTemplate
+} from 'langchain/dist/prompts';
 
 //Get for initialising chat
-
 export const GET = async ({ params, request }) => {
-	const event = (await db.query(`select * from events where id='${params.eventId}'`))[0];
-	if (!event) return new Response(JSON.stringify({ error: 'event not found' }));
-	//check if chat is already stored
-	let storedChat = storedChats.find((storedChat) => storedChat.eventId === params.eventId);
-	let chatHistory: ChatMessageHistory;
-	if (!storedChat) {
-		//create new chat
-		storedChat = {
-			eventId: params.eventId,
-			chatHistory: new ChatMessageHistory([]),
-			chain: null
-		};
-		storedChats.push(storedChat);
-		chatHistory = new ChatMessageHistory([]);
-	}
-	//create new chat
-	const documents = await db.query(`select * from documentsForAI where event='${params.eventId}'`);
+	const { storedChat, event } = await storedChats.findStoredChatAndEvent(params.eventId);
 
-	let documentTexts: (string | Document)[] = [];
-	let docs: Document[] = [];
-	const userRoles: {
-		id: string;
-		user: string;
-		organization: string;
-	}[] = await db.query(`select * from userRoles where organization='${event.organization}'`);
+	return new Response(JSON.stringify({ storedChat }));
+};
+
+//PUT for giving context documents
+export const PUT = async ({ request, params }) => {
+	const { storedChat, event } = await storedChats.findStoredChatAndEvent(params.eventId);
+	if (!event) return new Response(JSON.stringify({ error: 'event not found' }), { status: 404 });
+
+	const userRoles: UserRole[] = await db.query(
+		`select * from userRoles where organization='${event.organization}'`
+	);
 	const users: User[] = await db.query(
 		`select * from users where id in ('${userRoles.map((userRole) => userRole.user).join("','")}')`
 	);
 	//load user data as json to docs
 	const usersJson = JSON.stringify(users);
-	const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
-	docs = [...docs, ...(await textSplitter.createDocuments([usersJson]))];
-	const Promises: Promise<Document[]>[] = [];
-	documents.forEach((document: DocumentForAI) => {
-		if (document.type.includes('text')) {
-			Promises.push(loadDocument(document.filename, 'text'));
-		}
-		// for docx files
-		if (document.type.includes('docx')) {
-			Promises.push(loadDocument(document.filename, 'docx'));
-		}
-		if (document.type.includes('pdf')) {
-			Promises.push(loadDocument(document.filename, 'pdf'));
-		}
-		if (document.type.includes('csv')) {
-			Promises.push(loadDocument(document.filename, 'csv'));
-		}
-	});
-	await Promise.all(Promises).then((res) => {
-		res.forEach((d) => {
-			docs = [...docs, ...d];
-			//documentTexts = [...documentTexts, ...documents];
+	if (event.withDocumentsForAI) {
+		let docs: Document[] = [];
+		const thePrompt = virtuaMentorPrompt({
+			name: event.virtuaMentorName,
+			additionalPrompt: event.virtuaMentorPrompt,
+			widhDocumentsForAI: event.withDocumentsForAI
 		});
-	});
 
-	const thePrompt = `You are a friendly AI teacher for student users, named ${
-		event.virtuaMentorName || 'Nancy'
-	}. You may answer questions based on the given context. You can also ask questions to students based on the given context to check if the student understands the context, but do it in a way that does not disclose the answer, and ask one question at a time. When new user says hello, answer hello back and introduce your name. You have users list as json in your memory. You can use it to ask questions to users. please match each users with their nickname.
-	${event.virtuaMentorPrompt || ''}}`;
-	//get it into the docs
-	docs = [...docs, ...(await textSplitter.createDocuments([thePrompt]))];
-	const vectorStore = await MemoryVectorStore.fromDocuments(
-		docs,
-		new OpenAIEmbeddings({ openAIApiKey: OPENAI_API_KEY })
-	);
+		//get it into the docs
+		const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
+		docs = [
+			...docs,
+			...(await textSplitter.createDocuments([
+				thePrompt,
+				`Below is the list of users in the class with some details about each users.`,
+				usersJson
+			]))
+		];
+		docs = [
+			...docs,
+			...(await textSplitter.createDocuments([
+				`Following contents are the context of this class. Please answer questions based on this context.`
+			]))
+		];
 
-	const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-3.5-turbo' });
-	storedChat.chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), {
-		memory: new BufferMemory({ chatHistory: storedChat.chatHistory, memoryKey: 'chat_history' })
-	});
+		const Promises: Promise<Document[]>[] = [];
+		const documents = await db.query(
+			`select * from documentsForAI where event='${params.eventId}'`
+		);
+		documents.forEach((document: DocumentForAI) => {
+			if (document.type.includes('text')) {
+				Promises.push(loadDocument(document.filename, 'text'));
+			}
+			// for docx files
+			if (document.type.includes('docx')) {
+				Promises.push(loadDocument(document.filename, 'docx'));
+			}
+			if (document.type.includes('pdf')) {
+				Promises.push(loadDocument(document.filename, 'pdf'));
+			}
+			if (document.type.includes('csv')) {
+				Promises.push(loadDocument(document.filename, 'csv'));
+			}
+		});
+		await Promise.all(Promises).then((res) => {
+			res.forEach((d) => {
+				docs = [...docs, ...d];
+			});
+		});
+		storedChat.docs = docs;
+
+		//document is already loaded
+		const vectorStore = await MemoryVectorStore.fromDocuments(
+			storedChat.docs,
+			new OpenAIEmbeddings({ openAIApiKey: OPENAI_API_KEY })
+		);
+
+		const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-3.5-turbo' });
+		storedChat.chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), {
+			memory: new BufferMemory({ chatHistory: storedChat.chatHistory, memoryKey: 'chat_history' })
+		});
+	} else {
+		//no document. lets create a generic conversation chain
+		const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-3.5-turbo' });
+
+		const chatPrompt = ChatPromptTemplate.fromPromptMessages([
+			SystemMessagePromptTemplate.fromTemplate(`${virtuaMentorPrompt({
+				name: event.virtuaMentorName,
+				additionalPrompt: event.virtuaMentorPrompt,
+				widhDocumentsForAI: event.withDocumentsForAI
+			})}
+			Below is the list of users in the class with some details about each users.
+			${usersJson}
+			`),
+			new MessagesPlaceholder('history'),
+			HumanMessagePromptTemplate.fromTemplate('{question}')
+		]);
+
+		storedChat.chain = new ConversationChain({
+			memory: new BufferMemory({ returnMessages: true, memoryKey: 'history' }),
+			prompt: chatPrompt,
+			llm: model
+		});
+	}
 	return new Response(JSON.stringify({ storedChat }));
 };
 

@@ -26,9 +26,9 @@
 		users = await axios.get('/api/users').then((res) => {
 			res.data = res.data.map((user: User) => {
 				user.userRoles = userRoles.filter((userRole) => userRole.user == user.id);
-				user.organizations = organizations.filter((org) =>
-					user.userRoles.find((userRole) => userRole.organization == org.id)
-				);
+				user.organizations = organizations.filter((org) => {
+					return user.userRoles?.some((userRole) => userRole.organization == org.id) || false;
+				});
 				return user;
 			});
 			return res.data;
@@ -36,7 +36,8 @@
 		console.log({ users });
 		const results = await axios.get('/api/events').then((res) => {
 			res.data.forEach((event: Event) => {
-				event.organizationTitle = organizations.find((org) => org.id == event.organization).title;
+				event.organizationTitle =
+					organizations.find((org) => org.id == event.organization)?.title || '';
 				events.push(new Event(event));
 			});
 			return res.data;
@@ -48,6 +49,9 @@
 		if (!(await editEvent.validate())) return;
 		editEvent.allowedUsers = JSON.stringify(editEvent.allowedUsersArray);
 		const newEvent = await axios.post('/api/events', editEvent).then((res) => res.data);
+		axios.put('/chat/' + newEvent.id).then((res) => {
+			console.log(res.data);
+		});
 		events = [...events, new Event(newEvent)].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 		modalOpen = false;
 	};
@@ -57,6 +61,9 @@
 		const updatedEvent = await axios
 			.put('/api/events/' + editEvent.id, editEvent)
 			.then((res) => res.data);
+		axios.put('/chat/' + updatedEvent.id).then((res) => {
+			console.log(res.data);
+		});
 		events = events.map((event) => {
 			if (event.id == updatedEvent.id) {
 				return new Event(updatedEvent);

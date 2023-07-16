@@ -25,9 +25,10 @@
 
 	onMount(async () => {
 		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
+		console.log({ userRoles });
 		organizations = await axios.get('/api/organizations').then((res) => res.data);
+		console.log({ organizations });
 		users = await axios.get('/api/users').then((res) => res.data);
-		const promises: Promise<User>[] = [];
 		users = users
 			.map((user) => {
 				return fillOrganization(user);

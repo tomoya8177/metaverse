@@ -11,7 +11,7 @@
 	import { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { VideoChat } from '$lib/frontend/Classes/VideoChat';
-	import { nl2br } from '$lib/frontend/nl2br';
+	import { nl2br } from '$lib/math/nl2br';
 	import type { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import InputWithLabel from './InputWithLabel.svelte';
@@ -39,7 +39,7 @@
 		<div style="flex:1">
 			{#if author}
 				<div style="font-size:0.9rem;">
-					<a>
+					<a href={'#'}>
 						{author.nickname || ''}
 					</a>
 					{#if message.isTalking}

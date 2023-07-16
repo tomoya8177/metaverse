@@ -15,7 +15,8 @@ export class Event {
 	createdAt: string;
 	virtuaMentorName: string;
 	virtuaMentorPrompt: string;
-	constructor(obj) {
+	withDocumentsForAI: boolean = false;
+	constructor(obj: any) {
 		this.id = obj.id;
 		this.slug = obj.slug;
 		this.title = obj.title;

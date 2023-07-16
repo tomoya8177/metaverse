@@ -2,7 +2,7 @@ import { Auth } from '$lib/backend/auth.js';
 import { db } from '$lib/backend/db.js';
 import axios from 'axios';
 import { port } from '$env/static/private';
-import { nl2br } from '$lib/frontend/nl2br.js';
+import { nl2br } from '$lib/math/nl2br.js';
 export async function POST({ request }): Promise<Response> {
 	const body = await request.json();
 	console.log({ email: body.email });

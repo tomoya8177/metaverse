@@ -6,6 +6,7 @@ export class Message extends DBObject {
 	body: string;
 	createdAt: string = new Date().toISOString();
 	isTalking: boolean = false;
+	pinned: boolean = false;
 	constructor(data: any) {
 		super(data);
 		this.event = data.event;
