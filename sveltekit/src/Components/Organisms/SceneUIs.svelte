@@ -112,9 +112,9 @@
 <div class="action-buttons">
 	<ActionButtons bind:textChatOpen bind:micActive {me} />
 </div>
-{#if textChatOpen}
+<div style:display={textChatOpen ? 'block' : 'none'}>
 	<ChatBox bind:messages bind:authors bind:micActive {virtuaMentorReady} />
-{/if}
+</div>
 
 <div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>
 	<div id="myCameraPreview" />

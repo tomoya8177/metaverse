@@ -26,8 +26,10 @@
 	let newMessagePinned = false;
 	let newMessageBody = '';
 	export let authors: User[];
+	export let textChatOpen = false;
 
 	const onKeyDown = (e: KeyboardEvent) => {
+		if (!textChatOpen) return;
 		if (document.activeElement?.tagName === 'TEXTAREA' && e.key === 'Enter' && e.ctrlKey) {
 			onMessageSendClicked();
 			return;
@@ -153,17 +155,17 @@
 			if (event.error === 'not-allowed') {
 				alert('Microphone access denied by the user.');
 				// Perform any necessary actions when access is denied
-				onMicClicked();
 			} else {
 				console.log('Error', event.error);
 			}
+			onMicClicked();
 		};
 	};
 	const createRecognition = () => {
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 		recognition = new SpeechRecognition();
 		recognition.interimResults = true;
-		// recognition.lang = 'en-US';
+		recognition.lang = 'en-US';
 		recognition.continuous = true;
 	};
 </script>
