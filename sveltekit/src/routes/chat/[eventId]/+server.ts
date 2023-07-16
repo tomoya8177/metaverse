@@ -116,20 +116,24 @@ export const PUT = async ({ request, params }) => {
 	} else {
 		//no document. lets create a generic conversation chain
 		const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-3.5-turbo' });
-
+		let string = `${virtuaMentorPrompt({
+			name: event.virtuaMentorName,
+			additionalPrompt: event.virtuaMentorPrompt,
+			widhDocumentsForAI: event.withDocumentsForAI
+		})}
+		Below is the list of users in the class with some details about each users.
+		${usersJson}
+		`;
+		console.log({ string });
+		string = string.replace(/({|})/g, '$&$&');
+		const template = SystemMessagePromptTemplate.fromTemplate(string);
+		console.log({ template });
 		const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-			SystemMessagePromptTemplate.fromTemplate(`${virtuaMentorPrompt({
-				name: event.virtuaMentorName,
-				additionalPrompt: event.virtuaMentorPrompt,
-				widhDocumentsForAI: event.withDocumentsForAI
-			})}
-			Below is the list of users in the class with some details about each users.
-			${usersJson}
-			`),
+			template,
 			new MessagesPlaceholder('history'),
 			HumanMessagePromptTemplate.fromTemplate('{question}')
 		]);
-
+		console.log({ chatPrompt });
 		storedChat.chain = new ConversationChain({
 			memory: new BufferMemory({ returnMessages: true, memoryKey: 'history' }),
 			prompt: chatPrompt,

@@ -115,6 +115,57 @@
 	};
 	let busy = false;
 	let newMessageForMentor = false;
+	export let micActive = false;
+	const onMicClicked = () => {
+		micActive = !micActive;
+		if (micActive) {
+			//activate my mic and start audio to text
+			startAudioToText();
+		} else {
+			//deactivate my mic and stop audio to text
+			recognition.stop();
+		}
+	};
+	let recognition;
+	const startAudioToText = () => {
+		//activate speech detech api
+		createRecognition();
+		recognition.start();
+		console.log({ recognition }, 'started');
+		recognition.addEventListener('result', (e) => {
+			console.log(e.results);
+			const transcript = Array.from(e.results)
+				.map((result) => result[0])
+				.map((result) => result.transcript.replace('at mentor', '@Mentor'))
+				.join('');
+			newMessageBody = transcript;
+			if (e.results[0].isFinal) {
+				onMessageSendClicked();
+				//reset recognition results
+				onMicClicked();
+
+				setTimeout(() => {
+					onMicClicked();
+				}, 1000);
+			}
+		});
+		recognition.onerror = (event) => {
+			if (event.error === 'not-allowed') {
+				alert('Microphone access denied by the user.');
+				// Perform any necessary actions when access is denied
+				onMicClicked();
+			} else {
+				console.log('Error', event.error);
+			}
+		};
+	};
+	const createRecognition = () => {
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		recognition = new SpeechRecognition();
+		recognition.interimResults = true;
+		// recognition.lang = 'en-US';
+		recognition.continuous = true;
+	};
 </script>
 
 <div class="chat-box">
@@ -131,6 +182,11 @@
 	</div>
 	<hr />
 	<div style="display:flex; gap:1rem;">
+		<div>
+			<a href={'#'} on:click={onMicClicked} style:opacity={micActive ? 1 : 0.5}>
+				<Icon icon="mic" />
+			</a>
+		</div>
 		<div style="text-align:right;flex:1">
 			<InputWithLabel
 				label="@Mentor"

@@ -17,6 +17,7 @@
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	export let textChatOpen = false;
+	export let micActive = false;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -51,9 +52,22 @@
 	export let me: Me | null = null;
 </script>
 
-<button data-tooltip="T" class="circle-button" on:click={onTextChatClicked}>
-	<Icon icon="chat" />
-</button>
+<div style="position:relative">
+	<button data-tooltip="T" class="circle-button" on:click={onTextChatClicked}>
+		<Icon icon="chat" />
+	</button>
+	{#if micActive}
+		<button
+			xsmall
+			style="background-color:red;position:absolute;top:-0.6rem;right:-0.6rem;"
+			class="circle-button secondary"
+			on:click={() => {}}
+		>
+			<Icon icon="mic" />
+		</button>
+	{/if}
+</div>
+
 {#if $EventStore.allowAudio}
 	<AudioButton />
 {/if}

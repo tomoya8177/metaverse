@@ -68,10 +68,15 @@
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
 		loadMessages(messages);
-		axios.get('/chat/' + $EventStore.id).then((res) => {
+		axios.get('/chat/' + $EventStore.id).then(async (res) => {
 			//this is okay to be delaied
 			virtuaMentorReady = true;
 			console.log('chat setup', res);
+			if (res.data.chain == null) {
+				//put action
+				const res = await axios.put('/chat/' + $EventStore.id, {});
+				console.log(res);
+			}
 		}); //ping to wake up the server
 		console.log('listening to incoming message');
 		console.log({ videoChat });
@@ -101,13 +106,14 @@
 
 	let rotation = 0;
 	export let me: Me | null = null;
+	let micActive = false;
 </script>
 
 <div class="action-buttons">
-	<ActionButtons bind:textChatOpen {me} />
+	<ActionButtons bind:textChatOpen bind:micActive {me} />
 </div>
 {#if textChatOpen}
-	<ChatBox bind:messages bind:authors {virtuaMentorReady} />
+	<ChatBox bind:messages bind:authors bind:micActive {virtuaMentorReady} />
 {/if}
 
 <div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>
