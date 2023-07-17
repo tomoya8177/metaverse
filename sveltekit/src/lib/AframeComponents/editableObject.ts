@@ -1,7 +1,10 @@
 import { editableObject } from '$lib/frontend/Classes/EditableObject';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
-import { FocusObjectStore, UserStore } from '$lib/store';
+import { degree2radian } from '$lib/math/degree2radians';
+import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
 import 'aframe';
+import axios from 'axios';
+import { get } from 'svelte/store';
 import { scale } from 'svelte/transition';
 let userId = '';
 UserStore.subscribe((user) => {
@@ -52,6 +55,14 @@ AFRAME.registerComponent('editable-object', {
 			this.rig.setAttribute('look-controls', 'enabled:true');
 			this.state = 'idle';
 			this.initialPos = null;
+			//lets' save position
+			axios.put('/api/objects/' + this.el.id, {
+				components: JSON.stringify({
+					position: this.el.getAttribute('position'),
+					rotation: this.el.getAttribute('rotation'),
+					scale: this.el.getAttribute('scale')
+				})
+			});
 		});
 	},
 	tick: function (e) {
@@ -79,20 +90,23 @@ AFRAME.registerComponent('editable-object', {
 							${this.el.getAttribute('position').z + diff.z}`
 						);
 					} else if (editableObject.transportMode == 'rotation') {
-						const factor = diff.x * 20;
+						//the diff shoukld be calculated with pointsrelative to the raycatcher
+						const relativeDiff = this.getRelativeDiff(intersection);
+						const factor = relativeDiff.x * 20;
 						this.el.setAttribute(
 							'rotation',
-							`${this.el.getAttribute('rotation').x - (diff.y * 200) / this.distance} ${
-								this.el.getAttribute('rotation').y + (diff.x * 200) / this.distance
+							`${this.el.getAttribute('rotation').x - (relativeDiff.y * 200) / this.distance} ${
+								this.el.getAttribute('rotation').y + (relativeDiff.x * 200) / this.distance
 							} 0`
 						);
 						const result = this.el.getAttribute('rotation').y;
 					} else if (editableObject.transportMode == 'scale') {
+						const relativeDiff = this.getRelativeDiff(intersection);
 						this.el.setAttribute(
 							'scale',
-							`${this.el.getAttribute('scale').x + diff.x / this.distance}
-							${this.el.getAttribute('scale').y + diff.x / this.distance}
-							${this.el.getAttribute('scale').z + diff.x / this.distance}`
+							`${this.el.getAttribute('scale').x + relativeDiff.x / this.distance}
+							${this.el.getAttribute('scale').y + relativeDiff.x / this.distance}
+							${this.el.getAttribute('scale').z + relativeDiff.x / this.distance}`
 						);
 					}
 
@@ -109,5 +123,30 @@ AFRAME.registerComponent('editable-object', {
 				this.initialPos = { ...intersection };
 			}
 		}
+	},
+	getRelativeDiff: function (intersection: xyz) {
+		//turn it to Vector 3
+		const intersectionVector = new THREE.Vector3(intersection.x, intersection.y, intersection.z);
+		//convert it to rayCatcher local
+		intersectionVector.applyMatrix4(this.rayCatcher.object3D.matrixWorld);
+		//rotate intersection vector to raycatcher's rotation
+		const initialPosVector = new THREE.Vector3(
+			this.initialPos.x,
+			this.initialPos.y,
+			this.initialPos.z
+		);
+		//convert it to rayCatcher local
+		initialPosVector.applyMatrix4(this.rayCatcher.object3D.matrixWorld);
+
+		//get the intersection on raycatcher's plane
+
+		const relativeIntersection = intersectionVector.sub(this.rayCatcher.object3D.position);
+		const relativeInitialPos = initialPosVector.sub(this.rayCatcher.object3D.position);
+		const relativeDiff = {
+			x: relativeIntersection.x - relativeInitialPos.x,
+			y: relativeIntersection.y - relativeInitialPos.y,
+			z: relativeIntersection.z - relativeInitialPos.z
+		};
+		return relativeDiff;
 	}
 });

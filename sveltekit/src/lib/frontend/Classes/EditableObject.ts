@@ -43,7 +43,7 @@ class EditableObject {
 			file: file,
 			open: false,
 			el: this.el,
-			name: this.el.getAttribute('name') || this.el?.tagName.replace('A-', '') || '',
+			name: this.el?.getAttribute('name') || this.el?.tagName.replace('A-', '') || '',
 			id: this.el?.id || ''
 		});
 	}

@@ -3,6 +3,7 @@ import { Users } from '$lib/frontend/Classes/Users';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import type { User } from '$lib/types/User';
 import axios from 'axios';
+import { SharedObject } from './Classes/SharedObject';
 
 export const messageListeners = () => {
 	videoChat.listenTo('handshake', async (data) => {
@@ -26,6 +27,10 @@ export const messageListeners = () => {
 		if (!unit) return;
 		unit.nickname = data.nickname;
 		unit.avatarURL = data.avatarURL;
+	});
+	videoChat.listenTo('objectCreate', async (data) => {
+		const objectData = await axios.get('/api/objects/' + data.id).then((res) => res.data);
+		const object = new SharedObject(objectData);
 	});
 	videoChat.listenTo('objectPosition', (data) => {
 		const object = document.getElementById(data.object.id);

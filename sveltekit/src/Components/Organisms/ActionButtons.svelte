@@ -16,6 +16,7 @@
 	import axios from 'axios';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+	import AvatarPreview from '../Atom/AvatarPreview.svelte';
 	export let textChatOpen = false;
 	export let micActive = false;
 	const scrolToBottom = (element: Element) => {
@@ -164,7 +165,12 @@
 						.then((res) => res.data);
 					console.log({ createdFile });
 					const object = new SharedObject(createdFile);
+					object.moveToMyFront(me?.position, me?.rotation);
 					sharedObjects.add(object);
+					videoChat.sendMessage({
+						key: 'objectCreate',
+						id: object.id
+					});
 				});
 			})}
 	>

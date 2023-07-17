@@ -1,5 +1,5 @@
 <script lang="ts">
-	import EnterRoomDialog from '../../Components/Organisms/EnterRoomDialog.svelte';
+	import EnterRoomDialog from '../../../Components/Organisms/EnterRoomDialog.svelte';
 
 	import 'aframe';
 	import 'aframe-environment-component';
@@ -10,15 +10,16 @@
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
-	import SceneUIs from '../../Components/Organisms/SceneUIs.svelte';
+	import SceneUIs from '../../../Components/Organisms/SceneUIs.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
-	import ProfileEditInputs from '../../Components/Organisms/ProfileEditInputs.svelte';
-	import AudioButton from '../../Components/Organisms/AudioButton.svelte';
+	import ProfileEditInputs from '../../../Components/Organisms/ProfileEditInputs.svelte';
+	import AudioButton from '../../../Components/Organisms/AudioButton.svelte';
 	import axios from 'axios';
 	import type { Organization } from '$lib/types/Organization';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+	import { loadSharedObjects } from '$lib/frontend/loadSharedObjects';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -63,11 +64,6 @@
 		organization = await axios
 			.get('/api/organizations/' + $EventStore.organization)
 			.then((res) => res.data);
-		const models = await axios.get('/api/objects?event=' + $EventStore.id).then((res) => res.data);
-		models.forEach((model: SharedObject) => {
-			const sharedObject = new SharedObject(model);
-			sharedObjects.add(sharedObject);
-		});
 	});
 	onDestroy(() => {
 		window.removeEventListener('mouseup', setMousePos);
@@ -76,7 +72,13 @@
 </script>
 
 {#if !readyToConnect}
-	<EnterRoomDialog {me} bind:readyToConnect />
+	<EnterRoomDialog
+		whenChatConnected={() => {
+			loadSharedObjects($EventStore.id);
+		}}
+		{me}
+		bind:readyToConnect
+	/>
 {/if}
 <a-scene
 	on-scene-loaded
@@ -117,8 +119,6 @@
 	/>
 	<a-plane
 		id="screenshare-container"
-		class="clickable"
-		editable-object
 		width="8"
 		height="6"
 		position="0 4 -10"

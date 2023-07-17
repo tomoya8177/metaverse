@@ -25,6 +25,7 @@
 			.get('/api/organizations/' + $EventStore.organization)
 			.then((res) => res.data);
 	});
+	export let whenChatConnected: () => void;
 </script>
 
 <dialog open>
@@ -44,6 +45,7 @@
 					if (!videoChat.connected) {
 						videoChat.init($UserStore, $EventStore);
 						await videoChat.connect();
+						whenChatConnected();
 					}
 				}}
 				user={$UserStore}

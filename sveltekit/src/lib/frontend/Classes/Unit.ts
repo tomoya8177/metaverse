@@ -7,6 +7,7 @@ import { sessionPing } from '$lib/frontend/Classes/sessionPing';
 import type { Event } from './Event';
 import type { User } from '$lib/types/User';
 import axios from 'axios';
+import { degree2radian } from '$lib/math/degree2radians';
 let event: Event;
 EventStore.subscribe((value) => {
 	event = value;
@@ -113,11 +114,8 @@ export class Unit {
 	async showScreen(track: RemoteVideoTrack | LocalVideoTrack, sid: string): Promise<void> {
 		const video = document.createElement('a-plane');
 		video.setAttribute('side', 'double');
+		video.setAttribute('name', 'Shared Screen');
 		video.setAttribute('id', 'screenPlaneOf' + this.userId);
-		video.setAttribute(
-			'position',
-			`${this.position.x} ${this.position.y + 1.5} ${this.position.z}`
-		);
 		video.setAttribute('rotation', `0 ${this.rotation.y + 180} 0`);
 		video.setAttribute('width', '1');
 		video.setAttribute('material', 'src:#' + sid + ';shader: flat; side:double');
@@ -128,6 +126,13 @@ export class Unit {
 		//send ping only when the screen is mine
 		if (this.userId == videoChat.userId) {
 			console.log('this screen is mine lets send ping');
+			const vector = new THREE.Vector3(0, 0, -2);
+			vector.applyAxisAngle(new THREE.Vector3(0, 1, 0), degree2radian(this.rotation.y));
+			video.setAttribute(
+				'position',
+				`${this.position.x + vector.x} ${this.position.y + 1.65} ${this.position.z + vector.z}`
+			);
+
 			videoChat.screenPingInterval = new sessionPing(
 				{
 					instanceId: sid,

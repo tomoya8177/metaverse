@@ -43,7 +43,7 @@
 		camera.rotation.y = Math.PI / 7;
 		renderer.setSize(180, 180);
 		const container = document.querySelector('#avatarPreview');
-		container.appendChild(renderer.domElement);
+		container?.appendChild(renderer.domElement);
 
 		const controls = new OrbitControls(camera, renderer.domElement);
 		controls.target.set(0, 0.58, 0);

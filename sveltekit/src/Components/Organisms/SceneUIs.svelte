@@ -121,6 +121,14 @@
 </div>
 
 <style>
+	#myCameraPreview {
+		position: absolute;
+		bottom: 6rem;
+		right: 1rem;
+		border-radius: 50%;
+		overflow: hidden;
+		box-shadow: 0 0 0.4rem 0.4rem rgba(0, 0, 0, 0.2);
+	}
 	.transform-buttons {
 		position: absolute;
 		top: 1rem;

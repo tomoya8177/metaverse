@@ -71,6 +71,16 @@
 	};
 	console.log({ $FocusObjectStore });
 	const onDeleteClicked = async () => {
+		if ($FocusObjectStore.name == 'Shared Screen') {
+			//check if the screen belong to myself. otherwise you can't relete it.
+			if (!$UserStore.onScreenShare) return alert('You are not sharing your screen.');
+			videoChat.unpublishMyTrack('screen');
+			const me = Users.find($UserStore.id);
+			if (!me) return console.error('me is null');
+			me?.hideScreen();
+			$UserStore.onScreenShare = false;
+			return;
+		}
 		if (!confirm('Are you sure that you want to delete this object?')) return;
 
 		const file = sharedObjects.get($FocusObjectStore.id);
