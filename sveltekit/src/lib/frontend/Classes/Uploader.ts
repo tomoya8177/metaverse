@@ -5,10 +5,13 @@ class Uploader {
 	constructor() {
 		this.client = filestack.init(PUBLIC_FileStackAPIKey);
 	}
-	launchPicker(onDone: (res: filestack.PickerResponse) => void) {
+	launchPicker(
+		accept: string | string[] | undefined,
+		onDone: (res: filestack.PickerResponse) => void
+	) {
 		this.client
 			.picker({
-				accept: ['image/*', 'video/*'],
+				accept: accept,
 				maxFiles: 1,
 				onUploadDone: (res) => {
 					onDone(res);

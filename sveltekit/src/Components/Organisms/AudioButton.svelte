@@ -12,6 +12,7 @@
 
 {#if $UserStore.onMute}
 	<button
+		data-tooltip="Mute"
 		aria-busy={busy}
 		class="circle-button dim"
 		on:click={async () => {
@@ -36,6 +37,7 @@
 	</button>
 {:else}
 	<button
+		data-tooltip="Unmute"
 		class="circle-button"
 		on:click={() => {
 			videoChat.unpublishMyTrack('audio');

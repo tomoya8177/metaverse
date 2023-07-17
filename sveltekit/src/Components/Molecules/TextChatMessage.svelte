@@ -58,7 +58,13 @@
 					{/if}
 				</div>
 			{/if}
-			{@html nl2br(message.body)}
+			{#if message.type == 'attachment'}
+				<a href={message.url} target="_blank">
+					{message.body}
+				</a>
+			{:else}
+				{@html nl2br(message.body)}
+			{/if}
 			<div style="font-size:0.7rem;text-align:right;width:100%">
 				{DateTime.fromISO(message.createdAt).setZone().toRelative()}
 			</div>

@@ -5,7 +5,7 @@
 	import 'aframe-environment-component';
 	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
+	import { EventStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 
 	import '$lib/AframeComponents';
@@ -21,6 +21,7 @@
 	import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
 	import { LocalAudioTrack, createLocalAudioTrack } from 'twilio-video';
 	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
+	import { uploader } from '$lib/frontend/Classes/Uploader';
 	export let virtuaMentorReady = false;
 	export let messages: Message[] = [];
 	let newMessagePinned = false;
@@ -189,6 +190,30 @@
 		<div>
 			<a href={'#'} on:click={onMicClicked} style:opacity={micActive ? 1 : 0.5}>
 				<Icon icon="mic" />
+			</a>
+		</div>
+		<div>
+			<a
+				href={'#'}
+				on:click={() => {
+					uploader.launchPicker(undefined, async (res) => {
+						res.filesUploaded.forEach(async (file) => {
+							console.log(file);
+
+							const message = new Message({
+								event: $EventStore.id,
+								type: 'attachment',
+								user: $UserStore.id,
+								body: file.filename,
+								url: file.url
+							});
+							const createdMessage = await sendChatMessage(message);
+							console.log({ createdMessage });
+						});
+					});
+				}}
+			>
+				<Icon icon="attachment" />
 			</a>
 		</div>
 		<div style="text-align:right;flex:1">

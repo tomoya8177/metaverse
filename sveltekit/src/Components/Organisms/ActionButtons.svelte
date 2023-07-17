@@ -54,7 +54,7 @@
 </script>
 
 <div style="position:relative">
-	<button data-tooltip="T" class="circle-button" on:click={onTextChatClicked}>
+	<button data-tooltip="Text Chat (T)" class="circle-button" on:click={onTextChatClicked}>
 		<Icon icon="chat" />
 	</button>
 	{#if micActive}
@@ -75,6 +75,7 @@
 {#if $EventStore.allowVideo}
 	{#if $UserStore.onVideoMute}
 		<button
+			data-tooltip="Start My Camera"
 			class="circle-button dim"
 			on:click={async () => {
 				try {
@@ -91,6 +92,7 @@
 		</button>
 	{:else}
 		<button
+			data-tooltip="Hide My Camera"
 			class="circle-button"
 			on:click={() => {
 				videoChat.unpublishMyTrack('camera');
@@ -103,6 +105,7 @@
 	{/if}
 	{#if $UserStore.onScreenShare}
 		<button
+			data-tooltip="Hide My Screen"
 			class="circle-button"
 			on:click={() => {
 				videoChat.unpublishMyTrack('screen');
@@ -114,6 +117,7 @@
 		</button>
 	{:else}
 		<button
+			data-tooltip="Share Screen"
 			class="circle-button dim"
 			on:click={async () => {
 				try {
@@ -132,9 +136,10 @@
 		</button>
 	{/if}
 	<button
+		data-tooltip="Upload Image"
 		class="circle-button"
 		on:click={() =>
-			uploader.launchPicker((res) => {
+			uploader.launchPicker(['image/*'], (res) => {
 				//when done
 				console.log(res);
 				res.filesUploaded.forEach(async (file) => {
@@ -166,6 +171,7 @@
 					console.log({ createdFile });
 					const object = new SharedObject(createdFile);
 					object.moveToMyFront(me?.position, me?.rotation);
+					object.locked = false;
 					sharedObjects.add(object);
 					videoChat.sendMessage({
 						key: 'objectCreate',

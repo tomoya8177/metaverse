@@ -10,8 +10,9 @@ export type User = {
 	isAdmin: boolean;
 	organizations?: Organization[];
 	userRoles?: UserRole[];
-	createdAt: string;
+	createdAt?: string;
 	onMute: boolean;
 	onVideoMute: boolean;
-	onScreenShare: boolean;
+	onScreenShare?: boolean;
+	isManager?: boolean;
 };

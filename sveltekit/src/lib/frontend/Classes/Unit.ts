@@ -8,6 +8,7 @@ import type { Event } from './Event';
 import type { User } from '$lib/types/User';
 import axios from 'axios';
 import { degree2radian } from '$lib/math/degree2radians';
+import { sharedObjects } from './SharedObjects';
 let event: Event;
 EventStore.subscribe((value) => {
 	event = value;
@@ -23,7 +24,6 @@ export class Unit {
 	onVideoMute: boolean = false;
 	sharingScreen: boolean = false;
 	constructor(userId: string) {
-		console.log('creating unit', userId);
 		this.userId = userId;
 		//append element to the scene
 		this.el = document.createElement('a-entity');
@@ -112,20 +112,23 @@ export class Unit {
 		this.avatarContainer.appendChild(video);
 	}
 	async showScreen(track: RemoteVideoTrack | LocalVideoTrack, sid: string): Promise<void> {
+		const shredObject = {
+			id: 'screenPlaneOf' + this.userId,
+			locked: this.userId != videoChat.userId,
+			title: 'Shared Screen'
+		};
+		sharedObjects.add(shredObject);
 		const video = document.createElement('a-plane');
-		video.setAttribute('side', 'double');
-		video.setAttribute('name', 'Shared Screen');
 		video.setAttribute('id', 'screenPlaneOf' + this.userId);
 		video.setAttribute('rotation', `0 ${this.rotation.y + 180} 0`);
-		video.setAttribute('width', '1');
 		video.setAttribute('material', 'src:#' + sid + ';shader: flat; side:double');
 		video.setAttribute('editable-object', '');
+		video.setAttribute('width', '1');
 		if (track.dimensions?.width && track.dimensions?.height) {
 			video.setAttribute('height', (track.dimensions?.height / track.dimensions?.width).toString());
 		}
 		//send ping only when the screen is mine
 		if (this.userId == videoChat.userId) {
-			console.log('this screen is mine lets send ping');
 			const vector = new THREE.Vector3(0, 0, -2);
 			vector.applyAxisAngle(new THREE.Vector3(0, 1, 0), degree2radian(this.rotation.y));
 			video.setAttribute(

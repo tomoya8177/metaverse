@@ -4,15 +4,17 @@ export class SharedObject {
 	id: string;
 	url: string;
 	type: string;
-	size: number;
+	size?: number;
 	title: string;
-	createdAt: string;
+	createdAt?: string;
 	components: string;
 	event: string;
 	user: string;
 	editable: boolean;
-	handle: string;
+	handle?: string;
 	el?: Entity;
+	locked: boolean = true;
+	linkTo: string;
 	constructor({
 		id,
 		url,
@@ -24,7 +26,8 @@ export class SharedObject {
 		event,
 		user,
 		editable,
-		handle
+		handle,
+		linkTo
 	}: SharedObject) {
 		this.id = id;
 		this.url = url;
@@ -37,26 +40,47 @@ export class SharedObject {
 		this.user = user;
 		this.editable = editable;
 		this.handle = handle;
+		this.linkTo = linkTo;
 		const entity = document.createElement('a-entity');
 		entity.setAttribute('id', id);
+		let asset: Entity | null = null;
 		if (this.type.includes('image')) {
-			const asset = document.createElement('img');
-			asset.src = this.url;
-			asset.id = this.id + 'asset';
-			asset.crossOrigin = 'anonymous';
-			document.querySelector('a-assets')?.appendChild(asset);
+			asset = document.createElement('img');
 			asset.onload = () => {
+				console.log('loaded', asset);
 				const width = asset.width;
 				const height = asset.height;
 				const aspectRatio = height / width;
-				entity.setAttribute('geometry', `primitive: plane;`);
-				entity.setAttribute(
-					'material',
-					`src: #${asset.id}; shader:flat;side: double;transparent: true`
-				);
-				entity.setAttribute('geometry', `height:${aspectRatio}; width:1;`);
+				entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
 			};
+		} else if (this.type.includes('video')) {
+			asset = document.createElement('video');
+			asset.autoplay = true;
+			asset.playsinline = true;
+			asset['webkit-playsinline'] = true;
+			// const width = asset.width;
+			// const height = asset.height;
+			// const aspectRatio = height / width;
+			// entity.setAttribute('geometry', `height:${aspectRatio}; width:1;`);
+			asset.addEventListener('loadedmetadata', () => {
+				console.log('loaded', asset);
+				const width = asset.videoWidth;
+				const height = asset.videoHeight;
+				const aspectRatio = height / width;
+				console.log({ aspectRatio });
+				entity.setAttribute('geometry', { primitive: 'plane', height: aspectRatio, width: 1 });
+			});
 		}
+		asset.id = this.id + 'asset';
+		asset.src = this.url;
+		asset.crossOrigin = 'anonymous';
+		entity.setAttribute('geometry', `primitive: plane;`);
+		entity.setAttribute(
+			'material',
+			`src: #${asset.id}; shader:flat;side: double;transparent: true`
+		);
+		if (!asset) return;
+		document.querySelector('a-assets')?.appendChild(asset);
 		entity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
 		entity.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
 		entity.setAttribute('scale', `${this.scale.x} ${this.scale.y} ${this.scale.z}`);

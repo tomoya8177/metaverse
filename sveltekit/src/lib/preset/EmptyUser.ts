@@ -10,5 +10,6 @@ export const emptyUser: User = {
 	lastPosition: '',
 	organizations: [],
 	onMute: true,
-	onVideoMute: true
+	onVideoMute: true,
+	isManager: false
 };

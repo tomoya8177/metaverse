@@ -23,10 +23,13 @@
 		console.log({ events });
 		if (events.length) {
 			const event = new Event(events[0]);
+			const userRole: UserRole = await axios
+				.get(`/api/userRoles?user=${$UserStore.id}&organization=${event.organization}`)
+				.then((res) => res.data[0]);
+			if (userRole.role == 'manager') {
+				$UserStore.isManager = true;
+			}
 			if (!event.isPublic) {
-				const userRole: UserRole = await axios
-					.get(`/api/userRoles?user=${$UserStore.id}&organization=${event.organization}`)
-					.then((res) => res.data[0]);
 				if (!userRole) {
 					noEvent = true;
 					return;

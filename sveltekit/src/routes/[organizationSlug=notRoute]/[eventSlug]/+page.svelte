@@ -45,28 +45,13 @@
 		//me.twilioConnect($EventStore.id)
 	};
 
-	FocusObjectStore.subscribe((obj) => {
-		if (!obj.open) return;
-		setTimeout(() => {
-			const editingPane = document.querySelector('.editingPane') as HTMLElement;
-			if (!editingPane) return;
-			editingPane.style.left = mousePos.x + 'px';
-			editingPane.style.top = mousePos.y + 'px';
-		}, 100);
-	});
-	let mousePos = { x: 0, y: 0 };
-	const setMousePos = (e) => {
-		mousePos = { x: e.clientX, y: e.clientY };
-	};
 	let organization: Organization | null = null;
 	onMount(async () => {
-		window.addEventListener('mouseup', setMousePos);
 		organization = await axios
 			.get('/api/organizations/' + $EventStore.organization)
 			.then((res) => res.data);
 	});
 	onDestroy(() => {
-		window.removeEventListener('mouseup', setMousePos);
 		messageUnlisteners();
 	});
 </script>

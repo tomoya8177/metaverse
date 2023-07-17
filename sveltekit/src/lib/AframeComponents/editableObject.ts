@@ -1,4 +1,5 @@
 import { editableObject } from '$lib/frontend/Classes/EditableObject';
+import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { degree2radian } from '$lib/math/degree2radians';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
@@ -17,12 +18,18 @@ AFRAME.registerComponent('editable-object', {
 		this.initialPos = null;
 		this.cursorEl = document.querySelector('[raycaster]');
 		this.rayCatcher = document.getElementById('rayCatcher');
+		this.transportMode = 'position';
 
 		this.el.addEventListener('mousedown', (e) => {
-			editableObject.transportMode = 'position';
+			this.object = sharedObjects.get(this.el.id);
+			this.transportMode = 'position';
 			this.camera = document.getElementById('camera');
 			this.rig = document.getElementById(userId);
-			editableObject.setEntity(this.el);
+			FocusObjectStore.set(this.object);
+			if (this.object.locked) {
+				return;
+			}
+			// editableObject.setEntity(this.el);
 			const intersection = e.detail.intersection.point;
 			this.rayCatcher.setAttribute(
 				'position',
@@ -50,6 +57,37 @@ AFRAME.registerComponent('editable-object', {
 			}
 		});
 		this.el.addEventListener('mouseup', () => {
+			if (this.object && this.object.locked) {
+				if (this.object.linkTo) {
+					setTimeout(() => {
+						this.el.setAttribute(
+							'link',
+							`href:${this.object.linkTo};target:_blank; highlighted:true`
+						);
+						const text = document.createElement('a-text');
+						text.setAttribute('value', 'Click to open');
+						text.setAttribute('position', '0 0 0.02');
+						text.setAttribute('color', 'white');
+						text.setAttribute('align', 'center');
+						text.setAttribute('width', '1');
+						//set geometry as background
+						const geometry = document.createElement('a-plane');
+						geometry.setAttribute('color', 'green');
+						geometry.setAttribute('width', '0.4');
+						geometry.setAttribute('height', '0.1');
+						geometry.setAttribute('position', '0 0 0.01');
+						//append to the object
+						this.el.appendChild(text);
+						this.el.appendChild(geometry);
+						setTimeout(() => {
+							this.el.removeAttribute('link');
+							this.el.removeChild(this.el.lastChild);
+							this.el.removeChild(this.el.lastChild);
+						}, 3000);
+					}, 100);
+				}
+				return;
+			}
 			if (!this.rig) return;
 			this.rayCatcher.setAttribute('position', '0 -100 0');
 			this.rig.setAttribute('look-controls', 'enabled:true');
@@ -63,6 +101,29 @@ AFRAME.registerComponent('editable-object', {
 					scale: this.el.getAttribute('scale')
 				})
 			});
+		});
+		window.addEventListener('keydown', (evt) => {
+			if (evt.key == 'Shift') {
+				//rotation
+				this.transportMode = 'rotation';
+			} else if (evt.key == 'Control') {
+				//scale
+				this.transportMode = 'scale';
+			} else if (evt.key == 'Escape') {
+				console.log('escape');
+				//scale
+				this.transportMode = 'position';
+				FocusObjectStore.set(null);
+			}
+		});
+		window.addEventListener('keyup', (evt) => {
+			if (evt.key == 'Shift') {
+				//rotation
+				this.transportMode = 'position';
+			} else if (evt.key == 'Control') {
+				//scale
+				this.transportMode = 'position';
+			}
 		});
 	},
 	tick: function (e) {
@@ -82,14 +143,14 @@ AFRAME.registerComponent('editable-object', {
 					};
 					//if diff is too small, don't do anything
 					if (Math.abs(diff.x) == 0 && Math.abs(diff.y) == 0 && Math.abs(diff.z) == 0) return;
-					if (editableObject.transportMode == 'position') {
+					if (this.transportMode == 'position') {
 						this.el.setAttribute(
 							'position',
 							`${this.el.getAttribute('position').x + diff.x}
 							${this.el.getAttribute('position').y + diff.y}
 							${this.el.getAttribute('position').z + diff.z}`
 						);
-					} else if (editableObject.transportMode == 'rotation') {
+					} else if (this.transportMode == 'rotation') {
 						//the diff shoukld be calculated with pointsrelative to the raycatcher
 						const relativeDiff = this.getRelativeDiff(intersection);
 						const factor = relativeDiff.x * 20;
@@ -100,7 +161,7 @@ AFRAME.registerComponent('editable-object', {
 							} 0`
 						);
 						const result = this.el.getAttribute('rotation').y;
-					} else if (editableObject.transportMode == 'scale') {
+					} else if (this.transportMode == 'scale') {
 						const relativeDiff = this.getRelativeDiff(intersection);
 						this.el.setAttribute(
 							'scale',

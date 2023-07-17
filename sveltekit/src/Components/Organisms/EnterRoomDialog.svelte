@@ -3,7 +3,7 @@
 	import 'aframe-environment-component';
 	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
+	import { EventStore, UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/frontend/Classes/Me';
