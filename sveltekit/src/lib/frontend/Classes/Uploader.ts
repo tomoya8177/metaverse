@@ -8,6 +8,8 @@ class Uploader {
 	launchPicker(onDone: (res: filestack.PickerResponse) => void) {
 		this.client
 			.picker({
+				accept: ['image/*', 'video/*'],
+				maxFiles: 1,
 				onUploadDone: (res) => {
 					onDone(res);
 				}
