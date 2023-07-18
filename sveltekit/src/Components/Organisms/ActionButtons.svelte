@@ -125,10 +125,15 @@
 			on:click={async () => {
 				try {
 					const publicationTrackSid = await videoChat.startMyScreen();
-					if (publicationTrackSid && videoChat.screenTrack && me) {
-						me.showScreen(videoChat.screenTrack, publicationTrackSid);
-						$UserStore.onScreenShare = true;
-					}
+					if (!publicationTrackSid) return console.error(`Couldn't get access to the Screen`);
+					const el = document.getElementById(publicationTrackSid);
+					if (!el) return console.error(`Couldn't get access to the Screen`);
+					el.addEventListener('loadedmetadata', () => {
+						if (publicationTrackSid && videoChat.screenTrack && me) {
+							me.showScreen(videoChat.screenTrack, publicationTrackSid);
+							$UserStore.onScreenShare = true;
+						}
+					});
 				} catch (e) {
 					console.log(e);
 					alert(`Couldn't get access to the Screen`);

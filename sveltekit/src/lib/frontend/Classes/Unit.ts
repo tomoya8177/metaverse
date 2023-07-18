@@ -115,7 +115,8 @@ export class Unit {
 		const shredObject = {
 			id: 'screenPlaneOf' + this.userId,
 			locked: this.userId != videoChat.userId,
-			title: 'Shared Screen'
+			title: 'Shared Screen',
+			type: 'screen'
 		};
 		sharedObjects.add(shredObject);
 		const video = document.createElement('a-plane');

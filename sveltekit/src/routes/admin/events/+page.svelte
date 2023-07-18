@@ -111,7 +111,11 @@
 			{@const organization = organizations.find((org) => org.id == event.organization)}
 			<tr>
 				<td>
-					<a href={`/${event.slug}`} role="button" class="outline circle-button">
+					<a
+						href={`/${organization?.slug}/${event.slug}`}
+						role="button"
+						class="outline circle-button"
+					>
 						<Icon icon="login" />
 					</a>
 				</td>

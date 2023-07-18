@@ -13,6 +13,8 @@
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
 	import { Users, UsersStore } from '$lib/frontend/Classes/Users';
+	import { _, lang } from '$lib/i18n';
+	export let title: String = 'VirtuaIntel';
 	const onLogoutClicked = () => {
 		videoChat.leave();
 		EventStore.set(EmptyEvent);
@@ -64,29 +66,38 @@
 
 <nav>
 	<ul>
+		<li>
+			<a href={'#'}>
+				<strong>
+					{title}
+				</strong>
+			</a>
+		</li>
 		<ObjectEditor />
 	</ul>
 	<ul />
 	<ul>
-		<li>
-			<details role="list" dir="rtl">
-				<summary aria-haspopup="listbox" role="link">
-					<div>
-						<Icon icon="groups" />
-						Users (
-						{$UsersStore.length}
-						)
-					</div>
-				</summary>
-				<ul role="listbox">
-					{#each $UsersStore || [] as unit}
-						<li>
-							{unit.nickname}
-						</li>
-					{/each}
-				</ul>
-			</details>
-		</li>
+		{#if $UsersStore.length}
+			<li>
+				<details role="list" dir="rtl">
+					<summary aria-haspopup="listbox" role="link">
+						<div>
+							<Icon icon="groups" />
+							{lang.t('Users')} (
+							{$UsersStore.length}
+							)
+						</div>
+					</summary>
+					<ul role="listbox">
+						{#each $UsersStore || [] as unit}
+							<li>
+								{unit.nickname}
+							</li>
+						{/each}
+					</ul>
+				</details>
+			</li>
+		{/if}
 		<li>
 			<details role="list" dir="rtl">
 				<summary aria-haspopup="listbox" role="link">
@@ -98,15 +109,15 @@
 				<ul role="listbox">
 					{#if $EventStore?.id}
 						<li>
-							<button on:click={onLeaveClicked} class="warning">Leave Room</button>
+							<button on:click={onLeaveClicked} class="warning">{_('Leave Room')}</button>
 						</li>
 					{/if}
-					<li><a href={'#'} on:click={changeEmailClicked}> Change Email </a></li>
+					<li><a href={'#'} on:click={changeEmailClicked}> {_('Change Email')} </a></li>
 					<li>
-						<a href={'#'} on:click={changeProfileClicked}> Change Profile </a>
+						<a href={'#'} on:click={changeProfileClicked}> {_('Change Profile')} </a>
 					</li>
 					<li>
-						<a href={'#'} on:click={onLogoutClicked}>Logout</a>
+						<a href={'#'} on:click={onLogoutClicked}>{_('Logout')}</a>
 					</li>
 				</ul>
 			</details>
@@ -121,17 +132,17 @@
 					emailDialogOpen = false;
 				}}
 			/>
-			<h3>Change Email</h3>
+			<h3>{_('Change Email')}</h3>
 			<div style="margin-bottom:1rem">
-				<div>Current Email</div>
+				<div>{_('Current Email')}</div>
 				<span>{$UserStore.email}</span>
 			</div>
 			{#if emailAlreadyExists}
 				<div style="margin-bottom:1rem">This Email address already exists.</div>
 			{/if}
-			<InputWithLabel label="New Email" bind:value={newEmail} />
+			<InputWithLabel label={_('New Email')} bind:value={newEmail} />
 			<button aria-busy={busy} on:click={() => onChangeEmailDoClicked()} disabled={busy}>
-				Change
+				{_('Change')}
 			</button>
 		</article>
 	</dialog>

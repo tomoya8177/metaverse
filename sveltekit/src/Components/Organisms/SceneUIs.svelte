@@ -19,6 +19,7 @@
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { escapeHTML } from '$lib/math/escapeHTML';
+	import ObjectEditor from './ObjectEditor.svelte';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -88,6 +89,7 @@
 			setTimeout(() => {
 				scrollChatToBottom();
 			}, 100);
+			if (data.user === 'Mentor') aiSpeaksOut(data.body);
 		});
 	});
 	onDestroy(() => {
@@ -182,6 +184,8 @@
 	};
 </script>
 
+<div class="object-editor" />
+
 <div class="action-buttons">
 	<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:textChatOpen bind:micActive {me} />
 </div>
@@ -203,6 +207,12 @@
 </div>
 
 <style>
+	.object-editor {
+		position: absolute;
+		top: 2em;
+		left: 1rem;
+		z-index: 100;
+	}
 	#myCameraPreview {
 		position: absolute;
 		bottom: 6rem;

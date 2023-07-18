@@ -2,6 +2,7 @@ import { editableObject } from '$lib/frontend/Classes/EditableObject';
 import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { degree2radian } from '$lib/math/degree2radians';
+import { EmptyObject } from '$lib/preset/EmptyObject';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
 import 'aframe';
 import axios from 'axios';
@@ -115,7 +116,7 @@ AFRAME.registerComponent('editable-object', {
 				console.log('escape');
 				//scale
 				this.transportMode = 'position';
-				FocusObjectStore.set(null);
+				FocusObjectStore.set(EmptyObject);
 			}
 		});
 		window.addEventListener('keyup', (evt) => {
@@ -155,11 +156,11 @@ AFRAME.registerComponent('editable-object', {
 					} else if (this.transportMode == 'rotation') {
 						//the diff shoukld be calculated with pointsrelative to the raycatcher
 						const relativeDiff = this.getRelativeDiff(intersection);
-						const factor = relativeDiff.x * 20;
+						const factor = relativeDiff.x * 40;
 						this.el.setAttribute(
 							'rotation',
-							`${this.el.getAttribute('rotation').x - (relativeDiff.y * 200) / this.distance} ${
-								this.el.getAttribute('rotation').y + (relativeDiff.x * 200) / this.distance
+							`${this.el.getAttribute('rotation').x - (relativeDiff.y * 300) / this.distance} ${
+								this.el.getAttribute('rotation').y + (relativeDiff.x * 300) / this.distance
 							} 0`
 						);
 						const result = this.el.getAttribute('rotation').y;
@@ -167,9 +168,9 @@ AFRAME.registerComponent('editable-object', {
 						const relativeDiff = this.getRelativeDiff(intersection);
 						this.el.setAttribute(
 							'scale',
-							`${this.el.getAttribute('scale').x + relativeDiff.x / this.distance}
-							${this.el.getAttribute('scale').y + relativeDiff.x / this.distance}
-							${this.el.getAttribute('scale').z + relativeDiff.x / this.distance}`
+							`${this.el.getAttribute('scale').x + (relativeDiff.x * 3) / this.distance}
+							${this.el.getAttribute('scale').y + (relativeDiff.x * 3) / this.distance}
+							${this.el.getAttribute('scale').z + (relativeDiff.x * 3) / this.distance}`
 						);
 					}
 

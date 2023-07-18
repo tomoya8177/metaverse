@@ -4,6 +4,7 @@
 	import { UserStore } from '$lib/store';
 	import Navigation from '../../Components/Organisms/Navigation.svelte';
 	import Icon from '../../Components/Atom/Icon.svelte';
+	import { _, lang } from '$lib/i18n';
 	let loggedIn: boolean | null = null;
 	onMount(async () => {
 		loggedIn = await checkLogin();
@@ -24,19 +25,19 @@
 						<li>
 							<a href="/admin/users">
 								<Icon icon="group" />
-								Users</a
+								{_('Users')}</a
 							>
 						</li>
 						<li>
 							<a href="/admin/organizations">
 								<Icon icon="apartment" />
-								Organizations</a
+								{_('Organizations')}</a
 							>
 						</li>
 						<li>
 							<a href="/admin/events">
 								<Icon icon="vrpano" />
-								Events</a
+								{_('Events')}</a
 							>
 						</li>
 					</ul>

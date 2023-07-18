@@ -8,6 +8,7 @@
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { PUBLIC_FileStackPolicy, PUBLIC_FileStackSignature } from '$env/static/public';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
+	import { EmptyObject } from '$lib/preset/EmptyObject';
 
 	const onDeleteClicked = async () => {
 		if ($FocusObjectStore.title == 'Shared Screen') {
@@ -33,17 +34,19 @@
 			key: 'objectDelete',
 			id: $FocusObjectStore.id
 		});
-		FocusObjectStore.set(null);
+		FocusObjectStore.set(EmptyObject);
 	};
 </script>
 
-{#if $FocusObjectStore}
+{#if $FocusObjectStore.id}
 	<li>
 		<details role="list">
 			<summary aria-haspopup="listbox" role="link">
 				<div>
 					<Icon icon="deployed_code" />
-					{$FocusObjectStore.title}
+					<span style="max-width:15rem;text-wrap:nowrap;overflow:hidden;display:inline-flex">
+						{$FocusObjectStore.title}
+					</span>
 					{#if $FocusObjectStore.locked}
 						<Icon icon="lock" />
 					{:else}

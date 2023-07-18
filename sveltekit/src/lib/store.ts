@@ -2,6 +2,7 @@ import { writable } from 'svelte/store';
 import type { Event } from './frontend/Classes/Event';
 import { emptyUser } from './preset/EmptyUser';
 import type { SharedObject } from './frontend/Classes/SharedObject';
+import { EmptyObject } from './preset/EmptyObject';
 
 export const UserStore = writable({
 	...emptyUser,
@@ -31,4 +32,4 @@ export type xyz = {
 	y: number;
 	z: number;
 };
-export const FocusObjectStore = writable(null);
+export const FocusObjectStore = writable(EmptyObject);

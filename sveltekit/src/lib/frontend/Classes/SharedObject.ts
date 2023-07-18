@@ -15,34 +15,22 @@ export class SharedObject {
 	el?: Entity;
 	locked: boolean = true;
 	linkTo: string;
-	constructor({
-		id,
-		url,
-		type,
-		size,
-		title,
-		createdAt,
-		components,
-		event,
-		user,
-		editable,
-		handle,
-		linkTo
-	}: SharedObject) {
-		this.id = id;
-		this.url = url;
-		this.type = type;
-		this.size = size;
-		this.title = title;
-		this.createdAt = createdAt;
-		this.components = components;
-		this.event = event;
-		this.user = user;
-		this.editable = editable;
-		this.handle = handle;
-		this.linkTo = linkTo;
+	constructor(data: any) {
+		this.id = data.id;
+		if (!this.id) return;
+		this.url = data.url;
+		this.type = data.type || '';
+		this.size = data.size;
+		this.title = data.title;
+		this.createdAt = data.createdAt;
+		this.components = data.components;
+		this.event = data.event;
+		this.user = data.user;
+		this.editable = data.editable;
+		this.handle = data.handle;
+		this.linkTo = data.linkTo;
 		const entity = document.createElement('a-entity');
-		entity.setAttribute('id', id);
+		entity.setAttribute('id', this.id);
 		let asset: Entity | null = null;
 		if (this.type.includes('image')) {
 			asset = document.createElement('img');
