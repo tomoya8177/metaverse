@@ -14,13 +14,25 @@
 	onMount(async () => {
 		organizations = await axios.get('/api/organizations').then((res) => res.data);
 	});
+	const checkSlug = async (slug: string) => {
+		const result = await axios.get('/api/organizations?slug=' + slug).then((res) => res.data);
+		if (result.length && result[0].id != editOrganization.id) {
+			alert('Slug already exists');
+			return false;
+		}
+		return true;
+	};
+
 	const onCreateClicked = async () => {
+		if (!(await checkSlug(editOrganization.slug))) return;
 		if (!editOrganization.title) return alert('Please enter a title');
 		const newOrg = await axios.post('/api/organizations', editOrganization).then((res) => res.data);
 		organizations = [...organizations, newOrg].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 		modalOpen = false;
 	};
 	const onUpdateClicked = async () => {
+		if (!(await checkSlug(editOrganization.slug))) return;
+
 		if (!editOrganization.title) return alert('Please enter a title');
 		const updatedOrg = await axios
 			.put('/api/organizations/' + editOrganization.id, editOrganization)
@@ -79,6 +91,7 @@
 		<article>
 			<ModalCloseButton onClick={() => (modalOpen = false)} />
 			<InputWithLabel label="Title" bind:value={editOrganization.title} />
+			<InputWithLabel label="Slug" bind:value={editOrganization.slug} />
 			{#if editMode == 'create'}
 				<button
 					on:click={() => {
