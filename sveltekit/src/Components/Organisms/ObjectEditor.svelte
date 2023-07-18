@@ -52,6 +52,46 @@
 				</div>
 			</summary>
 			<ul role="listbox">
+				{#if $FocusObjectStore.type.includes('video')}
+					<li>
+						<div style="display:flex;gap:0.4rem">
+							<div>
+								<button
+									class="circle-button"
+									on:click={() => {
+										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+										video?.play();
+									}}
+								>
+									<Icon icon="play_arrow" />
+								</button>
+							</div>
+							<div>
+								<button
+									class="circle-button"
+									on:click={() => {
+										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+										video?.pause();
+									}}
+								>
+									<Icon icon="pause" />
+								</button>
+							</div>
+							<div>
+								<button
+									class="circle-button"
+									on:click={() => {
+										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+										if (!video) return console.error('video is null');
+										video.currentTime = 0;
+									}}
+								>
+									<Icon icon="replay" />
+								</button>
+							</div>
+						</div>
+					</li>
+				{/if}
 				{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
 					<li>
 						<div style="display:flex;flex-direction:reverse">

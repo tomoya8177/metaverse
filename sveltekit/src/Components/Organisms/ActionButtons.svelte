@@ -139,7 +139,7 @@
 		data-tooltip="Upload Image"
 		class="circle-button"
 		on:click={() =>
-			uploader.launchPicker(['image/*'], (res) => {
+			uploader.launchPicker(['image/*', 'video/*'], (res) => {
 				//when done
 				console.log(res);
 				res.filesUploaded.forEach(async (file) => {
