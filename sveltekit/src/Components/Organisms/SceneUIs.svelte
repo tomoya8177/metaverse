@@ -12,10 +12,13 @@
 	import '$lib/AframeComponents';
 	import type { User } from '$lib/types/User';
 	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
-	import type { Message } from '$lib/frontend/Classes/Message';
+	import { Message } from '$lib/frontend/Classes/Message';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import type { Me } from '$lib/frontend/Classes/Me';
+	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
+	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
+	import { escapeHTML } from '$lib/math/escapeHTML';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -93,16 +96,106 @@
 	});
 
 	let textChatOpen = false;
-
+	let recognition;
 	export let me: Me | null = null;
 	let micActive = false;
+	const onMicClicked = async () => {
+		micActive = !micActive;
+		if (micActive) {
+			//activate my mic and start audio to text
+			startAudioToText();
+		} else {
+			//deactivate my mic and stop audio to text
+			recognition.stop();
+			const newMessage = new Message({
+				body: escapeHTML(newMessageBody) + ' @Mentor',
+				user: $UserStore.id,
+				event: $EventStore.id,
+				pinned: newMessagePinned
+			});
+
+			await sendChatMessage(newMessage);
+			waitingForAIAnswer = true;
+			const aiMessage = await sendQuestionToAI($EventStore.id, newMessage);
+			waitingForAIAnswer = false;
+			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
+			aiSpeaksOut(createdMessage.body);
+		}
+	};
+	let waitingForAIAnswer = false;
+	let newMessagePinned = false;
+	let newMessageBody = '';
+	const startAudioToText = () => {
+		//activate speech detech api
+		createRecognition();
+		recognition.start();
+		console.log({ recognition }, 'started');
+		recognition.addEventListener('result', (e) => {
+			console.log(e.results);
+			const transcript = e.results[0][0].transcript;
+			// const transcript = Array.from(e.results)
+			// 	.map((result) => result[0])
+			// 	.map((result) => result.transcript.replace('at mentor', '@Mentor'))
+			// 	.join('');
+			newMessageBody = transcript;
+			console.log({ transcript });
+			// if (e.results[0].isFinal) {
+			// 	onMessageSendClicked();
+			// 	//reset recognition results
+			// 	// onMicClicked();
+
+			// 	// setTimeout(() => {
+			// 	// 	onMicClicked();
+			// 	// }, 1000);
+			// }
+		});
+		recognition.onerror = (event) => {
+			if (event.error === 'not-allowed') {
+				alert('Microphone access denied by the user.');
+				// Perform any necessary actions when access is denied
+			} else {
+				console.log('Error', event.error);
+				alert(event.error);
+			}
+			onMicClicked();
+		};
+	};
+	const createRecognition = () => {
+		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+		recognition = new SpeechRecognition();
+		recognition.interimResults = false;
+		recognition.lang = 'en-US';
+		recognition.continuous = false;
+		//Setting interimResults to true
+	};
+	const sendChatMessage = async (message: Message) => {
+		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
+		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
+		messages = [
+			...messages,
+			{ ...createdMessage, isTalking: createdMessage.user === 'Mentor' ? true : false }
+		];
+		authors = await axios
+			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
+			.then((res) => res.data);
+		return createdMessage;
+	};
 </script>
 
 <div class="action-buttons">
-	<ActionButtons bind:textChatOpen bind:micActive {me} />
+	<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:textChatOpen bind:micActive {me} />
 </div>
 <div style:display={textChatOpen ? 'block' : 'none'}>
-	<ChatBox bind:messages bind:authors bind:micActive {virtuaMentorReady} />
+	<ChatBox
+		bind:waitingForAIAnswer
+		bind:newMessagePinned
+		{sendChatMessage}
+		{onMicClicked}
+		bind:messages
+		bind:authors
+		bind:micActive
+		{virtuaMentorReady}
+	/>
 </div>
 
 <div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>

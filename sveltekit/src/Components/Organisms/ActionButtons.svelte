@@ -18,7 +18,7 @@
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import AvatarPreview from '../Atom/AvatarPreview.svelte';
 	export let textChatOpen = false;
-	export let micActive = false;
+	export let waitingForAIAnswer;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -51,22 +51,25 @@
 	});
 
 	export let me: Me | null = null;
+	export let onMicClicked: () => void;
+	export let micActive: boolean;
 </script>
 
+<button
+	aria-busy={waitingForAIAnswer}
+	style:background-color={micActive ? 'red' : ''}
+	class=""
+	style="border-radius:29px
+"
+	on:click={onMicClicked}
+>
+	<Icon icon="mic" />
+	Ask AI Mentor
+</button>
 <div style="position:relative">
 	<button data-tooltip="Text Chat (T)" class="circle-button" on:click={onTextChatClicked}>
 		<Icon icon="chat" />
 	</button>
-	{#if micActive}
-		<button
-			xsmall
-			style="background-color:red;position:absolute;top:-0.6rem;right:-0.6rem;"
-			class="circle-button secondary"
-			on:click={() => {}}
-		>
-			<Icon icon="mic" />
-		</button>
-	{/if}
 </div>
 
 {#if $EventStore.allowAudio}

@@ -22,9 +22,11 @@
 	import { LocalAudioTrack, createLocalAudioTrack } from 'twilio-video';
 	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
+	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
+	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	export let virtuaMentorReady = false;
 	export let messages: Message[] = [];
-	let newMessagePinned = false;
+	export let newMessagePinned = false;
 	let newMessageBody = '';
 	export let authors: User[];
 	export let textChatOpen = false;
@@ -67,33 +69,24 @@
 			newMessageBody = newMessageBody + ' @Mentor';
 		}
 		busy = true;
-		const newMessage = {
+		const newMessage = new Message({
 			body: escapeHTML(newMessageBody),
 			user: $UserStore.id,
 			event: $EventStore.id,
 			pinned: newMessagePinned
-		};
-		await sendChatMessage(new Message(newMessage));
+		});
+		await sendChatMessage(newMessage);
 		busy = false;
 		if (newMessageBody.includes('@Mentor')) {
 			//io.emit('question', newMessageBody);
 			newMessageBody = '';
 			//send message to mentor
-			const response = await axios
-				.post('/chat/' + $EventStore.id, newMessage)
-				.then((res) => res.data);
-			console.log(response);
-			const aiMessage = new Message({
-				body: escapeHTML(response.response || response.text),
-				user: 'Mentor',
-				event: $EventStore.id,
-				pinned: false,
-				isTalking: true
-			});
+			waitingForAIAnswer = true;
+			const aiMessage = await sendQuestionToAI($EventStore.id, newMessage);
+			waitingForAIAnswer = false;
 			newMessageBody = '';
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
-			const utterance = new SpeechSynthesisUtterance(unescapeHTML(createdMessage.body));
-			speechSynthesis.speak(utterance);
+			aiSpeaksOut(createdMessage.body);
 		} else {
 			//io.emit('statement', newMessageBody);
 		}
@@ -104,73 +97,13 @@
 			scrollToBottom(element);
 		}, 100);
 	};
-	const sendChatMessage = async (message: Message) => {
-		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
-		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
-		messages = [
-			...messages,
-			{ ...createdMessage, isTalking: createdMessage.user === 'Mentor' ? true : false }
-		];
-		authors = await axios
-			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
-			.then((res) => res.data);
-		return createdMessage;
-	};
+	export let waitingForAIAnswer = false;
+	export let sendChatMessage: (message: Message) => Promise<Message>;
 	let busy = false;
 	let newMessageForMentor = false;
-	export let micActive = false;
-	const onMicClicked = () => {
-		micActive = !micActive;
-		if (micActive) {
-			//activate my mic and start audio to text
-			startAudioToText();
-		} else {
-			//deactivate my mic and stop audio to text
-			recognition.stop();
-		}
-	};
+	export let onMicClicked: () => void;
 	let recognition;
-	const startAudioToText = () => {
-		//activate speech detech api
-		createRecognition();
-		recognition.start();
-		console.log({ recognition }, 'started');
-		recognition.addEventListener('result', (e) => {
-			console.log(e.results);
-			const transcript = e.results[0][0].transcript;
-			// const transcript = Array.from(e.results)
-			// 	.map((result) => result[0])
-			// 	.map((result) => result.transcript.replace('at mentor', '@Mentor'))
-			// 	.join('');
-			newMessageBody = transcript;
-			if (e.results[0].isFinal) {
-				onMessageSendClicked();
-				//reset recognition results
-				// onMicClicked();
-
-				// setTimeout(() => {
-				// 	onMicClicked();
-				// }, 1000);
-			}
-		});
-		recognition.onerror = (event) => {
-			if (event.error === 'not-allowed') {
-				alert('Microphone access denied by the user.');
-				// Perform any necessary actions when access is denied
-			} else {
-				console.log('Error', event.error);
-			}
-			onMicClicked();
-		};
-	};
-	const createRecognition = () => {
-		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-		recognition = new SpeechRecognition();
-		recognition.interimResults = false;
-		recognition.lang = 'en-US';
-		recognition.continuous = false;
-		//Setting interimResults to true
-	};
+	export let micActive: boolean;
 </script>
 
 <div class="chat-box">
@@ -188,9 +121,14 @@
 	<hr />
 	<div style="display:flex; gap:1rem;">
 		<div>
-			<a href={'#'} on:click={onMicClicked} style:opacity={micActive ? 1 : 0.5}>
+			<button
+				aria-busy={waitingForAIAnswer}
+				style="height:2rem;border-radius:1rem;padding-top:0.1rem"
+				style:background-color={micActive ? 'red' : ''}
+				on:click={onMicClicked}
+			>
 				<Icon icon="mic" />
-			</a>
+			</button>
 		</div>
 		<div>
 			<a
