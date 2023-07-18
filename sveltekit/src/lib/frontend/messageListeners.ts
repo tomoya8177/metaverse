@@ -4,6 +4,7 @@ import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import type { User } from '$lib/types/User';
 import axios from 'axios';
 import { SharedObject } from './Classes/SharedObject';
+import { sharedObjects } from './Classes/SharedObjects';
 
 export const messageListeners = () => {
 	videoChat.listenTo('handshake', async (data) => {
@@ -38,6 +39,11 @@ export const messageListeners = () => {
 		object.setAttribute('position', data.position);
 		object.setAttribute('rotation', data.rotation);
 		object.setAttribute('scale', data.scale);
+	});
+	videoChat.listenTo('objectUpdate', (data) => {
+		const object = sharedObjects.get(data.id);
+		if (!object) return;
+		object.linkTo = data.linkTo;
 	});
 	videoChat.listenTo('objectDelete', (data) => {
 		console.log('delete revceived', data);

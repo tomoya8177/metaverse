@@ -19,6 +19,7 @@ AFRAME.registerComponent('editable-object', {
 		this.cursorEl = document.querySelector('[raycaster]');
 		this.rayCatcher = document.getElementById('rayCatcher');
 		this.transportMode = 'position';
+		this.readyToLink = false;
 
 		this.el.addEventListener('mousedown', (e) => {
 			this.object = sharedObjects.get(this.el.id);
@@ -59,32 +60,33 @@ AFRAME.registerComponent('editable-object', {
 		this.el.addEventListener('mouseup', () => {
 			if (this.object && this.object.locked) {
 				if (this.object.linkTo) {
+					if (this.readyToLink) {
+						//link to object
+						window.open(this.object.linkTo, '_blank');
+						return;
+					}
+					const text = document.createElement('a-text');
+					text.setAttribute('value', 'Click to open');
+					text.setAttribute('position', '0 0 0.02');
+					text.setAttribute('color', 'white');
+					text.setAttribute('align', 'center');
+					text.setAttribute('width', '1');
+					//set geometry as background
+					const geometry = document.createElement('a-plane');
+					geometry.setAttribute('color', 'green');
+					geometry.setAttribute('width', '0.4');
+					geometry.setAttribute('height', '0.1');
+					geometry.setAttribute('position', '0 0 0.01');
+					//append to the object
+					geometry.classList.add('clickable');
+					this.el.appendChild(text);
+					this.el.appendChild(geometry);
 					setTimeout(() => {
-						this.el.setAttribute(
-							'link',
-							`href:${this.object.linkTo};target:_blank; highlighted:true`
-						);
-						const text = document.createElement('a-text');
-						text.setAttribute('value', 'Click to open');
-						text.setAttribute('position', '0 0 0.02');
-						text.setAttribute('color', 'white');
-						text.setAttribute('align', 'center');
-						text.setAttribute('width', '1');
-						//set geometry as background
-						const geometry = document.createElement('a-plane');
-						geometry.setAttribute('color', 'green');
-						geometry.setAttribute('width', '0.4');
-						geometry.setAttribute('height', '0.1');
-						geometry.setAttribute('position', '0 0 0.01');
-						//append to the object
-						this.el.appendChild(text);
-						this.el.appendChild(geometry);
-						setTimeout(() => {
-							this.el.removeAttribute('link');
-							this.el.removeChild(this.el.lastChild);
-							this.el.removeChild(this.el.lastChild);
-						}, 3000);
-					}, 100);
+						this.el.removeChild(this.el.lastChild);
+						this.el.removeChild(this.el.lastChild);
+						this.readyToLink = false;
+					}, 3000);
+					this.readyToLink = true;
 				}
 				return;
 			}
