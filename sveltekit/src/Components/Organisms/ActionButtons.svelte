@@ -17,8 +17,9 @@
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import AvatarPreview from '../Atom/AvatarPreview.svelte';
+	import { _ } from '$lib/i18n';
 	export let textChatOpen = false;
-	export let waitingForAIAnswer;
+	export let waitingForAIAnswer: boolean;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -64,10 +65,10 @@
 	on:click={onMicClicked}
 >
 	<Icon icon="mic" />
-	Ask AI Mentor
+	{_('Ask AI Mentor')}
 </button>
 <div style="position:relative">
-	<button data-tooltip="Text Chat (T)" class="circle-button" on:click={onTextChatClicked}>
+	<button data-tooltip={_('Text Chat') + ' (T)'} class="circle-button" on:click={onTextChatClicked}>
 		<Icon icon="chat" />
 	</button>
 </div>
@@ -78,7 +79,7 @@
 {#if $EventStore.allowVideo}
 	{#if $UserStore.onVideoMute}
 		<button
-			data-tooltip="Start My Camera"
+			data-tooltip={_('Start My Camera')}
 			class="circle-button dim"
 			on:click={async () => {
 				try {
@@ -87,7 +88,7 @@
 					}
 				} catch (e) {
 					console.log(e);
-					alert(`Couldn't get access to the Camera`);
+					alert(_(`Couldn't get access to the Camera`));
 				}
 			}}
 		>
@@ -95,7 +96,7 @@
 		</button>
 	{:else}
 		<button
-			data-tooltip="Hide My Camera"
+			data-tooltip={_('Hide My Camera')}
 			class="circle-button"
 			on:click={() => {
 				videoChat.unpublishMyTrack('camera');
@@ -108,7 +109,7 @@
 	{/if}
 	{#if $UserStore.onScreenShare}
 		<button
-			data-tooltip="Hide My Screen"
+			data-tooltip={_('Hide My Screen')}
 			class="circle-button"
 			on:click={() => {
 				videoChat.unpublishMyTrack('screen');
@@ -120,7 +121,7 @@
 		</button>
 	{:else}
 		<button
-			data-tooltip="Share Screen"
+			data-tooltip={_('Share Screen')}
 			class="circle-button dim"
 			on:click={async () => {
 				try {
@@ -136,7 +137,7 @@
 					});
 				} catch (e) {
 					console.log(e);
-					alert(`Couldn't get access to the Screen`);
+					alert(_(`Couldn't get access to the Screen`));
 				}
 			}}
 		>
@@ -144,7 +145,7 @@
 		</button>
 	{/if}
 	<button
-		data-tooltip="Upload Image"
+		data-tooltip={_('Upload')}
 		class="circle-button"
 		on:click={() =>
 			uploader.launchPicker(['image/*', 'video/*'], (res) => {

@@ -5,7 +5,7 @@ import type { LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack } from 'twilio
 import { videoChat } from './VideoChat';
 import { sessionPing } from '$lib/frontend/Classes/sessionPing';
 import type { Event } from './Event';
-import type { User } from '$lib/types/User';
+import type { User } from '$lib/frontend/Classes/User';
 import axios from 'axios';
 import { degree2radian } from '$lib/math/degree2radians';
 import { sharedObjects } from './SharedObjects';

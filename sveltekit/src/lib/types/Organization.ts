@@ -3,5 +3,5 @@ export type Organization = {
 	title: string;
 	checked?: boolean;
 	isManager?: boolean;
-	stulg: string;
+	slug: string;
 };

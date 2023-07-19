@@ -2,16 +2,17 @@
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
 	import { Event } from '$lib/frontend/Classes/Event';
 	import axios from 'axios';
-	import ModalCloseButton from '../../../Components/Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';
-	import FilterPagination from '../../../Components/Organisms/FilterPagination.svelte';
+	import ModalCloseButton from '../../../../Components/Atom/ModalCloseButton.svelte';
+	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
+	import FilterPagination from '../../../../Components/Organisms/FilterPagination.svelte';
 	import { onMount } from 'svelte';
-	import Icon from '../../../Components/Atom/Icon.svelte';
+	import Icon from '../../../../Components/Atom/Icon.svelte';
 	import { fade } from 'svelte/transition';
 	import type { User } from '$lib/frontend/Classes/User';
 	import type { Organization } from '$lib/types/Organization';
 	import type { UserRole } from '$lib/types/UserRole';
 	import { _ } from '$lib/i18n';
+	import { page } from '$app/stores';
 
 	let events: Event[] = [];
 	let paginated: Event[] = [];
@@ -19,23 +20,27 @@
 	let editMode: 'update' | 'create' = 'update';
 	let modalOpen = false;
 	let organizations: Organization[] = [];
+	let organization: Organization;
 	let users: User[] = [];
 	let userRoles: UserRole[] = [];
 	onMount(async () => {
-		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
-		organizations = await axios.get('/api/organizations').then((res) => res.data);
-		users = await axios.get('/api/users').then((res) => {
-			res.data = res.data.map((user: User) => {
-				user.userRoles = userRoles.filter((userRole) => userRole.user == user.id);
-				user.organizations = organizations.filter((org) => {
-					return user.userRoles?.some((userRole) => userRole.organization == org.id) || false;
+		organization = await axios
+			.get('/api/organizations?slug=' + $page.params.organizationSlug)
+			.then((res) => res.data[0]);
+		userRoles = await axios
+			.get('/api/userRoles?organizatin=' + organization.id)
+			.then((res) => res.data);
+		users = await axios
+			.get(`/api/users?id=in:'${userRoles.map((role) => role.user).join("','")}'`)
+			.then((res) => {
+				res.data = res.data.map((user: User) => {
+					user.userRoles = userRoles.filter((userRole) => userRole.user == user.id);
+					return user;
 				});
-				return user;
+				return res.data;
 			});
-			return res.data;
-		});
 		console.log({ users });
-		const results = await axios.get('/api/events').then((res) => {
+		const results = await axios.get('/api/events?organization=' + organization.id).then((res) => {
 			res.data.forEach((event: Event) => {
 				event.organizationTitle =
 					organizations.find((org) => org.id == event.organization)?.title || '';
@@ -103,13 +108,11 @@
 			<th />
 			<th>{_('Title')}</th>
 			<th>{_('Slug')}</th>
-			<th>{_('Organization')}</th>
 			<th>{_('Edit')}</th>
 		</tr>
 	</thead>
 	<tbody>
 		{#each paginated as event}
-			{@const organization = organizations.find((org) => org.id == event.organization)}
 			<tr>
 				<td>
 					<a
@@ -122,7 +125,6 @@
 				</td>
 				<td> {event.title}</td>
 				<td>{event.slug}</td>
-				<td>{organization?.title}</td>
 				<td>
 					<button
 						on:click={() => {
@@ -167,13 +169,11 @@
 				/>
 				{#if !editEvent.isOpen}
 					Allowed Users
-					{#each users.filter((user) => user.organizations.find((userOrg) => {
-							console.log({ userOrg });
-							return userOrg.id == editEvent.organization;
-						})) as user}
+					{#each users as user}
 						<label>
 							<input type="checkbox" bind:group={editEvent.allowedUsersArray} value={user.id} />
-							{user.nickname}({user.email})
+							{user.nickname}
+							({user.email})
 						</label>
 					{/each}
 				{/if}
@@ -191,7 +191,7 @@
 						onCreateClicked();
 					}}
 				>
-					Create
+					{_('Create')}
 				</button>
 			{:else}
 				<button
@@ -199,7 +199,7 @@
 						onUpdateClicked();
 					}}
 				>
-					Update
+					{_('Update')}
 				</button>
 				<button
 					class="secondary"
@@ -207,7 +207,7 @@
 						onDeleteClicked();
 					}}
 				>
-					Delete
+					{_('Delete')}
 				</button>
 			{/if}
 		</article>

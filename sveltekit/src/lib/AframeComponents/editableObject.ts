@@ -1,6 +1,7 @@
 import { editableObject } from '$lib/frontend/Classes/EditableObject';
 import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
+import { _ } from '$lib/i18n';
 import { degree2radian } from '$lib/math/degree2radians';
 import { EmptyObject } from '$lib/preset/EmptyObject';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
@@ -67,7 +68,7 @@ AFRAME.registerComponent('editable-object', {
 						return;
 					}
 					const text = document.createElement('a-text');
-					text.setAttribute('value', 'Click to open');
+					text.setAttribute('value', _('Click to open'));
 					text.setAttribute('position', '0 0 0.02');
 					text.setAttribute('color', 'white');
 					text.setAttribute('align', 'center');

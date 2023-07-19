@@ -62,6 +62,7 @@
 		EventStore.set(EmptyEvent);
 		location.href = '/';
 	};
+	let chosenLanguage: string = cookies.get('locale') || 'en';
 </script>
 
 <nav>
@@ -79,7 +80,7 @@
 	<ul>
 		{#if $UsersStore.length}
 			<li>
-				<details role="list" dir="rtl">
+				<details role="list">
 					<summary aria-haspopup="listbox" role="link">
 						<div>
 							<Icon icon="groups" />
@@ -98,30 +99,48 @@
 				</details>
 			</li>
 		{/if}
-		<li>
-			<details role="list" dir="rtl">
-				<summary aria-haspopup="listbox" role="link">
-					<div>
-						<Icon icon="account_circle" />
-						{$UserStore.nickname}
-					</div>
-				</summary>
-				<ul role="listbox">
-					{#if $EventStore?.id}
+		{#if $UserStore.id}
+			<li>
+				<details role="list" dir="rtl">
+					<summary aria-haspopup="listbox" role="link">
+						<div>
+							<Icon icon="account_circle" />
+							{$UserStore.nickname}
+						</div>
+					</summary>
+					<ul role="listbox">
+						{#if $EventStore?.id}
+							<li>
+								<button on:click={onLeaveClicked} class="warning">{_('Leave Room')}</button>
+							</li>
+						{/if}
+						<li><a href={'#'} on:click={changeEmailClicked}> {_('Change Email')} </a></li>
 						<li>
-							<button on:click={onLeaveClicked} class="warning">{_('Leave Room')}</button>
+							<a href={'#'} on:click={changeProfileClicked}> {_('Change Profile')} </a>
 						</li>
-					{/if}
-					<li><a href={'#'} on:click={changeEmailClicked}> {_('Change Email')} </a></li>
-					<li>
-						<a href={'#'} on:click={changeProfileClicked}> {_('Change Profile')} </a>
-					</li>
-					<li>
-						<a href={'#'} on:click={onLogoutClicked}>{_('Logout')}</a>
-					</li>
-				</ul>
-			</details>
-		</li>
+						<li>
+							<a href={'#'} on:click={onLogoutClicked}>{_('Logout')}</a>
+						</li>
+						<hr />
+						<li>
+							<div>Language</div>
+							<select
+								bind:value={chosenLanguage}
+								on:change={(e) => {
+									//set it to cookie
+									console.log(chosenLanguage);
+									cookies.set('locale', chosenLanguage, { expires: 365 * 10 });
+									location.reload();
+								}}
+							>
+								<option value="en">English</option>
+								<option value="ja">日本語</option>
+							</select>
+						</li>
+					</ul>
+				</details>
+			</li>
+		{/if}
 	</ul>
 </nav>
 {#if emailDialogOpen}

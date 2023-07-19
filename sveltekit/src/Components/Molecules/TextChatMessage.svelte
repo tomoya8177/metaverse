@@ -18,7 +18,7 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { escapeHTML } from '$lib/math/escapeHTML';
-	import type { User } from '$lib/types/User';
+	import type { User } from '$lib/frontend/Classes/User';
 
 	export let message: Message;
 	export let onDelete: (id: string) => void;

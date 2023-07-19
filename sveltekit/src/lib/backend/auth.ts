@@ -1,6 +1,6 @@
 import { db } from './db';
 import type { Login } from '../types/Login';
-import type { User } from '../types/User';
+import type { User } from '../frontend/Classes/User';
 import type { Student } from '$lib/types/Student';
 import jwt from 'jsonwebtoken';
 
@@ -27,7 +27,9 @@ class auth {
 		} catch (err) {
 			return failResponse;
 		}
+		console.log({ decoded });
 		const users = await db.query(`select * from users where id='${decoded.userId}'`);
+		console.log({ users });
 		if (users.length == 0) return failResponse;
 		let personas: Student[] | User[] | null = [];
 		return {

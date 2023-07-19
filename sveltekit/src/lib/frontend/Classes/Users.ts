@@ -1,6 +1,6 @@
 import { writable, type Writable } from 'svelte/store';
 import type { Unit } from './Unit';
-import type { User } from '$lib/types/User';
+import type { User } from '$lib/frontend/Classes/User';
 
 export const UsersStore = writable([] as Unit[]);
 

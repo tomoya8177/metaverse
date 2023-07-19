@@ -10,7 +10,7 @@
 	import axios from 'axios';
 
 	import '$lib/AframeComponents';
-	import type { User } from '$lib/types/User';
+	import type { User } from '$lib/frontend/Classes/User';
 	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';

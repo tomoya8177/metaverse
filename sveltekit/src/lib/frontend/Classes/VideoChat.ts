@@ -16,7 +16,7 @@ import {
 import type { Event } from './Event';
 import axios from 'axios';
 import { Users } from './Users';
-import type { User } from '$lib/types/User';
+import type { User } from '$lib/frontend/Classes/User';
 import { messageListeners, welcomeUnit } from '$lib/frontend/messageListeners';
 import { UserStore } from '$lib/store';
 import { sessionPing } from '$lib/frontend/Classes/sessionPing';

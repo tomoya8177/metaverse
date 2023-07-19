@@ -6,6 +6,7 @@
 	import InputWithLabel from '../../Components/Molecules/InputWithLabel.svelte';
 	import { cookies } from '$lib/frontend/cookies';
 	import { fade } from 'svelte/transition';
+	export let organization: string = '';
 	let loggedIn: boolean | null = null;
 	let verificationMode = false;
 	let email = '';
@@ -56,7 +57,8 @@
 		} else {
 			//register
 			const res = await axios.post('/api/register', {
-				email
+				email,
+				organization
 			});
 			console.log({
 				res

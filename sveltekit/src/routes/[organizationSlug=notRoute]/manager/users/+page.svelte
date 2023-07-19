@@ -1,35 +1,39 @@
 <script lang="ts">
 	import axios from 'axios';
-	import { onMount } from 'svelte';
-	import FilterPagination from '../../../Components/Organisms/FilterPagination.svelte';
-	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';
-	import ModalCloseButton from '../../../Components/Atom/ModalCloseButton.svelte';
+	import { getContext, onMount } from 'svelte';
+	import FilterPagination from '../../../../Components/Organisms/FilterPagination.svelte';
+	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
+	import ModalCloseButton from '../../../../Components/Atom/ModalCloseButton.svelte';
 	import { User } from '$lib/frontend/Classes/User';
 	import { emptyUser } from '$lib/preset/EmptyUser';
 	import type { UserRole } from '$lib/types/UserRole';
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
+	import { page } from '$app/stores';
 
 	let users: User[] = [];
 	let paginated: User[] = [];
-	let organizations: Organization[] = [];
+	let organization: Organization;
 	let userRoles: UserRole[] = [];
 	const fillOrganization = (user: User) => {
 		const filteredUserRoles: UserRole[] = userRoles.filter((userRole) => userRole.user == user.id);
 		if (!filteredUserRoles.length) return user;
 		user.userRoles = filteredUserRoles;
-		user.organizations = organizations.filter((org) =>
-			filteredUserRoles.find((userRole) => userRole.organization == org.id)
-		);
+
 		return user;
 	};
 
 	onMount(async () => {
-		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
+		organization = await axios
+			.get('/api/organizations?slug=' + $page.params.organizationSlug)
+			.then((res) => res.data[0]);
+		userRoles = await axios
+			.get('/api/userRoles?organization=' + organization.id)
+			.then((res) => res.data);
 		console.log({ userRoles });
-		organizations = await axios.get('/api/organizations').then((res) => res.data);
-		console.log({ organizations });
-		users = await axios.get('/api/users').then((res) => res.data);
+		users = await axios
+			.get(`/api/users?id=in:'${userRoles.map((role) => role.user).join("','")}'`)
+			.then((res) => res.data);
 		users = users
 			.map((user) => {
 				user = fillOrganization(user);
@@ -43,33 +47,15 @@
 	let editMode: 'update' | 'create' = 'update';
 
 	const createUserRoles = async (userId: string) => {
-		let promises: Promise<UserRole>[] = [];
-		organizations.forEach((org) => {
-			console.log({ org });
-			if (org.checked) {
-				console.log('posting');
-				promises.push(
-					axios
-						.post('/api/userRoles', {
-							user: userId,
-							organization: org.id,
-							role: org.isManager ? 'manager' : 'subscriber'
-						})
-						.then((res) => res.data)
-				);
-			}
-		});
-		await Promise.all(promises).then((results) => {
-			console.log(results);
-		});
+		return await axios
+			.post('/api/userRoles', {
+				user: userId,
+				organization: organization.id,
+				role: organization.isManager ? 'manager' : 'subscriber'
+			})
+			.then((res) => res.data);
 	};
-	const deleteExistinguserRoles = (userRoles: UserRole[]) => {
-		let promises: Promise<UserRole>[] = [];
-		userRoles.forEach((userRole) => {
-			promises.push(axios.delete('/api/userRoles/' + userRole.id).then((res) => res.data));
-		});
-		return Promise.all(promises);
-	};
+
 	const onCreateClicked = async () => {
 		if (!editUser.email) {
 			alert('Email is required');
@@ -89,8 +75,6 @@
 			return;
 		}
 		const result = await axios.put('/api/users/' + editUser.id, editUser).then((res) => res.data);
-		await deleteExistinguserRoles(editUser.userRoles || []);
-		await createUserRoles(result.id);
 
 		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
 		const filledUser = fillOrganization(result);
@@ -116,10 +100,7 @@
 		on:click={() => {
 			editUser = emptyUser;
 			editMode = 'create';
-			organizations.forEach((org) => {
-				org.checked = false;
-				org.isManager = false;
-			});
+
 			newUserModalOpen = true;
 		}}>{_('New User')}</button
 	>
@@ -131,43 +112,25 @@
 			<tr>
 				<th>{_('Nickname')}</th>
 				<th>{_('Email')}</th>
-				<th>{_('Is Admin')}</th>
-				<th>{_('Organizations')}</th>
+				<th>{_('Is Manager')}</th>
 				<th>{_('Edit')}</th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each paginated as user}
+				{@const userRole = user.userRoles?.find((role) => role.organization == organization.id)}
 				<tr>
 					<td>{user.nickname}</td>
 					<td>{user.email}</td>
 					<td>
-						<input type="checkbox" disabled role="switch" bind:checked={user.isAdmin} />
-					</td>
-					<td>
-						{#each user.organizations || [] as org}
-							{@const userRole = user.userRoles?.find((role) => role.organization == org.id)}
-							<div>
-								<div>
-									{org.title}
-									{#if userRole}
-										({userRole.role})
-									{/if}
-								</div>
-							</div>
-						{/each}
+						<input type="checkbox" disabled role="switch" checked={userRole.role == 'manager'} />
 					</td>
 					<td>
 						<button
 							on:click={() => {
 								editUser = { ...user };
 								editMode = 'update';
-								organizations.forEach((org) => {
-									org.checked = !!user.organizations?.find((userOrg) => userOrg.id == org.id);
-									org.isManager = !!user.userRoles?.find(
-										(userRole) => userRole.organization == org.id && userRole.role == 'manager'
-									);
-								});
+
 								newUserModalOpen = true;
 							}}
 						>
@@ -185,18 +148,8 @@
 			<ModalCloseButton onClick={() => (newUserModalOpen = false)} />
 			<InputWithLabel label={_('Nickname')} bind:value={editUser.nickname} />
 			<InputWithLabel label={_('Email')} bind:value={editUser.email} type="email" />
-			<InputWithLabel label={_('Is Admin')} bind:value={editUser.isAdmin} type="switch" />
-			<div style="margin-top:1rem">{_('Organizations')}</div>
-			<ul>
-				{#each organizations as org}
-					<li style="display:flex;gap:1rem">
-						<InputWithLabel type="checkbox" label={org.title} bind:value={org.checked} />
-						{#if org.checked}
-							<InputWithLabel type="switch" bind:value={org.isManager} label={_('Is Manager')} />
-						{/if}
-					</li>
-				{/each}
-			</ul>
+			<InputWithLabel label={_('Is Manager')} bind:value={editUser.isAdmin} type="switch" />
+
 			{#if editMode == 'create'}
 				<button
 					on:click={() => {

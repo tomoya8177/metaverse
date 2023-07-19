@@ -15,6 +15,7 @@
 	import AudioButton from './AudioButton.svelte';
 	import axios from 'axios';
 	import type { Organization } from '$lib/types/Organization';
+	import { _ } from '$lib/i18n';
 
 	export let me: Me | null;
 
@@ -30,16 +31,16 @@
 
 <dialog open>
 	<article>
-		<div>Title</div>
+		<div>{_('Event Title')}</div>
 		<h4>{$EventStore.title}</h4>
 		{#if organization}
-			<div>Organization</div>
+			<div>{_('Organization')}</div>
 			<h5>{organization?.title}</h5>
 		{/if}
 		{#if me}
 			<ProfileEditInputs
 				{me}
-				label="Enter"
+				label={_('Enter')}
 				onUpdateDone={async () => {
 					readyToConnect = true;
 					if (!videoChat.connected) {
@@ -51,10 +52,11 @@
 				user={$UserStore}
 			>
 				<hr />
-				<div>Audio</div>
+				<div>{_('Audio')}</div>
 				<div style="display:flex;gap:1rem;">
 					<div style="flex:1;align-self:center">
-						Your Audio is {#if $UserStore.onMute}Muted{:else}On{/if}
+						{_('Your Audio')}:
+						{#if $UserStore.onMute}{_('Muted')}{:else}{_('On')}{/if}
 					</div>
 					<div
 						style="align-self: center;

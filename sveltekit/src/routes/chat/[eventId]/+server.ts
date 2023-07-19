@@ -18,7 +18,7 @@ import axios from 'axios';
 import { OpenAI } from 'langchain/llms/openai';
 import type { Document } from 'langchain/document';
 import { loadDocument } from '$lib/backend/loadDocument.js';
-import type { User } from '$lib/types/User.js';
+import type { User } from '$lib/frontend/Classes/User.js';
 import type { Message } from '$lib/frontend/Classes/Message.js';
 import type { DocumentForAI } from '$lib/types/DocumentForAI.js';
 import { virtuaMentorPrompt } from '$lib/preset/VirtuaMentorPrompt.js';

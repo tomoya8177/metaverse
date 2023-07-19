@@ -9,6 +9,7 @@
 	import { PUBLIC_FileStackPolicy, PUBLIC_FileStackSignature } from '$env/static/public';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
+	import { _ } from '$lib/i18n';
 
 	const onDeleteClicked = async () => {
 		if ($FocusObjectStore.title == 'Shared Screen') {
@@ -98,7 +99,7 @@
 				{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
 					<li>
 						<div style="display:flex;flex-direction:reverse">
-							<div style="flex:1">Locked</div>
+							<div style="flex:1">{_('Locked')}</div>
 							<div>
 								<InputWithLabel type="switch" bind:value={$FocusObjectStore.locked} />
 							</div>
@@ -111,7 +112,7 @@
 							<a href={$FocusObjectStore.linkTo} target="_blank"> <Icon icon="open_in_new" /></a>
 						</div>
 						<InputWithLabel
-							label="Link To"
+							label={_('Link To')}
 							bind:value={$FocusObjectStore.linkTo}
 							disabled={$FocusObjectStore.locked}
 						/>
@@ -128,14 +129,14 @@
 										id: $FocusObjectStore.id,
 										linkTo: $FocusObjectStore.linkTo
 									});
-								}}>Update Link</button
+								}}>{_('Update Link')}</button
 							>
 						</li>
 					{/if}
 				{/if}
 				{#if !$FocusObjectStore.locked}
 					<li>
-						<button on:click={onDeleteClicked} class="secondary">Delete</button>
+						<button on:click={onDeleteClicked} class="secondary">{_('Delete')}</button>
 					</li>
 				{/if}
 			</ul>

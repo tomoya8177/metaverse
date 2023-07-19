@@ -1,4 +1,4 @@
-import type { User } from '$lib/types/User';
+import type { User } from '$lib/frontend/Classes/User';
 
 export const emptyUser: User = {
 	id: '',

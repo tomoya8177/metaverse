@@ -7,12 +7,13 @@
 	import '$lib/AframeComponents';
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	import { _ } from '$lib/i18n';
 	let busy = false;
 </script>
 
 {#if $UserStore.onMute}
 	<button
-		data-tooltip="Mute"
+		data-tooltip={_('Press to Unmute')}
 		aria-busy={busy}
 		class="circle-button dim"
 		on:click={async () => {
@@ -37,7 +38,7 @@
 	</button>
 {:else}
 	<button
-		data-tooltip="Unmute"
+		data-tooltip={_('Press to Mute')}
 		class="circle-button"
 		on:click={() => {
 			videoChat.unpublishMyTrack('audio');

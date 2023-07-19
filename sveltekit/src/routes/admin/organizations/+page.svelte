@@ -6,6 +6,7 @@
 	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';
 	import axios from 'axios';
 	import FilterPagination from '../../../Components/Organisms/FilterPagination.svelte';
+	import { _ } from '$lib/i18n';
 	let editOrganization: Organization = EmptyOrganization;
 	let editMode: 'update' | 'create' = 'update';
 	let organizations: Organization[] = [];
@@ -47,7 +48,7 @@
 	};
 </script>
 
-<h2>Organizations</h2>
+<h2>{_('Organizations')}</h2>
 <div style="width:14rem">
 	<button
 		on:click={() => {
@@ -58,15 +59,15 @@
 				org.isManager = false;
 			});
 			modalOpen = true;
-		}}>New Organization</button
+		}}>{_('New Organization')}</button
 	>
 </div>
 <FilterPagination inputArray={organizations} bind:paginated />
 <table>
 	<thead>
 		<tr>
-			<th>Title</th>
-			<th>Edit</th>
+			<th>{_('Organization Name')}</th>
+			<th>{_('Edit')}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -79,7 +80,7 @@
 							editOrganization = org;
 							editMode = 'update';
 							modalOpen = true;
-						}}>Edit</button
+						}}>{_('Edit')}</button
 					>
 				</td>
 			</tr>
@@ -90,19 +91,19 @@
 	<dialog open>
 		<article>
 			<ModalCloseButton onClick={() => (modalOpen = false)} />
-			<InputWithLabel label="Title" bind:value={editOrganization.title} />
-			<InputWithLabel label="Slug" bind:value={editOrganization.slug} />
+			<InputWithLabel label={_('Organization Name')} bind:value={editOrganization.title} />
+			<InputWithLabel label={_('Slug')} bind:value={editOrganization.slug} />
 			{#if editMode == 'create'}
 				<button
 					on:click={() => {
 						onCreateClicked();
-					}}>Create</button
+					}}>{_('Create')}</button
 				>
 			{:else}
 				<button
 					on:click={() => {
 						onUpdateClicked();
-					}}>Update</button
+					}}>{_('Update')}</button
 				>
 			{/if}
 		</article>

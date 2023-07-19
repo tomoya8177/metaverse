@@ -15,7 +15,7 @@
 	});
 </script>
 
-<Navigation title="Admin Console" />
+<Navigation title={_('Admin Console')} />
 {#if loggedIn}
 	<div style="display:flex;margin-left:1rem;margin-right:1rem">
 		<div class="menu">

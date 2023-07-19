@@ -3,7 +3,7 @@
 	import axios from 'axios';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
-	import type { User } from '$lib/types/User';
+	import type { User } from '$lib/frontend/Classes/User';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
 	import AvatarPreview from '../Atom/AvatarPreview.svelte';
 	import type { Unit } from '$lib/frontend/Classes/Unit';
@@ -12,6 +12,7 @@
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { fade } from 'svelte/transition';
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { _ } from '$lib/i18n';
 	export let onUpdateDone: () => void;
 	export let me: Me;
 	let busy = false;
@@ -47,9 +48,9 @@
 	};
 </script>
 
-<InputWithLabel label="Nickname" bind:value={user.nickname} />
+<InputWithLabel label={_('Nickname')} bind:value={user.nickname} />
 <div>
-	<div>Avatar</div>
+	<div>{_('Avatar')}</div>
 	<div style="margin-left:auto; margin-right:auto;width:180px;margin-bottom:0.4rem;">
 		{#if $UserStore.avatarURL}
 			{#key $UserStore.avatarURL}
@@ -61,7 +62,7 @@
 <button
 	on:click={() => {
 		avatarSelectOpen = !avatarSelectOpen;
-	}}>{avatarSelectOpen ? 'OK' : 'Change Avatar'}</button
+	}}>{avatarSelectOpen ? _('OK') : _('Change Avatar')}</button
 >
 
 {#if avatarSelectOpen}
@@ -73,7 +74,7 @@
 					<button
 						on:click={() => {
 							$UserStore.avatarURL = avatar.url;
-						}}>Select</button
+						}}>{_('Select')}</button
 					>
 				</div>
 			{/each}
@@ -84,7 +85,7 @@
 <button aria-busy={busy} on:click={() => onUpdateProfileDoClicked()} disabled={busy}>
 	{label}
 </button>
-<button class="secondary" on:click={onLeaveClicked}>Leave</button>
+<button class="secondary" on:click={onLeaveClicked}>{_('Leave')}</button>
 
 <style>
 	img {

@@ -15,7 +15,7 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
 	import { Users } from '$lib/frontend/Classes/Users';
-	import type { User } from '$lib/types/User';
+	import type { User } from '$lib/frontend/Classes/User';
 	import { editableObject } from '$lib/frontend/Classes/EditableObject';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
@@ -24,6 +24,7 @@
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
+	import { _ } from '$lib/i18n';
 	export let virtuaMentorReady = false;
 	export let messages: Message[] = [];
 	export let newMessagePinned = false;
@@ -119,11 +120,12 @@
 		{/each}
 	</div>
 	<hr />
-	<div style="display:flex; gap:1rem;">
+	<div style="display:flex; gap:0.4rem;">
 		<div>
 			<button
+				data-tooltip={_('Ask AI Mentor')}
 				aria-busy={waitingForAIAnswer}
-				style="height:2rem;border-radius:1rem;padding-top:0.1rem"
+				class="pill-icon-button"
 				style:background-color={micActive ? 'red' : ''}
 				on:click={onMicClicked}
 			>
@@ -131,8 +133,9 @@
 			</button>
 		</div>
 		<div>
-			<a
-				href={'#'}
+			<button
+				data-tooltip={_('Attach File')}
+				class="pill-icon-button"
 				on:click={() => {
 					uploader.launchPicker(undefined, async (res) => {
 						res.filesUploaded.forEach(async (file) => {
@@ -152,7 +155,7 @@
 				}}
 			>
 				<Icon icon="attachment" />
-			</a>
+			</button>
 		</div>
 		<div style="text-align:right;flex:1">
 			<InputWithLabel
@@ -162,7 +165,7 @@
 				bind:value={newMessageForMentor}
 			/>
 		</div>
-		<InputWithLabel label="Pinned" type="switch" bind:value={newMessagePinned} />
+		<InputWithLabel label={_('Pinned')} type="switch" bind:value={newMessagePinned} />
 	</div>
 	<div style="display:flex;gap:0.4rem">
 		<div style="flex:1" id="chat-textarea">
@@ -170,13 +173,18 @@
 		</div>
 		<div>
 			<button aria-busy={busy} style="margin-bottom:0rem" on:click={onMessageSendClicked}
-				>Send</button
+				>{_('Send')}</button
 			>
 		</div>
 	</div>
 </div>
 
 <style>
+	.pill-icon-button {
+		height: 2rem;
+		border-radius: 1rem;
+		padding-top: 0.1rem;
+	}
 	.chat-box {
 		max-height: calc(100vh - 9rem);
 		overflow: auto;

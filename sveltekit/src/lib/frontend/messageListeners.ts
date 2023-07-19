@@ -1,7 +1,7 @@
 import { Unit } from '$lib/frontend/Classes/Unit';
 import { Users } from '$lib/frontend/Classes/Users';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
-import type { User } from '$lib/types/User';
+import type { User } from '$lib/frontend/Classes/User';
 import axios from 'axios';
 import { SharedObject } from './Classes/SharedObject';
 import { sharedObjects } from './Classes/SharedObjects';
