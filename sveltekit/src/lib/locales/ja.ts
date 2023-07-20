@@ -62,5 +62,6 @@ export default {
 	'Open for Anyone': '誰でも参加可能',
 	'Open for Anyone in the organization': 'チームのメンバーは誰でも参加可能',
 	'You are not a manager of this organization': 'あなたはこのチームのマネージャーではありません',
-	'You are not a member of this organization': 'あなたはこのチームのメンバーではありません'
+	'You are not a member of this organization': 'あなたはこのチームのメンバーではありません',
+	'This organization does not allow registration': 'このチームは新規登録を許可していません'
 };

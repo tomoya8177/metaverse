@@ -10,56 +10,78 @@
 	import { Event } from '$lib/frontend/Classes/Event';
 	import type { UserRole } from '$lib/types/UserRole';
 	import { _ } from '$lib/i18n';
+	import type { Organization } from '$lib/types/Organization';
 	let loggedIn: boolean | null = null;
 	let event: any = null;
-	let noEvent = false;
+	let noEvent: boolean | null = null;
+	let organization: Organization | null = null;
 	$: console.log(loggedIn);
 	onMount(async () => {
 		loggedIn = await checkLogin();
 		console.log({ loggedIn });
-		const events = await axios
-			.get(`/api/events?slug=${$page.params.eventSlug}`)
-			.then((res) => res.data);
-		console.log({ events });
-		if (events.length) {
-			const event = new Event(events[0]);
-			EventStore.set(new Event(event));
-			console.log($EventStore);
-			if (!loggedIn) return;
-			const userRole: UserRole = await axios
-				.get(`/api/userRoles?user=${$UserStore.id}&organization=${event.organization}`)
-				.then((res) => res.data[0]);
-			if (userRole.role == 'manager') {
-				$UserStore.isManager = true;
-			}
-			if (!event.isPublic) {
-				if (!userRole) {
-					noEvent = true;
-					return;
-				}
-				if (!event.isOpen && !event.allowedUsersArray.includes($UserStore.id)) {
-					noEvent = true;
-					return;
-				}
-			}
-		} else {
+		organization = await axios
+			.get(`/api/organizations?slug=${$page.params.organizationSlug}`)
+			.then((res) => res.data[0]);
+		if (!organization) {
 			noEvent = true;
+			return;
 		}
+		event = await axios
+			.get(`/api/events?slug=${$page.params.eventSlug}&organization=${organization.id}`)
+			.then((res) => res.data[0]);
+		if (!event) {
+			noEvent = true;
+			return;
+		}
+		EventStore.set(new Event(event));
+		console.log($EventStore);
+		if (!loggedIn) return;
+		const userRole: UserRole = await axios
+			.get(`/api/userRoles?user=${$UserStore.id}&organization=${event.organization}`)
+			.then((res) => res.data[0]);
+
+		if (userRole?.role == 'manager') {
+			$UserStore.isManager = true;
+		}
+		if (!event.isPublic) {
+			if (!userRole) {
+				//event exists, but you are not a mamber of this organization
+				//check if the ogranization accepts registration
+				console.log({ organization });
+				if (!organization.allowRegistration) {
+					noEvent = true;
+					return;
+				}
+				//you may get registered
+				const newUserRole = {
+					user: $UserStore.id,
+					organization: event.organization
+				};
+				const res = await axios.post('/api/userRoles', newUserRole);
+				//let's do it again.
+				location.reload();
+				return;
+			}
+			if (!event.isOpen && !event.allowedUsersArray?.includes($UserStore.id)) {
+				noEvent = true;
+				return;
+			}
+		}
+		noEvent = false;
 	});
 </script>
 
 {#if loggedIn === false}
-	<Login organization={$EventStore.organization} />
+	<Login organization={$EventStore.organization} {event} />
 {:else}
-	{#if loggedIn === null}
+	{#if loggedIn === null || noEvent === null}
 		<dialog open transition:fade>
 			<article>
 				{_('logging in')}...
 				<progress />
 			</article>
 		</dialog>
-	{/if}
-	{#if $EventStore.id}
+	{:else if $EventStore.id && !noEvent}
 		<slot />
 	{/if}
 	{#if noEvent}
@@ -77,7 +99,7 @@
 		</div>
 	{/if}
 	<div class="top">
-		<Navigation />
+		<Navigation title={$EventStore.title} />
 	</div>
 {/if}
 

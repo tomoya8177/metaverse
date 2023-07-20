@@ -93,6 +93,11 @@
 			<ModalCloseButton onClick={() => (modalOpen = false)} />
 			<InputWithLabel label={_('Organization Name')} bind:value={editOrganization.title} />
 			<InputWithLabel label={_('Slug')} bind:value={editOrganization.slug} />
+			<InputWithLabel
+				label={_('Allow Registration by Users')}
+				bind:value={editOrganization.allowRegistration}
+				type="switch"
+			/>
 			{#if editMode == 'create'}
 				<button
 					on:click={() => {

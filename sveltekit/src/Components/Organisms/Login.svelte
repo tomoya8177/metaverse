@@ -6,7 +6,9 @@
 	import InputWithLabel from '../../Components/Molecules/InputWithLabel.svelte';
 	import { cookies } from '$lib/frontend/cookies';
 	import { fade } from 'svelte/transition';
+	import type { Event } from '$lib/frontend/Classes/Event';
 	export let organization: string = '';
+	export let event: Event | null = null;
 	let loggedIn: boolean | null = null;
 	let verificationMode = false;
 	let email = '';
@@ -55,14 +57,28 @@
 			await login(email);
 			return;
 		} else {
-			//register
-			const res = await axios.post('/api/register', {
-				email,
-				organization
-			});
-			console.log({
-				res
-			});
+			//register if organiatin allow to do so
+			const organiatinData = await axios
+				.get('/api/organizations/' + organization)
+				.then((res) => res.data);
+			console.log({ event });
+			if (!organiatinData.allowRegister && (event === null || !event.isPublic)) {
+				busy = false;
+				alert('This organization does not allow registration');
+				return;
+			}
+			if (event !== null && event.isPublic) {
+				//event is free to access. no registration under organization
+				const res = await axios.post('/api/register', {
+					email
+				});
+			} else {
+				//event is not public. register under organization
+				const res = await axios.post('/api/register', {
+					email,
+					organization
+				});
+			}
 			await login(email);
 		}
 	};

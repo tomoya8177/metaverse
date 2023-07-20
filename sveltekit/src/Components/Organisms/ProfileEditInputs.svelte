@@ -22,6 +22,10 @@
 		if (found) me = found;
 	});
 	const onUpdateProfileDoClicked = async () => {
+		if ($UserStore.avatarURL == '') {
+			alert('Please select avatar');
+			return;
+		}
 		busy = true;
 		await axios.put('/api/users/' + $UserStore.id, {
 			nickname: user.nickname,
