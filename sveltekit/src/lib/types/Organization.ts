@@ -4,4 +4,5 @@ export type Organization = {
 	checked?: boolean;
 	isManager?: boolean;
 	slug: string;
+	allowRegistration: boolean;
 };
