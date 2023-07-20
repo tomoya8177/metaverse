@@ -137,7 +137,7 @@
 				data-tooltip={_('Attach File')}
 				class="pill-icon-button"
 				on:click={() => {
-					uploader.launchPicker(undefined, async (res) => {
+					uploader.launchPicker(undefined, 1, async (res) => {
 						res.filesUploaded.forEach(async (file) => {
 							console.log(file);
 

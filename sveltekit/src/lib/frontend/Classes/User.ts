@@ -5,15 +5,13 @@ export class User {
 	id: string;
 	nickname: string;
 	email: string;
-	avatarURL: string | null;
-	lastRoom: string;
-	lastPosition: string;
+	avatarURL: string | '';
 	isAdmin: boolean;
 	organizations?: Organization[];
 	userRoles?: UserRole[];
 	createdAt?: string;
-	onMute: boolean;
-	onVideoMute: boolean;
+	onMute?: boolean;
+	onVideoMute?: boolean;
 	onScreenShare?: boolean;
 	isManager?: boolean;
 	constructor(data: any) {
@@ -21,8 +19,6 @@ export class User {
 		this.nickname = data.nickname;
 		this.email = data.email;
 		this.avatarURL = data.avatarURL;
-		this.lastRoom = data.lastRoom;
-		this.lastPosition = data.lastPosition;
 		this.isAdmin = data.isAdmin;
 		this.organizations = data.organizations;
 		this.userRoles = data.userRoles;

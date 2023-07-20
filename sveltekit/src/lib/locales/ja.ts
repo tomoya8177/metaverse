@@ -63,5 +63,11 @@ export default {
 	'Open for Anyone in the organization': 'チームのメンバーは誰でも参加可能',
 	'You are not a manager of this organization': 'あなたはこのチームのマネージャーではありません',
 	'You are not a member of this organization': 'あなたはこのチームのメンバーではありません',
-	'This organization does not allow registration': 'このチームは新規登録を許可していません'
+	'This organization does not allow registration': 'このチームは新規登録を許可していません',
+	Mentors: 'メンター',
+	'New Mentor': '新規メンター',
+	'New Mentor Prompt': '新規メンタープロンプト',
+	Prompt: 'プロンプト',
+	'Choose Files': 'ファイルを選択',
+	'Brain Documents': 'Brainドキュメント'
 };

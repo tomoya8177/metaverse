@@ -26,6 +26,25 @@ class StoredChats extends Array {
 		}
 		return { storedChat, event };
 	};
+	findStoredChatAndMentor = async (
+		mentorId: string
+	): Promise<{ storedChat: typeof storedChat; mentor: typeof mentor }> => {
+		const mentor = (await db.query(`select * from mentors where id='${mentorId}'`))[0];
+		if (!mentor) return { storedChat: false, mentor: false };
+		//check if chat is already stored
+		let storedChat = storedChats.find((storedChat) => storedChat.mentorId === mentorId);
+		if (!storedChat) {
+			//create new chat
+			storedChat = {
+				mentorId: mentorId,
+				chatHistory: new ChatMessageHistory([]),
+				chain: null,
+				docs: null
+			};
+			storedChats.push(storedChat);
+		}
+		return { storedChat, mentor };
+	};
 }
 
 export const storedChats = new StoredChats();

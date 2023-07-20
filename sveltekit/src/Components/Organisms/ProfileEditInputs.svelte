@@ -1,4 +1,6 @@
 <script lang="ts">
+	import AvatarSelectPane from './AvatarSelectPane.svelte';
+
 	import { EventStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -53,38 +55,7 @@
 </script>
 
 <InputWithLabel label={_('Nickname')} bind:value={user.nickname} />
-<div>
-	<div>{_('Avatar')}</div>
-	<div style="margin-left:auto; margin-right:auto;width:180px;margin-bottom:0.4rem;">
-		{#if $UserStore.avatarURL}
-			{#key $UserStore.avatarURL}
-				<AvatarPreview url={$UserStore.avatarURL} />
-			{/key}
-		{/if}
-	</div>
-</div>
-<button
-	on:click={() => {
-		avatarSelectOpen = !avatarSelectOpen;
-	}}>{avatarSelectOpen ? _('OK') : _('Change Avatar')}</button
->
-
-{#if avatarSelectOpen}
-	<figure transition:fade>
-		<div style="display:flex;gap:0.4rem;">
-			{#each PresetAvatars as avatar}
-				<div style="width:180px">
-					<img src={avatar.thumbnailURL} alt="" style="margin-bottom:0.4rem;" />
-					<button
-						on:click={() => {
-							$UserStore.avatarURL = avatar.url;
-						}}>{_('Select')}</button
-					>
-				</div>
-			{/each}
-		</div>
-	</figure>
-{/if}
+<AvatarSelectPane bind:url={user.avatarURL} />
 <slot />
 <button aria-busy={busy} on:click={() => onUpdateProfileDoClicked()} disabled={busy}>
 	{label}

@@ -3,6 +3,7 @@ import { createInsertData } from '$lib/backend/createInsertData.js';
 import { createUpdateQuery } from '$lib/backend/createUpdateQuery.js';
 import { db } from '$lib/backend/db.js';
 import { createFiltersFromParams } from '../../../lib/backend/createFiltersFromParams.js';
+import { unlink } from 'fs/promises';
 
 export async function GET({ request, params, cookies }) {
 	const isLocalhost = request.headers.get('host')?.includes('localhost');
@@ -39,6 +40,17 @@ export async function DELETE({ request, params, cookies }) {
 	}
 	const filter = await createFiltersFromParams(request, params, checkResult);
 	if (!filter) return new Response(JSON.stringify(null));
+	if (params.tableName == 'documentsForAI') {
+		//delete actual files
+		const rows = await db.query(`select * from ${params.tableName} where ${filter}`);
+		for (let i = 0; i < rows.length; i++) {
+			//elete local file without Deno
+			const filePath = './static/documentsForAI/' + rows[i].filename;
+			console.log({ filePath });
+			const res = await unlink(filePath);
+			console.log({ res });
+		}
+	}
 	const result = await db.query(`delete from ${params.tableName} where ${filter}`);
 	return new Response(JSON.stringify(result.affectedRows));
 }

@@ -9,7 +9,6 @@ export async function POST({ request }): Promise<Response> {
 	const users = await db.query(`select * from users where email='${body.email}'`);
 	if (users.length == 0)
 		return new Response(JSON.stringify({ result: false, user: null, persona: null }));
-	console.log({ users });
 
 	const code = Math.floor(Math.random() * 899999) + 100000;
 	await db.query(`update users set verificationCode='${code}' where id='${users[0].id}'`);
@@ -19,9 +18,6 @@ export async function POST({ request }): Promise<Response> {
   ${code}
   
   `;
-
-	console.log({ port });
-
 	const result = await axios.post(`http://localhost:${port}/api/email`, {
 		to: user.email, // list of receivers
 		subject: 'Confirmation Code', // Subject line

@@ -60,6 +60,12 @@
 								{_('Events')}</a
 							>
 						</li>
+						<li>
+							<a href={`/${organization.slug}/manager/mentors`}>
+								<Icon icon="person_book" />
+								{_('Mentors')}</a
+							>
+						</li>
 					</ul>
 				</nav>
 			</aside>

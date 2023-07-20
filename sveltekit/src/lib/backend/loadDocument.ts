@@ -7,6 +7,7 @@ import { CSVLoader } from 'langchain/document_loaders/fs/csv';
 
 export const loadDocument = async (filename: string, type: string): Promise<Document[]> => {
 	const url = './static/documentsForAI/' + filename;
+	console.log({ url });
 	switch (type) {
 		case 'text':
 			const text = await axios
@@ -25,7 +26,7 @@ export const loadDocument = async (filename: string, type: string): Promise<Docu
 			return await loader.loadAndSplit();
 		}
 		case 'csv': {
-			const loader = new CSVLoader('src/document_loaders/example_data/example.csv');
+			const loader = new CSVLoader(url);
 
 			return await loader.loadAndSplit();
 		}
