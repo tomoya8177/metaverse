@@ -73,7 +73,11 @@
 	<tbody>
 		{#each paginated as org}
 			<tr>
-				<td>{org.title}</td>
+				<td>
+					<a href={`/${org.slug}`}>
+						{org.title}
+					</a>
+				</td>
 				<td>
 					<button
 						on:click={() => {

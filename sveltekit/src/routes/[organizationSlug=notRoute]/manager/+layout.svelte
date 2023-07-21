@@ -63,7 +63,7 @@
 						<li>
 							<a href={`/${organization.slug}/manager/mentors`}>
 								<Icon icon="person_book" />
-								{_('Mentors')}</a
+								{_('VirtuaMentors')}</a
 							>
 						</li>
 					</ul>

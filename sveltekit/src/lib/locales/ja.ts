@@ -69,5 +69,8 @@ export default {
 	'New Mentor Prompt': '新規メンタープロンプト',
 	Prompt: 'プロンプト',
 	'Choose Files': 'ファイルを選択',
-	'Brain Documents': 'Brainドキュメント'
+	'Brain Documents': 'Brainドキュメント',
+	VirtuaMentor: 'メタ先生',
+	VirtuaMentors: 'メタ先生',
+	'Event Specific Materials': 'イベント固有の資料'
 };

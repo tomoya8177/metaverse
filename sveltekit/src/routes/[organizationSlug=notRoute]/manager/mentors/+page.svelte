@@ -1,4 +1,6 @@
 <script lang="ts">
+	import DocumentForAIRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
+
 	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import FilterPagination from '../../../../Components/Organisms/FilterPagination.svelte';
@@ -61,11 +63,7 @@
 		}
 		return true;
 	};
-	const loadAIDocuments = async () => {
-		const res = await axios.get('/mentor/' + editMentor.id); //get for initialize
-		const res2 = await axios.put('/mentor/' + editMentor.id); //put for load docs and userdata
-		console.log({ res, res2 });
-	};
+
 	const onCreateClicked = async () => {
 		if (!validate(editMentor)) return;
 		const createdUser = await axios.post('/api/users', editMentor.userData).then((res) => res.data);
@@ -75,7 +73,6 @@
 		console.log({ createdMentor, createdUser });
 		createdMentor.userData = createdUser;
 		mentors = [...mentors, createdMentor];
-		await loadAIDocuments();
 		newMentorModalOpen = false;
 	};
 	const onUpdateClicked = async () => {
@@ -95,7 +92,6 @@
 			return mentor;
 		});
 
-		await loadAIDocuments();
 		newMentorModalOpen = false;
 	};
 	const onDeleteClicked = async () => {
@@ -166,23 +162,12 @@
 			<InputWithLabel label={_('Prompt')} bind:value={editMentor.prompt} type="textarea" />
 			<div>{_('Brain Documents')}</div>
 			{#each editMentor.documents || [] as document}
-				<div style="display:flex">
-					<div style="flex:1">
-						<a href={`/documentsForAI/${document.filename}`} target="_blank">{document.title}</a>
-					</div>
-					<div>
-						<a
-							href={'#'}
-							on:click={async () => {
-								if (!confirm(_('Are you sure that you want to delete this document?'))) return;
-								await axios.delete('/api/documentsForAI/' + document.id).then((res) => res.data);
-								editMentor.documents = editMentor.documents.filter((doc) => doc.id != document.id);
-							}}
-						>
-							<Icon icon="delete" />
-						</a>
-					</div>
-				</div>
+				<DocumentForAIRow
+					{document}
+					onDeleteDone={() => {
+						editMentor.documents = editMentor.documents.filter((doc) => doc.id != document.id);
+					}}
+				/>
 			{/each}
 			<label for="file">{_('Choose Files')}</label>
 			<input

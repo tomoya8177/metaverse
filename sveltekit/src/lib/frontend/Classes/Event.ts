@@ -13,9 +13,9 @@ export class Event {
 	organizationTitle?: string;
 	allowedUsersArray: string[];
 	createdAt: string;
-	virtuaMentorName: string;
-	virtuaMentorPrompt: string;
-	withDocumentsForAI: boolean = false;
+	mentor: string;
+	prompt: string;
+	documents: DocumentForAI[];
 	constructor(obj: any) {
 		this.id = obj.id;
 		this.slug = obj.slug;
@@ -28,8 +28,9 @@ export class Event {
 		this.isOpen = obj.isOpen;
 		this.createdAt = obj.createdAt;
 		this.organizationTitle = obj.organizationTitle;
-		this.virtuaMentorName = obj.virtuaMentorName;
-		this.virtuaMentorPrompt = obj.virtuaMentorPrompt;
+		this.mentor = obj.mentor;
+		this.prompt = obj.prompt;
+		this.documents = obj.documents || [];
 		if (this.allowedUsers == '') {
 			this.allowedUsersArray = [];
 		} else {
