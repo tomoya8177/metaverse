@@ -2,26 +2,15 @@ import { db } from '$lib/backend/db.js';
 import { storedChats } from '$lib/memory/StoredChats.js';
 
 import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
-import {
-	ConversationalRetrievalQAChain,
-	ConversationChain,
-	loadQAStuffChain
-} from 'langchain/chains';
-import { AIMessage, HumanMessage, SystemMessage } from 'langchain/schema';
+import { BufferMemory } from 'langchain/memory';
+import { ConversationalRetrievalQAChain, ConversationChain } from 'langchain/chains';
 import { OPENAI_API_KEY } from '$env/static/private';
-import { unescapeHTML } from '$lib/math/escapeHTML.js';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { MemoryVectorStore } from 'langchain/vectorstores/memory';
-import { HNSWLib } from 'langchain/vectorstores/hnswlib';
-import * as fs from 'fs';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import axios from 'axios';
-import { OpenAI } from 'langchain/llms/openai';
 import type { Document } from 'langchain/document';
 import { loadDocument } from '$lib/backend/loadDocument.js';
 import type { User } from '$lib/frontend/Classes/User.js';
-import type { Message } from '$lib/frontend/Classes/Message.js';
 import type { DocumentForAI } from '$lib/types/DocumentForAI.js';
 import { virtuaMentorPrompt } from '$lib/preset/VirtuaMentorPrompt.js';
 import type { UserRole } from '$lib/types/UserRole.js';
@@ -35,13 +24,30 @@ import {
 
 //get for AI mentor initialize
 export const GET = async ({ params, request }) => {
-	const { storedChat, mentor } = await storedChats.findStoredChatAndMentor(params.mentorId);
-	return new Response(JSON.stringify({ storedChat, mentor }));
+	const events = (await db.query(
+		`select * from events where mentor='${params.mentorId}'`
+	)) as Event[];
+	const promises = events.map(async (event) => {
+		const { storedChat, mentor } = await storedChats.findStoredChatAndMentor(
+			params.mentorId,
+			event.id
+		);
+		return { storedChat, mentor, event };
+	});
+	await Promise.all(promises);
+	return new Response(JSON.stringify({ promises }));
 };
 
 //put for loading documents
 export const PUT = async ({ request, params }) => {
-	const { storedChat, mentor } = await storedChats.findStoredChatAndMentor(params.mentorId);
+	const body = await request.json();
+	const events = (await db.query(
+		`select * from events where mentor='${params.mentorId}'`
+	)) as Event[];
+	const { storedChat, mentor } = await storedChats.findStoredChatAndMentor(
+		params.mentorId,
+		body.eventId
+	);
 	console.log({ storedChat, mentor });
 	if (!mentor) return new Response(JSON.stringify({ error: 'mentor not found' }), { status: 404 });
 	const user = (await db.query(`select * from users where id='${mentor.user}'`))[0];
@@ -126,9 +132,9 @@ export const PUT = async ({ request, params }) => {
 			additionalPrompt: mentor.prompt,
 			widhDocumentsForAI: false
 		})}
-		Below is the list of users in the class with some details about each users.
-		${usersJson}
-		`;
+							Below is the list of users in the class with some details about each users.
+							${usersJson}
+							`;
 		string = string.replace(/({|})/g, '$&$&');
 		const template = SystemMessagePromptTemplate.fromTemplate(string);
 		console.log({ template });
@@ -144,7 +150,7 @@ export const PUT = async ({ request, params }) => {
 			llm: model
 		});
 	}
-	return new Response(JSON.stringify({ storedChat }));
+	return new Response(JSON.stringify({ storedChat, mentor }));
 };
 
 //post for chat

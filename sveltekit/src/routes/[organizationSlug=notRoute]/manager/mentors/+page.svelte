@@ -17,6 +17,7 @@
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import Icon from '../../../../Components/Atom/Icon.svelte';
 	import { cookies } from '$lib/frontend/cookies';
+	import type { Event } from '$lib/frontend/Classes/Event';
 
 	let paginated: Mentor[] = [];
 	let organization: Organization;
@@ -64,6 +65,17 @@
 		return true;
 	};
 
+	const reinstallAIBrain = async (mentor: Mentor) => {
+		const response = await axios.get('/mentor/' + mentor.id);
+		const events = await axios.get('/api/events?mentor=' + mentor.id).then((res) => res.data);
+		const promises = events.map(async (event: Event) => {
+			await axios.put('/api/mentors/' + mentor.id, {
+				eventId: event.id
+			});
+		});
+		console.log({ response, promises });
+	};
+
 	const onCreateClicked = async () => {
 		if (!validate(editMentor)) return;
 		const createdUser = await axios.post('/api/users', editMentor.userData).then((res) => res.data);
@@ -73,6 +85,7 @@
 		console.log({ createdMentor, createdUser });
 		createdMentor.userData = createdUser;
 		mentors = [...mentors, createdMentor];
+		reinstallAIBrain(createdMentor);
 		newMentorModalOpen = false;
 	};
 	const onUpdateClicked = async () => {
@@ -81,9 +94,13 @@
 		const updatedUser = await axios
 			.put('/api/users/' + editMentor.userData.id, editMentor.userData)
 			.then((res) => res.data);
+		console.log({ editMentor });
 		const updatedMentor = await axios
-			.put('/api/mentors/' + editMentor.id, editMentor)
+			.put('/api/mentors/' + editMentor.id, {
+				prompt: editMentor.prompt
+			})
 			.then((res) => res.data);
+		console.log({ updatedMentor });
 		updatedMentor.userData = updatedUser;
 		mentors = mentors.map((mentor) => {
 			if (mentor.id == updatedMentor.id) {
@@ -91,7 +108,7 @@
 			}
 			return mentor;
 		});
-
+		reinstallAIBrain(updatedMentor);
 		newMentorModalOpen = false;
 	};
 	const onDeleteClicked = async () => {
