@@ -138,6 +138,8 @@
 							>
 								<option value="en">English</option>
 								<option value="es">Spanish</option>
+								<option value="nl">Dutch</option>
+								<option value="pt">Portuguese</option>
 								<option value="ja">日本語</option>
 							</select>
 						</li>

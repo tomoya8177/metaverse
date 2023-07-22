@@ -82,5 +82,6 @@ export default {
 	'First Name': '名',
 	'Last Name': '姓',
 	'Are you sure that you want to delete this user?': 'このユーザーを削除してもよろしいですか？',
-	'Available VirtuaMentors to chat with': 'チャット可能なメタ先生'
+	'Available VirtuaMentors to chat with': 'チャット可能なメタ先生',
+	'Available Rooms': '利用可能なルーム'
 };
