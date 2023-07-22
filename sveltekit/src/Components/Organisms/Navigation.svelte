@@ -140,6 +140,9 @@
 								<option value="es">Spanish</option>
 								<option value="nl">Dutch</option>
 								<option value="pt">Portuguese</option>
+								<option value="hi">Hindi</option>
+								<option value="zh">Chinese</option>
+								<option value="ko">Korean</option>
 								<option value="ja">日本語</option>
 							</select>
 						</li>
