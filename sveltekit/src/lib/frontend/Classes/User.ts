@@ -9,11 +9,15 @@ export class User {
 	isAdmin: boolean;
 	organizations?: Organization[];
 	userRoles?: UserRole[];
+	userRole?: UserRole;
 	createdAt?: string;
 	onMute?: boolean;
 	onVideoMute?: boolean;
 	onScreenShare?: boolean;
 	isManager?: boolean;
+	isMember?: boolean;
+	firstName?: string;
+	lastName?: string;
 	constructor(data: any) {
 		this.id = data.id;
 		this.nickname = data.nickname;

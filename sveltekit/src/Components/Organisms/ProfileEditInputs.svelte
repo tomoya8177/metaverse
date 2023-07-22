@@ -45,7 +45,7 @@
 		onUpdateDone();
 	};
 	export let user: User;
-	export let label: string = 'Update';
+	export let label: string = _('Update');
 	let avatarSelectOpen = false;
 	const onLeaveClicked = () => {
 		videoChat.leave();
@@ -54,7 +54,16 @@
 	};
 </script>
 
-<InputWithLabel label={_('Nickname')} bind:value={user.nickname} />
+<div style="display:flex;gap:0.4rem">
+	<InputWithLabel label={_('First Name')} bind:value={user.firstName} />
+	<InputWithLabel label={_('Last Name')} bind:value={user.lastName} />
+</div>
+
+<InputWithLabel
+	meta={_('Only alphabets and numbers allowed for nickname')}
+	label={_('Nickname')}
+	bind:value={user.nickname}
+/>
 <AvatarSelectPane bind:url={user.avatarURL} />
 <slot />
 <button aria-busy={busy} on:click={() => onUpdateProfileDoClicked()} disabled={busy}>

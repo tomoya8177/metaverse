@@ -20,7 +20,7 @@ class StoredChats extends Array {
 		eventId: string
 	): Promise<{ storedChat: StoredChat | false; event: Event | false }> => {
 		const event = (await db.query(`select * from events where id='${eventId}'`))[0];
-		if (!event) return { storedChat: false, event: false };
+		//if (!event) return { storedChat: false, event: false };
 		//check if chat is already stored
 		let storedChat = storedChats.find((storedChat) => storedChat.eventId === eventId);
 		if (!storedChat) {
@@ -41,7 +41,7 @@ class StoredChats extends Array {
 	): Promise<{ storedChat: StoredChat | false; mentor: Mentor | false; event: Event | false }> => {
 		const event = (await db.query(`select * from events where id='${eventId}'`))[0];
 		const mentor = (await db.query(`select * from mentors where id='${mentorId}'`))[0];
-		if (!mentor || !event) return { storedChat: false, mentor: false, event: false };
+		if (!mentor) return { storedChat: false, mentor: false, event: false };
 		//check if chat is already stored
 		let storedChat = storedChats.find(
 			(storedChat) => storedChat.mentorId === mentorId && storedChat.eventId === eventId

@@ -10,35 +10,22 @@
 	import type { UserRole } from '$lib/types/UserRole';
 	import type { Organization } from '$lib/types/Organization';
 	import { organizationFromSlug } from '$lib/frontend/organizationFromSlug';
-	let organization: Organization | null = null;
-	let loggedIn: boolean | null = null;
-	onMount(async () => {
-		loggedIn = await checkLogin();
-		console.log({ loggedIn });
-		organization = await organizationFromSlug($page.params.organizationSlug);
-
-		if (!organization) {
-			alert(_('Organization not found'));
-			location.href = '/';
-			return;
-		}
-		const userRole: UserRole = await axios
-			.get('/api/userRoles?user=' + $UserStore.id + '&organization=' + organization.id)
-			.then((res) => res.data[0]);
-		if (!userRole) {
-			alert(_('You are not a member of this organization'));
-			location.href = '/';
-			return;
-		}
-
-		if (userRole.role != 'manager') {
-			alert(_('You are not a manager of this organization'));
-			//not allowed here
-			location.href = '/' + organization.slug;
-			return;
-		}
-		console.log(loggedIn, organization, userRole);
-	});
+	import type { PageData } from './$types';
+	export let data: PageData;
+	const organization: Organization = data.organization;
+	const loggedIn: boolean = data.loggedIn;
+	if (!organization) {
+		alert(_('Organization not found'));
+		location.href = '/';
+	}
+	if (!$UserStore.isMember) {
+		alert(_('You are not a member of this organization'));
+		location.href = '/';
+	}
+	if (!$UserStore.isManager) {
+		alert(_('You are not a manager of this organization'));
+		location.href = '/' + organization.slug;
+	}
 </script>
 
 {#if loggedIn && organization}
@@ -53,11 +40,10 @@
 								{_('Users')}</a
 							>
 						</li>
-
 						<li>
-							<a href={`/${organization.slug}/manager/events`}>
+							<a href={`/${organization.slug}/manager/rooms`}>
 								<Icon icon="vrpano" />
-								{_('Events')}</a
+								{_('Rooms')}</a
 							>
 						</li>
 						<li>

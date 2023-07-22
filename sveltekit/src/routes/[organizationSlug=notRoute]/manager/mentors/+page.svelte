@@ -1,4 +1,6 @@
 <script lang="ts">
+	import AvatarThumbnail from './AvatarThumbnail.svelte';
+
 	import DocumentForAIRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
 
 	import axios from 'axios';
@@ -9,7 +11,7 @@
 	import type { User } from '$lib/frontend/Classes/User';
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
-	import { page } from '$app/stores';
+	import { page, updated } from '$app/stores';
 	import type { Mentor } from '$lib/types/Mentor';
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
 	import AvatarSelectPane from '../../../../Components/Organisms/AvatarSelectPane.svelte';
@@ -18,38 +20,46 @@
 	import Icon from '../../../../Components/Atom/Icon.svelte';
 	import { cookies } from '$lib/frontend/cookies';
 	import type { Event } from '$lib/frontend/Classes/Event';
-
+	import type { DocumentForAI } from '$lib/types/DocumentForAI';
+	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
+	import type { PageData } from './$types';
+	import { nl2br } from '$lib/math/nl2br';
+	import { unescapeHTML } from '$lib/math/escapeHTML';
+	export let data: PageData;
 	let paginated: Mentor[] = [];
-	let organization: Organization;
+	export let organization: Organization = data.organization;
 	let mentors: Mentor[] = [];
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;
 	});
+	export let users: User[] = data.users;
+	let documents: DocumentForAI[] = [];
+	const setUpMentorbject = (mentor: Mentor) => {
+		const user = users.find((user) => user.id == mentor.user);
+		const docs = documents.filter((document) => document.mentor == mentor.id);
+		if (user) mentor.userData = user;
+		if (document) mentor.documents = docs;
+		return mentor;
+	};
 	onMount(async () => {
-		organization = await axios
-			.get('/api/organizations?slug=' + $page.params.organizationSlug)
-			.then((res) => res.data[0]);
 		mentors = await axios
 			.get('/api/mentors?organization=' + organization.id)
 			.then((res) => res.data);
 		if (mentors.length) {
-			const users = await axios
+			users = await axios
 				.get(`/api/users?id=in:'${mentors.map((mentor) => mentor.user).join("','")}'`)
 				.then((res) => res.data);
-			const documents = await axios
+			documents = await axios
 				.get(`/api/documentsForAI?mentor=in:'${mentors.map((mentor) => mentor.id).join("','")}'`)
 				.then((res) => res.data);
 			mentors = mentors.map((mentor) => {
-				const user = users.find((user) => user.id == mentor.user);
-				const docs = documents.filter((document) => document.mentor == mentor.id);
-				if (user) mentor.userData = user;
-				if (document) mentor.documents = docs;
-				return mentor;
+				return setUpMentorbject(mentor);
 			});
 			console.log({ mentors });
 		}
 	});
+	let busy: boolean = false;
 	let newMentorModalOpen = false;
 	let editMentor: Mentor = EmptyMentor;
 	let editMode: 'update' | 'create' = 'update';
@@ -65,50 +75,50 @@
 		return true;
 	};
 
-	const reinstallAIBrain = async (mentor: Mentor) => {
-		const response = await axios.get('/mentor/' + mentor.id);
-		const events = await axios.get('/api/events?mentor=' + mentor.id).then((res) => res.data);
-		const promises = events.map(async (event: Event) => {
-			await axios.put('/api/mentors/' + mentor.id, {
-				eventId: event.id
-			});
-		});
-		console.log({ response, promises });
-	};
-
 	const onCreateClicked = async () => {
 		if (!validate(editMentor)) return;
+		busy = true;
 		const createdUser = await axios.post('/api/users', editMentor.userData).then((res) => res.data);
-		const createdMentor = await axios
+		users = [...users, createdUser];
+		let createdMentor = await axios
 			.post('/api/mentors', { ...editMentor, user: createdUser.id, organization: organization.id })
 			.then((res) => res.data);
 		console.log({ createdMentor, createdUser });
-		createdMentor.userData = createdUser;
+		createdMentor = setUpMentorbject(createdMentor);
 		mentors = [...mentors, createdMentor];
-		reinstallAIBrain(createdMentor);
+		await reinstallAIBrain(createdMentor);
+		busy = false;
 		newMentorModalOpen = false;
 	};
 	const onUpdateClicked = async () => {
 		if (!validate(editMentor)) return;
 		if (!editMentor.userData?.id) return;
+		busy = true;
 		const updatedUser = await axios
 			.put('/api/users/' + editMentor.userData.id, editMentor.userData)
 			.then((res) => res.data);
 		console.log({ editMentor });
-		const updatedMentor = await axios
+		users = users.map((user) => {
+			if (user.id == updatedUser.id) {
+				return updatedUser;
+			}
+			return user;
+		});
+		let updatedMentor = await axios
 			.put('/api/mentors/' + editMentor.id, {
 				prompt: editMentor.prompt
 			})
 			.then((res) => res.data);
 		console.log({ updatedMentor });
-		updatedMentor.userData = updatedUser;
 		mentors = mentors.map((mentor) => {
 			if (mentor.id == updatedMentor.id) {
+				updatedMentor = setUpMentorbject(updatedMentor);
 				return updatedMentor;
 			}
 			return mentor;
 		});
-		reinstallAIBrain(updatedMentor);
+		await reinstallAIBrain(updatedMentor);
+		busy = false;
 		newMentorModalOpen = false;
 	};
 	const onDeleteClicked = async () => {
@@ -123,13 +133,15 @@
 
 <h2>{_('Mentors')}</h2>
 <div style="width:10rem">
-	<button
+	<a
+		href={'#'}
+		role="button"
 		on:click={() => {
 			editMentor = { ...EmptyMentor, id: crypto.randomUUID() };
 			editMode = 'create';
 			console.log({ editMentor });
 			newMentorModalOpen = true;
-		}}>{_('New Mentor')}</button
+		}}>{_('New Mentor')}</a
 	>
 </div>
 {#if mentors.length}
@@ -138,6 +150,7 @@
 		<thead>
 			<tr>
 				<th>{_('Nickname')}</th>
+				<th>{_('Introduction')}</th>
 				<th>{_('Edit')}</th>
 			</tr>
 		</thead>
@@ -145,13 +158,15 @@
 			{#each paginated as mentor}
 				<tr>
 					<td>
-						<img
-							src={PresetAvatars.find((avatar) => avatar.url == mentor.userData?.avatarURL)
-								?.thumbnailURL}
-							style="width:3rem;height:3rem;border-radius:0.2rem;margin-right:0.4rem"
-							alt=""
-						/>
-						{mentor.userData?.nickname || ''}
+						<a href={`/${organization.slug}/mentor/${mentor.id}`}>
+							{#if mentor.userData?.avatarURL}
+								<AvatarThumbnail url={mentor.userData.avatarURL} />
+							{/if}
+							{mentor.userData?.nickname || ''}
+						</a>
+					</td>
+					<td>
+						{@html nl2br(unescapeHTML(mentor.userData?.description) || '')}
 					</td>
 					<td>
 						<button
@@ -176,6 +191,11 @@
 
 			<InputWithLabel label={_('Nickname')} bind:value={editMentor.userData.nickname} />
 			<AvatarSelectPane bind:url={editMentor.userData.avatarURL} />
+			<InputWithLabel
+				label={_('Introduction')}
+				bind:value={editMentor.userData.description}
+				type="textarea"
+			/>
 			<InputWithLabel label={_('Prompt')} bind:value={editMentor.prompt} type="textarea" />
 			<div>{_('Brain Documents')}</div>
 			{#each editMentor.documents || [] as document}
@@ -205,6 +225,7 @@
 						return res.data;
 					});
 					const fileDatas = await Promise.all(promises);
+					documents = [...documents, ...fileDatas];
 					editMentor.documents = [...editMentor.documents, ...fileDatas];
 					e.target.value = '';
 				}}
@@ -212,14 +233,19 @@
 			{#if progress > 0}
 				<progress max={100} value={progress} />
 			{/if}
+			{#if editMentor.documents}
+				<small> {_("VirtuaMentor's memory will be refreshed")} </small>
+			{/if}
 			{#if editMode == 'create'}
 				<button
+					aria-busy={busy}
 					on:click={() => {
 						onCreateClicked();
 					}}>{_('Create')}</button
 				>
 			{:else}
 				<button
+					aria-busy={busy}
 					on:click={() => {
 						onUpdateClicked();
 					}}>{_('Update')}</button

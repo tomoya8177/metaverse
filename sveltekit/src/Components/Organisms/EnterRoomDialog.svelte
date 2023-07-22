@@ -31,7 +31,7 @@
 
 <dialog open>
 	<article>
-		<div>{_('Event Title')}</div>
+		<div>{_('Room Title')}</div>
 		<h4>{$EventStore.title}</h4>
 		{#if organization}
 			<div>{_('Organization')}</div>

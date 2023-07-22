@@ -29,9 +29,10 @@
 	export let messages: Message[] = [];
 	export let newMessagePinned = false;
 	let newMessageBody = '';
-	export let authors: User[];
+	export let authors: User[] = [];
 	export let textChatOpen = false;
-
+	export let forceMentor: string | false = false;
+	export let forceNoPin = false;
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (!textChatOpen) return;
 		if (document.activeElement?.tagName === 'TEXTAREA' && e.key === 'Enter' && e.ctrlKey) {
@@ -40,6 +41,9 @@
 		}
 	};
 	onMount(async () => {
+		if (forceMentor) {
+			newMessageForMentor = true;
+		}
 		//loadMessages();
 		//onKeyDown
 		// io.emit('setEventId', {
@@ -66,11 +70,11 @@
 	// });
 	const onMessageSendClicked = async () => {
 		if (newMessageBody.trim() === '') return;
-		if (newMessageForMentor) {
+		if (newMessageForMentor && !forceMentor) {
 			newMessageBody = newMessageBody + ' @Mentor';
 		}
 		busy = true;
-		const newMessage = new Message({
+		let newMessage = new Message({
 			body: escapeHTML(newMessageBody),
 			user: $UserStore.id,
 			event: $EventStore.id,
@@ -78,12 +82,17 @@
 		});
 		await sendChatMessage(newMessage);
 		busy = false;
-		if (newMessageBody.includes('@Mentor')) {
+		if (newMessageBody.includes('@Mentor') || forceMentor) {
+			console.log({ newMessage });
 			//io.emit('question', newMessageBody);
 			newMessageBody = '';
 			//send message to mentor
 			waitingForAIAnswer = true;
-			const aiMessage = await sendQuestionToAI($EventStore.id, newMessage);
+			const aiMessage = await sendQuestionToAI(
+				forceMentor || $EventStore.mentor,
+				$EventStore.id,
+				newMessage
+			);
 			waitingForAIAnswer = false;
 			newMessageBody = '';
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
@@ -102,36 +111,39 @@
 	export let sendChatMessage: (message: Message) => Promise<Message>;
 	let busy = false;
 	let newMessageForMentor = false;
-	export let onMicClicked: () => void;
+	export let onMicClicked: () => void = () => {};
 	let recognition;
-	export let micActive: boolean;
+	export let micActive: boolean = false;
 </script>
 
-<div class="chat-box">
-	<div style="overflow-y:auto;max-height:calc(100vh - 23rem)">
-		{#each messages.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)) as message}
-			<TextChatMessage
-				{message}
-				author={authors.find((a) => a.id === message.user) || { nickname: 'AI' }}
-				onDelete={(messageId) => {
-					messages = messages.filter((m) => m.id !== messageId);
-				}}
-			/>
-		{/each}
+<div
+	style="overflow-y:auto;max-height:calc(100vh - 23rem)"
+	style:max-height={forceMentor ? 'calc(100vh - 16rem)' : 'calc(100vh - 23rem)'}
+>
+	{#each messages.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)) as message}
+		<TextChatMessage
+			{message}
+			{forceNoPin}
+			author={authors.find((a) => a.id === message.user) || { nickname: 'AI' }}
+			onDelete={(messageId) => {
+				messages = messages.filter((m) => m.id !== messageId);
+			}}
+		/>
+	{/each}
+</div>
+<hr />
+<div style="display:flex; gap:0.4rem;">
+	<div>
+		<button
+			data-tooltip={_('Ask AI Mentor')}
+			class="pill-icon-button"
+			style:background-color={micActive ? 'red' : ''}
+			on:click={onMicClicked}
+		>
+			<Icon icon="mic" />
+		</button>
 	</div>
-	<hr />
-	<div style="display:flex; gap:0.4rem;">
-		<div>
-			<button
-				data-tooltip={_('Ask AI Mentor')}
-				aria-busy={waitingForAIAnswer}
-				class="pill-icon-button"
-				style:background-color={micActive ? 'red' : ''}
-				on:click={onMicClicked}
-			>
-				<Icon icon="mic" />
-			</button>
-		</div>
+	{#if !forceMentor}
 		<div>
 			<button
 				data-tooltip={_('Attach File')}
@@ -157,25 +169,29 @@
 				<Icon icon="attachment" />
 			</button>
 		</div>
+	{/if}
+	{#if forceMentor || $EventStore.mentor}
 		<div style="text-align:right;flex:1">
 			<InputWithLabel
 				label="@Mentor"
-				disabled={!virtuaMentorReady}
+				disabled={!virtuaMentorReady || forceMentor}
 				type="switch"
 				bind:value={newMessageForMentor}
 			/>
 		</div>
+	{/if}
+	{#if !forceNoPin}
 		<InputWithLabel label={_('Pinned')} type="switch" bind:value={newMessagePinned} />
+	{/if}
+</div>
+<div style="display:flex;gap:0.4rem">
+	<div style="flex:1" id="chat-textarea">
+		<InputWithLabel label="" type="textarea" bind:value={newMessageBody} />
 	</div>
-	<div style="display:flex;gap:0.4rem">
-		<div style="flex:1" id="chat-textarea">
-			<InputWithLabel label="" type="textarea" bind:value={newMessageBody} />
-		</div>
-		<div>
-			<button aria-busy={busy} style="margin-bottom:0rem" on:click={onMessageSendClicked}
-				>{_('Send')}</button
-			>
-		</div>
+	<div>
+		<button aria-busy={busy} style="margin-bottom:0rem" on:click={onMessageSendClicked}
+			>{_('Send')}</button
+		>
 	</div>
 </div>
 
@@ -184,18 +200,5 @@
 		height: 2rem;
 		border-radius: 1rem;
 		padding-top: 0.1rem;
-	}
-	.chat-box {
-		max-height: calc(100vh - 9rem);
-		overflow: auto;
-		width: 26rem;
-		position: absolute;
-		padding: 1rem;
-		border-radius: 1rem;
-		bottom: 6rem;
-		right: 0;
-		background-color: rgba(0, 0, 0, 0.5);
-		color: white;
-		display: grid;
 	}
 </style>

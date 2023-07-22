@@ -14,7 +14,6 @@
 {#if $UserStore.onMute}
 	<button
 		data-tooltip={_('Press to Unmute')}
-		aria-busy={busy}
 		class="circle-button dim"
 		on:click={async () => {
 			busy = true;
@@ -27,14 +26,16 @@
 				$UserStore.onMute = false;
 			} catch (e) {
 				console.log(e);
-				alert(`Couldn't get access to the microphone.`);
+				alert(_(`Couldn't get access to the microphone`));
 			}
 			busy = false;
 		}}
 	>
-		{#if !busy}
-			<Icon icon="mic_off" />
-		{/if}
+		<span aria-busy={busy}>
+			{#if !busy}
+				<Icon icon="mic_off" />
+			{/if}
+		</span>
 	</button>
 {:else}
 	<button

@@ -6,10 +6,13 @@
 	import { organizationFromSlug } from '$lib/frontend/organizationFromSlug';
 	import Navigation from '../../Components/Organisms/Navigation.svelte';
 	let organization: Organization;
-	onMount(async () => {
-		organization = await organizationFromSlug($page.params.organizationSlug);
-	});
+	import { UserStore } from '$lib/store';
+	import type { PageData } from './$types';
+
+	export let data: PageData;
+	organization = data.organization;
+	console.log({ user: $UserStore });
 </script>
 
-<Navigation title={organization?.title} />
-<slot></slot>
+<Navigation logoLinkTo={'/' + organization.slug} title={organization?.title} />
+<slot />

@@ -14,6 +14,7 @@
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
 	import { Users, UsersStore } from '$lib/frontend/Classes/Users';
 	import { _, lang } from '$lib/i18n';
+	import Login from './Login.svelte';
 	export let title: String = 'VirtuaIntel';
 	const onLogoutClicked = () => {
 		videoChat.leave();
@@ -63,12 +64,14 @@
 		location.href = '/';
 	};
 	let chosenLanguage: string = cookies.get('locale') || 'en';
+	let loginOpen: boolean = false;
+	export let logoLinkTo: string = '#';
 </script>
 
 <nav>
 	<ul>
 		<li>
-			<a href={'#'}>
+			<a href={logoLinkTo || '#'}>
 				<strong>
 					{title}
 				</strong>
@@ -134,15 +137,28 @@
 								}}
 							>
 								<option value="en">English</option>
+								<option value="es">Spanish</option>
 								<option value="ja">日本語</option>
 							</select>
 						</li>
 					</ul>
 				</details>
 			</li>
+		{:else}
+			<a
+				href={'#'}
+				on:click={() => {
+					loginOpen = true;
+				}}
+			>
+				{_('Login')}
+			</a>
 		{/if}
 	</ul>
 </nav>
+{#if loginOpen}
+	<Login />
+{/if}
 {#if emailDialogOpen}
 	<dialog open transition:fade>
 		<article>

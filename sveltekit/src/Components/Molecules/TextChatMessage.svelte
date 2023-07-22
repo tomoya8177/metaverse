@@ -19,10 +19,12 @@
 	import { fade, slide } from 'svelte/transition';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import type { User } from '$lib/frontend/Classes/User';
+	import { _ } from '$lib/i18n';
 
 	export let message: Message;
 	export let onDelete: (id: string) => void;
 	export let author: User | null;
+	export let forceNoPin = false;
 	onMount(async () => {
 		//author = await axios.get('/api/users/' + message.user).then((res) => res.data);
 		const interval = setInterval(() => {
@@ -35,7 +37,10 @@
 </script>
 
 {#if message}
-	<div style="position:relative;display:flex;gap:0.1rem;margin-bottom:0.4rem">
+	<div
+		style="position:relative;display:flex;gap:0.1rem;margin-bottom:0.4rem;padding:0.4rem;border-radius:0.4rem;"
+		style:background-color={message.user == $UserStore.id ? 'rgba(100,100,100,0.5)' : ''}
+	>
 		<div style="flex:1">
 			{#if author}
 				<div style="font-size:0.9rem;">
@@ -69,18 +74,19 @@
 				{DateTime.fromISO(message.createdAt).setZone().toRelative()}
 			</div>
 		</div>
-
-		<a
-			href={'#'}
-			style:opacity={message.pinned ? 1 : 0.5}
-			on:click={async () => {
-				message = await axios
-					.put('/api/messages/' + message.id, { pinned: !message.pinned })
-					.then((res) => res.data);
-			}}
-		>
-			<Icon icon="push_pin" />
-		</a>
+		{#if !forceNoPin}
+			<a
+				href={'#'}
+				style:opacity={message.pinned ? 1 : 0.5}
+				on:click={async () => {
+					message = await axios
+						.put('/api/messages/' + message.id, { pinned: !message.pinned })
+						.then((res) => res.data);
+				}}
+			>
+				<Icon icon="push_pin" />
+			</a>
+		{/if}
 		{#if message.user == $UserStore.id || message.user == 'Mentor'}
 			<a
 				href={'#'}

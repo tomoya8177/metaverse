@@ -11,17 +11,14 @@
 	import type { UserRole } from '$lib/types/UserRole';
 	import { _ } from '$lib/i18n';
 	import type { Organization } from '$lib/types/Organization';
-	let loggedIn: boolean | null = null;
+	import type { PageData } from './$types';
+	export let data: PageData;
+	let loggedIn: boolean | null = data.loggedIn;
 	let event: any = null;
 	let noEvent: boolean | null = null;
-	let organization: Organization | null = null;
+	let organization: Organization | null = data.organization;
 	$: console.log(loggedIn);
 	onMount(async () => {
-		loggedIn = await checkLogin();
-		console.log({ loggedIn });
-		organization = await axios
-			.get(`/api/organizations?slug=${$page.params.organizationSlug}`)
-			.then((res) => res.data[0]);
 		if (!organization) {
 			noEvent = true;
 			return;
@@ -34,12 +31,9 @@
 			return;
 		}
 		EventStore.set(new Event(event));
-		console.log($EventStore);
+		console.log($EventStore, $UserStore);
 		if (!loggedIn) return;
-		const userRole: UserRole = await axios
-			.get(`/api/userRoles?user=${$UserStore.id}&organization=${event.organization}`)
-			.then((res) => res.data[0]);
-
+		const userRole: UserRole | undefined = $UserStore.userRole;
 		if (userRole?.role == 'manager') {
 			$UserStore.isManager = true;
 		}
@@ -88,12 +82,10 @@
 		<div style="display:flex;width:100vw;height:100vh">
 			<div style="align-self:center;width:100%;text-align:center">
 				<h2>
-					{_('NO EVENT FOUND')}
+					{_('NO ROOM FOUND')}
 				</h2>
 				<p>
-					{_(
-						'Please make sure you have the correct URL and you have the right to enter the event!'
-					)}
+					{_('Please make sure you have the correct URL and you have the right to enter the room!')}
 				</p>
 			</div>
 		</div>

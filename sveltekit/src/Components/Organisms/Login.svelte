@@ -96,7 +96,7 @@
 				Please check your Email and copy the verification code here. Please understand the
 				verification email is likely to be sent to your spam box...
 			</p>
-			<InputWithLabel label="Verification Code" bind:value={verificationCode} />
+			<InputWithLabel type="tel" label="Verification Code" bind:value={verificationCode} />
 			{#if wrongCode}
 				<p class="p" style="color:red" transition:fade>Wrong code</p>
 			{/if}

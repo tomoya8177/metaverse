@@ -35,9 +35,9 @@
 							>
 						</li>
 						<li>
-							<a href="/admin/events">
+							<a href="/admin/rooms">
 								<Icon icon="vrpano" />
-								{_('Events')}</a
+								{_('Rooms')}</a
 							>
 						</li>
 					</ul>

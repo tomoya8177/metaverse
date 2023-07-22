@@ -5,14 +5,7 @@ import type { SharedObject } from './frontend/Classes/SharedObject';
 import { EmptyObject } from './preset/EmptyObject';
 
 export const UserStore = writable({
-	...emptyUser,
-	id: '',
-	nickname: '',
-	email: '',
-	avatarURL: '',
-	lastRoom: '',
-	lastPosition: '',
-	isAdmin: false
+	...emptyUser
 });
 export const RigStore = writable({
 	position: {

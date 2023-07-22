@@ -12,5 +12,6 @@ export const EmptyMentor: Mentor = {
 		avatarURL: '',
 		isAdmin: false,
 		delete: async () => {}
-	}
+	},
+	documents: []
 };

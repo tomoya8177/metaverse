@@ -8,6 +8,7 @@
 		| 'email'
 		| 'password'
 		| 'date'
+		| 'tel'
 		| 'time'
 		| 'textarea'
 		| 'switch'
@@ -21,6 +22,7 @@
 	export let step = 1;
 	export let min = 0;
 	export let max = 100;
+	export let meta: string = '';
 </script>
 
 <div class="field">
@@ -31,10 +33,16 @@
 		{#if required}
 			<span class="has-text-danger">*</span>
 		{/if}
+		{#if meta}
+			<br />
+			<small>{meta}</small>
+		{/if}
 
 		<div class="control">
 			{#if type == 'text'}
 				<input on:change={onChange} type="text" bind:value {disabled} />
+			{:else if type == 'tel'}
+				<input on:change={onChange} type="tel" bind:value {disabled} />
 			{:else if type == 'number'}
 				<input on:change={onChange} type="number" bind:value {disabled} />
 			{:else if type == 'email'}

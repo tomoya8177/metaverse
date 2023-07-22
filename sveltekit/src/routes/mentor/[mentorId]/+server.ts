@@ -34,16 +34,15 @@ export const GET = async ({ params, request }) => {
 		);
 		return { storedChat, mentor, event };
 	});
-	await Promise.all(promises);
-	return new Response(JSON.stringify({ promises }));
+	const result = await Promise.all(promises).then((res) => res);
+	console.log({ promises, result });
+	return new Response(JSON.stringify({ result }));
 };
 
 //put for loading documents
 export const PUT = async ({ request, params }) => {
 	const body = await request.json();
-	const events = (await db.query(
-		`select * from events where mentor='${params.mentorId}'`
-	)) as Event[];
+
 	const { storedChat, mentor } = await storedChats.findStoredChatAndMentor(
 		params.mentorId,
 		body.eventId
@@ -52,9 +51,14 @@ export const PUT = async ({ request, params }) => {
 	if (!mentor) return new Response(JSON.stringify({ error: 'mentor not found' }), { status: 404 });
 	const user = (await db.query(`select * from users where id='${mentor.user}'`))[0];
 	mentor.userData = user;
-	const documents = await db.query(
-		`select * from documentsForAI where mentor='${params.mentorId}'`
-	);
+	const documents = [
+		...(await db.query(`select * from documentsForAI where mentor='${params.mentorId}'`)),
+
+		...(body.eventId
+			? await db.query(`select * from documentsForAI where event='${body.eventId}'`)
+			: [])
+	];
+
 	console.log({ documents });
 
 	const userRoles: UserRole[] = await db.query(
@@ -65,6 +69,7 @@ export const PUT = async ({ request, params }) => {
 	);
 	//load user data as json to docs
 	const usersJson = JSON.stringify(users);
+	const failedLogs: DocumentForAI[] = [];
 	if (mentor.withDocuments || documents.length > 0) {
 		let docs: Document[] = [];
 		const thePrompt = virtuaMentorPrompt({
@@ -90,7 +95,7 @@ export const PUT = async ({ request, params }) => {
 			]))
 		];
 
-		const Promises: Promise<Document[]>[] = [];
+		const Promises: Promise<Document[] | false>[] = [];
 
 		documents.forEach((document: DocumentForAI) => {
 			if (document.type.includes('text')) {
@@ -108,7 +113,13 @@ export const PUT = async ({ request, params }) => {
 			}
 		});
 		await Promise.all(Promises).then((res) => {
-			res.forEach((d) => {
+			res.forEach((d, i) => {
+				if (!d) {
+					const failedDocument = documents[i];
+					console.log({ failedDocument });
+					failedLogs.push(failedDocument);
+					return;
+				}
 				docs = [...docs, ...d];
 			});
 		});
@@ -150,15 +161,25 @@ export const PUT = async ({ request, params }) => {
 			llm: model
 		});
 	}
-	return new Response(JSON.stringify({ storedChat, mentor }));
+	return new Response(JSON.stringify({ storedChat, failedLogs }));
 };
 
 //post for chat
 //POST for ask question
 export const POST = async ({ request, params }) => {
+	console.log({ params });
 	const body = await request.json();
 	const user = (await db.query(`select * from users where id='${body.user}'`))[0];
-	let storedChat = storedChats.find((storedChat) => storedChat.mentorId === params.mentorId);
+	console.log({ storedChats });
+	let storedChat = storedChats.find((storedChat) => {
+		if (body.eventId) {
+			return storedChat.mentorId === params.mentorId && storedChat.eventId === body.eventId;
+		} else {
+			console.log(typeof storedChat.eventId, storedChat.mentorId, params.mentorId);
+			return storedChat.mentorId == params.mentorId && typeof storedChat.eventId == 'undefined';
+		}
+	});
+	console.log({ storedChat });
 	const question = `${body.body.replace('@Mentor', '').trim()}`;
 	if (!storedChat || !storedChat.chain) {
 		return new Response(JSON.stringify({ error: 'mentor not initialized' }));

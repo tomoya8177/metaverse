@@ -20,6 +20,7 @@
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import ObjectEditor from './ObjectEditor.svelte';
+	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -66,15 +67,19 @@
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
 		loadMessages(messages);
-		axios.get('/chat/' + $EventStore.id).then(async (res) => {
-			//this is okay to be delaied
-			virtuaMentorReady = true;
-			console.log('chat setup', res);
-			if (res.data.chain == null) {
-				//put action
-				const res = await axios.put('/chat/' + $EventStore.id, {});
-			}
-		}); //ping to wake up the server
+		if ($EventStore.mentor) {
+			axios.get('/mentor/' + $EventStore.mentor).then(async (res) => {
+				//this is okay to be delaied
+				virtuaMentorReady = true;
+				console.log('chat setup', res);
+				if (res.data.chain == null) {
+					//put action
+					const res = await axios.put('/mentor/' + $EventStore.mentor, {
+						eventId: $EventStore.id
+					});
+				}
+			}); //ping to wake up the server
+		}
 		videoChat.listenTo('textMessage', async (data) => {
 			messages = [...messages, data];
 			const existingAuthor = authors.find((a) => a.id === data.user);
@@ -89,7 +94,10 @@
 			setTimeout(() => {
 				scrollChatToBottom();
 			}, 100);
-			if (data.user === 'Mentor') aiSpeaksOut(data.body);
+			if (data.user === 'Mentor') {
+				data.isTalking = true;
+				aiSpeaksOut(data.body);
+			}
 		});
 	});
 	onDestroy(() => {
@@ -98,19 +106,30 @@
 	});
 
 	let textChatOpen = false;
-	let recognition;
+	let recognition: VoiceRecognition;
 	export let me: Me | null = null;
 	let micActive = false;
 	const onMicClicked = async () => {
 		micActive = !micActive;
 		if (micActive) {
 			//activate my mic and start audio to text
-			startAudioToText();
+			recognition = new VoiceRecognition((event) => {
+				if (event.error === 'not-allowed') {
+					alert('Microphone access denied by the user.');
+					// Perform any necessary actions when access is denied
+				} else {
+					console.log('Error', event.error);
+					alert(event.error);
+					return;
+				}
+				onMicClicked();
+			});
 		} else {
 			//deactivate my mic and stop audio to text
 			recognition.stop();
+			if (!recognition.body) return;
 			const newMessage = new Message({
-				body: escapeHTML(newMessageBody) + ' @Mentor',
+				body: escapeHTML(recognition.body) + ' @Mentor',
 				user: $UserStore.id,
 				event: $EventStore.id,
 				pinned: newMessagePinned
@@ -118,7 +137,7 @@
 
 			await sendChatMessage(newMessage);
 			waitingForAIAnswer = true;
-			const aiMessage = await sendQuestionToAI($EventStore.id, newMessage);
+			const aiMessage = await sendQuestionToAI($EventStore.mentor, $EventStore.id, newMessage);
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
 			aiSpeaksOut(createdMessage.body);
@@ -127,49 +146,7 @@
 	let waitingForAIAnswer = false;
 	let newMessagePinned = false;
 	let newMessageBody = '';
-	const startAudioToText = () => {
-		//activate speech detech api
-		createRecognition();
-		recognition.start();
-		console.log({ recognition }, 'started');
-		recognition.addEventListener('result', (e) => {
-			console.log(e.results);
-			const transcript = e.results[0][0].transcript;
-			// const transcript = Array.from(e.results)
-			// 	.map((result) => result[0])
-			// 	.map((result) => result.transcript.replace('at mentor', '@Mentor'))
-			// 	.join('');
-			newMessageBody = transcript;
-			console.log({ transcript });
-			// if (e.results[0].isFinal) {
-			// 	onMessageSendClicked();
-			// 	//reset recognition results
-			// 	// onMicClicked();
 
-			// 	// setTimeout(() => {
-			// 	// 	onMicClicked();
-			// 	// }, 1000);
-			// }
-		});
-		recognition.onerror = (event) => {
-			if (event.error === 'not-allowed') {
-				alert('Microphone access denied by the user.');
-				// Perform any necessary actions when access is denied
-			} else {
-				console.log('Error', event.error);
-				alert(event.error);
-			}
-			onMicClicked();
-		};
-	};
-	const createRecognition = () => {
-		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-		recognition = new SpeechRecognition();
-		recognition.interimResults = false;
-		recognition.lang = 'en-US';
-		recognition.continuous = false;
-		//Setting interimResults to true
-	};
 	const sendChatMessage = async (message: Message) => {
 		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
 		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
@@ -190,16 +167,18 @@
 	<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:textChatOpen bind:micActive {me} />
 </div>
 <div style:display={textChatOpen ? 'block' : 'none'}>
-	<ChatBox
-		bind:waitingForAIAnswer
-		bind:newMessagePinned
-		{sendChatMessage}
-		{onMicClicked}
-		bind:messages
-		bind:authors
-		bind:micActive
-		{virtuaMentorReady}
-	/>
+	<div class="chat-box">
+		<ChatBox
+			bind:waitingForAIAnswer
+			bind:newMessagePinned
+			{sendChatMessage}
+			{onMicClicked}
+			bind:messages
+			bind:authors
+			bind:micActive
+			{virtuaMentorReady}
+		/>
+	</div>
 </div>
 
 <div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>
@@ -228,5 +207,19 @@
 		right: 1rem;
 		display: flex;
 		gap: 0.4rem;
+	}
+
+	.chat-box {
+		max-height: calc(100vh - 9rem);
+		overflow: auto;
+		width: 26rem;
+		position: absolute;
+		padding: 1rem;
+		border-radius: 1rem;
+		bottom: 6rem;
+		right: 0;
+		background-color: rgba(0, 0, 0, 0.5);
+		color: white;
+		display: grid;
 	}
 </style>

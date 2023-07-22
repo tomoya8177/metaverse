@@ -10,11 +10,12 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
 	import { page } from '$app/stores';
-
-	let users: User[] = [];
+	import type { PageData } from './$types';
+	export let data: PageData;
+	export let users: User[] = data.users;
+	export let userRoles: UserRole[] = data.userRoles;
 	let paginated: User[] = [];
-	let organization: Organization;
-	let userRoles: UserRole[] = [];
+	const organization: Organization = data.organization;
 	const fillOrganization = (user: User) => {
 		const filteredUserRoles: UserRole[] = userRoles.filter((userRole) => userRole.user == user.id);
 		if (!filteredUserRoles.length) return user;
@@ -23,25 +24,6 @@
 		return user;
 	};
 
-	onMount(async () => {
-		organization = await axios
-			.get('/api/organizations?slug=' + $page.params.organizationSlug)
-			.then((res) => res.data[0]);
-		userRoles = await axios
-			.get('/api/userRoles?organization=' + organization.id)
-			.then((res) => res.data);
-		console.log({ userRoles });
-		users = await axios
-			.get(`/api/users?id=in:'${userRoles.map((role) => role.user).join("','")}'`)
-			.then((res) => res.data);
-		users = users
-			.map((user) => {
-				user = fillOrganization(user);
-				return new User(user);
-			})
-			.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-		console.log({ users });
-	});
 	let newUserModalOpen = false;
 	let editUser: User = emptyUser;
 	let editMode: 'update' | 'create' = 'update';
@@ -61,12 +43,13 @@
 			alert('Email is required');
 			return;
 		}
+		updateBusy = true;
 		const result = await axios.post('/api/users', editUser).then((res) => res.data);
 		await createUserRoles(result.id);
 		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
 		const filledUser = fillOrganization(result);
 		users = [...users, filledUser].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-
+		updateBusy = false;
 		newUserModalOpen = false;
 	};
 	const onUpdateClicked = async () => {
@@ -74,6 +57,7 @@
 			alert('Email is required');
 			return;
 		}
+		updateBusy = true;
 		const result = await axios.put('/api/users/' + editUser.id, editUser).then((res) => res.data);
 
 		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
@@ -84,25 +68,32 @@
 			}
 			return user;
 		});
+		updateBusy = false;
 		newUserModalOpen = false;
 	};
 	const onDeleteClicked = async () => {
-		if (!confirm('Are you sure that you want to delete this user?')) return;
+		if (!confirm(_('Are you sure that you want to delete this user?'))) return;
+		deleteBusy = true;
 		await new User(editUser).delete();
+		deleteBusy = false;
 		users = users.filter((user) => user.id != editUser.id);
 		newUserModalOpen = false;
 	};
+	let updateBusy = false;
+	let deleteBusy = false;
 </script>
 
 <h2>{_('Users')}</h2>
-<div style="width:10rem">
-	<button
+<div>
+	<a
+		href={'#'}
+		role="button"
 		on:click={() => {
 			editUser = emptyUser;
 			editMode = 'create';
 
 			newUserModalOpen = true;
-		}}>{_('New User')}</button
+		}}>{_('New User')}</a
 	>
 </div>
 {#if users.length}
@@ -123,7 +114,7 @@
 					<td>{user.nickname}</td>
 					<td>{user.email}</td>
 					<td>
-						<input type="checkbox" disabled role="switch" checked={userRole.role == 'manager'} />
+						<input type="checkbox" disabled role="switch" checked={userRole?.role == 'manager'} />
 					</td>
 					<td>
 						<button
@@ -146,23 +137,34 @@
 	<dialog open>
 		<article>
 			<ModalCloseButton onClick={() => (newUserModalOpen = false)} />
-			<InputWithLabel label={_('Nickname')} bind:value={editUser.nickname} />
+			<div style="display:flex;gap:0.4rem">
+				<InputWithLabel label={_('First Name')} bind:value={editUser.firstName} />
+				<InputWithLabel label={_('Last Name')} bind:value={editUser.lastName} />
+			</div>
+			<InputWithLabel
+				meta={_('Only alphabets and numbers allowed for nickname')}
+				label={_('Nickname')}
+				bind:value={editUser.nickname}
+			/>
 			<InputWithLabel label={_('Email')} bind:value={editUser.email} type="email" />
 			<InputWithLabel label={_('Is Manager')} bind:value={editUser.isAdmin} type="switch" />
 
 			{#if editMode == 'create'}
 				<button
+					aria-busy={updateBusy}
 					on:click={() => {
 						onCreateClicked();
 					}}>{_('Create')}</button
 				>
 			{:else}
 				<button
+					aria-busy={updateBusy}
 					on:click={() => {
 						onUpdateClicked();
 					}}>{_('Update')}</button
 				>
 				<button
+					aria-busy={deleteBusy}
 					class="secondary"
 					on:click={() => {
 						onDeleteClicked();

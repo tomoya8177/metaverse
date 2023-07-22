@@ -121,7 +121,7 @@ export class Unit {
 		sharedObjects.add(shredObject);
 		const video = document.createElement('a-plane');
 		video.setAttribute('id', 'screenPlaneOf' + this.userId);
-		video.setAttribute('rotation', `0 ${this.rotation.y + 180} 0`);
+		video.setAttribute('rotation', `0 ${this.rotation.y} 0`);
 		video.setAttribute('material', 'src:#' + sid + ';shader: flat; side:double');
 		video.setAttribute('editable-object', '');
 		video.setAttribute('width', '1');

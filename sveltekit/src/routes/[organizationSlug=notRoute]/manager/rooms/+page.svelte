@@ -1,4 +1,6 @@
 <script lang="ts">
+	import RoomTitleForManagers from '../../../../Components/Molecules/RoomTitleForManagers.svelte';
+
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
 	import { Event } from '$lib/frontend/Classes/Event';
 	import axios from 'axios';
@@ -17,6 +19,9 @@
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import DocumentForAiRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
+	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
+	import type { PageData } from './$types';
+	export let data: PageData;
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;
@@ -27,28 +32,11 @@
 	let editMode: 'update' | 'create' = 'update';
 	let modalOpen = false;
 	let organizations: Organization[] = [];
-	let organization: Organization;
-	let users: User[] = [];
-	let userRoles: UserRole[] = [];
+	const organization: Organization = data.organization;
+	const users: User[] = data.users;
 	let mentors: Mentor[] = [];
 	let documents: DocumentForAI[] = [];
 	onMount(async () => {
-		organization = await axios
-			.get('/api/organizations?slug=' + $page.params.organizationSlug)
-			.then((res) => res.data[0]);
-		userRoles = await axios
-			.get('/api/userRoles?organizatin=' + organization.id)
-			.then((res) => res.data);
-		users = await axios
-			.get(`/api/users?id=in:'${userRoles.map((role) => role.user).join("','")}'`)
-			.then((res) => {
-				res.data = res.data.map((user: User) => {
-					user.userRoles = userRoles.filter((userRole) => userRole.user == user.id);
-					return user;
-				});
-				return res.data;
-			});
-		console.log({ users });
 		const results = await axios.get('/api/events?organization=' + organization.id).then((res) => {
 			res.data.forEach((event: Event) => {
 				event.organizationTitle =
@@ -79,29 +67,38 @@
 
 	const onCreateClicked = async () => {
 		if (!(await editEvent.validate())) return;
+		busy = true;
 		editEvent.allowedUsers = JSON.stringify(editEvent.allowedUsersArray);
 		const newEvent = await axios.post('/api/events', editEvent).then((res) => res.data);
-		axios.put('/chat/' + newEvent.id).then((res) => {
-			console.log(res.data);
-		});
 		events = [...events, new Event(newEvent)].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+		if (editEvent.mentor) {
+			const mentor = await axios.get('/api/mentors/' + editEvent.mentor).then((res) => res.data);
+			mentors = [...mentors.filter((mentor) => mentor.id != editEvent.mentor), mentor];
+			await reinstallAIBrain(mentor);
+		}
+		busy = false;
 		modalOpen = false;
 	};
 	const onUpdateClicked = async () => {
 		if (!(await editEvent.validate())) return;
+		busy = true;
 		editEvent.allowedUsers = JSON.stringify(editEvent.allowedUsersArray);
 		const updatedEvent = await axios
 			.put('/api/events/' + editEvent.id, editEvent)
 			.then((res) => res.data);
-		axios.put('/chat/' + updatedEvent.id).then((res) => {
-			console.log(res.data);
-		});
 		events = events.map((event) => {
 			if (event.id == updatedEvent.id) {
 				return new Event(updatedEvent);
 			}
 			return event;
 		});
+		if (editEvent.mentor) {
+			const mentor = await axios.get('/api/mentors/' + editEvent.mentor).then((res) => res.data);
+			mentors = [...mentors.filter((mentor) => mentor.id != editEvent.mentor), mentor];
+			await reinstallAIBrain(mentor);
+		}
+
+		busy = false;
 		modalOpen = false;
 	};
 	const onDeleteClicked = async () => {
@@ -112,10 +109,13 @@
 		await axios.delete('/api/messages?event=' + editEvent.id);
 		modalOpen = false;
 	};
+	let busy = false;
 </script>
 
-<h3>{_('Events')}</h3>
-<button
+<h3>{_('Rooms')}</h3>
+<a
+	href={'#'}
+	role="button"
 	on:click={() => {
 		editEvent = new Event({
 			...EmptyEvent,
@@ -125,8 +125,8 @@
 		modalOpen = true;
 	}}
 >
-	{_('New Event')}
-</button>
+	{_('New Room')}
+</a>
 <FilterPagination inputArray={events} bind:paginated />
 <table>
 	<thead>
@@ -140,21 +140,7 @@
 		{#each paginated as event}
 			<tr>
 				<td>
-					<div style="display:flex; gap:0.4rem">
-						<div>
-							<a
-								data-tooltip={_('Enter Event')}
-								href={`/${organization?.slug}/${event.slug}`}
-								role="button"
-								class="outline circle-button"
-							>
-								<Icon icon="login" />
-							</a>
-						</div>
-						<div style="align-self:center">
-							{event.title}
-						</div>
-					</div>
+					<RoomTitleForManagers {event} {organization} />
 				</td>
 				<td>{event.slug}</td>
 				<td>
@@ -217,7 +203,7 @@
 				bind:value={editEvent.mentor}
 			/>
 			{#if editEvent.mentor}
-				<div>{_('Event Specific Materials')}</div>
+				<div>{_('Room Specific Materials')}</div>
 				{#each editEvent.documents || [] as document}
 					<DocumentForAiRow
 						{document}
@@ -252,12 +238,15 @@
 					<progress max={100} value={progress} />
 				{/if}
 				<InputWithLabel type="textarea" label={_('Prompt')} bind:value={editEvent.prompt} />
-				<small>
-					{_("VirtuaMentor's memory will be refreshed.")}
-				</small>
+				{#if editEvent.mentor}
+					<small>
+						{_("VirtuaMentor's memory will be refreshed")}
+					</small>
+				{/if}
 			{/if}
 			{#if editMode == 'create'}
 				<button
+					aria-busy={busy}
 					on:click={() => {
 						onCreateClicked();
 					}}
@@ -266,6 +255,7 @@
 				</button>
 			{:else}
 				<button
+					aria-busy={busy}
 					on:click={() => {
 						onUpdateClicked();
 					}}
