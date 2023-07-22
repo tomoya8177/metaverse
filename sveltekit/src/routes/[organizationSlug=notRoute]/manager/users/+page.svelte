@@ -11,6 +11,7 @@
 	import { _ } from '$lib/i18n';
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
+	import AvatarThumbnail from '../mentors/AvatarThumbnail.svelte';
 	export let data: PageData;
 	export let users: User[] = data.users;
 	export let userRoles: UserRole[] = data.userRoles;
@@ -101,7 +102,7 @@
 	<table>
 		<thead>
 			<tr>
-				<th>{_('Nickname')}</th>
+				<th>{_('Name')}</th>
 				<th>{_('Email')}</th>
 				<th>{_('Is Manager')}</th>
 				<th>{_('Edit')}</th>
@@ -111,7 +112,20 @@
 			{#each paginated as user}
 				{@const userRole = user.userRoles?.find((role) => role.organization == organization.id)}
 				<tr>
-					<td>{user.nickname}</td>
+					<td>
+						<div style="display:flex;gap:0.4rem">
+							<AvatarThumbnail url={user.avatarURL} />
+							<div>
+								<div>
+									<strong>
+										{user.firstName || ''}
+										{user.lastName || ''}
+									</strong>
+								</div>
+								{user.nickname}
+							</div>
+						</div></td
+					>
 					<td>{user.email}</td>
 					<td>
 						<input type="checkbox" disabled role="switch" checked={userRole?.role == 'manager'} />
