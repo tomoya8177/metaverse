@@ -4,21 +4,28 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
-	import { UserStore } from '$lib/store';
+	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import type { Mentor } from '$lib/types/Mentor';
 	import axios from 'axios';
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
-	import type { Event } from '$lib/frontend/Classes/Event';
+	import { Event } from '$lib/frontend/Classes/Event';
 	import RoomTitleForManagers from '../../Components/Molecules/RoomTitleForManagers.svelte';
 	import AvatarThumbnail from '../../Components/Atom/AvatarThumbnail.svelte';
+	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { Users } from '$lib/frontend/Classes/Users';
+	import { EmptyObject } from '$lib/preset/EmptyObject';
 
 	export let data: PageData;
 	const organization: Organization = data.organization;
 	let mentors: Mentor[] = [];
 	let events: Event[] = [];
 	onMount(async () => {
+		console.log('dashboard mount');
+		FocusObjectStore.set(EmptyObject);
+		EventStore.set(EmptyEvent);
+		Users.clear();
 		mentors = await axios
 			.get('/api/mentors?organization=' + organization.id)
 			.then((res) => res.data);

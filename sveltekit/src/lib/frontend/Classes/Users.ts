@@ -25,5 +25,8 @@ class users {
 	find(userId: string): Unit | false {
 		return this.users.find((user) => user.userId === userId) || false;
 	}
+	clear = () => {
+		UsersStore.set([]);
+	};
 }
 export const Users = new users();

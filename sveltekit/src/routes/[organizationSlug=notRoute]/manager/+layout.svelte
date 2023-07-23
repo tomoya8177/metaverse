@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { checkLogin } from '$lib/frontend/checkLogin';
 	import { onMount, setContext } from 'svelte';
-	import { UserStore } from '$lib/store';
+	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
 	import Icon from '../../../Components/Atom/Icon.svelte';
 	import { _, lang } from '$lib/i18n';
 	import Navigation from '../../../Components/Organisms/Navigation.svelte';
@@ -11,6 +11,9 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { organizationFromSlug } from '$lib/frontend/organizationFromSlug';
 	import type { PageData } from './$types';
+	import { Users } from '$lib/frontend/Classes/Users';
+	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { EmptyObject } from '$lib/preset/EmptyObject';
 	export let data: PageData;
 	const organization: Organization = data.organization;
 	const loggedIn: boolean = data.loggedIn;
@@ -26,6 +29,12 @@
 		alert(_('You are not a manager of this organization'));
 		location.href = '/' + organization.slug;
 	}
+	onMount(async () => {
+		console.log('manager dashboard mount');
+		FocusObjectStore.set(EmptyObject);
+		EventStore.set(EmptyEvent);
+		Users.clear();
+	});
 </script>
 
 {#if loggedIn && organization}

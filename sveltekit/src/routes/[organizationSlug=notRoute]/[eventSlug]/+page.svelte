@@ -29,6 +29,11 @@
 			});
 		}
 	});
+	window.onpopstate = function (event) {
+		console.log('onbeforeunload');
+		// your code here
+		delete AFRAME.components['on-scene-loaded'];
+	};
 	let sceneLoaded = false;
 	let readyToConnect = false;
 	let me: Me | null = null;
