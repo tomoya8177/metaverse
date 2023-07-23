@@ -7,6 +7,10 @@ import { EmptyObject } from './preset/EmptyObject';
 export const UserStore = writable({
 	...emptyUser
 });
+export const Toast = writable({
+	open: false,
+	message: ''
+});
 export const RigStore = writable({
 	position: {
 		x: 0,

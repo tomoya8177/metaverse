@@ -30,12 +30,9 @@ class I18N {
 	}
 	t(key: string) {
 		//await this.load(this.locale);
-		const keys = key.split('.');
 		let value = this.data;
 		if (!value) return key;
-		for (const k of keys) {
-			value = value[k] || '';
-		}
+		value = value[key] || '';
 		return value || key;
 	}
 }

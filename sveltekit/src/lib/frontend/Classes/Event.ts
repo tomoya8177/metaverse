@@ -1,4 +1,7 @@
 import axios from 'axios';
+import { reinstallAIBrain } from '../reinstallAIBrain';
+import { _ } from '$lib/i18n';
+import type { DocumentForAI } from '$lib/types/DocumentForAI';
 
 export class Event {
 	id: string;
@@ -16,6 +19,10 @@ export class Event {
 	mentor: string;
 	prompt: string;
 	documents: DocumentForAI[];
+	environmentPreset?: string;
+	environmentModelURL?: string;
+	navMeshModelURL?: string;
+	withMetaverse?: boolean;
 	constructor(obj: any) {
 		this.id = obj.id;
 		this.slug = obj.slug;
@@ -31,6 +38,11 @@ export class Event {
 		this.mentor = obj.mentor;
 		this.prompt = obj.prompt;
 		this.documents = obj.documents || [];
+		this.environmentPreset = obj.environmentPreset;
+		this.environmentModelURL = obj.environmentModelURL;
+		this.navMeshModelURL = obj.navMeshModelURL;
+		this.withMetaverse = obj.withMetaverse;
+
 		if (this.allowedUsers == '') {
 			this.allowedUsersArray = [];
 		} else {
@@ -40,22 +52,22 @@ export class Event {
 	}
 	async validate(): Promise<boolean> {
 		if (!this.title) {
-			alert('Please enter a title for the event.');
+			alert(_('Please enter a title for the event.'));
 			return false;
 		}
 		if (!this.organization) {
-			alert('Please select an organization for the event.');
+			alert(_('Please select an organization for the event.'));
 			return false;
 		}
 		if (!this.slug) {
-			alert('Please enter a slug for the event.');
+			alert(_('Please enter a slug for the event.'));
 			return false;
 		}
 		const existingEventWithSlug = await axios
-			.get('/api/events?slug=' + this.slug)
+			.get('/api/events?slug=' + this.slug + '&organiation=' + this.organization)
 			.then((res) => res.data);
 		if (existingEventWithSlug.length && existingEventWithSlug[0].id != this.id) {
-			alert('Slug already exists');
+			alert(_('Slug already exists'));
 			return false;
 		}
 		return true;
@@ -63,4 +75,33 @@ export class Event {
 	get capacity(): number {
 		return 50;
 	}
+	create = async () => {
+		this.allowedUsers = JSON.stringify(this.allowedUsersArray);
+		const newEvent = await axios.post('/api/events', { ...this }).then((res) => res.data);
+		let mentor;
+		if (this.mentor) {
+			mentor = await axios.get('/api/mentors/' + this.mentor).then((res) => res.data);
+			await reinstallAIBrain(mentor);
+		}
+		return { newEvent, mentor };
+	};
+	update = async () => {
+		this.allowedUsers = JSON.stringify(this.allowedUsersArray);
+		const updatedEvent = await axios
+			.put('/api/events/' + this.id, { ...this })
+			.then((res) => res.data);
+
+		let mentor;
+		if (this.mentor) {
+			mentor = await axios.get('/api/mentors/' + this.mentor).then((res) => res.data);
+			await reinstallAIBrain(mentor);
+		}
+		return { updatedEvent, mentor };
+	};
+	delete = async () => {
+		await axios.delete('/api/events/' + this.id);
+		await axios.delete('/api/sessions?event=' + this.id);
+		await axios.delete('/api/messages?event=' + this.id);
+		const results = await axios.delete('/api/objects?event=' + this.id).then((res) => res.data);
+	};
 }

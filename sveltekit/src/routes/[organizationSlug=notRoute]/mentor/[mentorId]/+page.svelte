@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import ChatBox from '../../../../Components/Organisms/ChatBox.svelte';
-	import AvatarThumbnail from '../../manager/mentors/AvatarThumbnail.svelte';
+	import AvatarThumbnail from '../../../../Components/Atom/AvatarThumbnail.svelte';
 	import type { PageData } from './$types';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import axios from 'axios';

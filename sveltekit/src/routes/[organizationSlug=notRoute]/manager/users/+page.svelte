@@ -11,7 +11,7 @@
 	import { _ } from '$lib/i18n';
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
-	import AvatarThumbnail from '../mentors/AvatarThumbnail.svelte';
+	import AvatarThumbnail from '../../../../Components/Atom/AvatarThumbnail.svelte';
 	export let data: PageData;
 	export let users: User[] = data.users;
 	export let userRoles: UserRole[] = data.userRoles;

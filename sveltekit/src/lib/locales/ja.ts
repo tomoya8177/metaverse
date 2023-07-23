@@ -83,5 +83,12 @@ export default {
 	'Last Name': '姓',
 	'Are you sure that you want to delete this user?': 'このユーザーを削除してもよろしいですか？',
 	'Available VirtuaMentors to chat with': 'チャット可能なメタ先生',
-	'Available Rooms': '利用可能なルーム'
+	'Available Rooms': '利用可能なルーム',
+	'Are you sure to delete this event?': 'このイベントを削除してもよろしいですか？',
+	Updated: '更新しました',
+	'Copied to clipboard': 'クリップボードにコピーしました',
+	'Slug already exists': 'スラッグはすでに存在します',
+	'Please enter a title for the event.': 'イベントのタイトルを入力してください',
+	'Please select an organization for the event.': 'イベントのチームを選択してください',
+	'Please enter a slug for the event.': 'イベントのスラッグを入力してください'
 };

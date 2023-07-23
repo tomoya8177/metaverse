@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AvatarThumbnail from './AvatarThumbnail.svelte';
+	import AvatarThumbnail from '../../../../Components/Atom/AvatarThumbnail.svelte';
 
 	import DocumentForAIRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
 

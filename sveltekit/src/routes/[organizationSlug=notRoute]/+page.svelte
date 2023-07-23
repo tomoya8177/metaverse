@@ -6,13 +6,13 @@
 	import type { PageData } from './$types';
 	import { UserStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
-	import AvatarThumbnail from './manager/mentors/AvatarThumbnail.svelte';
 	import type { Mentor } from '$lib/types/Mentor';
 	import axios from 'axios';
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
 	import type { Event } from '$lib/frontend/Classes/Event';
 	import RoomTitleForManagers from '../../Components/Molecules/RoomTitleForManagers.svelte';
+	import AvatarThumbnail from '../../Components/Atom/AvatarThumbnail.svelte';
 
 	export let data: PageData;
 	const organization: Organization = data.organization;

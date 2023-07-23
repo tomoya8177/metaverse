@@ -68,5 +68,6 @@
 	}
 	.content {
 		flex: 1;
+		width: calc(100vw - 10rem);
 	}
 </style>

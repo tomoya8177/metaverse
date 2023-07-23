@@ -1,0 +1,20 @@
+export const environmentPresets = [
+	{ value: 'default', name: 'Default' },
+	{ value: 'contact', name: 'Contact' },
+	{ value: 'egypt', name: 'Egypt' },
+	{ value: 'checkerboard', name: 'Checkerboard' },
+	{ value: 'forest', name: 'Forest' },
+	{ value: 'goaland', name: 'Goaland' },
+	{ value: 'yavapai', name: 'Yavapai' },
+	{ value: 'goldmine', name: 'Goldmine' },
+	{ value: 'threetowers', name: 'Three Towers' },
+	{ value: 'poison', name: 'Poison' },
+	{ value: 'arches', name: 'Arches' },
+	{ value: 'tron', name: 'Tron' },
+	{ value: 'japan', name: 'Japan' },
+	{ value: 'dream', name: 'Dream' },
+	{ value: 'volcano', name: 'Volcano' },
+	{ value: 'starry', name: 'Starry' },
+	{ value: 'osiris', name: 'Osiris' },
+	{ value: 'moon', name: 'Moon' }
+];

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import EventEdit from '../../../../Components/Organisms/EventEdit.svelte';
+
 	import RoomTitleForManagers from '../../../../Components/Molecules/RoomTitleForManagers.svelte';
 
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
@@ -68,45 +70,30 @@
 	const onCreateClicked = async () => {
 		if (!(await editEvent.validate())) return;
 		busy = true;
-		editEvent.allowedUsers = JSON.stringify(editEvent.allowedUsersArray);
-		const newEvent = await axios.post('/api/events', editEvent).then((res) => res.data);
+		const { newEvent, mentor } = await editEvent.create();
 		events = [...events, new Event(newEvent)].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-		if (editEvent.mentor) {
-			const mentor = await axios.get('/api/mentors/' + editEvent.mentor).then((res) => res.data);
-			mentors = [...mentors.filter((mentor) => mentor.id != editEvent.mentor), mentor];
-			await reinstallAIBrain(mentor);
-		}
+		mentors = [...mentors.filter((mentor) => mentor.id != editEvent.mentor), mentor];
 		busy = false;
 		modalOpen = false;
 	};
 	const onUpdateClicked = async () => {
 		if (!(await editEvent.validate())) return;
 		busy = true;
-		editEvent.allowedUsers = JSON.stringify(editEvent.allowedUsersArray);
-		const updatedEvent = await axios
-			.put('/api/events/' + editEvent.id, editEvent)
-			.then((res) => res.data);
+		const { updatedEvent, mentor } = await editEvent.update();
+		mentors = [...mentors.filter((m) => m.id != mentor.id), mentor];
 		events = events.map((event) => {
-			if (event.id == updatedEvent.id) {
-				return new Event(updatedEvent);
-			}
+			if (event.id == updatedEvent.id) return new Event(updatedEvent);
 			return event;
 		});
-		if (editEvent.mentor) {
-			const mentor = await axios.get('/api/mentors/' + editEvent.mentor).then((res) => res.data);
-			mentors = [...mentors.filter((mentor) => mentor.id != editEvent.mentor), mentor];
-			await reinstallAIBrain(mentor);
-		}
-
 		busy = false;
 		modalOpen = false;
 	};
 	const onDeleteClicked = async () => {
 		if (!confirm('Are you sure you want to delete this event?')) return;
-		await axios.delete('/api/events/' + editEvent.id);
+		await editEvent.delete();
+
 		events = events.filter((event) => event.id != editEvent.id);
-		await axios.delete('/api/sessions?event=' + editEvent.id);
-		await axios.delete('/api/messages?event=' + editEvent.id);
+
 		modalOpen = false;
 	};
 	let busy = false;
@@ -140,7 +127,7 @@
 		{#each paginated as event}
 			<tr>
 				<td>
-					<RoomTitleForManagers {event} {organization} />
+					<RoomTitleForManagers forManager {event} {organization} />
 				</td>
 				<td>{event.slug}</td>
 				<td>
@@ -162,88 +149,7 @@
 	<dialog open transition:fade>
 		<article>
 			<ModalCloseButton onClick={() => (modalOpen = false)} />
-			<InputWithLabel label={_('Title')} bind:value={editEvent.title} />
-			<InputWithLabel label={_('Slug')} bind:value={editEvent.slug} />
-
-			<InputWithLabel type="switch" label={_('Allow Audio')} bind:value={editEvent.allowAudio} />
-			<InputWithLabel type="switch" label={_('Allow Video')} bind:value={editEvent.allowVideo} />
-			<InputWithLabel type="switch" label={_('Open for Anyone')} bind:value={editEvent.isPublic} />
-			{#if !editEvent.isPublic}
-				<InputWithLabel
-					type="switch"
-					label={_('Open for Anyone in the organization')}
-					bind:value={editEvent.isOpen}
-				/>
-				{#if !editEvent.isOpen}
-					Allowed Users
-					{#each users as user}
-						<label>
-							<input type="checkbox" bind:group={editEvent.allowedUsersArray} value={user.id} />
-							{user.nickname}
-							({user.email})
-						</label>
-					{/each}
-				{/if}
-			{/if}
-			<InputWithLabel
-				type="select"
-				label={_('VirtuaMentor')}
-				selects={[
-					{
-						name: _('None'),
-						value: ''
-					},
-					...mentors.map((mentor) => {
-						return {
-							name: mentor.userData?.nickname,
-							value: mentor.id
-						};
-					})
-				]}
-				bind:value={editEvent.mentor}
-			/>
-			{#if editEvent.mentor}
-				<div>{_('Room Specific Materials')}</div>
-				{#each editEvent.documents || [] as document}
-					<DocumentForAiRow
-						{document}
-						onDeleteDone={() => {
-							editEvent.documents = editEvent.documents.filter((doc) => doc.id != document.id);
-						}}
-					/>
-				{/each}
-				<input
-					type="file"
-					accept=".pdf,.txt,.docx"
-					multiple
-					on:change={async (e) => {
-						//get files from event
-						const files = e.target.files;
-						const res = await uploader.uploadLocally(files);
-						const promises = res.data.map(async (file) => {
-							const res = await axios.post('/api/documentsForAI', {
-								filename: file.filename,
-								title: file.title,
-								type: file.type,
-								event: editEvent.id
-							});
-							return res.data;
-						});
-						const fileDatas = await Promise.all(promises);
-						editEvent.documents = [...editEvent.documents, ...fileDatas];
-						e.target.value = '';
-					}}
-				/>
-				{#if progress > 0}
-					<progress max={100} value={progress} />
-				{/if}
-				<InputWithLabel type="textarea" label={_('Prompt')} bind:value={editEvent.prompt} />
-				{#if editEvent.mentor}
-					<small>
-						{_("VirtuaMentor's memory will be refreshed")}
-					</small>
-				{/if}
-			{/if}
+			<EventEdit {editEvent} {users} {mentors} />
 			{#if editMode == 'create'}
 				<button
 					aria-busy={busy}

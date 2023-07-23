@@ -86,22 +86,27 @@
 	/>
 	<a-entity
 		environment="
-        preset:forest;
-        ground:canyon;
+        preset:{$EventStore.environmentPreset || 'default'};
         groundYScale:20
         "
 	/>
-	<a-plane
-		id="ground"
-		shadow="receive: true"
-		position="0 0 0"
-		rotation="-90 0 0"
-		width="20"
-		height="20"
-		nav-mesh
-		visible="false"
-		color="#7BC8A4"
-	/>
+	{#if $EventStore.environmentModelURL}
+		<a-gltf-model src={$EventStore.environmentModelURL} />
+	{/if}
+	{#if $EventStore.navMeshModelURL}
+		<a-gltf-model src={$EventStore.navMeshModelURL} nav-mesh />
+	{:else}
+		<a-plane
+			id="ground"
+			shadow="receive: true"
+			position="0 0 0"
+			rotation="-90 0 0"
+			width="20"
+			height="20"
+			nav-mesh
+			visible="false"
+		/>
+	{/if}
 	<a-plane
 		id="screenshare-container"
 		width="8"

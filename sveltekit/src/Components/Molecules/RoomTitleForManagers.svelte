@@ -5,6 +5,7 @@
 	import { _ } from '$lib/i18n';
 	export let event: Event;
 	export let organization: Organization;
+	export let forManager = false;
 </script>
 
 <div style="display:flex; gap:0.4rem">
@@ -19,6 +20,12 @@
 		</a>
 	</div>
 	<div style="align-self:center">
-		{event.title}
+		{#if forManager}
+			<a href={`/${organization?.slug}/manager/rooms/${event.id}`}>
+				{event.title}
+			</a>
+		{:else}
+			{event.title}
+		{/if}
 	</div>
 </div>
