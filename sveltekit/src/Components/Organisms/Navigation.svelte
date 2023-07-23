@@ -127,10 +127,8 @@
 						deleteButton.onclick = () => {
 							el.remove();
 						};
-						el.style['min-width'] = 'calc(100vw - 6rem)';
-						el.style['max-height'] = 'calc(100vh - 9rem)';
+						el.style['height'] = 'calc(100vh - 9rem)';
 						el.style['border-radius'] = '0.2rem';
-						el.style.overflow = 'hidden';
 						el.appendChild(deleteButton);
 						const clonedAsset = asset.cloneNode();
 						if ($FocusObjectStore.type.includes('video')) {
@@ -138,9 +136,8 @@
 							clonedAsset.autoplay = true;
 							clonedAsset.style['width'] = 'calc(100vw - 6rem)';
 						}
-						clonedAsset.style['min-width'] = 'calc(100vw - 6rem)';
-						clonedAsset.style['max-height'] = 'calc(100vh - 9rem)';
-						clonedAsset.style['border-radius'] = '0.2rem';
+						clonedAsset.style['height'] = 'calc(100vh - 9rem)';
+						clonedAsset.style['max-width'] = 'calc(100vw - 6rem)';
 						clonedAsset.id = asset.id + '_preview';
 						el.appendChild(clonedAsset);
 						document.querySelector('#filePreview')?.appendChild(el);
