@@ -20,6 +20,7 @@
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { loadSharedObjects } from '$lib/frontend/loadSharedObjects';
+	import { environmentPresets } from '$lib/preset/EnvironmentPresets';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -84,17 +85,26 @@
 		rotation="0 0 0"
 		visible="false"
 	/>
-	<a-entity
-		environment="
+	{#if $EventStore.environmentPreset != 'none'}
+		<a-entity
+			environment="
         preset:{$EventStore.environmentPreset || 'default'};
         groundYScale:20
         "
-	/>
+		/>
+	{:else}
+		<a-entity
+			environment="
+				preset: default;
+				ground:none
+				"
+		/>
+	{/if}
 	{#if $EventStore.environmentModelURL}
 		<a-gltf-model src={$EventStore.environmentModelURL} position="0 0.01 0" />
 	{/if}
 	{#if $EventStore.navMeshModelURL}
-		<a-gltf-model src={$EventStore.navMeshModelURL} position="0 0.01 0" nav-mesh />
+		<a-gltf-model src={$EventStore.navMeshModelURL} position="0 0.01 0" visible="false" nav-mesh />
 	{:else}
 		<a-plane
 			id="ground"

@@ -13,10 +13,5 @@ export const EnvironmentModelPresets = [
 		name: 'Floating Restaurant',
 		modelURL: '/models/floating_restaurant.glb',
 		navMeshURL: ''
-	},
-	{
-		name: 'AVOS',
-		modelURL: '/models/AVOS.glb',
-		navMeshURL: '/models/navMeshAVOS.glb'
 	}
 ];

@@ -1,4 +1,5 @@
 export const environmentPresets = [
+	{ value: 'none', name: 'None' },
 	{ value: 'default', name: 'Default' },
 	{ value: 'contact', name: 'Contact' },
 	{ value: 'egypt', name: 'Egypt' },
