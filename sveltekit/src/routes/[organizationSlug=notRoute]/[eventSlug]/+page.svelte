@@ -94,7 +94,7 @@
 		<a-gltf-model src={$EventStore.environmentModelURL} position="0 0.01 0" />
 	{/if}
 	{#if $EventStore.navMeshModelURL}
-		<a-gltf-model src={$EventStore.navMeshModelURL}  position="0 0.01 0 nav-mesh />
+		<a-gltf-model src={$EventStore.navMeshModelURL} position="0 0.01 0" nav-mesh />
 	{:else}
 		<a-plane
 			id="ground"
