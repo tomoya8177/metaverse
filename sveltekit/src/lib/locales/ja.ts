@@ -90,5 +90,6 @@ export default {
 	'Slug already exists': 'スラッグはすでに存在します',
 	'Please enter a title for the event.': 'イベントのタイトルを入力してください',
 	'Please select an organization for the event.': 'イベントのチームを選択してください',
-	'Please enter a slug for the event.': 'イベントのスラッグを入力してください'
+	'Please enter a slug for the event.': 'イベントのスラッグを入力してください',
+	'Are you sure that you want to leave this room?': 'このルームから退出してもよろしいですか？'
 };

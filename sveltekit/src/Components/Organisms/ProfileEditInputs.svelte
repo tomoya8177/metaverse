@@ -47,11 +47,6 @@
 	export let user: User;
 	export let label: string = _('Update');
 	let avatarSelectOpen = false;
-	const onLeaveClicked = () => {
-		videoChat.leave();
-		EventStore.set(EmptyEvent);
-		location.href = '/';
-	};
 </script>
 
 <div style="display:flex;gap:0.4rem">
@@ -69,7 +64,6 @@
 <button aria-busy={busy} on:click={() => onUpdateProfileDoClicked()} disabled={busy}>
 	{label}
 </button>
-<button class="secondary" on:click={onLeaveClicked}>{_('Leave')}</button>
 
 <style>
 	img {

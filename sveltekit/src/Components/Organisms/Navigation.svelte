@@ -15,6 +15,7 @@
 	import { Users, UsersStore } from '$lib/frontend/Classes/Users';
 	import { _, lang } from '$lib/i18n';
 	import Login from './Login.svelte';
+	import type { Organization } from '$lib/types/Organization';
 	export let title: String = 'VirtuaIntel';
 	const onLogoutClicked = () => {
 		videoChat.leave();
@@ -57,11 +58,14 @@
 		emailDialogOpen = false;
 	};
 
-	const onLeaveClicked = () => {
-		if (!confirm('Are you sure that you want to leave this room?')) return;
+	const onLeaveClicked = async () => {
+		if (!confirm(_('Are you sure that you want to leave this room?'))) return;
 		videoChat.leave();
+		const organization: Organization = await axios
+			.get('/api/organizations/' + $EventStore.organization)
+			.then((res) => res.data);
 		EventStore.set(EmptyEvent);
-		location.href = '/';
+		location.href = '/' + organization.slug;
 	};
 	let chosenLanguage: string = cookies.get('locale') || 'en';
 	let loginOpen: boolean = false;

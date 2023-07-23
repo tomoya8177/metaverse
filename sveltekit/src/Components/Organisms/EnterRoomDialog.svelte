@@ -16,6 +16,7 @@
 	import axios from 'axios';
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
+	import { EmptyEvent } from '$lib/preset/EmptyEvent';
 
 	export let me: Me | null;
 
@@ -27,6 +28,11 @@
 			.then((res) => res.data);
 	});
 	export let whenChatConnected: () => void;
+	const onLeaveClicked = () => {
+		videoChat.leave();
+		EventStore.set(EmptyEvent);
+		location.href = '/' + organization?.slug;
+	};
 </script>
 
 <dialog open>
@@ -68,5 +74,6 @@
 				<hr />
 			</ProfileEditInputs>
 		{/if}
+		<button class="secondary" on:click={onLeaveClicked}>{_('Leave')}</button>
 	</article>
 </dialog>
