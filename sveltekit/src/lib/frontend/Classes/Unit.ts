@@ -112,14 +112,15 @@ export class Unit {
 		this.avatarContainer.appendChild(video);
 	}
 	async showScreen(track: RemoteVideoTrack | LocalVideoTrack, sid: string): Promise<void> {
+		const video = document.createElement('a-plane');
 		const shredObject = {
 			id: 'screenPlaneOf' + this.userId,
 			locked: this.userId != videoChat.userId,
 			title: 'Shared Screen',
-			type: 'screen'
+			type: 'screen',
+			el: video
 		};
 		sharedObjects.add(shredObject);
-		const video = document.createElement('a-plane');
 		video.setAttribute('id', 'screenPlaneOf' + this.userId);
 		video.setAttribute('rotation', `0 ${this.rotation.y} 0`);
 		video.setAttribute('material', 'src:#' + sid + ';shader: flat; side:double');

@@ -6,7 +6,7 @@
 	import 'aframe-environment-component';
 	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, UserStore } from '$lib/store';
+	import { PreviewPanelOpen, EventStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 
 	import '$lib/AframeComponents';
@@ -21,6 +21,8 @@
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import ObjectEditor from './ObjectEditor.svelte';
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
+	import { _ } from '$lib/i18n';
+	import Icon from '../Atom/Icon.svelte';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -161,6 +163,25 @@
 	};
 </script>
 
+<div class="filePreviewContainer" style:display={$PreviewPanelOpen ? 'block' : 'none'}>
+	<div style="display:flex">
+		<div style="flex:1">
+			{_('Preview Panel')}
+		</div>
+		<div>
+			<a
+				href={'#'}
+				on:click={() => {
+					PreviewPanelOpen.set(false);
+				}}
+			>
+				<Icon icon="close" />
+			</a>
+		</div>
+	</div>
+	<div id="filePreview" />
+</div>
+
 <div class="object-editor" />
 
 <div class="action-buttons">
@@ -186,6 +207,22 @@
 </div>
 
 <style>
+	.filePreviewContainer {
+		position: absolute;
+		top: 4em;
+		left: 1rem;
+		right: 1rem;
+		background-color: black;
+		padding: 0.4rem;
+		border-radius: 0.4rem;
+		z-index: 100;
+	}
+	#filePreview {
+		overflow: auto;
+		display: flex;
+		gap: 0.2rem;
+		max-height: calc(100vh - 9rem);
+	}
 	.object-editor {
 		position: absolute;
 		top: 2em;

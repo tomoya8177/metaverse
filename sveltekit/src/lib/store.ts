@@ -30,3 +30,4 @@ export type xyz = {
 	z: number;
 };
 export const FocusObjectStore = writable(EmptyObject);
+export const PreviewPanelOpen = writable(false);

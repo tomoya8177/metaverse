@@ -116,7 +116,10 @@ AFRAME.registerComponent('editable-object', {
 			} else if (evt.key == 'Escape') {
 				console.log('escape');
 				//scale
-				this.transportMode = 'position';
+				this.rayCatcher.setAttribute('position', '0 -100 0');
+				this.rig.setAttribute('look-controls', 'enabled:true');
+				this.state = 'idle';
+				this.initialPos = null;
 				FocusObjectStore.set(EmptyObject);
 			}
 		});

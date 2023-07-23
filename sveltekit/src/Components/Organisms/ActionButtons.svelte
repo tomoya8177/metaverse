@@ -5,7 +5,7 @@
 	import 'aframe-environment-component';
 	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, UserStore } from '$lib/store';
+	import { EventStore, UserStore, PreviewPanelOpen } from '$lib/store';
 
 	import '$lib/AframeComponents';
 	import Icon from '../Atom/Icon.svelte';
@@ -144,6 +144,9 @@
 			<Icon icon="stop_screen_share" />
 		</button>
 	{/if}
+	<button class="circle-button" on:click={() => ($PreviewPanelOpen = !$PreviewPanelOpen)}>
+		<Icon icon="preview" />
+	</button>
 	<button
 		data-tooltip={_('Upload')}
 		class="circle-button"

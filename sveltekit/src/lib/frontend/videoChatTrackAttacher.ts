@@ -23,6 +23,15 @@ export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTra
 		unit.showCamera(track as RemoteVideoTrack);
 	} else if (track.name.includes('screenOf')) {
 		el.addEventListener('loadedmetadata', () => {
+			const clonedEl = track.attach();
+			clonedEl.id = track.sid + '_preview';
+			document.getElementById('filePreview')?.appendChild(clonedEl);
+			if (track.dimensions?.width && track.dimensions?.height) {
+				clonedEl.style['min-width'] = 'calc(100vw - 6rem)';
+				clonedEl.style['max-height'] = 'calc(100vh - 9rem)';
+				clonedEl.style['border-radius'] = '0.2rem';
+				clonedEl.style.overflow = 'hidden';
+			}
 			if (!unit) return;
 			unit.showScreen(track as RemoteVideoTrack, track.sid);
 		});
@@ -45,6 +54,7 @@ export const detatchTrack = (track: RemoteTrack) => {
 	if (track.name.includes('cameraOf')) {
 		unit.hideCamera();
 	} else if (track.name.includes('screenOf')) {
+		document.getElementById(track.sid + '_preview')?.remove();
 		unit.hideScreen();
 	} else if (track.name.includes('audioOf')) {
 		unit.detachAudio();

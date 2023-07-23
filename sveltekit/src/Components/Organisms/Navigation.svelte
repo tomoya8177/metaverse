@@ -4,7 +4,7 @@
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
 
 	import { cookies } from '$lib/frontend/cookies';
-	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
+	import { EventStore, FocusObjectStore, PreviewPanelOpen, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -82,6 +82,76 @@
 			</a>
 		</li>
 		<ObjectEditor />
+		{#if $FocusObjectStore.id}
+			<li>
+				<button
+					class:outline={$FocusObjectStore.locked}
+					class="circle-button"
+					small
+					on:click={() => {
+						$FocusObjectStore.locked = !$FocusObjectStore.locked;
+					}}
+				>
+					<Icon icon={$FocusObjectStore.locked ? 'lock' : 'lock_open'} />
+				</button>
+			</li>
+			<li>
+				<button
+					class="circle-button"
+					small
+					on:click={() => {
+						console.log($FocusObjectStore);
+						if ($FocusObjectStore.type == 'screen') {
+							PreviewPanelOpen.set(true);
+							return;
+						}
+						let asset;
+						asset = $FocusObjectStore.el.components.material.data.src;
+						const el = document.createElement('div');
+						el.style.position = 'relative';
+						const deleteButton = document.createElement('a');
+						deleteButton.href = '#';
+						const x = document.createElement('span');
+						x.innerHTML = 'Close';
+						x.style.position = 'absolute';
+						x.style.top = '0.2rem';
+						x.style.right = '0.7rem';
+						deleteButton.appendChild(x);
+						deleteButton.style.position = 'absolute';
+						deleteButton.classList.add('circle-button');
+						deleteButton.classList.add('secondary');
+						deleteButton.setAttribute('small', '');
+						deleteButton.style.top = '0';
+						deleteButton.style.right = '0';
+						deleteButton.style['z-index'] = '1000';
+						deleteButton.onclick = () => {
+							el.remove();
+						};
+						el.style['min-width'] = 'calc(100vw - 6rem)';
+						el.style['max-height'] = 'calc(100vh - 9rem)';
+						el.style['border-radius'] = '0.2rem';
+						el.style.overflow = 'hidden';
+						el.appendChild(deleteButton);
+						const clonedAsset = asset.cloneNode();
+						if ($FocusObjectStore.type.includes('video')) {
+							clonedAsset.controls = true;
+							clonedAsset.autoplay = true;
+							clonedAsset.style['width'] = 'calc(100vw - 6rem)';
+						}
+						clonedAsset.style['min-width'] = 'calc(100vw - 6rem)';
+						clonedAsset.style['max-height'] = 'calc(100vh - 9rem)';
+						clonedAsset.style['border-radius'] = '0.2rem';
+						clonedAsset.id = asset.id + '_preview';
+						el.appendChild(clonedAsset);
+						document.querySelector('#filePreview')?.appendChild(el);
+						PreviewPanelOpen.set(true);
+						console.log($FocusObjectStore.el.components.material.data.src);
+					}}
+				>
+					<Icon icon="magnify_fullscreen" />
+				</button>
+			</li>
+		{/if}
 	</ul>
 	<ul />
 	<ul>
