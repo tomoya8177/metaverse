@@ -7,7 +7,6 @@ import { type Entity, THREE } from 'aframe';
 let user: User;
 UserStore.subscribe((obj) => {
 	user = obj;
-	console.log({ user });
 });
 AFRAME.registerComponent('ai-mentor', {
 	init: function () {
@@ -26,7 +25,6 @@ AFRAME.registerComponent('ai-mentor', {
 				y: theRig.object3D.position.y,
 				z: theRig.object3D.position.z + vector.z
 			};
-			console.log({ targetPosition });
 
 			// get distance between the target and aiMentor
 			const distance = this.el.object3D.position.distanceTo(
