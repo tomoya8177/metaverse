@@ -16,6 +16,7 @@
 	import { _, lang } from '$lib/i18n';
 	import Login from './Login.svelte';
 	import type { Organization } from '$lib/types/Organization';
+	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	export let title: String = 'VirtuaIntel';
 	const onLogoutClicked = () => {
 		videoChat.leave();
@@ -73,7 +74,7 @@
 </script>
 
 <nav>
-	<ul>
+	<ul class="hiddenInSmallScreen">
 		<li>
 			<a href={logoLinkTo || '#'}>
 				<strong>
@@ -81,77 +82,10 @@
 				</strong>
 			</a>
 		</li>
-		<ObjectEditor />
-		{#if $FocusObjectStore.id}
-			<li>
-				<button
-					class:outline={$FocusObjectStore.locked}
-					class="circle-button"
-					small
-					on:click={() => {
-						$FocusObjectStore.locked = !$FocusObjectStore.locked;
-					}}
-				>
-					<Icon icon={$FocusObjectStore.locked ? 'lock' : 'lock_open'} />
-				</button>
-			</li>
-			<li>
-				<button
-					class="circle-button"
-					small
-					on:click={() => {
-						console.log($FocusObjectStore);
-						if ($FocusObjectStore.type == 'screen') {
-							PreviewPanelOpen.set(true);
-							return;
-						}
-						let asset;
-						asset = $FocusObjectStore.el.components.material.data.src;
-						const el = document.createElement('div');
-						el.style.position = 'relative';
-						const deleteButton = document.createElement('a');
-						deleteButton.href = '#';
-						const x = document.createElement('span');
-						x.innerHTML = 'Close';
-						x.style.position = 'absolute';
-						x.style.top = '0.2rem';
-						x.style.right = '0.7rem';
-						deleteButton.appendChild(x);
-						deleteButton.style.position = 'absolute';
-						deleteButton.classList.add('circle-button');
-						deleteButton.classList.add('secondary');
-						deleteButton.setAttribute('small', '');
-						deleteButton.style.top = '0';
-						deleteButton.style.right = '0';
-						deleteButton.style['z-index'] = '1000';
-						deleteButton.onclick = () => {
-							el.remove();
-						};
-						el.style['height'] = 'calc(100vh - 9rem)';
-						el.style['border-radius'] = '0.2rem';
-						el.appendChild(deleteButton);
-						const clonedAsset = asset.cloneNode();
-						if ($FocusObjectStore.type.includes('video')) {
-							clonedAsset.controls = true;
-							clonedAsset.autoplay = true;
-							clonedAsset.style['width'] = 'calc(100vw - 6rem)';
-						}
-						clonedAsset.style['height'] = 'calc(100vh - 9rem)';
-						clonedAsset.style['max-width'] = 'calc(100vw - 6rem)';
-						clonedAsset.id = asset.id + '_preview';
-						el.appendChild(clonedAsset);
-						document.querySelector('#filePreview')?.appendChild(el);
-						PreviewPanelOpen.set(true);
-						console.log($FocusObjectStore.el.components.material.data.src);
-					}}
-				>
-					<Icon icon="magnify_fullscreen" />
-				</button>
-			</li>
-		{/if}
 	</ul>
 	<ul />
 	<ul>
+		<li style="flex:1" />
 		{#if $UsersStore.length}
 			<li>
 				<details role="list">
@@ -281,5 +215,6 @@
 	nav {
 		padding-left: 1rem;
 		padding-right: 1rem;
+		flex-wrap: wrap;
 	}
 </style>

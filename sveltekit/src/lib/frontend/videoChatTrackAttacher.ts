@@ -2,6 +2,8 @@ import axios from 'axios';
 import { welcomeUnit } from './messageListeners';
 import type { RemoteAudioTrack, RemoteTrack, RemoteVideoTrack } from 'twilio-video';
 import { Users } from './Classes/Users';
+import { ItemsInPreview } from '$lib/store';
+import { SharedObject } from './Classes/SharedObject';
 
 export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
 	const remoteUserId = track.name
@@ -23,15 +25,14 @@ export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTra
 		unit.showCamera(track as RemoteVideoTrack);
 	} else if (track.name.includes('screenOf')) {
 		el.addEventListener('loadedmetadata', () => {
+			console.log('loaded screen of', el);
 			const clonedEl = track.attach();
-			clonedEl.id = track.sid + '_preview';
-			document.getElementById('filePreview')?.appendChild(clonedEl);
-			if (track.dimensions?.width && track.dimensions?.height) {
-				clonedEl.style['min-width'] = 'calc(100vw - 6rem)';
-				clonedEl.style['max-height'] = 'calc(100vh - 9rem)';
-				clonedEl.style['border-radius'] = '0.2rem';
-				clonedEl.style.overflow = 'hidden';
-			}
+			ItemsInPreview.update((items) => {
+				return [...items, { id: track.sid, type: 'screen' }];
+			});
+			setTimeout(() => {
+				document.getElementById(track.sid + '_preview')?.appendChild(clonedEl);
+			});
 			if (!unit) return;
 			unit.showScreen(track as RemoteVideoTrack, track.sid);
 		});

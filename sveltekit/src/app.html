@@ -12,6 +12,16 @@
 			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0"
 		/>
 		<style>
+			@media (max-width: 768px) {
+				.hiddenInSmallScreen {
+					display: none;
+				}
+			}
+			.previewPaneItem img,
+			.previewPaneItem video {
+				height: calc(100vh - 11rem);
+				flex-grow: 1;
+			}
 			.remoteVideo {
 				width: 8rem;
 				height: 8rem;

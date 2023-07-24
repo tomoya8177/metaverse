@@ -44,6 +44,7 @@ export const messageListeners = () => {
 	videoChat.listenTo('objectUpdate', (data) => {
 		const object = sharedObjects.get(data.id);
 		if (!object) return;
+		object.title = data.title;
 		object.linkTo = data.linkTo;
 	});
 	videoChat.listenTo('objectDelete', (data) => {

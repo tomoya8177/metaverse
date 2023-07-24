@@ -6,7 +6,13 @@
 	import 'aframe-environment-component';
 	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
-	import { PreviewPanelOpen, EventStore, UserStore } from '$lib/store';
+	import {
+		PreviewPanelOpen,
+		EventStore,
+		UserStore,
+		ItemsInPreview,
+		FocusObjectStore
+	} from '$lib/store';
 	import axios from 'axios';
 
 	import '$lib/AframeComponents';
@@ -23,6 +29,8 @@
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
 	import { _ } from '$lib/i18n';
 	import Icon from '../Atom/Icon.svelte';
+	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -163,6 +171,53 @@
 	};
 </script>
 
+{#if $FocusObjectStore.id}
+	<nav class="objectEditorNav">
+		<ul />
+		<ul
+			style="
+	border:solid 1px lightgreen;
+	border-radius:0.6rem;
+	height:3rem;
+	background-color:rgba(0,0,0,0.3)
+	"
+		>
+			<ObjectEditor />
+			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
+				<li>
+					<button
+						class:outline={$FocusObjectStore.locked}
+						class="circle-button"
+						small
+						on:click={() => {
+							$FocusObjectStore.locked = !$FocusObjectStore.locked;
+						}}
+					>
+						<Icon icon={$FocusObjectStore.locked ? 'lock' : 'lock_open'} />
+					</button>
+				</li>
+			{/if}
+			<li>
+				<button
+					class="circle-button"
+					small
+					on:click={() => {
+						if ($FocusObjectStore.type == 'screen') {
+							PreviewPanelOpen.set(true);
+							return;
+						}
+						sharedObjects.get($FocusObjectStore.id)?.cloneToPreviewPane();
+						PreviewPanelOpen.set(true);
+					}}
+				>
+					<Icon icon="magnify_fullscreen" />
+				</button>
+			</li>
+		</ul>
+		<ul />
+	</nav>
+{/if}
+
 <div class="filePreviewContainer" style:display={$PreviewPanelOpen ? 'block' : 'none'}>
 	<div style="display:flex">
 		<div style="flex:1">
@@ -179,7 +234,31 @@
 			</a>
 		</div>
 	</div>
-	<div id="filePreview" />
+	<ul id="filePreview">
+		{#each $ItemsInPreview as object}
+			<li class="previewPaneItem" id={object.id + '_preview'}>
+				{#if object.title}
+					<div style="position:absolute; top:0px;right:0px;z-index:2;">
+						<a href={object.url} target="_blank">
+							{object.title}
+							<Icon icon="open_in_new" />
+						</a>
+						<a
+							href={'#'}
+							on:click={() => {
+								object.inPreviewPane = false;
+								ItemsInPreview.update((items) => {
+									return items.filter((item) => item.id !== object.id);
+								});
+							}}
+						>
+							<Icon icon="close" />
+						</a>
+					</div>
+				{/if}
+			</li>
+		{/each}
+	</ul>
 </div>
 
 <div class="object-editor" />
@@ -207,22 +286,46 @@
 </div>
 
 <style>
+	.objectEditorNav {
+		position: absolute;
+		top: 0.4rem;
+		width: 100vw;
+	}
+	@media (max-width: 1200px) {
+		.objectEditorNav {
+			position: absolute;
+			top: 3rem;
+			width: 100vw;
+		}
+	}
+	#filePreview {
+		overflow: auto;
+		display: flex;
+		flex-wrap: nowrap;
+		list-style-type: none;
+		gap: 0.2rem;
+		height: 100%;
+		margin-bottom: 0px;
+	}
+	.previewPaneItem {
+		/* min-width: calc(100vw - 6rem); */
+		height: calc(100vh - 11rem);
+		border-radius: 0.2rem;
+		flex: none;
+		position: relative;
+		list-style: none;
+		margin-bottom: 0px;
+	}
 	.filePreviewContainer {
 		position: absolute;
-		top: 4em;
+		top: 3rem;
 		left: 1rem;
 		right: 1rem;
 		background-color: black;
 		padding: 0.4rem;
 		border-radius: 0.4rem;
-		z-index: 100;
 	}
-	#filePreview {
-		overflow: auto;
-		display: flex;
-		gap: 0.2rem;
-		max-height: calc(100vh - 9rem);
-	}
+
 	.object-editor {
 		position: absolute;
 		top: 2em;
@@ -255,7 +358,7 @@
 		border-radius: 1rem;
 		bottom: 6rem;
 		right: 0;
-		background-color: rgba(0, 0, 0, 0.5);
+		background-color: rgba(0, 0, 0, 0.7);
 		color: white;
 		display: grid;
 	}

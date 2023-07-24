@@ -57,6 +57,7 @@
 </script>
 
 <button
+	data-tooltip={_('Ask AI Mentor')}
 	aria-busy={waitingForAIAnswer}
 	style:background-color={micActive ? 'red' : ''}
 	class=""
@@ -65,7 +66,9 @@
 	on:click={onMicClicked}
 >
 	<Icon icon="mic" />
-	{_('Ask AI Mentor')}
+	<span class="hiddenInSmallScreen">
+		{_('Ask AI Mentor')}
+	</span>
 </button>
 <div style="position:relative">
 	<button data-tooltip={_('Text Chat') + ' (T)'} class="circle-button" on:click={onTextChatClicked}>

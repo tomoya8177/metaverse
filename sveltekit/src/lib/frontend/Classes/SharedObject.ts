@@ -1,5 +1,7 @@
 import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
+import { sharedObjects } from './SharedObjects';
+import { ItemsInPreview } from '$lib/store';
 export class SharedObject {
 	id: string;
 	url: string;
@@ -15,6 +17,7 @@ export class SharedObject {
 	el?: Entity;
 	locked: boolean = true;
 	linkTo: string;
+	inPreviewPane: boolean = false;
 	constructor(data: any) {
 		this.id = data.id;
 		if (!this.id) return;
@@ -118,4 +121,21 @@ export class SharedObject {
 			`${eyePosition.x + vector.x} ${eyePosition.y + 1.65} ${eyePosition.z + vector.z}`
 		);
 	}
+	cloneToPreviewPane = () => {
+		this.inPreviewPane = true;
+		ItemsInPreview.update((items) => [...items, this]);
+		console.log(this);
+		setTimeout(() => {
+			let asset;
+			asset = this.el.components.material.data.src;
+			console.log({ asset });
+			const li = document.getElementById(this.id + '_preview');
+			const clonedAsset = asset.cloneNode();
+			li?.appendChild(clonedAsset);
+			if (this.type.includes('video')) {
+				clonedAsset.controls = true;
+				clonedAsset.muted = true;
+			}
+		}, 100);
+	};
 }

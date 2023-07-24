@@ -45,22 +45,18 @@
 			<summary aria-haspopup="listbox" role="link">
 				<div>
 					<Icon icon="deployed_code" />
-					<span style="max-width:15rem;text-wrap:nowrap;overflow:hidden;display:inline-flex">
+					<span style="max-width:15rem;text-wrap:nowrap;overflow:hidden;">
 						{$FocusObjectStore.title}
 					</span>
-					{#if $FocusObjectStore.locked}
-						<Icon icon="lock" />
-					{:else}
-						<Icon icon="lock_open" />
-					{/if}
 				</div>
 			</summary>
-			<ul role="listbox">
+			<ul role="listbox" style="min-width:20rem">
 				{#if $FocusObjectStore.type.includes('video')}
 					<li>
 						<div style="display:flex;gap:0.4rem">
 							<div>
 								<button
+									small
 									class="circle-button"
 									on:click={() => {
 										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
@@ -72,6 +68,7 @@
 							</div>
 							<div>
 								<button
+									small
 									class="circle-button"
 									on:click={() => {
 										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
@@ -83,6 +80,7 @@
 							</div>
 							<div>
 								<button
+									small
 									class="circle-button"
 									on:click={() => {
 										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
@@ -96,40 +94,46 @@
 						</div>
 					</li>
 				{/if}
-				{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
-					<li>
-						<div style="display:flex;flex-direction:reverse">
-							<div style="flex:1">{_('Locked')}</div>
-							<div>
-								<InputWithLabel type="switch" bind:value={$FocusObjectStore.locked} />
-							</div>
-						</div>
-					</li>
-				{/if}
+
 				{#if $FocusObjectStore.title != 'Shared Screen'}
+					<li>
+						<InputWithLabel
+							label={_('Title')}
+							bind:value={$FocusObjectStore.title}
+							readonly={$FocusObjectStore.locked}
+						/>
+					</li>
 					<li style="position:relative">
-						<div style="position:absolute; top:0px;right:1rem;">
-							<a href={$FocusObjectStore.linkTo} target="_blank"> <Icon icon="open_in_new" /></a>
-						</div>
 						<InputWithLabel
 							label={_('Link To')}
 							bind:value={$FocusObjectStore.linkTo}
-							disabled={$FocusObjectStore.locked}
+							readonly={$FocusObjectStore.locked}
+							copiable={$FocusObjectStore.linkTo}
 						/>
 					</li>
+					{#if $FocusObjectStore.linkTo}
+						<li>
+							<a href={$FocusObjectStore.linkTo} target="_blank">
+								<Icon icon="link" />
+								{_('Go To Link')}
+							</a>
+						</li>
+					{/if}
 					{#if !$FocusObjectStore.locked}
 						<li>
 							<button
 								on:click={async () => {
 									await axios.put('/api/objects/' + $FocusObjectStore.id, {
+										title: $FocusObjectStore.title,
 										linkTo: $FocusObjectStore.linkTo
 									});
 									videoChat.sendMessage({
 										key: 'objectUpdate',
 										id: $FocusObjectStore.id,
+										title: $FocusObjectStore.title,
 										linkTo: $FocusObjectStore.linkTo
 									});
-								}}>{_('Update Link')}</button
+								}}>{_('Update')}</button
 							>
 						</li>
 					{/if}
