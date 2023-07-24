@@ -45,11 +45,16 @@
 			return;
 		}
 		updateBusy = true;
-		const result = await axios.post('/api/users', editUser).then((res) => res.data);
-		await createUserRoles(result.id);
+		let existingUser = await axios
+			.get('/api/users?email=' + editUser.email)
+			.then((res) => res.data[0]);
+		if (!existingUser) {
+			existingUser = await axios.post('/api/users', editUser).then((res) => res.data);
+		}
+		await createUserRoles(existingUser.id);
 		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
-		const filledUser = fillOrganization(result);
-		users = [...users, filledUser].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+		const filledUser = fillOrganization(existingUser);
+		users = [...users, filledUser].sort((a: User, b: User) => (a.createdAt > b.createdAt ? -1 : 1));
 		updateBusy = false;
 		newUserModalOpen = false;
 	};
@@ -114,7 +119,9 @@
 				<tr>
 					<td>
 						<div style="display:flex;gap:0.4rem">
-							<AvatarThumbnail url={user.avatarURL} />
+							{#if user.avatarURL}
+								<AvatarThumbnail url={user.avatarURL} />
+							{/if}
 							<div>
 								<div>
 									<strong>
