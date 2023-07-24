@@ -92,9 +92,8 @@ AFRAME.registerComponent('editable-object', {
 				}
 				return;
 			}
-			if (!this.rig) return;
 			this.rayCatcher.setAttribute('position', '0 -100 0');
-			this.rig.setAttribute('look-controls', 'enabled:true');
+			this.rig?.setAttribute('look-controls', 'enabled:true');
 			this.state = 'idle';
 			this.initialPos = null;
 			//lets' save position
@@ -117,7 +116,7 @@ AFRAME.registerComponent('editable-object', {
 				console.log('escape');
 				//scale
 				this.rayCatcher.setAttribute('position', '0 -100 0');
-				this.rig.setAttribute('look-controls', 'enabled:true');
+				this.rig?.setAttribute('look-controls', 'enabled:true');
 				this.state = 'idle';
 				this.initialPos = null;
 				FocusObjectStore.set(EmptyObject);

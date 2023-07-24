@@ -290,6 +290,7 @@
 		position: absolute;
 		top: 0.4rem;
 		width: 100vw;
+		z-index: 2;
 	}
 	@media (max-width: 1200px) {
 		.objectEditorNav {

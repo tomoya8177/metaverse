@@ -18,6 +18,7 @@ export class User {
 	isMember?: boolean;
 	firstName?: string;
 	lastName?: string;
+	description: string = '';
 	constructor(data: any) {
 		this.id = data.id;
 		this.nickname = data.nickname;
@@ -29,6 +30,7 @@ export class User {
 		this.createdAt = data.createdAt;
 		this.onMute = true;
 		this.onVideoMute = true;
+		this.description = data.description;
 	}
 	async delete() {
 		const user = await axios.delete('/api/users/' + this.id);

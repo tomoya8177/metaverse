@@ -201,7 +201,10 @@
 				}}
 			/>
 			<h3>Change Profile</h3>
+
 			<ProfileEditInputs
+				withName
+				withDescription
 				user={$UserStore}
 				onUpdateDone={() => {
 					profileDialogOpen = false;

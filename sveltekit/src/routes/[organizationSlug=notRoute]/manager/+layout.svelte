@@ -73,7 +73,7 @@
 
 <style>
 	.menu {
-		width: 10rem;
+		width: 14rem;
 	}
 	.content {
 		flex: 1;

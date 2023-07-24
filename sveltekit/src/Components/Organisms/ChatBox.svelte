@@ -133,16 +133,18 @@
 </div>
 <hr />
 <div style="display:flex; gap:0.4rem;">
-	<div>
-		<button
-			data-tooltip={_('Ask AI Mentor')}
-			class="pill-icon-button"
-			style:background-color={micActive ? 'red' : ''}
-			on:click={onMicClicked}
-		>
-			<Icon icon="mic" />
-		</button>
-	</div>
+	{#if forceMentor || $EventStore.mentor}
+		<div>
+			<button
+				data-tooltip={_('Ask AI Mentor')}
+				class="pill-icon-button"
+				style:background-color={micActive ? 'red' : ''}
+				on:click={onMicClicked}
+			>
+				<Icon icon="mic" />
+			</button>
+		</div>
+	{/if}
 	{#if !forceMentor}
 		<div>
 			<button
@@ -170,16 +172,16 @@
 			</button>
 		</div>
 	{/if}
-	{#if forceMentor || $EventStore.mentor}
-		<div style="text-align:right;flex:1">
+	<div style="text-align:right;flex:1">
+		{#if forceMentor || $EventStore.mentor}
 			<InputWithLabel
 				label="@Mentor"
 				disabled={!virtuaMentorReady || forceMentor}
 				type="switch"
 				bind:value={newMessageForMentor}
 			/>
-		</div>
-	{/if}
+		{/if}
+	</div>
 	{#if !forceNoPin}
 		<InputWithLabel label={_('Pinned')} type="switch" bind:value={newMessagePinned} />
 	{/if}

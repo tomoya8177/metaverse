@@ -5,3 +5,4 @@ import './clickToMoveScreen';
 import './editableObject';
 import './pingSession';
 import './resizeOnload';
+import './aiMentor';

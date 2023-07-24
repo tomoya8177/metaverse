@@ -56,20 +56,22 @@
 	export let micActive: boolean;
 </script>
 
-<button
-	data-tooltip={_('Ask AI Mentor')}
-	aria-busy={waitingForAIAnswer}
-	style:background-color={micActive ? 'red' : ''}
-	class=""
-	style="border-radius:29px
+{#if $EventStore.mentor}
+	<button
+		data-tooltip={_('Ask AI Mentor')}
+		aria-busy={waitingForAIAnswer}
+		style:background-color={micActive ? 'red' : ''}
+		class=""
+		style="border-radius:29px
 "
-	on:click={onMicClicked}
->
-	<Icon icon="mic" />
-	<span class="hiddenInSmallScreen">
-		{_('Ask AI Mentor')}
-	</span>
-</button>
+		on:click={onMicClicked}
+	>
+		<Icon icon="mic" />
+		<span class="hiddenInSmallScreen">
+			{_('Ask AI Mentor')}
+		</span>
+	</button>
+{/if}
 <div style="position:relative">
 	<button data-tooltip={_('Text Chat') + ' (T)'} class="circle-button" on:click={onTextChatClicked}>
 		<Icon icon="chat" />

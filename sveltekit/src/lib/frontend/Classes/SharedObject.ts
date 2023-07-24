@@ -38,7 +38,6 @@ export class SharedObject {
 		if (this.type.includes('image')) {
 			asset = document.createElement('img');
 			asset.onload = () => {
-				console.log('loaded', asset);
 				const width = asset.width;
 				const height = asset.height;
 				const aspectRatio = height / width;
@@ -54,11 +53,9 @@ export class SharedObject {
 			// const aspectRatio = height / width;
 			// entity.setAttribute('geometry', `height:${aspectRatio}; width:1;`);
 			asset.addEventListener('loadedmetadata', () => {
-				console.log('loaded', asset);
 				const width = asset.videoWidth;
 				const height = asset.videoHeight;
 				const aspectRatio = height / width;
-				console.log({ aspectRatio });
 				entity.setAttribute('geometry', { primitive: 'plane', height: aspectRatio, width: 1 });
 			});
 		}
@@ -110,7 +107,6 @@ export class SharedObject {
 		scene.removeChild(entity);
 	}
 	moveToMyFront(eyePosition, eyeRotation) {
-		console.log({ eyePosition, eyeRotation });
 		//move this object to eyesPosition and move away from the eyes by 2 meters.
 		this.el?.setAttribute('rotation', `0 ${eyeRotation.y} 0`);
 		//translate the object to the direction of the eye
@@ -124,11 +120,9 @@ export class SharedObject {
 	cloneToPreviewPane = () => {
 		this.inPreviewPane = true;
 		ItemsInPreview.update((items) => [...items, this]);
-		console.log(this);
 		setTimeout(() => {
 			let asset;
 			asset = this.el.components.material.data.src;
-			console.log({ asset });
 			const li = document.getElementById(this.id + '_preview');
 			const clonedAsset = asset.cloneNode();
 			li?.appendChild(clonedAsset);

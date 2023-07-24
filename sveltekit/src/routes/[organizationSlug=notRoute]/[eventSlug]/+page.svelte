@@ -21,6 +21,7 @@
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { loadSharedObjects } from '$lib/frontend/loadSharedObjects';
 	import { environmentPresets } from '$lib/preset/EnvironmentPresets';
+	import { Unit } from '$lib/frontend/Classes/Unit';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -49,6 +50,19 @@
 			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		sceneLoaded = true;
 		//me.twilioConnect($EventStore.id)
+
+		//load mentor user
+		if ($EventStore.mentor) {
+			const mentor = await axios.get('/api/mentors/' + $EventStore.mentor).then((res) => res.data);
+
+			mentor.userData = await axios.get('/api/users/' + mentor.user).then((res) => res.data);
+			const mentorUnit = new Unit(mentor.userData.id);
+			mentorUnit.nickname = mentor.userData.nickname;
+			mentorUnit.avatarURL = mentor.userData.avatarURL;
+			mentorUnit.el.setAttribute('ai-mentor', '');
+			Users.add(mentorUnit);
+			//mentorUser.setLastPosition($EventStore);
+		}
 	};
 
 	let organization: Organization | null = null;
