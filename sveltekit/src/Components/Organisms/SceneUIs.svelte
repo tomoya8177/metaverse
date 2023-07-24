@@ -288,8 +288,10 @@
 <style>
 	.objectEditorNav {
 		position: absolute;
+		/* center */
+		left: 50%;
+		transform: translateX(-50%);
 		top: 0.4rem;
-		width: 100vw;
 		z-index: 2;
 	}
 	@media (max-width: 1200px) {

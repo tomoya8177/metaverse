@@ -32,7 +32,7 @@ AFRAME.registerComponent('ai-mentor', {
 			const distance = this.el.object3D.position.distanceTo(
 				new THREE.Vector3(targetPosition.x, targetPosition.y, targetPosition.z)
 			);
-			if (distance < 1) return;
+			if (distance < 1.5) return;
 			if (distance > 10) return;
 			// how long it takes to get to the target if aiMentor walks 2m/s
 
