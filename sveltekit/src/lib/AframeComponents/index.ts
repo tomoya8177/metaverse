@@ -6,3 +6,4 @@ import './editableObject';
 import './pingSession';
 import './resizeOnload';
 import './aiMentor';
+import './moveMouth';

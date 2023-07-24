@@ -36,6 +36,7 @@
 	"dependencies": {
 		"@twilio/krisp-audio-plugin": "^1.0.0",
 		"aframe": "^1.4.2",
+		"aframe-audio-analyser": "^1.0.0",
 		"aframe-environment-component": "^1.3.3",
 		"aframe-extras": "^7.0.0",
 		"axios": "^1.4.0",

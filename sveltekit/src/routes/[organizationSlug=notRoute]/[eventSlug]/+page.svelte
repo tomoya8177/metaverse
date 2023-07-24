@@ -4,6 +4,7 @@
 	import 'aframe';
 	import 'aframe-environment-component';
 	import 'aframe-extras';
+	import 'aframe-audio-analyser';
 	import { onDestroy, onMount } from 'svelte';
 	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
 
@@ -60,6 +61,7 @@
 			mentorUnit.nickname = mentor.userData.nickname;
 			mentorUnit.avatarURL = mentor.userData.avatarURL;
 			mentorUnit.el.setAttribute('ai-mentor', '');
+			mentorUnit.avatar.setAttribute('move-mouth', 'userId:' + mentor.userData.id);
 			Users.add(mentorUnit);
 			//mentorUser.setLastPosition($EventStore);
 		}

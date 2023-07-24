@@ -150,7 +150,9 @@
 			const aiMessage = await sendQuestionToAI($EventStore.mentor, $EventStore.id, newMessage);
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
-			aiSpeaksOut(createdMessage.body);
+			const mentor = await axios.get('/api/mentors/' + $EventStore.mentor).then((res) => res.data);
+			console.log({ mentor });
+			aiSpeaksOut(createdMessage.body, Users.find(mentor.user) || null);
 		}
 	};
 	let waitingForAIAnswer = false;

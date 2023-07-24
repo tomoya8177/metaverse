@@ -9,6 +9,7 @@ import type { User } from '$lib/frontend/Classes/User';
 import axios from 'axios';
 import { degree2radian } from '$lib/math/degree2radians';
 import { sharedObjects } from './SharedObjects';
+import { pollAudioLevel } from '../pollAudioLevel';
 let event: Event;
 EventStore.subscribe((value) => {
 	event = value;
@@ -23,6 +24,7 @@ export class Unit {
 	onMute: boolean = false;
 	onVideoMute: boolean = false;
 	sharingScreen: boolean = false;
+	audioLevel: number = 0;
 	constructor(userId: string) {
 		this.userId = userId;
 		//append element to the scene
@@ -57,6 +59,7 @@ export class Unit {
 			this.avatar.setAttribute('position', '0 0.9 0');
 			this.avatar.setAttribute('rotation', '0 180 0');
 			this.avatar.setAttribute('hand-position', '');
+			this.avatar.setAttribute('smile', '');
 		}
 		this.avatar.setAttribute('src', avatarURL);
 		this.avatarContainer.setAttribute('rotate-at-position', '');
@@ -170,7 +173,11 @@ export class Unit {
 		video?.parentNode?.removeChild(video);
 	}
 	attachAudio(track: RemoteAudioTrack) {
-		const audio = document.createElement('a-entity');
+		pollAudioLevel(track, (level) => {
+			/* Update audio level indicator. */
+			this.audioLevel = level;
+		});
+		const audio = document.createElement('a-entity') as Entity;
 		audio.setAttribute(
 			'sound',
 			'src:#' +
@@ -179,6 +186,7 @@ export class Unit {
 		);
 		audio.setAttribute('position', '0 1.5 0');
 		audio.setAttribute('rotation', '0 180 0');
+		audio.setAttribute('move-mouth', 'userId:' + this.userId);
 		this.avatarContainer.appendChild(audio);
 	}
 	detachAudio() {

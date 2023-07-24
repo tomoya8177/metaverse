@@ -96,7 +96,11 @@
 			waitingForAIAnswer = false;
 			newMessageBody = '';
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
-			aiSpeaksOut(createdMessage.body);
+			const mentor = await axios
+				.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
+				.then((res) => res.data);
+			console.log({ mentor });
+			aiSpeaksOut(createdMessage.body, forceMentor ? null : Users.find(mentor.user) || null);
 		} else {
 			//io.emit('statement', newMessageBody);
 		}
