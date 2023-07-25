@@ -7,8 +7,15 @@ export class Me extends Unit {
 	cameraRig: Entity;
 	constructor(userId: string) {
 		super(userId);
-		this.el.setAttribute('movement-controls', 'constrainToNavMesh: true;camera: #camera;');
+		this.el.setAttribute(
+			'movement-controls',
+			'constrainToNavMesh: true;camera: #camera;controls: keyboard,touch,nipple'
+		);
 		this.el.setAttribute('touch-controls', '');
+		this.el.setAttribute(
+			'nipple-controls',
+			'mode: static; lookJoystickEnabled: true; moveJoystickPosition: left;'
+		);
 		this.el.setAttribute('gamepad-controls', '');
 		this.el.setAttribute('ping-session', `user:${userId};type:unit`);
 
