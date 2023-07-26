@@ -43,6 +43,14 @@ export class SharedObject {
 				const aspectRatio = height / width;
 				entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
 			};
+			asset.id = this.id + 'asset';
+			asset.src = this.url;
+			asset.crossOrigin = 'anonymous';
+			entity.setAttribute('geometry', `primitive: plane;`);
+			entity.setAttribute(
+				'material',
+				`src: #${asset.id}; shader:flat;side: double;transparent: true`
+			);
 		} else if (this.type.includes('video')) {
 			asset = document.createElement('video');
 			asset.autoplay = true;
@@ -58,15 +66,22 @@ export class SharedObject {
 				const aspectRatio = height / width;
 				entity.setAttribute('geometry', { primitive: 'plane', height: aspectRatio, width: 1 });
 			});
+			asset.id = this.id + 'asset';
+			asset.src = this.url;
+			asset.crossOrigin = 'anonymous';
+			entity.setAttribute('geometry', `primitive: plane;`);
+			entity.setAttribute(
+				'material',
+				`src: #${asset.id}; shader:flat;side: double;transparent: true`
+			);
+		} else if (this.type.includes('glb') || this.type.includes('gltf')) {
+			asset = document.createElement('a-asset-item');
+			asset.id = this.id + 'asset';
+			//asset.src = '/models/classroom_merged.glb';
+			console.log(asset.src);
+			entity.setAttribute('gltf-model', `url(${this.url})`);
 		}
-		asset.id = this.id + 'asset';
-		asset.src = this.url;
-		asset.crossOrigin = 'anonymous';
-		entity.setAttribute('geometry', `primitive: plane;`);
-		entity.setAttribute(
-			'material',
-			`src: #${asset.id}; shader:flat;side: double;transparent: true`
-		);
+
 		if (!asset) return;
 		document.querySelector('a-assets')?.appendChild(asset);
 		entity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
@@ -77,6 +92,7 @@ export class SharedObject {
 		if (this.editable) {
 			entity.classList.add('clickable');
 		}
+
 		scene.appendChild(entity);
 		this.el = entity;
 	}
