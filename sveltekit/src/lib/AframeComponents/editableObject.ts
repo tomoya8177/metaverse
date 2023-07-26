@@ -101,7 +101,8 @@ AFRAME.registerComponent('editable-object', {
 				components: JSON.stringify({
 					position: this.el.getAttribute('position'),
 					rotation: this.el.getAttribute('rotation'),
-					scale: this.el.getAttribute('scale')
+					scale: this.el.getAttribute('scale'),
+					radius: this.el.getAttribute('geometry')?.radius
 				})
 			});
 		});
@@ -160,12 +161,19 @@ AFRAME.registerComponent('editable-object', {
 						//the diff shoukld be calculated with pointsrelative to the raycatcher
 						const relativeDiff = this.getRelativeDiff(intersection);
 						const factor = relativeDiff.x * 40;
-						this.el.setAttribute(
-							'rotation',
-							`${this.el.getAttribute('rotation').x - (relativeDiff.y * 300) / this.distance} ${
-								this.el.getAttribute('rotation').y + (relativeDiff.x * 300) / this.distance
-							} 0`
-						);
+						if (this.object.isSphere) {
+							this.el.setAttribute(
+								'rotation',
+								`0 ${this.el.getAttribute('rotation').y + (relativeDiff.x * 300) / this.distance} 0`
+							);
+						} else {
+							this.el.setAttribute(
+								'rotation',
+								`${this.el.getAttribute('rotation').x - (relativeDiff.y * 300) / this.distance} ${
+									this.el.getAttribute('rotation').y + (relativeDiff.x * 300) / this.distance
+								} 0`
+							);
+						}
 						const result = this.el.getAttribute('rotation').y;
 					} else if (this.transportMode == 'scale') {
 						const relativeDiff = this.getRelativeDiff(intersection);
@@ -192,7 +200,8 @@ AFRAME.registerComponent('editable-object', {
 						},
 						position: this.el.getAttribute('position'),
 						rotation: this.el.getAttribute('rotation'),
-						scale: this.el.getAttribute('scale')
+						scale: this.el.getAttribute('scale'),
+						radius: this.el.getAttribute('geometry')?.radius
 					});
 				}
 				this.initialPos = { ...intersection };

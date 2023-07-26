@@ -2,6 +2,8 @@ import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
 import { sharedObjects } from './SharedObjects';
 import { ItemsInPreview } from '$lib/store';
+type shortType = 'image' | 'video' | 'model';
+
 export class SharedObject {
 	id: string;
 	url: string;
@@ -34,20 +36,24 @@ export class SharedObject {
 		this.handle = data.handle;
 		this.linkTo = data.linkTo;
 		this.isSphere = data.isSphere;
-
-		const entity = document.createElement('a-entity');
+		console.log('start construction', this.id);
+		let entity = document.createElement('a-entity') as Entity;
 		entity.setAttribute('id', this.id);
-		let asset: Entity | null = null;
-		if (this.type.includes('image') || this.type.includes('video')) {
-			if (this.isSphere) {
-				entity.setAttribute('geometry', `primitive: sphere;radius:${this.radius || 0.5};}`);
-				//flip the material
-			} else {
-				entity.setAttribute('geometry', `primitive: plane;`);
-			}
-		}
+		let shortType: shortType = 'image';
 		if (this.type.includes('image')) {
-			asset = document.createElement('img');
+			shortType = 'image';
+		} else if (this.type.includes('video')) {
+			shortType = 'video';
+		} else if (this.type.includes('glb') || this.type.includes('gltf')) {
+			shortType = 'model';
+		}
+		let asset: Entity | null = null;
+		if (shortType != 'model') {
+			asset = this.createAsset(shortType);
+		}
+		entity = this.setEntityGeometry(entity, shortType);
+		if (shortType == 'image') {
+			entity = this.setEntityMaterial(entity, asset);
 			if (!this.isSphere) {
 				asset.onload = () => {
 					const width = asset.width;
@@ -56,51 +62,27 @@ export class SharedObject {
 					entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
 				};
 			}
-			asset.id = this.id + 'asset';
-			asset.src = this.url;
-			asset.crossOrigin = 'anonymous';
-			entity.setAttribute(
-				'material',
-				`src: #${asset.id}; shader:flat;side: double;transparent: true`
-			);
-		} else if (this.type.includes('video')) {
-			asset = document.createElement('video');
-			asset.autoplay = true;
-			asset.playsinline = true;
-			asset['webkit-playsinline'] = true;
-			// const width = asset.width;
-			// const height = asset.height;
-			// const aspectRatio = height / width;
-			// entity.setAttribute('geometry', `height:${aspectRatio}; width:1;`);
+		} else if (shortType == 'video') {
+			entity = this.setEntityMaterial(entity, asset);
 			if (!this.isSphere) {
 				asset.addEventListener('loadedmetadata', () => {
 					const width = asset.videoWidth;
 					const height = asset.videoHeight;
 					const aspectRatio = height / width;
-					entity.setAttribute('geometry', { primitive: 'plane', height: aspectRatio, width: 1 });
+					entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
 				});
 			}
-			asset.id = this.id + 'asset';
-			asset.src = this.url;
-			asset.crossOrigin = 'anonymous';
-			entity.setAttribute(
-				'material',
-				`src: #${asset.id}; shader:flat;side: double;transparent: true`
-			);
-		} else if (this.type.includes('glb') || this.type.includes('gltf')) {
-			asset = document.createElement('a-asset-item');
-			asset.id = this.id + 'asset';
-			//asset.src = '/models/classroom_merged.glb';
-			console.log(asset.src);
+		} else if (shortType == 'model') {
 			entity.setAttribute('gltf-model', `url(${this.url})`);
 		}
+		console.log(0, { entity, asset });
 
-		if (!asset) return;
-		document.querySelector('a-assets')?.appendChild(asset);
+		if (shortType != 'model') {
+			document.querySelector('a-assets')?.appendChild(asset);
+		}
 		entity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
 		if (this.isSphere) {
 			entity.setAttribute('rotation', `0 ${this.rotation.y} 0`);
-			entity.setAttribute('radius', `${this.radius}`);
 			entity.setAttribute('scale', `-1 1 1`);
 		} else {
 			entity.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
@@ -111,9 +93,48 @@ export class SharedObject {
 		if (this.editable) {
 			entity.classList.add('clickable');
 		}
-
+		console.log({ entity, asset }, this.isSphere);
 		scene.appendChild(entity);
 		this.el = entity;
+		console.log('finished construction');
+	}
+	createAsset(type: 'image' | 'video') {
+		const asset = document.createElement(type == 'image' ? 'img' : 'video') as Entity;
+		asset.id = this.id + 'asset';
+		asset.src = this.url;
+		asset.crossOrigin = 'anonymous';
+		if (type == 'video') {
+			asset.autoplay = true;
+			asset.playsinline = true;
+			asset['webkit-playsinline'] = true;
+		}
+
+		return asset;
+	}
+	setEntityGeometry(entity: Entity, type: shortType) {
+		switch (type) {
+			case 'image':
+			case 'video':
+				if (this.isSphere) {
+					entity.setAttribute('geometry', `primitive: sphere;radius:${this.radius || 0.5};`);
+					//flip the material
+				} else {
+					entity.setAttribute('geometry', `primitive: plane;`);
+				}
+				break;
+			case 'model':
+				entity.setAttribute('gltf-model', `url(${this.url})`);
+
+				break;
+		}
+		return entity;
+	}
+	setEntityMaterial(entity: Entity, asset: Entity) {
+		entity.setAttribute(
+			'material',
+			`src: #${asset.id}; shader:flat;side: double;transparent: true`
+		);
+		return entity;
 	}
 	get position() {
 		if (this.components) {

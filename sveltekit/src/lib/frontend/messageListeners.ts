@@ -40,6 +40,7 @@ export const messageListeners = () => {
 		object.setAttribute('position', data.position);
 		object.setAttribute('rotation', data.rotation);
 		object.setAttribute('scale', data.scale);
+		object.setAttribute('geometry', { radius: data.radius });
 	});
 	videoChat.listenTo('objectUpdate', (data) => {
 		const object = sharedObjects.get(data.id);

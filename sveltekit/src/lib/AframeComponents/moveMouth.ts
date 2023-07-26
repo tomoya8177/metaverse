@@ -16,17 +16,20 @@ AFRAME.registerComponent('move-mouth', {
 		//get the audio level from the analyser node
 		//    this.unit.audioLevel
 		//open mouth when audio level is more than 5
-		if (!this.head) return;
+		if (!this.head) {
+			console.log('no head found');
+			return;
+		}
 		if (this.unit.audioLevel > 5) {
 			const level = (this.unit.audioLevel - 5) / 5;
 			setValue(this.head, 'jawOpen', level);
 			setValue(this.head, 'mouthOpen', level);
 			//rotate head a little
-			this.avatar.setAttribute('rotation', level * 2 + ' 0 0');
+			this.avatar.setAttribute('rotation', level * 2 + ' 180 0');
 		} else {
 			setValue(this.head, 'jawOpen', 0);
 			setValue(this.head, 'mouthOpen', 0);
-			this.avatar.setAttribute('rotation', '0 0 0');
+			this.avatar.setAttribute('rotation', '0 180 0');
 		}
 	}
 });
@@ -45,11 +48,12 @@ const setValue = (head, key, val) => {
 	head.morphTargetInfluences[index] = val;
 };
 const findNode = (node, name) => {
-	if (node.name === name) return node;
-	for (let i = 0; i < node.children.length; i++) {
-		const child = node.children[i];
-		const found = findNode(child, name);
-		if (found) return found;
-	}
-	return null;
+	//traverse through node
+	let match = null;
+	node.traverse((child) => {
+		if (child.name === name) {
+			match = child;
+		}
+	});
+	return match;
 };
