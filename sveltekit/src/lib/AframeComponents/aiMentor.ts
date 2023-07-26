@@ -43,7 +43,7 @@ AFRAME.registerComponent('ai-mentor', {
 			});
 			this.el.setAttribute('animation__rotation', {
 				property: 'rotation',
-				to: `0 ${theRig.getAttribute('rotation').y + 180} 0`,
+				to: `0 ${theRig.getAttribute('rotation').y} 0`,
 				dur: 3000,
 				easing: 'easeInOutQuad'
 			});

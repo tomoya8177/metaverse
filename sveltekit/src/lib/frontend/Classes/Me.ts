@@ -7,17 +7,6 @@ export class Me extends Unit {
 	cameraRig: Entity;
 	constructor(userId: string) {
 		super(userId);
-		this.el.setAttribute(
-			'movement-controls',
-			'constrainToNavMesh: true;camera: #camera;controls: keyboard,touch,nipple'
-		);
-		this.el.setAttribute('touch-controls', '');
-		this.el.setAttribute(
-			'nipple-controls',
-			'mode: static; lookJoystickEnabled: true; moveJoystickPosition: left;'
-		);
-		this.el.setAttribute('gamepad-controls', '');
-		this.el.setAttribute('ping-session', `user:${userId};type:unit`);
 
 		//this.el.setAttribute('wasd-controls', '');
 		this.el.setAttribute('look-controls', '');
@@ -33,7 +22,16 @@ export class Me extends Unit {
 		this.avatarContainer.appendChild(this.cameraRig);
 		this.cameraRig.appendChild(camera);
 
-		//enter twiklio room
+		this.el.setAttribute(
+			'movement-controls',
+			'constrainToNavMesh: true; camera: #camera; controls: keyboard,touch'
+		);
+		//this.el.setAttribute('touch-controls', '');
+
+		// this.el.setAttribute('nipple-controls', '');
+		// this.el.setAttribute('my-nipple-control', 'userId: ' + userId);
+		//this.el.setAttribute('gamepad-controls', '');
+		this.el.setAttribute('ping-session', `user:${userId};type:unit`);
 	}
 	async setLastPosition(event: Event): Promise<void> {
 		const sessions = await axios

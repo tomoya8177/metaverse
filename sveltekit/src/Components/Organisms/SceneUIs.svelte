@@ -31,6 +31,7 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
+	import NippleControl from '../Atom/NippleControl.svelte';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -286,8 +287,16 @@
 <div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>
 	<div id="myCameraPreview" />
 </div>
+<div class="nippleController">
+	<!-- <NippleControl /> -->
+</div>
 
 <style>
+	.nippleController {
+		position: absolute;
+		bottom: 6rem;
+		left: 1rem;
+	}
 	.objectEditorNav {
 		position: absolute;
 		/* center */
