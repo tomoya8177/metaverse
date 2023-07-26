@@ -79,7 +79,7 @@
 		<slot />
 	{/if}
 	{#if noEvent}
-		<div style="display:flex;width:100vw;height:100vh">
+		<div style="display:flex;width:100vw;height:100svh">
 			<div style="align-self:center;width:100%;text-align:center">
 				<h2>
 					{_('NO ROOM FOUND')}

@@ -22,6 +22,7 @@ export class SharedObject {
 	isSphere: boolean = false;
 	inPreviewPane: boolean = false;
 	scene: Entity | null = null;
+	asset: Entity | null = null;
 	constructor(data: any) {
 		this.id = data.id;
 		if (!this.id) return;
@@ -49,30 +50,29 @@ export class SharedObject {
 		} else if (this.type.includes('glb') || this.type.includes('gltf')) {
 			shortType = 'model';
 		}
-		let asset: Entity | null = null;
 		if (shortType != 'model') {
-			asset = this.createAsset(shortType);
+			this.asset = this.createAsset(shortType);
 		}
-		if (!asset) return;
+		if (!this.asset) return;
 		entity = this.setEntityGeometry(entity, shortType);
 		if (shortType == 'image') {
-			entity = this.setEntityMaterial(entity, asset);
+			entity = this.setEntityMaterial(entity, this.asset);
 			if (!this.isSphere) {
-				asset.onload = () => {
-					if (!asset) return console.error('asset is null');
-					const width = asset.width;
-					const height = asset.height;
+				this.asset.onload = () => {
+					if (!this.asset) return console.error('asset is null');
+					const width = this.asset.width;
+					const height = this.asset.height;
 					const aspectRatio = height / width;
 					entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
 				};
 			}
 		} else if (shortType == 'video') {
-			entity = this.setEntityMaterial(entity, asset);
+			entity = this.setEntityMaterial(entity, this.asset);
 			if (!this.isSphere) {
-				asset.addEventListener('loadedmetadata', () => {
-					if (!asset) return console.error('asset is null');
-					const width = asset.videoWidth;
-					const height = asset.videoHeight;
+				this.asset.addEventListener('loadedmetadata', () => {
+					if (!this.asset) return console.error('asset is null');
+					const width = this.asset.videoWidth;
+					const height = this.asset.videoHeight;
 					const aspectRatio = height / width;
 					entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
 				});
@@ -82,7 +82,7 @@ export class SharedObject {
 		}
 
 		if (shortType != 'model') {
-			document.querySelector('a-assets')?.appendChild(asset);
+			document.querySelector('a-assets')?.appendChild(this.asset);
 		}
 		entity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
 		if (this.isSphere) {

@@ -28,7 +28,6 @@
 	let recognition: VoiceRecognition;
 	let waitingForAIAnswer = false;
 	let micActive = false;
-	let newMessageBody = '';
 	const onMicClicked = async () => {
 		micActive = !micActive;
 		if (micActive) {
@@ -64,7 +63,7 @@
 	};
 </script>
 
-<div class="container" style="position:relative;height:calc(100vh - 3rem)">
+<div class="container" style="position:relative;height:calc(100svh - 3rem)">
 	<div aria-busy={waitingForAIAnswer}>
 		<AvatarThumbnail url={mentor.userData.avatarURL} />
 		{mentor.userData.nickname}

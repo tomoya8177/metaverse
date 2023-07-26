@@ -121,8 +121,8 @@
 </script>
 
 <div
-	style="overflow-y:auto;max-height:calc(100vh - 23rem)"
-	style:max-height={forceMentor ? 'calc(100vh - 16rem)' : 'calc(100vh - 23rem)'}
+	style="overflow-y:auto;max-height:calc(100svh - 23rem)"
+	style:max-height={forceMentor ? 'calc(100svh - 16rem)' : 'calc(100svh - 23rem)'}
 >
 	{#each messages.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)) as message}
 		<TextChatMessage

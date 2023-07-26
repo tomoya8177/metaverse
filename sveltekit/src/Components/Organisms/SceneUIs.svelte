@@ -323,7 +323,7 @@
 	}
 	.previewPaneItem {
 		/* min-width: calc(100vw - 6rem); */
-		height: calc(100vh - 11rem);
+		height: calc(100svh - 11rem);
 		border-radius: 0.2rem;
 		flex: none;
 		position: relative;
@@ -364,7 +364,7 @@
 	}
 
 	.chat-box {
-		max-height: calc(100vh - 9rem);
+		max-height: calc(100svh - 9rem);
 		overflow: auto;
 		width: 26rem;
 		position: absolute;

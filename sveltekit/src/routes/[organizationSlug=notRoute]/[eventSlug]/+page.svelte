@@ -6,22 +6,16 @@
 	import 'aframe-extras';
 	import 'aframe-audio-analyser';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
+	import { EventStore, UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import SceneUIs from '../../../Components/Organisms/SceneUIs.svelte';
-	import { videoChat } from '$lib/frontend/Classes/VideoChat';
-	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
-	import ProfileEditInputs from '../../../Components/Organisms/ProfileEditInputs.svelte';
-	import AudioButton from '../../../Components/Organisms/AudioButton.svelte';
+	import { messageUnlisteners } from '$lib/frontend/messageListeners';
 	import axios from 'axios';
 	import type { Organization } from '$lib/types/Organization';
-	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
-	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { loadSharedObjects } from '$lib/frontend/loadSharedObjects';
-	import { environmentPresets } from '$lib/preset/EnvironmentPresets';
 	import { Unit } from '$lib/frontend/Classes/Unit';
 
 	AFRAME.registerComponent('on-scene-loaded', {
@@ -32,8 +26,6 @@
 		}
 	});
 	window.onpopstate = function (event) {
-		console.log('onbeforeunload');
-		// your code here
 		delete AFRAME.components['on-scene-loaded'];
 	};
 	let sceneLoaded = false;
@@ -42,11 +34,8 @@
 	const onSceneLoaded = async () => {
 		me = new Me($UserStore.id);
 		me.nickname = $UserStore.nickname;
-		console.log({ me });
 		Users.add(me);
 		await me.setLastPosition($EventStore);
-		if (!me.avatarURL) {
-		}
 		me.avatarURL =
 			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		sceneLoaded = true;
@@ -55,24 +44,16 @@
 		//load mentor user
 		if ($EventStore.mentor) {
 			const mentor = await axios.get('/api/mentors/' + $EventStore.mentor).then((res) => res.data);
-
 			mentor.userData = await axios.get('/api/users/' + mentor.user).then((res) => res.data);
 			const mentorUnit = new Unit(mentor.userData.id);
 			mentorUnit.nickname = mentor.userData.nickname;
 			mentorUnit.avatarURL = mentor.userData.avatarURL;
 			mentorUnit.el.setAttribute('ai-mentor', '');
-			mentorUnit.avatar.setAttribute('move-mouth', 'userId:' + mentor.userData.id);
+			mentorUnit.avatar?.setAttribute('move-mouth', 'userId:' + mentor.userData.id);
 			Users.add(mentorUnit);
-			//mentorUser.setLastPosition($EventStore);
 		}
 	};
 
-	let organization: Organization | null = null;
-	onMount(async () => {
-		organization = await axios
-			.get('/api/organizations/' + $EventStore.organization)
-			.then((res) => res.data);
-	});
 	onDestroy(() => {
 		messageUnlisteners();
 	});
