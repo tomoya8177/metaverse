@@ -31,21 +31,12 @@
 		});
 		events = events.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 	});
+	let editMode: 'update' | 'create' = 'update';
+	let modalOpen = false;
 </script>
 
 <h3>{_('Rooms')}</h3>
-<button
-	on:click={() => {
-		editEvent = new Event({
-			...EmptyEvent,
-			slug: crypto.randomUUID()
-		});
-		editMode = 'create';
-		modalOpen = true;
-	}}
->
-	{_('New Room')}
-</button>
+
 <FilterPagination inputArray={events} bind:paginated />
 <table>
 	<thead>
