@@ -8,7 +8,7 @@ AFRAME.registerComponent('move-mouth', {
 		this.avatar = this.el.parentNode.querySelector('a-gltf-model');
 		//traverse the gltf model to find the head
 		this.avatar.addEventListener('model-loaded', () => {
-			this.head = findNode(this.avatar.object3D, 'Wolf3D_Avatar');
+			this.findMouth();
 		});
 		this.unit = Users.find(this.data.userId);
 	},
@@ -17,7 +17,7 @@ AFRAME.registerComponent('move-mouth', {
 		//    this.unit.audioLevel
 		//open mouth when audio level is more than 5
 		if (!this.head) {
-			console.log('no head found');
+			this.findMouth();
 			return;
 		}
 		if (this.unit.audioLevel > 5) {
@@ -31,6 +31,9 @@ AFRAME.registerComponent('move-mouth', {
 			setValue(this.head, 'mouthOpen', 0);
 			this.avatar.setAttribute('rotation', '0 180 0');
 		}
+	},
+	findMouth: function () {
+		this.head = findNode(this.avatar.object3D, 'Wolf3D_Avatar');
 	}
 });
 
