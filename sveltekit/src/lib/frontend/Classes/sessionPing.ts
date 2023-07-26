@@ -34,7 +34,8 @@ export class sessionPing {
 				components: JSON.stringify({
 					position: this.el?.getAttribute('position'),
 					rotation: this.el?.getAttribute('rotation'),
-					scale: this.el?.getAttribute('scale')
+					scale: this.el?.getAttribute('scale'),
+					radius: this.el?.getAttribute('geometry')?.radius
 				})
 			});
 		}, 5000);

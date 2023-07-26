@@ -169,12 +169,20 @@ AFRAME.registerComponent('editable-object', {
 						const result = this.el.getAttribute('rotation').y;
 					} else if (this.transportMode == 'scale') {
 						const relativeDiff = this.getRelativeDiff(intersection);
-						this.el.setAttribute(
-							'scale',
-							`${this.el.getAttribute('scale').x + (relativeDiff.x * 3) / this.distance}
-							${this.el.getAttribute('scale').y + (relativeDiff.x * 3) / this.distance}
-							${this.el.getAttribute('scale').z + (relativeDiff.x * 3) / this.distance}`
-						);
+						if (this.object.isSphere) {
+							const geometry = this.el.getAttribute('geometry');
+							const radius = geometry.radius || 0.5;
+							this.el.setAttribute('geometry', {
+								radius: `${radius + (relativeDiff.x * 3) / this.distance}`
+							});
+						} else {
+							this.el.setAttribute(
+								'scale',
+								`${this.el.getAttribute('scale').x + (relativeDiff.x * 3) / this.distance}
+								${this.el.getAttribute('scale').y + (relativeDiff.x * 3) / this.distance}
+								${this.el.getAttribute('scale').z + (relativeDiff.x * 3) / this.distance}`
+							);
+						}
 					}
 
 					videoChat.sendMessage({

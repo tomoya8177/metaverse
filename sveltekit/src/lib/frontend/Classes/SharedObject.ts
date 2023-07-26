@@ -17,6 +17,7 @@ export class SharedObject {
 	el?: Entity;
 	locked: boolean = true;
 	linkTo: string;
+	isSphere: boolean = false;
 	inPreviewPane: boolean = false;
 	constructor(data: any) {
 		this.id = data.id;
@@ -32,21 +33,32 @@ export class SharedObject {
 		this.editable = data.editable;
 		this.handle = data.handle;
 		this.linkTo = data.linkTo;
+		this.isSphere = data.isSphere;
+
 		const entity = document.createElement('a-entity');
 		entity.setAttribute('id', this.id);
 		let asset: Entity | null = null;
+		if (this.type.includes('image') || this.type.includes('video')) {
+			if (this.isSphere) {
+				entity.setAttribute('geometry', `primitive: sphere;radius:${this.radius || 0.5};}`);
+				//flip the material
+			} else {
+				entity.setAttribute('geometry', `primitive: plane;`);
+			}
+		}
 		if (this.type.includes('image')) {
 			asset = document.createElement('img');
-			asset.onload = () => {
-				const width = asset.width;
-				const height = asset.height;
-				const aspectRatio = height / width;
-				entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
-			};
+			if (!this.isSphere) {
+				asset.onload = () => {
+					const width = asset.width;
+					const height = asset.height;
+					const aspectRatio = height / width;
+					entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
+				};
+			}
 			asset.id = this.id + 'asset';
 			asset.src = this.url;
 			asset.crossOrigin = 'anonymous';
-			entity.setAttribute('geometry', `primitive: plane;`);
 			entity.setAttribute(
 				'material',
 				`src: #${asset.id}; shader:flat;side: double;transparent: true`
@@ -60,16 +72,17 @@ export class SharedObject {
 			// const height = asset.height;
 			// const aspectRatio = height / width;
 			// entity.setAttribute('geometry', `height:${aspectRatio}; width:1;`);
-			asset.addEventListener('loadedmetadata', () => {
-				const width = asset.videoWidth;
-				const height = asset.videoHeight;
-				const aspectRatio = height / width;
-				entity.setAttribute('geometry', { primitive: 'plane', height: aspectRatio, width: 1 });
-			});
+			if (!this.isSphere) {
+				asset.addEventListener('loadedmetadata', () => {
+					const width = asset.videoWidth;
+					const height = asset.videoHeight;
+					const aspectRatio = height / width;
+					entity.setAttribute('geometry', { primitive: 'plane', height: aspectRatio, width: 1 });
+				});
+			}
 			asset.id = this.id + 'asset';
 			asset.src = this.url;
 			asset.crossOrigin = 'anonymous';
-			entity.setAttribute('geometry', `primitive: plane;`);
 			entity.setAttribute(
 				'material',
 				`src: #${asset.id}; shader:flat;side: double;transparent: true`
@@ -85,8 +98,14 @@ export class SharedObject {
 		if (!asset) return;
 		document.querySelector('a-assets')?.appendChild(asset);
 		entity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
-		entity.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
-		entity.setAttribute('scale', `${this.scale.x} ${this.scale.y} ${this.scale.z}`);
+		if (this.isSphere) {
+			entity.setAttribute('rotation', `0 ${this.rotation.y} 0`);
+			entity.setAttribute('radius', `${this.radius}`);
+			entity.setAttribute('scale', `-1 1 1`);
+		} else {
+			entity.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
+			entity.setAttribute('scale', `${this.scale.x} ${this.scale.y} ${this.scale.z}`);
+		}
 		entity.setAttribute('name', this.title);
 		entity.setAttribute('editable-object', '');
 		if (this.editable) {
@@ -115,6 +134,13 @@ export class SharedObject {
 			return JSON.parse(this.components).scale;
 		} else {
 			return { x: 1, y: 1, z: 1 };
+		}
+	}
+	get radius() {
+		if (this.components) {
+			return JSON.parse(this.components).radius;
+		} else {
+			return 0.5;
 		}
 	}
 	remove() {

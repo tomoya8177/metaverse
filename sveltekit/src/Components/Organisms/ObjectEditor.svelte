@@ -10,6 +10,7 @@
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { _ } from '$lib/i18n';
+	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 
 	const onDeleteClicked = async () => {
 		if ($FocusObjectStore.title == 'Shared Screen') {
@@ -120,6 +121,35 @@
 						</li>
 					{/if}
 					{#if !$FocusObjectStore.locked}
+						{#if $FocusObjectStore.type.includes('image') || $FocusObjectStore.type.includes('video')}
+							{#if !$FocusObjectStore.isSphere}
+								<button
+									on:click={async () => {
+										const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
+											isSphere: true
+										});
+										$FocusObjectStore.remove();
+										const object = new SharedObject(updatedImage.data);
+										sharedObjects.remove($FocusObjectStore.id);
+										sharedObjects.add(object);
+										FocusObjectStore.set(object);
+									}}>{_('Convert To 360 Sphere')}</button
+								>
+							{:else}
+								<button
+									on:click={async () => {
+										const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
+											isSphere: false
+										});
+										$FocusObjectStore.remove();
+										const object = new SharedObject(updatedImage.data);
+										sharedObjects.remove($FocusObjectStore.id);
+										sharedObjects.add(object);
+										FocusObjectStore.set(object);
+									}}>{_('Convert To Flat Image')}</button
+								>
+							{/if}
+						{/if}
 						<li>
 							<button
 								on:click={async () => {
