@@ -106,7 +106,8 @@
 	on:click={() => {
 		editEvent = new Event({
 			...EmptyEvent,
-			slug: crypto.randomUUID()
+			slug: crypto.randomUUID(),
+			organization: organization.id
 		});
 		editMode = 'create';
 		modalOpen = true;

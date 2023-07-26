@@ -23,6 +23,7 @@ export class SharedObject {
 	inPreviewPane: boolean = false;
 	scene: Entity | null = null;
 	asset: Entity | null = null;
+	shortType: shortType = 'image';
 	constructor(data: any) {
 		this.id = data.id;
 		if (!this.id) return;
@@ -50,38 +51,31 @@ export class SharedObject {
 		} else if (this.type.includes('glb') || this.type.includes('gltf')) {
 			shortType = 'model';
 		}
+		this.shortType = shortType;
 		if (shortType != 'model') {
 			this.asset = this.createAsset(shortType);
+			if (!this.asset) return;
 		}
-		if (!this.asset) return;
 		entity = this.setEntityGeometry(entity, shortType);
-		if (shortType == 'image') {
+		if (shortType == 'image' && this.asset) {
 			entity = this.setEntityMaterial(entity, this.asset);
 			if (!this.isSphere) {
 				this.asset.onload = () => {
-					if (!this.asset) return console.error('asset is null');
-					const width = this.asset.width;
-					const height = this.asset.height;
-					const aspectRatio = height / width;
-					entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
+					this.setImageAspectRatio();
 				};
 			}
-		} else if (shortType == 'video') {
+		} else if (shortType == 'video' && this.asset) {
 			entity = this.setEntityMaterial(entity, this.asset);
 			if (!this.isSphere) {
 				this.asset.addEventListener('loadedmetadata', () => {
-					if (!this.asset) return console.error('asset is null');
-					const width = this.asset.videoWidth;
-					const height = this.asset.videoHeight;
-					const aspectRatio = height / width;
-					entity.setAttribute('geometry', { height: aspectRatio, width: 1 });
+					this.setVideoAspectRatio();
 				});
 			}
 		} else if (shortType == 'model') {
 			entity.setAttribute('gltf-model', `url(${this.url})`);
 		}
 
-		if (shortType != 'model') {
+		if (shortType != 'model' && this.asset) {
 			document.querySelector('a-assets')?.appendChild(this.asset);
 		}
 		entity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
@@ -99,6 +93,21 @@ export class SharedObject {
 		}
 		this.scene.appendChild(entity);
 	}
+	setImageAspectRatio() {
+		if (!this.asset || !this.el) return console.error('asset is null');
+		const width = this.asset.width;
+		const height = this.asset.height;
+		const aspectRatio = height / width;
+		this.el.setAttribute('geometry', { height: aspectRatio, width: 1 });
+	}
+	setVideoAspectRatio() {
+		if (!this.asset || !this.el) return console.error('asset is null');
+		const width = this.asset.videoWidth;
+		const height = this.asset.videoHeight;
+		const aspectRatio = height / width;
+		this.el.setAttribute('geometry', { height: aspectRatio, width: 1 });
+	}
+
 	createAsset(type: 'image' | 'video'): Entity {
 		const asset = document.createElement(type == 'image' ? 'img' : 'video') as Entity;
 		asset.id = this.id + 'asset';
@@ -136,6 +145,17 @@ export class SharedObject {
 		);
 		return entity;
 	}
+	updateEntityGeometryAndMaterial() {
+		if (!this.asset || !this.el) return;
+		this.setEntityGeometry(this.el, this.shortType);
+		this.setEntityMaterial(this.el, this.asset);
+		if (this.shortType == 'image') {
+			this.setImageAspectRatio();
+		} else if (this.shortType == 'video') {
+			this.setVideoAspectRatio();
+		}
+	}
+
 	get position() {
 		if (this.components) {
 			return JSON.parse(this.components).position;

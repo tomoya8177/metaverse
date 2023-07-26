@@ -48,6 +48,10 @@ export const messageListeners = () => {
 		if (!object) return;
 		object.title = data.title;
 		object.linkTo = data.linkTo;
+		if (data.isSphere != undefined) {
+			object.isSphere = data.isSphere;
+			object.updateEntityGeometryAndMaterial();
+		}
 	});
 	videoChat.listenTo('objectDelete', (data) => {
 		console.log('delete revceived', data);

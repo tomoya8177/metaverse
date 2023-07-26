@@ -31,6 +31,7 @@ AFRAME.registerComponent('editable-object', {
 		this.el.addEventListener('mousedown', (e: Event) => {
 			this.object = sharedObjects.get(this.el.id);
 			if (!this.object || !this.rayCatcher) return console.error('object is null');
+			console.log({ object: this.object });
 			FocusObjectStore.set(this.object);
 			this.transportMode = 'position';
 			this.camera = document.getElementById('camera') as Entity;

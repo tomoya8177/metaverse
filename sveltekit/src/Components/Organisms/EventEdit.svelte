@@ -117,8 +117,8 @@
 		},
 		...mentors.map((mentor) => {
 			return {
-				name: mentor.userData?.nickname,
-				value: mentor.id
+				name: mentor?.userData?.nickname,
+				value: mentor?.id
 			};
 		})
 	]}

@@ -10,5 +10,6 @@ export const EmptyEvent: Event = {
 	allowedUsers: '',
 	isPublic: false,
 	isOpen: true,
-	capacity: 0
+	capacity: 0,
+	withMetaverse: true
 };

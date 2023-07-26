@@ -55,30 +55,35 @@
 				{#if $FocusObjectStore.type.includes('video')}
 					<li>
 						<div style="display:flex;gap:0.4rem">
-							<div>
-								<button
-									small
-									class="circle-button"
-									on:click={() => {
-										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-										video?.play();
-									}}
-								>
-									<Icon icon="play_arrow" />
-								</button>
-							</div>
-							<div>
-								<button
-									small
-									class="circle-button"
-									on:click={() => {
-										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-										video?.pause();
-									}}
-								>
-									<Icon icon="pause" />
-								</button>
-							</div>
+							{#if !$FocusObjectStore.playing}
+								<div>
+									<button
+										small
+										class="circle-button"
+										on:click={() => {
+											const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+											video?.play();
+											$FocusObjectStore.playing = true;
+										}}
+									>
+										<Icon icon="play_arrow" />
+									</button>
+								</div>
+							{:else}
+								<div>
+									<button
+										small
+										class="circle-button"
+										on:click={() => {
+											const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+											video?.pause();
+											$FocusObjectStore.playing = false;
+										}}
+									>
+										<Icon icon="pause" />
+									</button>
+								</div>
+							{/if}
 							<div>
 								<button
 									small
@@ -90,6 +95,25 @@
 									}}
 								>
 									<Icon icon="replay" />
+								</button>
+							</div>
+							<div>
+								<!-- mute button-->
+								<button
+									small
+									class="circle-button"
+									on:click={() => {
+										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+										if (!video) return console.error('video is null');
+										video.muted = !video.muted;
+										$FocusObjectStore.muted = video.muted;
+									}}
+								>
+									{#if $FocusObjectStore.muted}
+										<Icon icon="volume_off" />
+									{:else}
+										<Icon icon="volume_up" />
+									{/if}
 								</button>
 							</div>
 						</div>
@@ -129,12 +153,13 @@
 											const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
 												isSphere: true
 											});
-											$FocusObjectStore.remove();
-											const object = new SharedObject(updatedImage.data);
-											object.locked = false;
-											sharedObjects.remove($FocusObjectStore.id);
-											sharedObjects.add(object);
-											FocusObjectStore.set(object);
+											$FocusObjectStore.isSphere = true;
+											$FocusObjectStore.updateEntityGeometryAndMaterial();
+											videoChat.sendMessage({
+												key: 'objectUpdate',
+												id: $FocusObjectStore.id,
+												isSphere: true
+											});
 										}}>{_('Convert To 360 Sphere')}</button
 									>
 								{:else}
@@ -143,12 +168,13 @@
 											const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
 												isSphere: false
 											});
-											$FocusObjectStore.remove();
-											const object = new SharedObject(updatedImage.data);
-											object.locked = false;
-											sharedObjects.remove($FocusObjectStore.id);
-											sharedObjects.add(object);
-											FocusObjectStore.set(object);
+											$FocusObjectStore.isSphere = false;
+											$FocusObjectStore.updateEntityGeometryAndMaterial();
+											videoChat.sendMessage({
+												key: 'objectUpdate',
+												id: $FocusObjectStore.id,
+												isSphere: false
+											});
 										}}>{_('Convert To Flat Image')}</button
 									>
 								{/if}
