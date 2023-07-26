@@ -5,6 +5,7 @@ import type { User } from '$lib/frontend/Classes/User';
 import axios from 'axios';
 import { SharedObject } from './Classes/SharedObject';
 import { sharedObjects } from './Classes/SharedObjects';
+import type { Entity } from 'aframe';
 
 export const messageListeners = () => {
 	videoChat.listenTo('handshake', async (data) => {
@@ -35,7 +36,7 @@ export const messageListeners = () => {
 		sharedObjects.add(object);
 	});
 	videoChat.listenTo('objectPosition', (data) => {
-		const object = document.getElementById(data.object.id);
+		const object = document.getElementById(data.object.id) as Entity;
 		if (!object) return;
 		object.setAttribute('position', data.position);
 		object.setAttribute('rotation', data.rotation);

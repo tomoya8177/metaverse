@@ -1,26 +1,27 @@
 import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
-import { sharedObjects } from './SharedObjects';
-import { ItemsInPreview } from '$lib/store';
+import { ItemsInPreview, type xyz } from '$lib/store';
+import * as THREE from 'three';
 type shortType = 'image' | 'video' | 'model';
 
 export class SharedObject {
 	id: string;
-	url: string;
-	type: string;
+	url: string = '';
+	type: string = '';
 	size?: number;
-	title: string;
+	title: string = '';
 	createdAt?: string;
-	components: string;
-	event: string;
-	user: string;
-	editable: boolean;
+	components: string = '';
+	event: string = '';
+	user: string = '';
+	editable: boolean = false;
 	handle?: string;
-	el?: Entity;
+	el: Entity | null = null;
 	locked: boolean = true;
-	linkTo: string;
+	linkTo: string = '';
 	isSphere: boolean = false;
 	inPreviewPane: boolean = false;
+	scene: Entity | null = null;
 	constructor(data: any) {
 		this.id = data.id;
 		if (!this.id) return;
@@ -36,8 +37,9 @@ export class SharedObject {
 		this.handle = data.handle;
 		this.linkTo = data.linkTo;
 		this.isSphere = data.isSphere;
-		console.log('start construction', this.id);
 		let entity = document.createElement('a-entity') as Entity;
+		this.el = entity;
+		this.scene = document.querySelector('a-scene');
 		entity.setAttribute('id', this.id);
 		let shortType: shortType = 'image';
 		if (this.type.includes('image')) {
@@ -51,11 +53,13 @@ export class SharedObject {
 		if (shortType != 'model') {
 			asset = this.createAsset(shortType);
 		}
+		if (!asset) return;
 		entity = this.setEntityGeometry(entity, shortType);
 		if (shortType == 'image') {
 			entity = this.setEntityMaterial(entity, asset);
 			if (!this.isSphere) {
 				asset.onload = () => {
+					if (!asset) return console.error('asset is null');
 					const width = asset.width;
 					const height = asset.height;
 					const aspectRatio = height / width;
@@ -66,6 +70,7 @@ export class SharedObject {
 			entity = this.setEntityMaterial(entity, asset);
 			if (!this.isSphere) {
 				asset.addEventListener('loadedmetadata', () => {
+					if (!asset) return console.error('asset is null');
 					const width = asset.videoWidth;
 					const height = asset.videoHeight;
 					const aspectRatio = height / width;
@@ -75,7 +80,6 @@ export class SharedObject {
 		} else if (shortType == 'model') {
 			entity.setAttribute('gltf-model', `url(${this.url})`);
 		}
-		console.log(0, { entity, asset });
 
 		if (shortType != 'model') {
 			document.querySelector('a-assets')?.appendChild(asset);
@@ -86,27 +90,24 @@ export class SharedObject {
 			entity.setAttribute('scale', `-1 1 1`);
 		} else {
 			entity.setAttribute('rotation', `${this.rotation.x} ${this.rotation.y} ${this.rotation.z}`);
-			entity.setAttribute('scale', `${this.scale.x} ${this.scale.y} ${this.scale.z}`);
+			entity.setAttribute('scale', `${Math.abs(this.scale.x)} ${this.scale.y} ${this.scale.z}`);
 		}
 		entity.setAttribute('name', this.title);
 		entity.setAttribute('editable-object', '');
 		if (this.editable) {
 			entity.classList.add('clickable');
 		}
-		console.log({ entity, asset }, this.isSphere);
-		scene.appendChild(entity);
-		this.el = entity;
-		console.log('finished construction');
+		this.scene.appendChild(entity);
 	}
-	createAsset(type: 'image' | 'video') {
+	createAsset(type: 'image' | 'video'): Entity {
 		const asset = document.createElement(type == 'image' ? 'img' : 'video') as Entity;
 		asset.id = this.id + 'asset';
-		asset.src = this.url;
-		asset.crossOrigin = 'anonymous';
+		asset.setAttribute('src', this.url);
+		asset.setAttribute('crossOrigin', 'anonymous');
 		if (type == 'video') {
-			asset.autoplay = true;
-			asset.playsinline = true;
-			asset['webkit-playsinline'] = true;
+			asset.setAttribute('autoplay', 'true');
+			asset.setAttribute('playsinline', 'true');
+			asset.setAttribute('webkit-playsinline', 'true');
 		}
 
 		return asset;
@@ -117,7 +118,6 @@ export class SharedObject {
 			case 'video':
 				if (this.isSphere) {
 					entity.setAttribute('geometry', `primitive: sphere;radius:${this.radius || 0.5};`);
-					//flip the material
 				} else {
 					entity.setAttribute('geometry', `primitive: plane;`);
 				}
@@ -129,7 +129,7 @@ export class SharedObject {
 		}
 		return entity;
 	}
-	setEntityMaterial(entity: Entity, asset: Entity) {
+	setEntityMaterial(entity: Entity, asset: Entity): Entity {
 		entity.setAttribute(
 			'material',
 			`src: #${asset.id}; shader:flat;side: double;transparent: true`
@@ -167,12 +167,10 @@ export class SharedObject {
 	remove() {
 		const entity = document.getElementById(this.id);
 		if (!entity) return;
-		scene.removeChild(entity);
+		this.scene?.removeChild(entity);
 	}
-	moveToMyFront(eyePosition, eyeRotation) {
-		//move this object to eyesPosition and move away from the eyes by 2 meters.
+	moveToMyFront(eyePosition: xyz, eyeRotation: xyz) {
 		this.el?.setAttribute('rotation', `0 ${eyeRotation.y} 0`);
-		//translate the object to the direction of the eye
 		const vector = new THREE.Vector3(0, 0, -2);
 		vector.applyAxisAngle(new THREE.Vector3(0, 1, 0), degree2radian(eyeRotation.y));
 		this.el?.setAttribute(
@@ -184,6 +182,7 @@ export class SharedObject {
 		this.inPreviewPane = true;
 		ItemsInPreview.update((items) => [...items, this]);
 		setTimeout(() => {
+			if (!this.el) return;
 			let asset;
 			asset = this.el.components.material.data.src;
 			const li = document.getElementById(this.id + '_preview');

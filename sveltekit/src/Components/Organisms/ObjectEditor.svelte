@@ -109,7 +109,7 @@
 							label={_('Link To')}
 							bind:value={$FocusObjectStore.linkTo}
 							readonly={$FocusObjectStore.locked}
-							copiable={$FocusObjectStore.linkTo}
+							copiable={!!$FocusObjectStore.linkTo}
 						/>
 					</li>
 					{#if $FocusObjectStore.linkTo}

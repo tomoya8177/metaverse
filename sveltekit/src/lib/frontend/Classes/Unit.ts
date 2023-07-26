@@ -10,6 +10,7 @@ import axios from 'axios';
 import { degree2radian } from '$lib/math/degree2radians';
 import { sharedObjects } from './SharedObjects';
 import { pollAudioLevel } from '../pollAudioLevel';
+import * as THREE from 'three';
 let event: Event;
 EventStore.subscribe((value) => {
 	event = value;
@@ -18,8 +19,8 @@ EventStore.subscribe((value) => {
 export class Unit {
 	userId: string;
 	el: Entity;
-	avatar: Entity | undefined;
-	avatarContainer: Entity | undefined;
+	avatar: Entity | null = null;
+	avatarContainer: Entity;
 	nicknameData: string = '';
 	onMute: boolean = false;
 	onVideoMute: boolean = false;
@@ -40,6 +41,7 @@ export class Unit {
 		return this.nicknameData;
 	}
 	set nickname(nickname: string) {
+		if (!this.avatarContainer) return;
 		this.nicknameData = nickname;
 		let text = this.el.querySelector('a-text');
 		if (!text) {
@@ -53,6 +55,8 @@ export class Unit {
 	}
 
 	set avatarURL(avatarURL: string) {
+		if (!this.avatarContainer) return;
+
 		if (!this.avatar) {
 			this.avatar = document.createElement('a-gltf-model');
 			this.avatarContainer.appendChild(this.avatar);
@@ -89,6 +93,8 @@ export class Unit {
 		this.el.parentNode?.removeChild(this.el);
 	}
 	say(message: string) {
+		if (!this.avatarContainer) return console.error('avatar container is null');
+
 		const text = document.createElement('a-entity');
 		text.setAttribute(
 			'text',
@@ -104,6 +110,8 @@ export class Unit {
 		}, Math.max(message.length * 500, 5000));
 	}
 	showCamera(track: RemoteVideoTrack) {
+		if (!this.avatarContainer) return console.error('avatar container is null');
+
 		const video = document.createElement('a-circle');
 		video.setAttribute('material', 'src:#' + track.sid + ';shader:flat;side:double;');
 		video.setAttribute('id', 'cameraCircleOf' + this.userId);
@@ -173,7 +181,9 @@ export class Unit {
 		video?.parentNode?.removeChild(video);
 	}
 	attachAudio(track: RemoteAudioTrack) {
-		pollAudioLevel(track, (level) => {
+		if (!this.avatarContainer) return console.error('avatar container is null');
+
+		pollAudioLevel(track, (level: number) => {
 			/* Update audio level indicator. */
 			this.audioLevel = level;
 		});

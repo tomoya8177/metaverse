@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { DateTime } from 'luxon';
 import type { Entity } from 'aframe';
 
 type Session = {

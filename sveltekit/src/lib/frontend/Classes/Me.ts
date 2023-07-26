@@ -2,13 +2,12 @@ import axios from 'axios';
 import { Unit } from './Unit';
 import { connect, createLocalTracks } from 'twilio-video';
 import type { Event } from './Event';
+import type { Component, Entity, ObjectMap, System } from 'aframe';
 
 export class Me extends Unit {
 	cameraRig: Entity;
 	constructor(userId: string) {
 		super(userId);
-
-		//this.el.setAttribute('wasd-controls', '');
 		this.el.setAttribute('look-controls', '');
 		this.el.setAttribute('update-position', '');
 		const camera = document.createElement('a-camera');
@@ -26,11 +25,7 @@ export class Me extends Unit {
 			'movement-controls',
 			'constrainToNavMesh: true; camera: #camera; controls: keyboard,touch'
 		);
-		//this.el.setAttribute('touch-controls', '');
 
-		// this.el.setAttribute('nipple-controls', '');
-		// this.el.setAttribute('my-nipple-control', 'userId: ' + userId);
-		//this.el.setAttribute('gamepad-controls', '');
 		this.el.setAttribute('ping-session', `user:${userId};type:unit`);
 	}
 	async setLastPosition(event: Event): Promise<void> {

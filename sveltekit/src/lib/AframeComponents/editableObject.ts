@@ -1,34 +1,40 @@
-import { editableObject } from '$lib/frontend/Classes/EditableObject';
+import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { _ } from '$lib/i18n';
-import { degree2radian } from '$lib/math/degree2radians';
 import { EmptyObject } from '$lib/preset/EmptyObject';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
-import 'aframe';
+import { THREE } from 'aframe';
+import type { Entity } from 'aframe';
 import axios from 'axios';
-import { get } from 'svelte/store';
-import { scale } from 'svelte/transition';
+import type { Event } from 'three';
 let userId = '';
 UserStore.subscribe((user) => {
 	userId = user.id;
 });
 
 AFRAME.registerComponent('editable-object', {
+	state: 'idle',
+	initialPos: null as xyz | null,
+	cursorEl: null as Entity | null,
+	rayCatcher: null as Entity | null,
+	transportMode: 'position',
+	readyToLink: false,
+	object: null as SharedObject | null,
+	camera: null as Entity | null,
+	rig: null as Entity | null,
+	distance: 0,
 	init: function () {
-		this.state = 'idle';
-		this.initialPos = null;
 		this.cursorEl = document.querySelector('[raycaster]');
-		this.rayCatcher = document.getElementById('rayCatcher');
-		this.transportMode = 'position';
-		this.readyToLink = false;
+		this.rayCatcher = document.getElementById('rayCatcher') as Entity;
 
-		this.el.addEventListener('mousedown', (e) => {
+		this.el.addEventListener('mousedown', (e: Event) => {
 			this.object = sharedObjects.get(this.el.id);
-			this.transportMode = 'position';
-			this.camera = document.getElementById('camera');
-			this.rig = document.getElementById(userId);
+			if (!this.object || !this.rayCatcher) return console.error('object is null');
 			FocusObjectStore.set(this.object);
+			this.transportMode = 'position';
+			this.camera = document.getElementById('camera') as Entity;
+			this.rig = document.getElementById(userId) as Entity;
 			if (this.object.locked) {
 				return;
 			}
@@ -52,7 +58,7 @@ AFRAME.registerComponent('editable-object', {
 		//attach shift key to move object up and down
 
 		window.addEventListener('wheel', (evt) => {
-			if (this.state != 'moving') return;
+			if (this.state != 'moving' || !this.rayCatcher) return;
 			if (evt.deltaY < 0) {
 				this.rayCatcher.object3D.translateZ(-0.05 * this.distance);
 			} else {
@@ -84,6 +90,7 @@ AFRAME.registerComponent('editable-object', {
 					this.el.appendChild(text);
 					this.el.appendChild(geometry);
 					setTimeout(() => {
+						if (!this.el.lastChild) return;
 						this.el.removeChild(this.el.lastChild);
 						this.el.removeChild(this.el.lastChild);
 						this.readyToLink = false;
@@ -92,6 +99,7 @@ AFRAME.registerComponent('editable-object', {
 				}
 				return;
 			}
+			if (!this.rayCatcher) return console.error('raycatcher is null');
 			this.rayCatcher.setAttribute('position', '0 -100 0');
 			this.rig?.setAttribute('look-controls', 'enabled:true');
 			this.state = 'idle';
@@ -116,6 +124,8 @@ AFRAME.registerComponent('editable-object', {
 			} else if (evt.key == 'Escape') {
 				console.log('escape');
 				//scale
+				if (!this.rayCatcher) return console.error('raycatcher is null');
+
 				this.rayCatcher.setAttribute('position', '0 -100 0');
 				this.rig?.setAttribute('look-controls', 'enabled:true');
 				this.state = 'idle';
@@ -135,6 +145,8 @@ AFRAME.registerComponent('editable-object', {
 	},
 	tick: function (e) {
 		if (this.state === 'moving') {
+			if (!this.cursorEl) return console.error('raycatcher is null');
+
 			var intersections = this.cursorEl.components.raycaster.intersections;
 			if (intersections.length > 0) {
 				const intersection = intersections.find(
@@ -150,6 +162,7 @@ AFRAME.registerComponent('editable-object', {
 					};
 					//if diff is too small, don't do anything
 					if (Math.abs(diff.x) == 0 && Math.abs(diff.y) == 0 && Math.abs(diff.z) == 0) return;
+					if (!this.object) return console.error('object is null');
 					if (this.transportMode == 'position') {
 						this.el.setAttribute(
 							'position',
@@ -209,6 +222,8 @@ AFRAME.registerComponent('editable-object', {
 		}
 	},
 	getRelativeDiff: function (intersection: xyz) {
+		if (!this.rayCatcher || !this.initialPos)
+			return console.error('raycatcher or initialPos is null');
 		//turn it to Vector 3
 		const intersectionVector = new THREE.Vector3(intersection.x, intersection.y, intersection.z);
 		//convert it to rayCatcher local
