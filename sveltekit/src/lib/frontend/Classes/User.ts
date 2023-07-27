@@ -32,10 +32,11 @@ export class User {
 		this.onVideoMute = true;
 		this.description = data.description;
 	}
-	async delete(userRoleId: string) {
-		await axios.delete('/api/userRoles/' + userRoleId);
-		// await axios.delete('/api/sessions?user=' + this.id);
-		// await axios.delete('/api/messages?user=' + this.id);
-		// await axios.delete('/api/objects?user=' + this.id);
+	async delete() {
+		const user = await axios.delete('/api/users/' + this.id);
+		await axios.delete('/api/userRoles?user=' + this.id);
+		await axios.delete('/api/sessions?user=' + this.id);
+		await axios.delete('/api/messages?user=' + this.id);
+		await axios.delete('/api/objects?user=' + this.id);
 	}
 }

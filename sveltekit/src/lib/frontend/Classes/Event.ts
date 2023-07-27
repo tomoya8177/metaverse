@@ -2,7 +2,6 @@ import axios from 'axios';
 import { reinstallAIBrain } from '../reinstallAIBrain';
 import { _ } from '$lib/i18n';
 import type { DocumentForAI } from '$lib/types/DocumentForAI';
-import { myAlert } from '../toast';
 
 export class Event {
 	id: string;
@@ -53,22 +52,22 @@ export class Event {
 	}
 	async validate(): Promise<boolean> {
 		if (!this.title) {
-			myAlert(_('Please enter a title for the room.'));
+			alert(_('Please enter a title for the event.'));
 			return false;
 		}
 		if (!this.organization) {
-			myAlert(_('Please select an organization for the room.'));
+			alert(_('Please select an organization for the event.'));
 			return false;
 		}
 		if (!this.slug) {
-			myAlert(_('Please enter a slug for the room.'));
+			alert(_('Please enter a slug for the event.'));
 			return false;
 		}
 		const existingEventWithSlug = await axios
 			.get('/api/events?slug=' + this.slug + '&organiation=' + this.organization)
 			.then((res) => res.data);
 		if (existingEventWithSlug.length && existingEventWithSlug[0].id != this.id) {
-			myAlert(_('Slug already exists'));
+			alert(_('Slug already exists'));
 			return false;
 		}
 		return true;

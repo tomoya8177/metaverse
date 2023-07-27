@@ -89,7 +89,7 @@
 		modalOpen = false;
 	};
 	const onDeleteClicked = async () => {
-		if (!confirm(_('Are you sure you want to delete this room?'))) return;
+		if (!confirm('Are you sure you want to delete this event?')) return;
 		await editEvent.delete();
 
 		events = events.filter((event) => event.id != editEvent.id);

@@ -16,7 +16,6 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { cookies } from '$lib/frontend/cookies';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
-	import { myAlert } from '$lib/frontend/toast';
 	export let document: DocumentForAI;
 	let paginated: Mentor[] = [];
 	let organization: Organization;
@@ -31,11 +30,11 @@
 	let editMode: 'update' | 'create' = 'update';
 	const validate = (editMentor: Mentor) => {
 		if (!editMentor.userData || !editMentor.userData.nickname) {
-			myAlert(_('Nickname is required'));
+			alert('Nickname is required');
 			return false;
 		}
 		if (!editMentor.userData || !editMentor.userData.avatarURL) {
-			myAlert(_('Nickname is required'));
+			alert('Nickname is required');
 			return false;
 		}
 		return true;

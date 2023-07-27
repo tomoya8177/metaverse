@@ -1,6 +1,4 @@
 <script lang="ts">
-	import OrganizationEdit from '../../../Components/Organisms/OrganizationEdit.svelte';
-
 	import { EmptyOrganization } from '$lib/preset/EmptyOrganization';
 	import type { Organization } from '$lib/types/Organization';
 	import { onMount } from 'svelte';
@@ -9,9 +7,6 @@
 	import axios from 'axios';
 	import FilterPagination from '../../../Components/Organisms/FilterPagination.svelte';
 	import { _ } from '$lib/i18n';
-	import { checkSlugForOrganization } from '$lib/frontend/checkSlugForOrganization';
-	import { deleteOrganization } from '$lib/frontend/deleteOrganization';
-	import { myAlert } from '$lib/frontend/toast';
 	let editOrganization: Organization = EmptyOrganization;
 	let editMode: 'update' | 'create' = 'update';
 	let organizations: Organization[] = [];
@@ -20,18 +15,26 @@
 	onMount(async () => {
 		organizations = await axios.get('/api/organizations').then((res) => res.data);
 	});
+	const checkSlug = async (slug: string) => {
+		const result = await axios.get('/api/organizations?slug=' + slug).then((res) => res.data);
+		if (result.length && result[0].id != editOrganization.id) {
+			alert('Slug already exists');
+			return false;
+		}
+		return true;
+	};
 
 	const onCreateClicked = async () => {
-		if (!(await checkSlugForOrganization(editOrganization.slug, editOrganization))) return;
-		if (!editOrganization.title) return myAlert(_('Please enter a title'));
+		if (!(await checkSlug(editOrganization.slug))) return;
+		if (!editOrganization.title) return alert('Please enter a title');
 		const newOrg = await axios.post('/api/organizations', editOrganization).then((res) => res.data);
 		organizations = [...organizations, newOrg].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 		modalOpen = false;
 	};
 	const onUpdateClicked = async () => {
-		if (!(await checkSlugForOrganization(editOrganization.slug, editOrganization))) return;
+		if (!(await checkSlug(editOrganization.slug))) return;
 
-		if (!editOrganization.title) return myAlert(_('Please enter a title'));
+		if (!editOrganization.title) return alert('Please enter a title');
 		const updatedOrg = await axios
 			.put('/api/organizations/' + editOrganization.id, editOrganization)
 			.then((res) => res.data);
@@ -92,7 +95,13 @@
 	<dialog open>
 		<article>
 			<ModalCloseButton onClick={() => (modalOpen = false)} />
-			<OrganizationEdit {editOrganization} />
+			<InputWithLabel label={_('Organization Name')} bind:value={editOrganization.title} />
+			<InputWithLabel label={_('Slug')} bind:value={editOrganization.slug} />
+			<InputWithLabel
+				label={_('Allow Registration by Users')}
+				bind:value={editOrganization.allowRegistration}
+				type="switch"
+			/>
 			{#if editMode == 'create'}
 				<button
 					on:click={() => {
@@ -105,17 +114,6 @@
 						onUpdateClicked();
 					}}>{_('Update')}</button
 				>
-				<button
-					class="secondary"
-					on:click={async () => {
-						if (!confirm(_('Are you sure that you want to delete this organization?'))) return;
-						await deleteOrganization(editOrganization);
-						modalOpen = false;
-						organizations = organizations.filter((org) => org.id != editOrganization.id);
-					}}
-				>
-					{_('Delete')}
-				</button>
 			{/if}
 		</article>
 	</dialog>
