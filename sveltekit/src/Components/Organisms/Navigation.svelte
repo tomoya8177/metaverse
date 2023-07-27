@@ -17,6 +17,7 @@
 	import Login from './Login.svelte';
 	import type { Organization } from '$lib/types/Organization';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+	import { onMount } from 'svelte';
 	export let title: String = '';
 	const onLogoutClicked = () => {
 		videoChat.leave();
@@ -71,6 +72,16 @@
 	let chosenLanguage: string = cookies.get('locale') || 'en';
 	let loginOpen: boolean = false;
 	export let logoLinkTo: string = '#';
+	onMount(() => {
+		const themeImage = document.getElementById('theme-image');
+		const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+
+		if (prefersDarkScheme.matches) {
+			themeImage.src = '/images/logo.png';
+		} else {
+			themeImage.src = '/images/logo.jpg';
+		}
+	});
 </script>
 
 <nav>
@@ -82,7 +93,7 @@
 						{title}
 					</strong>
 				{:else}
-					<img src="/images/logo.jpg" style="width:10rem" />
+					<img id="theme-image" src="/images/logo.jpg" style="width:10rem" />
 				{/if}
 			</a>
 		</li>
