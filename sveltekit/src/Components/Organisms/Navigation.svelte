@@ -74,7 +74,7 @@
 </script>
 
 <nav>
-	<ul class="">
+	<ul class:hiddenInSmallScreen={$EventStore.id}>
 		<li>
 			<a href={logoLinkTo || '#'}>
 				{#if title}
