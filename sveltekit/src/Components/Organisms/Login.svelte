@@ -9,6 +9,8 @@
 	import type { Event } from '$lib/frontend/Classes/Event';
 	import { _ } from '$lib/i18n';
 	import { myAlert } from '$lib/frontend/toast';
+	import { nl2br } from '$lib/math/nl2br';
+	import { unescapeHTML } from '$lib/math/escapeHTML';
 	export let organization: string = '';
 	export let event: Event | null = null;
 	let loggedIn: boolean | null = null;
@@ -18,8 +20,15 @@
 	let wrongCode = false;
 	const login = async (email: string) => {
 		busy = true;
+		const emailBody = `${_('Hello.')}
+  ${_('Please return to the login page and input the verification code below:')}
+	[[code]]
+  `;
 		const res = await axios.post('/api/login/sendCode', {
-			email
+			email,
+			emailBody,
+			emailBodyHTML: nl2br(unescapeHTML(emailBody)),
+			subject: _('Confirmation Code')
 		});
 		busy = false;
 		verificationMode = true;
@@ -31,9 +40,7 @@
 			email,
 			code: verificationCode
 		});
-		console.log({
-			res
-		});
+
 		if (res.data.result) {
 			cookies.set('login', res.data.login, { expires: 30 });
 			location.reload();
@@ -63,7 +70,6 @@
 			const organiatinData = await axios
 				.get('/api/organizations/' + organization)
 				.then((res) => res.data[0]);
-			console.log({ event, organiatinData });
 			if (!organiatinData.allowRegistration && (event === null || !event.isPublic)) {
 				busy = false;
 				myAlert(_('This organization does not allow registration'));
@@ -88,22 +94,24 @@
 
 <dialog open>
 	<article>
-		<h3>Welcome!</h3>
+		<h3>{_('Welcome!')}</h3>
 		{#if !verificationMode}
-			<p class="p">Please enter your email address and click "Proceed"</p>
-			<InputWithLabel label="Email" bind:value={email} type="email" />
-			<button aria-busy={busy} class="button" on:click={onLoginClicked}>Proceed</button>
+			<p class="p">{_('Please enter your email address and click "Proceed"')}</p>
+			<InputWithLabel label={_('Email')} bind:value={email} type="email" />
+			<button aria-busy={busy} class="button" on:click={onLoginClicked}>{_('Proceed')}</button>
 		{:else}
 			<p class="p">
-				Please check your Email and copy the verification code here. Please understand the
-				verification email is likely to be sent to your spam box...
+				{_(
+					'Please check your Email and copy the verification code here. Please understand the verification email is likely to be sent to your spam box...'
+				)}
 			</p>
-			<InputWithLabel type="tel" label="Verification Code" bind:value={verificationCode} />
+			<InputWithLabel type="tel" label={_('Verification Code')} bind:value={verificationCode} />
 			{#if wrongCode}
-				<p class="p" style="color:red" transition:fade>Wrong code</p>
+				<p class="p" style="color:red" transition:fade>{_('Wrong code')}</p>
 			{/if}
-			<button aria-busy={busy} class="button" on:click={onVerifyClicked}>Verify</button>
+			<button aria-busy={busy} class="button" on:click={onVerifyClicked}>{_('Verify')}</button>
 			<a
+				href={'#'}
 				on:click={() => {
 					verificationMode = false;
 				}}>{_('Back')}</a

@@ -29,12 +29,14 @@
 		<div style="display:flex;gap:0.4rem;">
 			{#each PresetAvatars as avatar}
 				<div style="width:180px">
-					<img src={avatar.thumbnailURL} alt="" style="margin-bottom:0.4rem;" />
-					<button
+					<a
+						href={'#'}
 						on:click={() => {
 							url = avatar.url;
-						}}>{_('Select')}</button
+						}}
 					>
+						<img src={avatar.thumbnailURL} alt="" style="margin-bottom:0.4rem;" />
+					</a>
 				</div>
 			{/each}
 		</div>

@@ -1,16 +1,17 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
-	import 'aframe';
-	// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+	import { THREE, type ThreeLib } from 'aframe';
 	// import { Scene } from 'three/src/scenes/Scene.js';
 	// import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera.js';
 	// import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer.js';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-	export let url;
+	import type { Object3D } from 'three';
+	import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
+	export let url: string;
 
-	let scene;
-	let camera;
-	let renderer;
+	let scene: THREE.Scene;
+	let camera: THREE.PerspectiveCamera;
+	let renderer: THREE.WebGLRenderer;
 
 	onMount(() => {
 		scene = new THREE.Scene();
@@ -18,10 +19,9 @@
 		renderer = new THREE.WebGLRenderer({ antialias: true });
 
 		renderer.setClearColor(0x808080);
-		renderer.gammaFactor = 2.2;
 		const loader = new THREE.GLTFLoader();
-		loader.load('http://localhost:5173' + url, (gltf) => {
-			gltf.scene.traverse((child) => {
+		loader.load(url, (gltf: GLTF) => {
+			gltf.scene.traverse((child: any) => {
 				if (child.isMesh) {
 					child.material.gammaFactor = 1;
 				}

@@ -11,26 +11,7 @@ import nodemailer from 'nodemailer';
 
 export const POST = async ({ request }) => {
 	const body = await request.json();
-	let testAccount = await nodemailer.createTestAccount();
-	/*
-	let transporter = nodemailer.createTransport({
-		host: EtherealHost,
-		port: 587,
-		secure: false, // true for 465, false for other ports
-		auth: {
-			user: EtherealUser, // generated ethereal user
-			pass: EtherealPassword // generated ethereal password
-		}
-	});
-	let info = await transporter.sendMail({
-		from: EtherealUser, // sender address
-		to: body.to, // list of receivers
-		cc: body.cc,
-		subject: body.subject, // Subject line
-		text: body.body, // plain text body
-		html: body.body // html body
-	});
-	*/
+
 	let transporter2 = nodemailer.createTransport({
 		host: MailerHost,
 		port: 465,
@@ -40,14 +21,13 @@ export const POST = async ({ request }) => {
 			pass: MailerPassword
 		}
 	});
-	console.log('sending mail to', body.to);
 	let info2 = await transporter2.sendMail({
 		from: FROM_EMAIL, // sender address
 		to: body.to, // list of receivers
 		cc: body.cc,
 		subject: body.subject, // Subject line
 		text: body.body, // plain text body
-		html: body.body // html body
+		html: body.html // html body
 	});
 	console.log('Message sent: %s', info2.messageId);
 	// Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>

@@ -1,23 +1,17 @@
 <script lang="ts">
 	import AudioButton from './AudioButton.svelte';
-
-	import 'aframe';
-	import 'aframe-environment-component';
-	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, UserStore, PreviewPanelOpen } from '$lib/store';
-
-	import '$lib/AframeComponents';
+	import { EventStore, UserStore, PreviewPanelOpen, FocusObjectStore } from '$lib/store';
 	import Icon from '../Atom/Icon.svelte';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
-	import * as filestack from 'filestack-js';
 	import axios from 'axios';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
-	import AvatarPreview from '../Atom/AvatarPreview.svelte';
 	import { _ } from '$lib/i18n';
+	import { myAlert } from '$lib/frontend/toast';
+	import { EmptyObject } from '$lib/preset/EmptyObject';
 	export let textChatOpen = false;
 	export let waitingForAIAnswer: boolean;
 	const scrolToBottom = (element: Element) => {
@@ -51,7 +45,7 @@
 		document.removeEventListener('keydown', onKeyDown);
 	});
 
-	export let me: Me | null = null;
+	export let me: Me;
 	export let onMicClicked: () => void;
 	export let micActive: boolean;
 </script>
@@ -59,15 +53,14 @@
 {#if $EventStore.mentor}
 	<button
 		data-tooltip={_('Ask AI Mentor')}
-		aria-busy={waitingForAIAnswer}
 		style:background-color={micActive ? 'red' : ''}
 		class=""
 		style="border-radius:29px
-"
+		"
 		on:click={onMicClicked}
 	>
 		<Icon icon="mic" />
-		<span class="hiddenInSmallScreen">
+		<span aria-busy={waitingForAIAnswer} class="hiddenInSmallScreen">
 			{_('Ask AI Mentor')}
 		</span>
 	</button>
@@ -93,7 +86,7 @@
 					}
 				} catch (e) {
 					console.log(e);
-					alert(_(`Couldn't get access to the Camera`));
+					myAlert(_(`Couldn't get access to the Camera`));
 				}
 			}}
 		>
@@ -142,14 +135,21 @@
 					});
 				} catch (e) {
 					console.log(e);
-					alert(_(`Couldn't get access to the Screen`));
+					myAlert(_(`Couldn't get access to the Screen`));
 				}
 			}}
 		>
 			<Icon icon="stop_screen_share" />
 		</button>
 	{/if}
-	<button class="circle-button" on:click={() => ($PreviewPanelOpen = !$PreviewPanelOpen)}>
+	<button
+		data-tooltip={_('Preview Panel')}
+		class="circle-button"
+		on:click={() => {
+			$PreviewPanelOpen = !$PreviewPanelOpen;
+			FocusObjectStore.set(EmptyObject);
+		}}
+	>
 		<Icon icon="preview" />
 	</button>
 	<button
@@ -171,7 +171,7 @@
 							size: file.size,
 							editable: 1,
 							components: JSON.stringify({
-								position: me?.position,
+								position: me.position,
 								rotation: {
 									x: 0,
 									y: 0,
@@ -185,9 +185,9 @@
 							})
 						})
 						.then((res) => res.data);
-					console.log({ createdFile });
 					const object = new SharedObject(createdFile);
-					object.moveToMyFront(me?.position, me?.rotation);
+					if (!me) return console.error('me is null');
+					object.moveToMyFront(me.position, me.rotation);
 					object.locked = false;
 					sharedObjects.add(object);
 					videoChat.sendMessage({

@@ -110,5 +110,24 @@ export default {
 	'Nickname is required': 'ニックネームは必須です',
 	'Avatar must be selected': 'アバターを選択してください',
 	'Set Avatar': 'アバターを設定',
-	'Are you sure you want to delete this room?': 'このルームを削除してもよろしいですか？'
+	'Are you sure you want to delete this room?': 'このルームを削除してもよろしいですか？',
+	'Hello.': 'こんにちは。',
+	'Please return to the login page and input the verification code below:':
+		'ログインページに戻り、以下の確認コードを入力してください：',
+	'Confirmation Code': '確認コード',
+	'Welcome!': 'ようこそ！',
+	'Please enter your email address and click "Proceed"':
+		'メールアドレスを入力して「進む」をクリックしてください',
+	Proceed: '進む',
+	'Please check your Email and copy the verification code here. Please understand the verification email is likely to be sent to your spam box...':
+		'メールを確認し、確認コードをここにコピーしてください。確認メールはスパムボックスに送信される可能性があることをご理解ください...',
+	'Wrong code': '間違ったコード',
+	Verify: '確認',
+	'Verification Code': '確認コード',
+	'Convert To 360 Sphere': '360度球体に変換',
+	'Convert To Flat Image': '平面画像に変換',
+	Unock: 'ロック解除',
+	Lock: 'ロック',
+	'Add To Preview Pane': 'プレビューパネルに追加',
+	'Microphone access denied by the user.': 'ユーザーによってマイクへのアクセスが拒否されました。'
 };

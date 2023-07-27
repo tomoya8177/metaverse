@@ -5,8 +5,6 @@ class I18N {
 	data: any = {};
 	constructor() {
 		//get cookie
-		const cookie = document.cookie;
-
 		const cookieLocale = cookies.get('locale');
 		if (cookieLocale && cookieLocale != 'undefined') {
 			this.locale = cookies.get('locale');

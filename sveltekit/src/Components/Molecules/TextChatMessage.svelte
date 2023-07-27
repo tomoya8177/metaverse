@@ -20,6 +20,7 @@
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import type { User } from '$lib/frontend/Classes/User';
 	import { _ } from '$lib/i18n';
+	import { speechInterval } from '$lib/frontend/aiSpeaksOut';
 
 	export let message: Message;
 	export let onDelete: (id: string) => void;
@@ -55,6 +56,8 @@
 							title="Speaking"
 							on:click={() => {
 								speechSynthesis.cancel();
+								clearInterval(speechInterval);
+
 								message.isTalking = false;
 							}}
 						>

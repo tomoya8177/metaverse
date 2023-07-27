@@ -32,6 +32,8 @@
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import NippleControl from '../Atom/NippleControl.svelte';
+	import { EmptyObject } from '$lib/preset/EmptyObject';
+	import { myAlert } from '$lib/frontend/toast';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -82,7 +84,6 @@
 			axios.get('/mentor/' + $EventStore.mentor).then(async (res) => {
 				//this is okay to be delaied
 				virtuaMentorReady = true;
-				console.log('chat setup', res);
 				if (res.data.chain == null) {
 					//put action
 					const res = await axios.put('/mentor/' + $EventStore.mentor, {
@@ -126,11 +127,10 @@
 			//activate my mic and start audio to text
 			recognition = new VoiceRecognition((event) => {
 				if (event.error === 'not-allowed') {
-					alert('Microphone access denied by the user.');
+					myAlert(_('Microphone access denied by the user.'));
 					// Perform any necessary actions when access is denied
 				} else {
-					console.log('Error', event.error);
-					alert(event.error);
+					myAlert(event.error);
 					return;
 				}
 				onMicClicked();
@@ -189,11 +189,13 @@
 			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
 				<li>
 					<button
+						data-tooltip={$FocusObjectStore.locked ? _('Unock') : _('Lock')}
 						class:outline={$FocusObjectStore.locked}
 						class="circle-button"
 						small
 						on:click={() => {
 							$FocusObjectStore.locked = !$FocusObjectStore.locked;
+							if ($FocusObjectStore.locked) FocusObjectStore.set(EmptyObject);
 						}}
 					>
 						<Icon icon={$FocusObjectStore.locked ? 'lock' : 'lock_open'} />
@@ -202,6 +204,7 @@
 			{/if}
 			<li>
 				<button
+					data-tooltip={_('Add To Preview Pane')}
 					class="circle-button"
 					small
 					on:click={() => {
@@ -211,6 +214,7 @@
 						}
 						sharedObjects.get($FocusObjectStore.id)?.cloneToPreviewPane();
 						PreviewPanelOpen.set(true);
+						FocusObjectStore.set(EmptyObject);
 					}}
 				>
 					<Icon icon="magnify_fullscreen" />
