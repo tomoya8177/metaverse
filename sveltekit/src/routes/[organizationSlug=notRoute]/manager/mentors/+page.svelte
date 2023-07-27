@@ -1,4 +1,6 @@
 <script lang="ts">
+	import MentorEdit from '../../../../Components/Organisms/MentorEdit.svelte';
+
 	import AvatarThumbnail from '../../../../Components/Atom/AvatarThumbnail.svelte';
 
 	import DocumentForAIRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
@@ -25,6 +27,7 @@
 	import type { PageData } from './$types';
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
+	import { validateMentorData } from '$lib/frontend/validateMentorData';
 	export let data: PageData;
 	let paginated: Mentor[] = [];
 	export let organization: Organization = data.organization;
@@ -63,20 +66,9 @@
 	let newMentorModalOpen = false;
 	let editMentor: Mentor = EmptyMentor;
 	let editMode: 'update' | 'create' = 'update';
-	const validate = (editMentor: Mentor) => {
-		if (!editMentor.userData || !editMentor.userData.nickname) {
-			alert('Nickname is required');
-			return false;
-		}
-		if (!editMentor.userData || !editMentor.userData.avatarURL) {
-			alert('Nickname is required');
-			return false;
-		}
-		return true;
-	};
 
 	const onCreateClicked = async () => {
-		if (!validate(editMentor)) return;
+		if (!validateMentorData(editMentor)) return;
 		busy = true;
 		const createdUser = await axios.post('/api/users', editMentor.userData).then((res) => res.data);
 		users = [...users, createdUser];
@@ -91,7 +83,7 @@
 		newMentorModalOpen = false;
 	};
 	const onUpdateClicked = async () => {
-		if (!validate(editMentor)) return;
+		if (!validateMentorData(editMentor)) return;
 		if (!editMentor.userData?.id) return;
 		busy = true;
 		const updatedUser = await axios
@@ -128,6 +120,7 @@
 		await axios.delete('/api/users/' + editMentor.userData.id).then((res) => res.data);
 		await axios.delete('/api/documentsForAI?mentor=' + editMentor.id).then((res) => res.data);
 		newMentorModalOpen = false;
+		mentors = mentors.filter((mentor) => mentor.id != editMentor.id);
 	};
 </script>
 
@@ -189,50 +182,7 @@
 		<article>
 			<ModalCloseButton onClick={() => (newMentorModalOpen = false)} />
 
-			<InputWithLabel label={_('Nickname')} bind:value={editMentor.userData.nickname} />
-			<AvatarSelectPane bind:url={editMentor.userData.avatarURL} />
-			<InputWithLabel
-				label={_('Introduction')}
-				bind:value={editMentor.userData.description}
-				type="textarea"
-			/>
-			<InputWithLabel label={_('Prompt')} bind:value={editMentor.prompt} type="textarea" />
-			<div>{_('Brain Documents')}</div>
-			{#each editMentor.documents || [] as document}
-				<DocumentForAIRow
-					{document}
-					onDeleteDone={() => {
-						editMentor.documents = editMentor.documents.filter((doc) => doc.id != document.id);
-					}}
-				/>
-			{/each}
-			<label for="file">{_('Choose Files')}</label>
-			<input
-				type="file"
-				accept=".pdf,.txt,.docx"
-				multiple
-				on:change={async (e) => {
-					//get files from event
-					const files = e.target.files;
-					const res = await uploader.uploadLocally(files);
-					const promises = res.data.map(async (file) => {
-						const res = await axios.post('/api/documentsForAI', {
-							filename: file.filename,
-							title: file.title,
-							type: file.type,
-							mentor: editMentor.id
-						});
-						return res.data;
-					});
-					const fileDatas = await Promise.all(promises);
-					documents = [...documents, ...fileDatas];
-					editMentor.documents = [...editMentor.documents, ...fileDatas];
-					e.target.value = '';
-				}}
-			/>
-			{#if progress > 0}
-				<progress max={100} value={progress} />
-			{/if}
+			<MentorEdit bind:editMentor />
 			{#if editMentor.documents}
 				<small> {_("VirtuaMentor's memory will be refreshed")} </small>
 			{/if}

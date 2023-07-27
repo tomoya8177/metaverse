@@ -18,7 +18,7 @@
 		toast(_('Updated'));
 	};
 	const onDeleteClicked = async () => {
-		if (!confirm(_('Are you sure to delete this event?'))) return;
+		if (!confirm(_('Are you sure to delete this room?'))) return;
 		deleteBusy = true;
 		await event.delete();
 		deleteBusy = false;

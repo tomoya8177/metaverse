@@ -9,7 +9,8 @@ export const UserStore = writable({
 });
 export const Toast = writable({
 	open: false,
-	message: ''
+	message: '',
+	position: 'bottom'
 });
 export const RigStore = writable({
 	position: {
