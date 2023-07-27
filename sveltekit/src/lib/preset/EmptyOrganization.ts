@@ -1,5 +1,8 @@
-export const EmptyOrganization = {
+import type { Organization } from '$lib/types/Organization';
 
-  id:"",
-  title:"",
-}
+export const EmptyOrganization: Organization = {
+	id: '',
+	title: '',
+	slug: '',
+	allowRegistration: false
+};

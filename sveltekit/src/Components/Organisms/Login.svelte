@@ -7,6 +7,8 @@
 	import { cookies } from '$lib/frontend/cookies';
 	import { fade } from 'svelte/transition';
 	import type { Event } from '$lib/frontend/Classes/Event';
+	import { _ } from '$lib/i18n';
+	import { myAlert } from '$lib/frontend/toast';
 	export let organization: string = '';
 	export let event: Event | null = null;
 	let loggedIn: boolean | null = null;
@@ -46,7 +48,7 @@
 	};
 	const onLoginClicked = async () => {
 		if (!email) {
-			alert('Please enter your email address');
+			myAlert(_('Please enter your email address'));
 			return;
 		}
 		busy = true;
@@ -60,11 +62,11 @@
 			//register if organiatin allow to do so
 			const organiatinData = await axios
 				.get('/api/organizations/' + organization)
-				.then((res) => res.data);
-			console.log({ event });
-			if (!organiatinData.allowRegister && (event === null || !event.isPublic)) {
+				.then((res) => res.data[0]);
+			console.log({ event, organiatinData });
+			if (!organiatinData.allowRegistration && (event === null || !event.isPublic)) {
 				busy = false;
-				alert('This organization does not allow registration');
+				myAlert(_('This organization does not allow registration'));
 				return;
 			}
 			if (event !== null && event.isPublic) {
@@ -104,7 +106,7 @@
 			<a
 				on:click={() => {
 					verificationMode = false;
-				}}>Back</a
+				}}>{_('Back')}</a
 			>
 		{/if}
 	</article>

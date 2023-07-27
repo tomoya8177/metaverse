@@ -80,7 +80,10 @@
 	const onDeleteClicked = async () => {
 		if (!confirm(_('Are you sure that you want to delete this user?'))) return;
 		deleteBusy = true;
-		await new User(editUser).delete();
+		const userRole: UserRole = await axios
+			.get(`/api/userRoles?user=${editUser.id}&organization=${organization.id}`)
+			.then((res) => res.data[0]);
+		await new User(editUser).delete(userRole.id);
 		deleteBusy = false;
 		users = users.filter((user) => user.id != editUser.id);
 		newUserModalOpen = false;
