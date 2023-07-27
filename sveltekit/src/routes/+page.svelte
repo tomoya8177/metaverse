@@ -9,11 +9,6 @@
 <Navigation />
 <div class="container">
 	<section>
-		<h1>
-			{_('VirtuaIntel')}
-		</h1>
-	</section>
-	<section>
 		<a role="button" href={'/gnv/firsttest'}>
 			<Icon icon="login" />
 

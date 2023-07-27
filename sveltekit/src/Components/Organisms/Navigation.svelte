@@ -17,7 +17,7 @@
 	import Login from './Login.svelte';
 	import type { Organization } from '$lib/types/Organization';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
-	export let title: String = 'VirtuaIntel';
+	export let title: String = '';
 	const onLogoutClicked = () => {
 		videoChat.leave();
 		EventStore.set(EmptyEvent);
@@ -77,9 +77,13 @@
 	<ul class="hiddenInSmallScreen">
 		<li>
 			<a href={logoLinkTo || '#'}>
-				<strong>
-					{title}
-				</strong>
+				{#if title}
+					<strong>
+						{title}
+					</strong>
+				{:else}
+					<img src="/images/logo.jpg" style="width:20rem" />
+				{/if}
 			</a>
 		</li>
 	</ul>

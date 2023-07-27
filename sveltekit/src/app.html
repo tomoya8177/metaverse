@@ -60,37 +60,38 @@
 			.circle-button[xsmall] > span {
 				margin-left: 0rem;
 			}
-			/* Light-green Light scheme (Default) */
+
+			/* Blue Light scheme (Default) */
 			/* Can be forced with data-theme="light" */
 			[data-theme='light'],
 			:root:not([data-theme='dark']) {
-				--primary: #7cb342;
-				--primary-hover: #689f38;
-				--primary-focus: rgba(124, 179, 66, 0.125);
+				--primary: #1e88e5;
+				--primary-hover: #1976d2;
+				--primary-focus: rgba(30, 136, 229, 0.125);
 				--primary-inverse: #fff;
 			}
 
-			/* Light-green Dark scheme (Auto) */
+			/* Blue Dark scheme (Auto) */
 			/* Automatically enabled if user has Dark mode enabled */
 			@media only screen and (prefers-color-scheme: dark) {
 				:root:not([data-theme]) {
-					--primary: #7cb342;
-					--primary-hover: #8bc34a;
-					--primary-focus: rgba(124, 179, 66, 0.25);
+					--primary: #1e88e5;
+					--primary-hover: #2196f3;
+					--primary-focus: rgba(30, 136, 229, 0.25);
 					--primary-inverse: #fff;
 				}
 			}
 
-			/* Light-green Dark scheme (Forced) */
+			/* Blue Dark scheme (Forced) */
 			/* Enabled if forced with data-theme="dark" */
 			[data-theme='dark'] {
-				--primary: #7cb342;
-				--primary-hover: #8bc34a;
-				--primary-focus: rgba(124, 179, 66, 0.25);
+				--primary: #1e88e5;
+				--primary-hover: #2196f3;
+				--primary-focus: rgba(30, 136, 229, 0.25);
 				--primary-inverse: #fff;
 			}
 
-			/* Light-green (Common styles) */
+			/* Blue (Common styles) */
 			:root {
 				--form-element-active-border-color: var(--primary);
 				--form-element-focus-color: var(--primary-focus);

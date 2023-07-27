@@ -179,7 +179,7 @@
 		<ul />
 		<ul
 			style="
-	border:solid 1px lightgreen;
+	border:solid 1px #1e88e5;
 	border-radius:0.6rem;
 	height:3rem;
 	background-color:rgba(0,0,0,0.3)
