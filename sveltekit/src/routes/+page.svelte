@@ -8,7 +8,7 @@
 
 <Navigation />
 <div class="container">
-	<section>
+	<section style="margin-top:6rem">
 		<a role="button" href={'/gnv/firsttest'}>
 			<Icon icon="login" />
 

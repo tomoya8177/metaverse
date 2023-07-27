@@ -74,7 +74,7 @@
 </script>
 
 <nav>
-	<ul class="hiddenInSmallScreen">
+	<ul class="">
 		<li>
 			<a href={logoLinkTo || '#'}>
 				{#if title}
@@ -82,7 +82,7 @@
 						{title}
 					</strong>
 				{:else}
-					<img src="/images/logo.jpg" style="width:20rem" />
+					<img src="/images/logo.jpg" style="width:10rem" />
 				{/if}
 			</a>
 		</li>
