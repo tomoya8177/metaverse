@@ -1,10 +1,7 @@
 <script lang="ts">
-	import ObjectEditor from './ObjectEditor.svelte';
-
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
-
 	import { cookies } from '$lib/frontend/cookies';
-	import { EventStore, FocusObjectStore, PreviewPanelOpen, UserStore } from '$lib/store';
+	import { EventStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -12,11 +9,10 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
-	import { Users, UsersStore } from '$lib/frontend/Classes/Users';
+	import { UsersStore } from '$lib/frontend/Classes/Users';
 	import { _, lang } from '$lib/i18n';
 	import Login from './Login.svelte';
 	import type { Organization } from '$lib/types/Organization';
-	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { onMount } from 'svelte';
 	export let title: String = '';
 	const onLogoutClicked = () => {
@@ -74,6 +70,7 @@
 	export let logoLinkTo: string = '#';
 	onMount(() => {
 		const themeImage = document.getElementById('theme-image');
+		if (!themeImage) return;
 		const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
 		if (prefersDarkScheme.matches) {
