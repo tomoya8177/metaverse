@@ -69,7 +69,7 @@
 	let loginOpen: boolean = false;
 	export let logoLinkTo: string = '#';
 	onMount(() => {
-		const themeImage = document.getElementById('theme-image');
+		const themeImage = document.getElementById('theme-image') as HTMLImageElement;
 		if (!themeImage) return;
 		const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -90,7 +90,7 @@
 						{title}
 					</strong>
 				{:else}
-					<img id="theme-image" src="/images/logo.jpg" style="width:10rem" />
+					<img alt="logo" id="theme-image" src="/images/logo.jpg" style="width:10rem" />
 				{/if}
 			</a>
 		</li>

@@ -17,6 +17,7 @@
 	import type { Mentor } from '$lib/types/Mentor';
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
+	import Navigation from '../../Components/Organisms/Navigation.svelte';
 	export let data: PageData;
 	console.log(data);
 	let loggedIn = data.loggedIn;
@@ -38,6 +39,8 @@
 	});
 	let busy = false;
 </script>
+
+<Navigation />
 
 {#if !loggedIn}
 	<Login />
