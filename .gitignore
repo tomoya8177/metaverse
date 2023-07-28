@@ -9,3 +9,5 @@ sveltekit/vite.config.ts.timestamp-*
 sveltekit/src/lib/config.ts
 sveltekit/vite.config.ts
 sveltekit/vite.config.ts
+deploy.sh
+```
