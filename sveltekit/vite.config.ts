@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
 	plugins: [sveltekit()],
 	preview: {
-		port: 5173,
+		port: 5173, //5173 for productino
 		strictPort: false
 	},
 	test: {

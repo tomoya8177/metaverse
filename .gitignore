@@ -7,3 +7,5 @@ sveltekit/package
 sveltekit/vite.config.js.timestamp-*
 sveltekit/vite.config.ts.timestamp-*
 sveltekit/src/lib/config.ts
+sveltekit/vite.config.ts
+sveltekit/vite.config.ts
