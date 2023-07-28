@@ -15,10 +15,10 @@
 	</div>
 {/if}
 {#if $page.url.host.includes('dev')}
-	DEV
+	DEV Environment
 {/if}
 {#if $page.url.host.includes('localhost')}
-	LOCAL
+	LOCAL Environment
 {/if}
 
 <style>
