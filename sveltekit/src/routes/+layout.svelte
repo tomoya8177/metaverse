@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import { Toast } from '$lib/store';
 	import { fade } from 'svelte/transition';
 </script>
@@ -12,6 +13,12 @@
 	>
 		{$Toast.message}
 	</div>
+{/if}
+{#if $page.url.host.includes('dev')}
+	DEV
+{/if}
+{#if $page.url.host.includes('localhost')}
+	LOCAL
 {/if}
 
 <style>
