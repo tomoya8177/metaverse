@@ -76,7 +76,7 @@ export const POST = async ({ request, params }): Promise<Response> => {
 
 	return new Response(
 		JSON.stringify({
-			path: filePath
+			path: 'http://localhost:3000' + filePath
 		})
 	);
 };
