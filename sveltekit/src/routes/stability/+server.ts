@@ -3,6 +3,7 @@ import axios from 'axios';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import { writeFile } from 'fs/promises';
+import { PUBLIC_FileStackAPIKey } from '$env/static/public';
 
 interface GenerationResponse {
 	artifacts: Array<{
@@ -48,13 +49,33 @@ export const POST = async ({ request, params }): Promise<Response> => {
 	const responseJSON = (await response.json()) as GenerationResponse;
 
 	const filePath = `/out/${crypto.randomUUID()}.png`;
-	responseJSON.artifacts.forEach((image, index) => {
-		//console.log({ image });
-		const buffer = Buffer.from(image.base64, 'base64');
-		//const result = await writeFile(filePath, buffer);
-		fs.writeFileSync('./static' + filePath, buffer);
-	});
+	const image = responseJSON.artifacts[0];
+
+	const buffer = Buffer.from(image.base64, 'base64');
+	const result = await writeFile('./static' + filePath, buffer);
+
+	// const formData = new FormData();
+	// formData.append('file', image.base64);
+
+	// const res = await axios.post(
+	// 	'https://www.filestackapi.com/api/store/S3?key=' + PUBLIC_FileStackAPIKey,
+	// 	formData,
+	// 	{
+	// 		headers: {
+	// 			'Content-Type': 'multipart/form-data'
+	// 		}
+	// 	}
+	// );
+
+	// console.log(res.data);
+
+	//const result = await writeFile(filePath, buffer);
+	//fs.writeFileSync('./static' + filePath, buffer);
 	console.log({ path: filePath });
 
-	return new Response(JSON.stringify({ path: filePath }));
+	return new Response(
+		JSON.stringify({
+			path: filePath
+		})
+	);
 };
