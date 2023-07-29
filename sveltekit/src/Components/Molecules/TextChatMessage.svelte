@@ -68,10 +68,14 @@
 			{/if}
 			{#if message.type == 'attachment'}
 				<a href={message.url} target="_blank">
-					{message.body}
-					{#if message.url?.includes('.png')}
-						<br />
-						<img src={message.url} style="max-width:100%;max-height:10rem" alt={message.body} />
+					{#if message.url?.includes('.png') || message.url?.includes('.jpg') || message.body.toLowerCase() == 'generated image'}
+						<img
+							src={message.url}
+							style="max-width:100%;max-height:10rem; border-radius:0.2rem"
+							alt={message.body}
+						/>
+					{:else}
+						{message.body}
 					{/if}
 				</a>
 			{:else}

@@ -87,6 +87,8 @@
 			const response = await axios.post('/stability', {
 				prompt: newMessageBody
 			});
+			newMessageBody = '';
+
 			console.log(response.data);
 			const mentor = await axios
 				.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
@@ -225,8 +227,8 @@
 	{/if}
 </div>
 <div style="display:flex;gap:0.4rem">
-	<div style="flex:1" id="chat-textarea">
-		<InputWithLabel label="" type="textarea" bind:value={newMessageBody} />
+	<div style="flex:1;" id="chat-textarea">
+		<textarea bind:value={newMessageBody} />
 	</div>
 	<div>
 		<button aria-busy={busy} style="margin-bottom:0rem" on:click={onMessageSendClicked}
@@ -236,6 +238,9 @@
 </div>
 
 <style>
+	#chat-textarea textarea {
+		color: white;
+	}
 	.pill-icon-button {
 		height: 2rem;
 		border-radius: 1rem;

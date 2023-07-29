@@ -49,34 +49,31 @@ export const POST = async ({ request, params }): Promise<Response> => {
 
 	const responseJSON = (await response.json()) as GenerationResponse;
 
-	const filePath = `/out/${crypto.randomUUID()}.png`;
 	const image = responseJSON.artifacts[0];
-
 	const buffer = Buffer.from(image.base64, 'base64');
-	const result = await writeFile('../userFiles/public' + filePath, buffer);
+	const blob = new Blob([buffer], { type: 'image/png' }); // Convert Buffer to Blob
 
-	// const formData = new FormData();
-	// formData.append('file', image.base64);
+	const formData = new FormData();
+	formData.append('fileUpload', blob, { filename: 'image.png' });
 
-	// const res = await axios.post(
-	// 	'https://www.filestackapi.com/api/store/S3?key=' + PUBLIC_FileStackAPIKey,
-	// 	formData,
-	// 	{
-	// 		headers: {
-	// 			'Content-Type': 'multipart/form-data'
-	// 		}
-	// 	}
-	// );
-
-	// console.log(res.data);
+	const res = await axios.post(
+		'https://www.filestackapi.com/api/store/S3?key=' + PUBLIC_FileStackAPIKey,
+		formData,
+		{
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			}
+		}
+	);
+	console.log(res);
 
 	//const result = await writeFile(filePath, buffer);
 	//fs.writeFileSync('./static' + filePath, buffer);
-	console.log({ path: 'http://localhost:3000' + filePath });
+	// console.log({ path: 'https://mymetaverseportal.net' + filePath });
 
 	return new Response(
 		JSON.stringify({
-			path: 'http://localhost:3000' + filePath
+			path: res.data.url
 		})
 	);
 };
