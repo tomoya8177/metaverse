@@ -2,7 +2,7 @@ import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
 import { ItemsInPreview, type xyz } from '$lib/store';
 import * as THREE from 'three';
-type shortType = 'image' | 'video' | 'model';
+type shortType = 'image' | 'video' | 'model' | 'screen';
 
 export class SharedObject {
 	id: string;
@@ -198,20 +198,6 @@ export class SharedObject {
 			`${eyePosition.x + vector.x} ${eyePosition.y + 1.65} ${eyePosition.z + vector.z}`
 		);
 	}
-	cloneToPreviewPane = () => {
-		this.inPreviewPane = true;
-		ItemsInPreview.update((items) => [...items, this]);
-		setTimeout(() => {
-			if (!this.el) return;
-			let asset;
-			asset = this.el.components.material.data.src;
-			const li = document.getElementById(this.id + '_preview');
-			const clonedAsset = asset.cloneNode();
-			li?.appendChild(clonedAsset);
-			if (this.type.includes('video')) {
-				clonedAsset.controls = true;
-				clonedAsset.muted = true;
-			}
-		}, 100);
-	};
+
+	//this is not working why?? @copilot
 }

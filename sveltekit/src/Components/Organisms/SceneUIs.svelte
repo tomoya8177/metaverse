@@ -172,6 +172,22 @@
 			.then((res) => res.data);
 		return createdMessage;
 	};
+	let filteredItemsInPreview: SharedObject[] = [];
+	// const refreshPreviewPane = (ifOpen: boolean) => {
+	// 	filteredItemsInPreview = [];
+	// 	if (!ifOpen) return;
+	// 	sharedObjects.items.forEach((item) => {
+	// 		setTimeout(() => {
+	// 			//check if the item has the function
+	// 			if (!item.appendAssetToPreviewPane) return;
+	// 			item.appendAssetToPreviewPane();
+	// 		}, 100);
+	// 		filteredItemsInPreview.push(item);
+	// 	});
+	// 	filteredItemsInPreview = filteredItemsInPreview;
+	// 	console.log({ filteredItemsInPreview });
+	// };
+	// $: refreshPreviewPane($PreviewPanelOpen);
 </script>
 
 {#if $FocusObjectStore.id}
@@ -212,7 +228,11 @@
 							PreviewPanelOpen.set(true);
 							return;
 						}
-						sharedObjects.get($FocusObjectStore.id)?.cloneToPreviewPane();
+						$FocusObjectStore.inPreviewPane = true;
+						ItemsInPreview.update((itemsInPreview) => {
+							return [...itemsInPreview, $FocusObjectStore];
+						});
+						//
 						PreviewPanelOpen.set(true);
 						FocusObjectStore.set(EmptyObject);
 					}}
@@ -224,8 +244,7 @@
 		<ul />
 	</nav>
 {/if}
-
-<div class="filePreviewContainer" style:display={$PreviewPanelOpen ? 'block' : 'none'}>
+<div class="filePreviewContainer" class:hidden={!$PreviewPanelOpen}>
 	<div style="display:flex">
 		<div style="flex:1">
 			{_('Preview Panel')}
@@ -242,7 +261,12 @@
 		</div>
 	</div>
 	<ul id="filePreview">
-		{#each $ItemsInPreview as object}
+		{#each $ItemsInPreview.filter((item) => item.shortType == 'screen') as object}
+			<li class="previewPaneItem" id={object.id + '_preview'}>
+				<div class="content" />
+			</li>
+		{/each}
+		{#each $ItemsInPreview.filter((item) => item.shortType != 'screen') as object}
 			<li class="previewPaneItem" id={object.id + '_preview'}>
 				{#if object.title}
 					<div style="position:absolute; top:0px;right:0px;z-index:2;">
@@ -255,7 +279,8 @@
 							on:click={() => {
 								object.inPreviewPane = false;
 								ItemsInPreview.update((items) => {
-									return items.filter((item) => item.id !== object.id);
+									console.log({ items });
+									return items.filter((item) => item.inPreviewPane);
 								});
 							}}
 						>
@@ -263,6 +288,15 @@
 						</a>
 					</div>
 				{/if}
+				<div class="content">
+					{#if object.shortType == 'image'}
+						<img src={object.url} alt={object.title} />
+					{:else if object.shortType == 'video'}
+						<video src={object.url} controls muted />
+					{:else if object.shortType == 'screen'}
+						<!--none-->
+					{/if}
+				</div>
 			</li>
 		{/each}
 	</ul>
@@ -291,15 +325,10 @@
 <div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>
 	<div id="myCameraPreview" />
 </div>
-<div class="nippleController">
-	<!-- <NippleControl /> -->
-</div>
 
 <style>
-	.nippleController {
-		position: absolute;
-		bottom: 6rem;
-		left: 1rem;
+	.hidden {
+		display: none;
 	}
 	.objectEditorNav {
 		position: absolute;

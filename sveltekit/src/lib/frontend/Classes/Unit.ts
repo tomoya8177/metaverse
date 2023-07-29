@@ -1,5 +1,5 @@
 import { unescapeHTML } from '$lib/math/escapeHTML';
-import { EventStore, UserStore, type xyz } from '$lib/store';
+import { EventStore, ItemsInPreview, UserStore, type xyz } from '$lib/store';
 import type { Entity } from 'aframe';
 import type { LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
 import { videoChat } from './VideoChat';
@@ -11,6 +11,7 @@ import { degree2radian } from '$lib/math/degree2radians';
 import { sharedObjects } from './SharedObjects';
 import { pollAudioLevel } from '../pollAudioLevel';
 import * as THREE from 'three';
+import { SharedObject } from './SharedObject';
 let event: Event;
 EventStore.subscribe((value) => {
 	event = value;
@@ -124,14 +125,17 @@ export class Unit {
 	}
 	async showScreen(track: RemoteVideoTrack | LocalVideoTrack, sid: string): Promise<void> {
 		const video = document.createElement('a-plane');
-		const shredObject = {
+		const sharedObject = {
 			id: 'screenPlaneOf' + this.userId,
 			locked: this.userId != videoChat.userId,
 			title: 'Shared Screen',
 			type: 'screen',
 			el: video
 		};
-		sharedObjects.add(shredObject);
+		console.log({ sharedObject });
+		sharedObjects.add(sharedObject);
+		sharedObject.inPreviewPane = true;
+
 		video.setAttribute('id', 'screenPlaneOf' + this.userId);
 		video.setAttribute('rotation', `0 ${this.rotation.y} 0`);
 		video.setAttribute('material', 'src:#' + sid + ';shader: flat; side:double');

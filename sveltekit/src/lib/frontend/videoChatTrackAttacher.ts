@@ -32,11 +32,16 @@ export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTra
 				const newItem = EmptyObject;
 				newItem.id = track.sid;
 				newItem.type = 'screen';
+				newItem.shortType = 'screen';
+				newItem.inPreviewPane = true;
 
 				return [...items, newItem];
 			});
 			setTimeout(() => {
-				document.getElementById(track.sid + '_preview')?.appendChild(clonedEl);
+				document
+					.getElementById(track.sid + '_preview')
+					?.querySelector('.content')
+					?.appendChild(clonedEl);
 			});
 			if (!unit) return;
 			unit.showScreen(track as RemoteVideoTrack, track.sid);
