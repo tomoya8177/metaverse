@@ -166,6 +166,7 @@
 					</ul>
 				</details>
 			</li>
+			<li>Version:0.0.1</li>
 		{:else}
 			<a
 				href={'#'}
