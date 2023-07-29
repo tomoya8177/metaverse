@@ -82,6 +82,28 @@
 		});
 		await sendChatMessage(newMessage);
 		busy = false;
+		if (newMessageGenerateImage) {
+			waitingForAIAnswer = true;
+			const response = await axios.post('/stability', {
+				prompt: newMessageBody
+			});
+			newMessageBody = '';
+
+			console.log(response.data);
+			const mentor = await axios
+				.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
+				.then((res) => res.data);
+			const message = new Message({
+				event: $EventStore.id,
+				type: 'attachment',
+				user: mentor.user,
+				body: 'generated image',
+				url: response.data.path
+			});
+			const createdMessage = await sendChatMessage(message);
+			waitingForAIAnswer = false;
+			return;
+		}
 		if (newMessageBody.includes('@Mentor') || forceMentor) {
 			console.log({ newMessage });
 			//io.emit('question', newMessageBody);
@@ -118,6 +140,7 @@
 	export let onMicClicked: () => void = () => {};
 	let recognition;
 	export let micActive: boolean = false;
+	let newMessageGenerateImage = false;
 </script>
 
 <div
@@ -177,22 +200,35 @@
 		</div>
 	{/if}
 	<div style="text-align:right;flex:1">
-		{#if forceMentor || $EventStore.mentor}
+		<small>
+			{#if forceMentor || $EventStore.mentor}
+				<InputWithLabel
+					label="@Mentor"
+					disabled={!virtuaMentorReady || forceMentor}
+					type="switch"
+					bind:value={newMessageForMentor}
+				/>
+			{/if}
+		</small>
+	</div>
+	<div>
+		<small>
 			<InputWithLabel
-				label="@Mentor"
-				disabled={!virtuaMentorReady || forceMentor}
+				label={_('Generate Image')}
 				type="switch"
-				bind:value={newMessageForMentor}
+				bind:value={newMessageGenerateImage}
 			/>
-		{/if}
+		</small>
 	</div>
 	{#if !forceNoPin}
-		<InputWithLabel label={_('Pinned')} type="switch" bind:value={newMessagePinned} />
+		<small>
+			<InputWithLabel label={_('Pinned')} type="switch" bind:value={newMessagePinned} />
+		</small>
 	{/if}
 </div>
 <div style="display:flex;gap:0.4rem">
-	<div style="flex:1" id="chat-textarea">
-		<InputWithLabel label="" type="textarea" bind:value={newMessageBody} />
+	<div style="flex:1;" id="chat-textarea">
+		<textarea bind:value={newMessageBody} />
 	</div>
 	<div>
 		<button aria-busy={busy} style="margin-bottom:0rem" on:click={onMessageSendClicked}
@@ -202,6 +238,9 @@
 </div>
 
 <style>
+	#chat-textarea textarea {
+		color: white;
+	}
 	.pill-icon-button {
 		height: 2rem;
 		border-radius: 1rem;

@@ -10,4 +10,6 @@ sveltekit/src/lib/config.ts
 sveltekit/vite.config.ts
 sveltekit/vite.config.ts
 deploy.sh
-```
+sveltekit/static/out/*
+sveltekit/static/documentsForI/*
+userFiles/node_modules
