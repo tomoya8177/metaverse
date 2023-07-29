@@ -15,6 +15,7 @@ interface GenerationResponse {
 const engineId = 'stable-diffusion-xl-1024-v1-0';
 const apiHost = 'https://api.stability.ai';
 const apiKey = STABILITY_AI_API_KEY;
+
 export const POST = async ({ request, params }): Promise<Response> => {
 	const body = await request.json();
 	if (!apiKey) throw new Error('Missing Stability API key.');
@@ -52,7 +53,7 @@ export const POST = async ({ request, params }): Promise<Response> => {
 	const image = responseJSON.artifacts[0];
 
 	const buffer = Buffer.from(image.base64, 'base64');
-	const result = await writeFile('./static' + filePath, buffer);
+	const result = await writeFile('../userFiles/public' + filePath, buffer);
 
 	// const formData = new FormData();
 	// formData.append('file', image.base64);
@@ -71,7 +72,7 @@ export const POST = async ({ request, params }): Promise<Response> => {
 
 	//const result = await writeFile(filePath, buffer);
 	//fs.writeFileSync('./static' + filePath, buffer);
-	console.log({ path: filePath });
+	console.log({ path: 'http://localhost:3000' + filePath });
 
 	return new Response(
 		JSON.stringify({
