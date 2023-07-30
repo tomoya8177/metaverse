@@ -31,7 +31,7 @@
 						mentor.userData.nickname
 					}. You are instructed as following: ${
 						mentor.prompt
-					}. Then invite them to enter the sample metaverse room. User's prefered language is ${cookies.get(
+					}, but use the user's prefered language. Then invite them to enter the sample metaverse room. User's prefered language is ${cookies.get(
 						'locale'
 					)}, so answer in that language if that is specified.`
 				}
@@ -47,7 +47,7 @@
 						'locale'
 					)}, so answer in that language if that is specified. You are instructed as following: ${
 						mentor.prompt
-					}.`
+					}, but use the user's prefered language.`
 				}
 			]
 		});
