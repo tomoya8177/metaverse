@@ -23,28 +23,35 @@
 		mentor = mentors[Math.floor(Math.random() * mentors.length)];
 		if (!mentor) return;
 		mentor.userData = await axios.get('/api/users/' + mentor?.user).then((res) => res.data);
-		const getResult = await axios.get('/mentor/' + mentor.id);
-		console.log(getResult);
-		await axios.put('/mentor/' + mentor.id, {
-			eventId: undefined
-		});
-		const response = await axios.post('/mentor/' + mentor.id, {
-			eventId: undefined,
-			body: `Create a greeting paragraph to the user visiting in less than 100 words. Start with saying Hello, and mention your name. then invite them to enter the sample metaverse room. User's prefered language is ${cookies.get(
-				'locale'
-			)}, so answer in that language if that is specified.`,
-			user: $UserStore.id || 'anonymous'
+		const response = await axios.post('/mentor', {
+			messages: [
+				{
+					role: 'system',
+					content: `Greet the user visiting in less than 100 words. Start with saying Hello, and mention your name that is ${
+						mentor.userData.nickname
+					}. You are instructed as following: ${
+						mentor.prompt
+					}. Then invite them to enter the sample metaverse room. User's prefered language is ${cookies.get(
+						'locale'
+					)}, so answer in that language if that is specified.`
+				}
+			]
 		});
 		console.log({ response });
-		intro = response.data.response || response.data.text;
-		const response2 = await axios.post('/mentor/' + mentor.id, {
-			eventId: undefined,
-			body: `Now, create a message to encourage the user to create their own virtual school with AI mentor with ChatGPT and AI image generator from Stability.ai in less than 100 words. User's prefered language is ${cookies.get(
-				'locale'
-			)}, so answer in that language if that is specified.`,
-			user: $UserStore.id || 'anonymous'
+		intro = response.data.response.content;
+		const response2 = await axios.post('/mentor', {
+			messages: [
+				{
+					role: 'system',
+					content: `Encourage the user to create their own virtual school with AI mentor with ChatGPT and AI image generator from Stability.ai in less than 100 words. User's prefered language is ${cookies.get(
+						'locale'
+					)}, so answer in that language if that is specified. You are instructed as following: ${
+						mentor.prompt
+					}.`
+				}
+			]
 		});
-		invite = response2.data.response || response2.data.text;
+		invite = response2.data.response.content;
 	});
 </script>
 
