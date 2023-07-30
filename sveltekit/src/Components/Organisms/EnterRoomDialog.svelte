@@ -17,9 +17,6 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
-	import type { PageData } from '../../routes/$types';
-	export let data: PageData;
-	export let user = data.user;
 	export let me: Me | null;
 
 	export let readyToConnect;
@@ -32,9 +29,8 @@
 	export let whenChatConnected: () => void;
 	const onLeaveClicked = () => {
 		videoChat.leave();
-		console.log(user);
 		EventStore.set(EmptyEvent);
-		if (user?.isMember) {
+		if ($UserStore?.isMember) {
 			location.href = '/' + organization?.slug;
 		} else {
 			location.href = '/';
