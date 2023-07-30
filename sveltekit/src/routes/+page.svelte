@@ -33,7 +33,7 @@
 						mentor.prompt
 					}, but use the user's prefered language. Then invite them to enter the sample metaverse room. User's prefered language is ${cookies.get(
 						'locale'
-					)}, so answer in that language if that is specified.`
+					)}.`
 				}
 			]
 		});
@@ -43,11 +43,11 @@
 			messages: [
 				{
 					role: 'system',
-					content: `Encourage the user to create their own virtual school with AI mentor with ChatGPT and AI image generator from Stability.ai in less than 100 words. User's prefered language is ${cookies.get(
-						'locale'
-					)}, so answer in that language if that is specified. You are instructed as following: ${
+					content: `Encourage the user to create their own virtual school with AI mentor with ChatGPT and AI image generator from Stability.ai in less than 100 words.  You are instructed as following: ${
 						mentor.prompt
-					}, but use the user's prefered language.`
+					}, but use the user's prefered language. User's prefered language is ${cookies.get(
+						'locale'
+					)}.`
 				}
 			]
 		});
