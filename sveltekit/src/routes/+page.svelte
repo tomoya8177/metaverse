@@ -25,11 +25,9 @@
 		mentor.userData = await axios.get('/api/users/' + mentor?.user).then((res) => res.data);
 		const getResult = await axios.get('/mentor/' + mentor.id);
 		console.log(getResult);
-		if (!getResult.data.result.length) {
-			await axios.put('/mentor/' + mentor.id, {
-				eventId: undefined
-			});
-		}
+		await axios.put('/mentor/' + mentor.id, {
+			eventId: undefined
+		});
 		const response = await axios.post('/mentor/' + mentor.id, {
 			eventId: undefined,
 			body: `Create a greeting paragraph to the user visiting in less than 100 words. Start with saying Hello, and mention your name. then invite them to enter the sample metaverse room. User's prefered language is ${cookies.get(
