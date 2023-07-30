@@ -69,6 +69,8 @@
 			<div transition:fade>
 				{intro}
 			</div>
+		{:else}
+			<span aria-busy="true" />
 		{/if}
 	</section>
 
@@ -84,6 +86,8 @@
 			<div transition:fade>
 				{invite}
 			</div>
+		{:else}
+			<span aria-busy="true" />
 		{/if}
 	</section>
 	<section>
