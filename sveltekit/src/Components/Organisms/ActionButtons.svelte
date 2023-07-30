@@ -1,7 +1,13 @@
 <script lang="ts">
 	import AudioButton from './AudioButton.svelte';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, UserStore, PreviewPanelOpen, FocusObjectStore } from '$lib/store';
+	import {
+		EventStore,
+		UserStore,
+		PreviewPanelOpen,
+		FocusObjectStore,
+		ItemsInPreview
+	} from '$lib/store';
 	import Icon from '../Atom/Icon.svelte';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -142,16 +148,18 @@
 			<Icon icon="stop_screen_share" />
 		</button>
 	{/if}
-	<button
-		data-tooltip={_('Preview Panel')}
-		class="circle-button"
-		on:click={() => {
-			$PreviewPanelOpen = !$PreviewPanelOpen;
-			FocusObjectStore.set(EmptyObject);
-		}}
-	>
-		<Icon icon="preview" />
-	</button>
+	{#if $ItemsInPreview.length}
+		<button
+			data-tooltip={_('Preview Panel')}
+			class="circle-button"
+			on:click={() => {
+				$PreviewPanelOpen = !$PreviewPanelOpen;
+				FocusObjectStore.set(EmptyObject);
+			}}
+		>
+			<Icon icon="preview" />
+		</button>
+	{/if}
 	<button
 		data-tooltip={_('Upload')}
 		class="circle-button"

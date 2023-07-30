@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { PUBLIC_IS_DEV } from '$env/static/public';
 	import { Toast } from '$lib/store';
 	import { fade } from 'svelte/transition';
 </script>
@@ -14,11 +15,8 @@
 		{$Toast.message}
 	</div>
 {/if}
-{#if $page.url.host.includes('dev')}
+{#if PUBLIC_IS_DEV}
 	DEV Environment
-{/if}
-{#if $page.url.host.includes('localhost')}
-	LOCAL Environment
 {/if}
 
 <style>
@@ -30,6 +28,7 @@
 		right: 1rem;
 		padding: 1rem;
 		border-radius: 0.5rem;
+		z-index: 1000;
 	}
 	.toast-top {
 		position: fixed;
@@ -39,5 +38,6 @@
 		right: 1rem;
 		padding: 1rem;
 		border-radius: 0.5rem;
+		z-index: 1000;
 	}
 </style>

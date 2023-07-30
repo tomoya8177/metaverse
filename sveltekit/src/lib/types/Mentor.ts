@@ -7,5 +7,5 @@ export type Mentor = {
 	organization: string;
 	prompt: string;
 	documents: DocumentForAI[];
-	userData?: User;
+	userData: User;
 };

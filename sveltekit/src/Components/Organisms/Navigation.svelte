@@ -1,4 +1,6 @@
 <script lang="ts">
+	import SquareThumbnail from './SquareThumbnail.svelte';
+
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
 	import { cookies } from '$lib/frontend/cookies';
 	import { EventStore, UserStore } from '$lib/store';
@@ -14,6 +16,7 @@
 	import Login from './Login.svelte';
 	import type { Organization } from '$lib/types/Organization';
 	import { onMount } from 'svelte';
+	export let thumbnailURL: string = '';
 	export let title: String = '';
 	const onLogoutClicked = () => {
 		videoChat.leave();
@@ -85,6 +88,9 @@
 	<ul class:hiddenInSmallScreen={$EventStore.id}>
 		<li>
 			<a href={logoLinkTo || '#'}>
+				{#if thumbnailURL}
+					<SquareThumbnail url={thumbnailURL} />
+				{/if}
 				{#if title}
 					<strong>
 						{title}

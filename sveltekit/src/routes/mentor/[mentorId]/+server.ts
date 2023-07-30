@@ -48,7 +48,8 @@ export const PUT = async ({ request, params }) => {
 		body.eventId
 	);
 	console.log({ storedChat, mentor });
-	if (!mentor) return new Response(JSON.stringify({ error: 'mentor not found' }), { status: 404 });
+	if (!storedChat || !mentor)
+		return new Response(JSON.stringify({ error: 'mentor not found' }), { status: 404 });
 	const user = (await db.query(`select * from users where id='${mentor.user}'`))[0];
 	mentor.userData = user;
 	const documents = [
@@ -70,8 +71,8 @@ export const PUT = async ({ request, params }) => {
 	//load user data as json to docs
 	const usersJson = JSON.stringify(users);
 	const failedLogs: DocumentForAI[] = [];
-	if (mentor.withDocuments || documents.length > 0) {
-		let docs: Document[] = [];
+	if (documents.length > 0) {
+		let docs: Document<Record<string, any>>[] = [];
 		const thePrompt = virtuaMentorPrompt({
 			name: mentor.userData.nickname,
 			additionalPrompt: mentor.prompt,
@@ -91,11 +92,11 @@ export const PUT = async ({ request, params }) => {
 		docs = [
 			...docs,
 			...(await textSplitter.createDocuments([
-				`Following contents are the context of this class. Please answer questions based on this context.`
+				`Following contents are the context of this class. Please answer questions based on these contexts.`
 			]))
 		];
 
-		const Promises: Promise<Document[] | false>[] = [];
+		const Promises: Promise<Document<Record<string, any>>[] | false>[] = [];
 
 		documents.forEach((document: DocumentForAI) => {
 			if (document.type.includes('text')) {

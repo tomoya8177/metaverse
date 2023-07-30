@@ -129,5 +129,8 @@ export default {
 	Unock: 'ロック解除',
 	Lock: 'ロック',
 	'Add To Preview Pane': 'プレビューパネルに追加',
-	'Microphone access denied by the user.': 'ユーザーによってマイクへのアクセスが拒否されました。'
+	'Microphone access denied by the user.': 'ユーザーによってマイクへのアクセスが拒否されました。',
+	'Delete Organization': 'チームを削除',
+	Icon: 'アイコン',
+	'Have AI to generate Icon': 'AIにアイコンを生成させる'
 };

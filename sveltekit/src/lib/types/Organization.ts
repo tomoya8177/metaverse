@@ -5,4 +5,5 @@ export type Organization = {
 	isManager?: boolean;
 	slug: string;
 	allowRegistration: boolean;
+	thumbnailURL: string;
 };

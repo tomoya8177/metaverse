@@ -18,6 +18,10 @@
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
 	import Navigation from '../../Components/Organisms/Navigation.svelte';
+	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { emptyUser } from '$lib/preset/EmptyUser';
+	import Icon from '../../Components/Atom/Icon.svelte';
+	import TeamIconEditor from '../[organizationSlug=notRoute]/manager/TeamIconEditor.svelte';
 	export let data: PageData;
 	console.log(data);
 	let loggedIn = data.loggedIn;
@@ -54,6 +58,10 @@
 				{_('Organization')}
 			</h4>
 			<OrganizationEdit bind:editOrganization={organization} />
+			<div>
+				<h4>{_('Icon')}</h4>
+				<TeamIconEditor bind:organization />
+			</div>
 			<button
 				aria-busy={busy}
 				style="margin-top: 1rem;"
@@ -71,7 +79,17 @@
 					});
 					event.organization = newOrg.id;
 					mentor.organization = newOrg.id;
+					if (!mentor.userData) mentor.userData = emptyUser;
 					mentor.userData.nickname = _('My First AI Mentor');
+					mentor.userData =
+						(await axios.post('/api/users', mentor.userData).then((res) => res.data)) || emptyUser;
+					mentor.user = mentor.userData?.id || '';
+					const mentorRes = await axios.post('/api/mentors', mentor).then((res) => res.data);
+					mentor = {
+						...mentor,
+						...mentorRes
+					};
+
 					process = 'mentor';
 					busy = false;
 				}}
@@ -86,19 +104,24 @@
 				on:click={async () => {
 					if (!validateMentorData(mentor)) return;
 					busy = true;
-					const createdUser = await axios
-						.post('/api/users', mentor.userData)
-						.then((res) => res.data);
-					const createdMentor = await axios
-						.post('/api/mentors', {
-							...mentor,
-							user: createdUser.id
+					if (!mentor.userData) mentor.userData = emptyUser;
+
+					const updatedUser = await axios
+						.put('/api/users/' + mentor.userData.id, {
+							...mentor.userData,
+							description: escapeHTML(mentor.userData.description)
 						})
 						.then((res) => res.data);
-					mentor.id = createdMentor.id;
-					createdMentor.userData = createdUser;
-					event.mentor = createdMentor.id;
-					console.log({ createdMentor, createdUser });
+					const updatedMentor = await axios
+						.put('/api/mentors/' + mentor.id, {
+							...mentor,
+							prompt: escapeHTML(mentor.prompt)
+						})
+						.then((res) => res.data);
+					mentor.id = updatedMentor.id;
+					updatedMentor.userData = updatedUser;
+					event.mentor = updatedMentor.id;
+					console.log({ updatedMentor, updatedUser });
 					busy = false;
 					process = 'event';
 				}}

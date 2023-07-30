@@ -1,4 +1,3 @@
-socketServer/node_modules
 sveltekit/node_modules
 sveltekit/.env
 sveltekit/build
@@ -9,7 +8,6 @@ sveltekit/vite.config.ts.timestamp-*
 sveltekit/src/lib/config.ts
 sveltekit/vite.config.ts
 sveltekit/vite.config.ts
-deploy.sh
+sveltekit/deploy.sh
 sveltekit/static/out/*
 sveltekit/static/documentsForI/*
-userFiles/node_modules

@@ -29,9 +29,7 @@
 		console.log({ userRoles });
 		organizations = await axios.get('/api/organizations').then((res) => res.data);
 		console.log({ organizations });
-		users = await axios
-			.get(`/api/users`)
-			.then((res) => res.data.filter((user) => user.email != ''));
+		users = await axios.get(`/api/users`).then((res) => res.data.filter((user) => !!user.email));
 		users = users
 			.map((user) => {
 				user = fillOrganization(user);

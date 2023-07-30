@@ -25,6 +25,7 @@
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { _ } from '$lib/i18n';
+	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
 	export let virtuaMentorReady = false;
 	export let messages: Message[] = [];
 	export let newMessagePinned = false;
@@ -84,23 +85,21 @@
 		busy = false;
 		if (newMessageGenerateImage) {
 			waitingForAIAnswer = true;
-			const response = await axios.post('/stability', {
-				prompt: newMessageBody
-			});
+			const promise = new GenerateImage(newMessageBody);
+			promise.onDone = async (file) => {
+				const mentor = await axios
+					.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
+					.then((res) => res.data);
+				const message = new Message({
+					event: $EventStore.id,
+					type: 'attachment',
+					user: mentor.user,
+					body: 'generated image',
+					url: file.url
+				});
+				const createdMessage = await sendChatMessage(message);
+			};
 			newMessageBody = '';
-
-			console.log(response.data);
-			const mentor = await axios
-				.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
-				.then((res) => res.data);
-			const message = new Message({
-				event: $EventStore.id,
-				type: 'attachment',
-				user: mentor.user,
-				body: 'generated image',
-				url: response.data.path
-			});
-			const createdMessage = await sendChatMessage(message);
 			waitingForAIAnswer = false;
 			return;
 		}
@@ -163,8 +162,9 @@
 	{#if forceMentor || $EventStore.mentor}
 		<div>
 			<button
+				small
 				data-tooltip={_('Ask AI Mentor')}
-				class="pill-icon-button"
+				class="circle-button"
 				style:background-color={micActive ? 'red' : ''}
 				on:click={onMicClicked}
 			>
@@ -176,7 +176,8 @@
 		<div>
 			<button
 				data-tooltip={_('Attach File')}
-				class="pill-icon-button"
+				class="circle-button"
+				small
 				on:click={() => {
 					uploader.launchPicker(undefined, 1, async (res) => {
 						res.filesUploaded.forEach(async (file) => {
@@ -199,31 +200,45 @@
 			</button>
 		</div>
 	{/if}
-	<div style="text-align:right;flex:1">
-		<small>
-			{#if forceMentor || $EventStore.mentor}
-				<InputWithLabel
-					label="@Mentor"
-					disabled={!virtuaMentorReady || forceMentor}
-					type="switch"
-					bind:value={newMessageForMentor}
-				/>
-			{/if}
-		</small>
-	</div>
+
 	<div>
-		<small>
-			<InputWithLabel
-				label={_('Generate Image')}
-				type="switch"
-				bind:value={newMessageGenerateImage}
-			/>
-		</small>
+		<button
+			data-tooltip={_('@Mentor')}
+			class="circle-button"
+			small
+			on:click={() => {
+				newMessageForMentor = !newMessageForMentor;
+			}}
+			style:opacity={newMessageForMentor ? 1 : 0.5}
+		>
+			<Icon icon="person" />
+		</button>
+	</div>
+	<div style="text-align:right;flex:1">
+		<button
+			data-tooltip={_('Generate Image')}
+			class="circle-button"
+			small
+			on:click={() => {
+				newMessageGenerateImage = !newMessageGenerateImage;
+			}}
+			style:opacity={newMessageGenerateImage ? 1 : 0.5}
+		>
+			<Icon icon="palette" />
+		</button>
 	</div>
 	{#if !forceNoPin}
-		<small>
-			<InputWithLabel label={_('Pinned')} type="switch" bind:value={newMessagePinned} />
-		</small>
+		<button
+			data-tooltip={newMessagePinned ? _('Unpin') : _('Pin')}
+			class="circle-button"
+			small
+			on:click={() => {
+				newMessagePinned = !newMessagePinned;
+			}}
+			style:opacity={newMessagePinned ? 1 : 0.5}
+		>
+			<Icon icon="push_pin" />
+		</button>
 	{/if}
 </div>
 <div style="display:flex;gap:0.4rem">
@@ -231,9 +246,15 @@
 		<textarea bind:value={newMessageBody} />
 	</div>
 	<div>
-		<button aria-busy={busy} style="margin-bottom:0rem" on:click={onMessageSendClicked}
-			>{_('Send')}</button
-		>
+		<button aria-busy={busy} style="margin-bottom:0.2rem" on:click={onMessageSendClicked}>
+			{#if !newMessageGenerateImage}
+				<Icon icon="send" />
+				{_('Send')}
+			{:else}
+				<Icon icon="palette" />
+				{_('Generate Image')}
+			{/if}
+		</button>
 	</div>
 </div>
 

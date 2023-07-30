@@ -11,7 +11,8 @@ export const EmptyMentor: Mentor = {
 		nickname: '',
 		avatarURL: '',
 		isAdmin: false,
-		delete: async () => {}
+		delete: async () => {},
+		description: ''
 	},
 	documents: []
 };

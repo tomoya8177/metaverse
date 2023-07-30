@@ -401,8 +401,8 @@
 		overflow: auto;
 		width: 26rem;
 		position: absolute;
-		padding: 1rem;
-		border-radius: 1rem;
+		padding: 0.4rem;
+		border-radius: 0.4rem;
 		bottom: 6rem;
 		right: 0;
 		background-color: rgba(0, 0, 0, 0.7);

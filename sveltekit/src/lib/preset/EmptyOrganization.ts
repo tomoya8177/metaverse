@@ -4,5 +4,6 @@ export const EmptyOrganization: Organization = {
 	id: '',
 	title: '',
 	slug: '',
-	allowRegistration: false
+	allowRegistration: false,
+	thumbnailURL: ''
 };

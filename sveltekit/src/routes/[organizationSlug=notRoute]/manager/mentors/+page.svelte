@@ -26,7 +26,7 @@
 	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
 	import type { PageData } from './$types';
 	import { nl2br } from '$lib/math/nl2br';
-	import { unescapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
 	export let data: PageData;
 	let paginated: Mentor[] = [];
@@ -87,7 +87,10 @@
 		if (!editMentor.userData?.id) return;
 		busy = true;
 		const updatedUser = await axios
-			.put('/api/users/' + editMentor.userData.id, editMentor.userData)
+			.put('/api/users/' + editMentor.userData.id, {
+				...editMentor.userData,
+				description: escapeHTML(editMentor.userData.description)
+			})
 			.then((res) => res.data);
 		console.log({ editMentor });
 		users = users.map((user) => {
@@ -98,7 +101,7 @@
 		});
 		let updatedMentor = await axios
 			.put('/api/mentors/' + editMentor.id, {
-				prompt: editMentor.prompt
+				prompt: escapeHTML(editMentor.prompt)
 			})
 			.then((res) => res.data);
 		console.log({ updatedMentor });
@@ -129,10 +132,22 @@
 	<a
 		href={'#'}
 		role="button"
-		on:click={() => {
-			editMentor = { ...EmptyMentor, id: crypto.randomUUID() };
-			editMode = 'create';
+		on:click={async () => {
+			const createdUser = await axios.post('/api/users', { nickname: '' }).then((res) => res.data);
+			users = [...users, createdUser];
+			let createdMentor = await axios
+				.post('/api/mentors', {
+					...editMentor,
+					user: createdUser.id,
+					organization: organization.id
+				})
+				.then((res) => res.data);
+			createdMentor.userData = createdUser;
+			editMentor = createdMentor;
+			editMode = 'update';
 			console.log({ editMentor });
+			mentors = [...mentors, createdMentor];
+
 			newMentorModalOpen = true;
 		}}>{_('New Mentor')}</a
 	>

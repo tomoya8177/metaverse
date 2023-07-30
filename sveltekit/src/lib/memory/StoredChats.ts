@@ -1,15 +1,20 @@
 import { ChatMessageHistory } from 'langchain/memory';
-import type { ConversationalRetrievalQAChain, loadQAStuffChain } from 'langchain/chains';
+import type {
+	ConversationalRetrievalQAChain,
+	loadQAStuffChain,
+	ConversationChain
+} from 'langchain/chains';
 import { db } from '$lib/backend/db';
 import type { Event } from '$lib/frontend/Classes/Event';
 import type { Mentor } from '$lib/types/Mentor';
+import type { Document } from 'langchain/document';
 
 type StoredChat = {
 	mentorId?: string;
 	eventId?: string;
 	chatHistory: ChatMessageHistory;
-	chain: ConversationalRetrievalQAChain | null;
-	docs: Document[] | null;
+	chain: ConversationChain | ConversationalRetrievalQAChain | null;
+	docs: Document<Record<string, any>>[] | null;
 };
 
 class StoredChats extends Array {

@@ -18,7 +18,7 @@
 {#if !loggedIn}
 	<Login />
 {:else}
-	<Navigation title={`VirtuaIntel | ${_('Admin Console')}`} logoLinkTo={`/admin`} />
+	<Navigation title={`${_('Admin Console')}`} logoLinkTo={`/admin`} />
 	{#if loggedIn}
 		<div style="display:flex;margin-left:1rem;margin-right:1rem">
 			<div class="menu">
