@@ -187,7 +187,9 @@ export const POST = async ({ request, params }) => {
 	}
 	// const res = await chain.call({ question, chatHistory: pastMessages });
 	//const res = await chain.call({ question });
-	const res = await storedChat.chain.call({ question: `I am ${user.nickname}. ${question}` });
+	const res = await storedChat.chain.call({
+		question: `I am ${user?.nickname || 'not registered'}. ${question}`
+	});
 
 	/* Return the response */
 	return new Response(JSON.stringify(res));

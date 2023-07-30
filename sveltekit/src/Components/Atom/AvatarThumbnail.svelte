@@ -21,10 +21,11 @@
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
 	export let url: string;
+	export let size: string = '3rem';
 </script>
 
 <img
 	src={PresetAvatars.find((avatar) => avatar.url == url)?.thumbnailURL}
-	style="width:3rem;height:3rem;border-radius:0.2rem;margin-right:0.4rem"
+	style="width:{size};height:{size};border-radius:0.2rem;margin-right:0.4rem"
 	alt=""
 />

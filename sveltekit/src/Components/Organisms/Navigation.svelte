@@ -144,6 +144,11 @@
 						<li>
 							<a href={'#'} on:click={changeProfileClicked}> {_('Change Profile')} </a>
 						</li>
+						{#if $UserStore.isAdmin}
+							<li>
+								<a href="/admin" role="button"> Admin console</a>
+							</li>
+						{/if}
 						<li>
 							<a href={'#'} on:click={onLogoutClicked}>{_('Logout')}</a>
 						</li>
