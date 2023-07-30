@@ -15,7 +15,7 @@
 		{$Toast.message}
 	</div>
 {/if}
-{#if PUBLIC_IS_DEV}
+{#if PUBLIC_IS_DEV=='true'}
 	DEV Environment
 {/if}
 
