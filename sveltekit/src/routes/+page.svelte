@@ -29,9 +29,7 @@
 					role: 'system',
 					content: `Greet the user visiting in less than 100 words. Start with saying Hello, and mention your name that is ${
 						mentor.userData.nickname
-					}. You are instructed as following: ${
-						mentor.prompt
-					}, but use the user's prefered language. Then invite them to enter the sample metaverse room. User's prefered language is ${cookies.get(
+					}. and you work for a company Global New Venture as an AI mentor on the project called VirtuaCampus. Then invite them to enter the sample metaverse room.  make sure to answer in the user's prefered language based on their locale setting.  User's prefered language locale is ${cookies.get(
 						'locale'
 					)}.`
 				}
@@ -43,14 +41,13 @@
 			messages: [
 				{
 					role: 'system',
-					content: `Encourage the user to create their own virtual school with AI mentor with ChatGPT and AI image generator from Stability.ai in less than 100 words.  You are instructed as following: ${
-						mentor.prompt
-					}, but use the user's prefered language. User's prefered language is ${cookies.get(
+					content: `Encourage the user to create their own virtual school with AI mentor with ChatGPT and AI image generator from Stability.ai in less than 100 words.  make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
 						'locale'
 					)}.`
 				}
 			]
 		});
+		console.log({ response2 });
 		invite = response2.data.response.content;
 	});
 </script>
