@@ -203,21 +203,19 @@
 			</button>
 		</div>
 	{/if}
-	{#if newMessageForMentor}
-		<div>
-			<button
-				style:opacity={aiSpeaks ? 1 : 0.5}
-				data-tooltip={_('AI Speaks')}
-				class="circle-button"
-				small
-				on:click={() => {
-					aiSpeaks = !aiSpeaks;
-				}}
-			>
-				<Icon icon="campaign" />
-			</button>
-		</div>
-	{/if}
+	<div>
+		<button
+			style:opacity={aiSpeaks ? 1 : 0.5}
+			data-tooltip={_('AI Speaks')}
+			class="circle-button"
+			small
+			on:click={() => {
+				aiSpeaks = !aiSpeaks;
+			}}
+		>
+			<Icon icon="campaign" />
+		</button>
+	</div>
 	<div style="text-align:right;flex:1">
 		<button
 			data-tooltip={_('Generate Image')}
