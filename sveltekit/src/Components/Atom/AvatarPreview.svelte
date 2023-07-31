@@ -6,6 +6,7 @@
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 	import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 	export let url: string;
+	import { THREE } from 'aframe';
 
 	let scene: THREE.Scene;
 	let camera: THREE.PerspectiveCamera;

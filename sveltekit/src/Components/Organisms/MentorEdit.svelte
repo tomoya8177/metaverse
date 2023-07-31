@@ -26,7 +26,14 @@
 	<InputWithLabel label={_('Nickname')} bind:value={editMentor.userData.nickname} />
 	<AvatarSelectPane bind:url={editMentor.userData.avatarURL} />
 
-	<InputWithLabel label={_('Prompt')} bind:value={editMentor.prompt} type="textarea" />
+	<InputWithLabel
+		meta={_(
+			'Specify the language you want it to speak. If not specified, AI mentor will talk in English.'
+		)}
+		label={_('Prompt')}
+		bind:value={editMentor.prompt}
+		type="textarea"
+	/>
 	<div>{_('Brain Documents')}</div>
 	{#each editMentor.documents || [] as document}
 		<DocumentForAIRow
@@ -72,17 +79,16 @@
 		aria-busy={introBusy}
 		on:click={async () => {
 			introBusy = true;
-			await reinstallAIBrain(editMentor);
-			const aiMessage = await sendQuestionToAI(
-				editMentor.id,
-				undefined,
-				new Message({
-					body: `Create your introduction in less than 100 words. Your new name is ${editMentor.userData?.nickname}. include your name, the context that you are given to help students. you are told to follow the instruction below. ${editMentor.prompt}`,
-					user: editMentor.user
-				})
-			);
-			console.log({ aiMessage });
-			editMentor.userData.description = unescapeHTML(aiMessage.body);
+			const response = await axios.post('/mentor', {
+				messages: [
+					{
+						role: 'system',
+						content: `Create your introduction in less than 100 words. Your name is ${editMentor.userData?.nickname}. Include your name, the context that you are given to help students. you are told to follow the instruction below. ${editMentor.prompt}`
+					}
+				]
+			});
+
+			editMentor.userData.description = unescapeHTML(await response.data.response.content);
 			introBusy = false;
 		}}
 	>

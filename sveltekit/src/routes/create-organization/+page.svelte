@@ -97,7 +97,9 @@
 				{_('Next')}
 			</button>
 		{:else if process == 'mentor'}
-			{_('VirtuaMentor')}
+			<h4>
+				{_('VirtuaMentor')}
+			</h4>
 			<MentorEdit editMentor={mentor} />
 			<button
 				aria-busy={busy}
@@ -129,7 +131,9 @@
 				{_('Next')}
 			</button>
 		{:else if process == 'event'}
-			{_('Room')}
+			<h4>
+				{_('Room')}
+			</h4>
 			<EventEdit bind:editEvent={event} users={[user]} mentors={[mentor]} />
 			<button
 				aria-busy={busy}

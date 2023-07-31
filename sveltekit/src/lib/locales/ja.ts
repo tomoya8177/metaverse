@@ -137,5 +137,8 @@ export default {
 		'あなたのプロンプトはAIに送信されました。画像を生成するには最大1分かかる場合があります。',
 	'Your image is ready!': '画像ができました！',
 	'Generate Image': '画像を生成',
-	'AI Speaks': 'AI読み上げ'
+	'AI Speaks': 'AI読み上げ',
+	'Have AI to write the introduction': 'AIに自己紹介を書かせる',
+	'Specify the language you want it to speak. If not specified, AI mentor will talk in English.':
+		'話してほしい言語を指定してください。指定しない場合、AIメンターは英語で話します。'
 };
