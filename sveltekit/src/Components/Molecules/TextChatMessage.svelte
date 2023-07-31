@@ -14,9 +14,10 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { escapeHTML } from '$lib/math/escapeHTML';
-	import type { User } from '$lib/frontend/Classes/User';
+	import { User } from '$lib/frontend/Classes/User';
 	import { _ } from '$lib/i18n';
 	import { speechInterval } from '$lib/frontend/aiSpeaksOut';
+	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
 
 	export let message: Message;
 	export let onDelete: (id: string) => void;
@@ -31,6 +32,19 @@
 			clearInterval(interval);
 		}, 1000);
 	});
+	const sendToRoomClicked = async (message) => {
+		const response = await axios.get(
+			'https://www.filestackapi.com/api/file/' + message.handle + '/metadata'
+		);
+		console.log(response);
+		appendObjectInTheRoom({
+			eventId: $EventStore.id,
+			userId: $UserStore.id,
+			me: Users.find($UserStore.id),
+			file: { ...response.data, url: message.url }
+		});
+	};
+	export let forceMentor: string | false = false;
 </script>
 
 {#if message}
@@ -64,12 +78,17 @@
 			{/if}
 			{#if message.type == 'attachment'}
 				<a href={message.url} target="_blank">
-					{#if message.url?.includes('.png') || message.url?.includes('.jpg') || message.body.toLowerCase() == 'generated image'}
+					{#if message.type == 'attachment' || message.body.toLowerCase() == 'generated image'}
 						<img
 							src={message.url}
 							style="max-width:100%;max-height:10rem; border-radius:0.2rem"
 							alt={message.body}
 						/>
+						{#if !forceMentor && message.handle}
+							<a href={'#'} on:click={() => sendToRoomClicked(message)}>
+								{_('Send to Room')}
+							</a>
+						{/if}
 					{:else}
 						{message.body}
 					{/if}

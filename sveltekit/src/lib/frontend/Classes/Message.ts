@@ -9,6 +9,7 @@ export class Message extends DBObject {
 	createdAt?: string = new Date().toISOString();
 	isTalking?: boolean = false;
 	pinned?: boolean = false;
+	handle: string = '';
 	constructor(data: any) {
 		super(data);
 		this.event = data.event;
@@ -18,5 +19,6 @@ export class Message extends DBObject {
 		this.pinned = data.pinned || false;
 		this.type = data.type || null;
 		this.url = data.url || null;
+		this.handle = data.handle || '';
 	}
 }

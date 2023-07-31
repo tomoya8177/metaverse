@@ -162,6 +162,7 @@
 
 	const sendChatMessage = async (message: Message) => {
 		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
+		console.log({ createdMessage });
 		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
 		messages = [
 			...messages,

@@ -71,11 +71,13 @@
 				const mentor = await axios
 					.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
 					.then((res) => res.data);
+				console.log({ file });
 				const message = new Message({
 					event: $EventStore.id,
 					type: 'attachment',
 					user: mentor.user,
 					body: 'generated image',
+					handle: file.handle,
 					url: file.url
 				});
 				console.log('sending image', message, mentor);
@@ -134,6 +136,7 @@
 		<TextChatMessage
 			bind:message
 			{forceNoPin}
+			{forceMentor}
 			author={authors.find((a) => a.id === message.user) || { nickname: 'AI' }}
 			onDelete={(messageId) => {
 				messages = messages.filter((m) => m.id !== messageId);
@@ -172,6 +175,7 @@
 								type: 'attachment',
 								user: $UserStore.id,
 								body: file.filename,
+								handle: file.handle,
 								url: file.url
 							});
 							const createdMessage = await sendChatMessage(message);
@@ -257,11 +261,3 @@
 		</button>
 	</div>
 </div>
-
-<style>
-	.pill-icon-button {
-		height: 2rem;
-		border-radius: 1rem;
-		padding-top: 0.1rem;
-	}
-</style>

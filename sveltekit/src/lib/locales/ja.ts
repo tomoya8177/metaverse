@@ -135,5 +135,7 @@ export default {
 	'Have AI to generate Icon': 'AIにアイコンを生成させる',
 	'Your prompt is sent to AI. It may take up to 1 minute to generate an image.':
 		'あなたのプロンプトはAIに送信されました。画像を生成するには最大1分かかる場合があります。',
-	'Your image is ready!': '画像ができました！'
+	'Your image is ready!': '画像ができました！',
+	'Generate Image': '画像を生成',
+	'AI Speaks': 'AI読み上げ'
 };

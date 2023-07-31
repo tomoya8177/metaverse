@@ -11,6 +11,7 @@
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { _ } from '$lib/i18n';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
+	import { toast } from '$lib/frontend/toast';
 
 	const onDeleteClicked = async () => {
 		if ($FocusObjectStore.title == 'Shared Screen') {
@@ -27,16 +28,17 @@
 		const file = sharedObjects.get($FocusObjectStore.id);
 		console.log({ file });
 		await axios.delete('/api/objects/' + file.id);
-		uploader.client.remove(file.handle, {
-			policy: PUBLIC_FileStackPolicy,
-			signature: PUBLIC_FileStackSignature
-		});
+		// uploader.client.remove(file.handle, {
+		// 	policy: PUBLIC_FileStackPolicy,
+		// 	signature: PUBLIC_FileStackSignature
+		// });
 		file.remove();
 		videoChat.sendMessage({
 			key: 'objectDelete',
 			id: $FocusObjectStore.id
 		});
 		FocusObjectStore.set(EmptyObject);
+		toast(_('Deleted'));
 	};
 </script>
 
@@ -187,6 +189,7 @@
 										title: $FocusObjectStore.title,
 										linkTo: $FocusObjectStore.linkTo
 									});
+									toast(_(`Updated`));
 									videoChat.sendMessage({
 										key: 'objectUpdate',
 										id: $FocusObjectStore.id,

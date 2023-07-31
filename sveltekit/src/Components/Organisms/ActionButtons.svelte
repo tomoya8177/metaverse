@@ -18,6 +18,7 @@
 	import { _ } from '$lib/i18n';
 	import { myAlert } from '$lib/frontend/toast';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
+	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
 	export let textChatOpen = false;
 	export let waitingForAIAnswer: boolean;
 	const scrolToBottom = (element: Element) => {
@@ -168,39 +169,11 @@
 				//when done
 				console.log(res);
 				res.filesUploaded.forEach(async (file) => {
-					const createdFile = await axios
-						.post('/api/objects', {
-							event: $EventStore.id,
-							type: file.mimetype,
-							url: file.url,
-							title: file.filename,
-							handle: file.handle,
-							user: $UserStore.id,
-							size: file.size,
-							editable: 1,
-							components: JSON.stringify({
-								position: me.position,
-								rotation: {
-									x: 0,
-									y: 0,
-									z: 0
-								},
-								scale: {
-									x: 1,
-									y: 1,
-									z: 1
-								}
-							})
-						})
-						.then((res) => res.data);
-					const object = new SharedObject(createdFile);
-					if (!me) return console.error('me is null');
-					object.moveToMyFront(me.position, me.rotation);
-					object.locked = false;
-					sharedObjects.add(object);
-					videoChat.sendMessage({
-						key: 'objectCreate',
-						id: object.id
+					appendObjectInTheRoom({
+						eventId: $EventStore.id,
+						file,
+						userId: $UserStore.id,
+						me
 					});
 				});
 			})}
