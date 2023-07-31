@@ -149,9 +149,13 @@
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
 			const mentor = await axios.get('/api/mentors/' + $EventStore.mentor).then((res) => res.data);
 			console.log({ mentor });
+			if (!aiSpeaks) {
+				return;
+			}
 			aiSpeaksOut(createdMessage.body, Users.find(mentor.user) || null);
 		}
 	};
+	let aiSpeaks = true;
 	let waitingForAIAnswer = false;
 	let newMessagePinned = false;
 	let newMessageBody = '';
@@ -306,6 +310,7 @@
 <div style:display={textChatOpen ? 'block' : 'none'}>
 	<div class="chat-box">
 		<ChatBox
+			bind:aiSpeaks
 			bind:waitingForAIAnswer
 			bind:newMessagePinned
 			{sendChatMessage}

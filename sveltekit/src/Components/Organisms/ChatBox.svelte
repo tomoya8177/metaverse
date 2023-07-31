@@ -123,7 +123,7 @@
 	let recognition;
 	export let micActive: boolean = false;
 	let newMessageGenerateImage = false;
-	let aiSpeaks = true;
+	export let aiSpeaks = true;
 </script>
 
 <div
@@ -132,7 +132,7 @@
 >
 	{#each messages.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)) as message}
 		<TextChatMessage
-			{message}
+			bind:message
 			{forceNoPin}
 			author={authors.find((a) => a.id === message.user) || { nickname: 'AI' }}
 			onDelete={(messageId) => {
