@@ -1,10 +1,6 @@
 <script lang="ts">
-	import 'aframe';
-	import 'aframe-environment-component';
-	import 'aframe-extras';
 	import { EventStore, UserStore } from '$lib/store';
 
-	import '$lib/AframeComponents';
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { _ } from '$lib/i18n';

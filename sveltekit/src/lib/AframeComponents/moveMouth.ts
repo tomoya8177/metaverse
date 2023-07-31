@@ -1,6 +1,5 @@
 import type { Unit } from '$lib/frontend/Classes/Unit';
 import { Users } from '$lib/frontend/Classes/Users';
-import 'aframe';
 import type { Entity } from 'aframe';
 import type { Object3D, SkinnedMesh } from 'three';
 AFRAME.registerComponent('move-mouth', {

@@ -1,12 +1,8 @@
 <script lang="ts">
-	import 'aframe';
-	import 'aframe-environment-component';
-	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
 	import { EventStore, UserStore } from '$lib/store';
 
-	import '$lib/AframeComponents';
-	import { Me } from '$lib/frontend/Classes/Me';
+	import type { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import SceneUIs from './SceneUIs.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';

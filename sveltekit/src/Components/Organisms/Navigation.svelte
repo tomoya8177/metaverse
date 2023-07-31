@@ -92,7 +92,7 @@
 					<SquareThumbnail url={thumbnailURL} />
 				{/if}
 				{#if title}
-					<strong>
+					<strong class:hiddenInSmallScreen={thumbnailURL}>
 						{title}
 					</strong>
 				{:else}

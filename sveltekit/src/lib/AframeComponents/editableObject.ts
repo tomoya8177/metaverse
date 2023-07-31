@@ -4,10 +4,8 @@ import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { _ } from '$lib/i18n';
 import { EmptyObject } from '$lib/preset/EmptyObject';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
-import { THREE } from 'aframe';
-import type { Entity } from 'aframe';
+import type { Entity, Event } from 'aframe';
 import axios from 'axios';
-import type { Event } from 'three';
 let userId = '';
 UserStore.subscribe((user) => {
 	userId = user.id;

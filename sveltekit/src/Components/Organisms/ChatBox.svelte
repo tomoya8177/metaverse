@@ -1,14 +1,10 @@
 <script lang="ts">
 	import TextChatMessage from '../Molecules/TextChatMessage.svelte';
 
-	import 'aframe';
-	import 'aframe-environment-component';
-	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
 	import { EventStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 
-	import '$lib/AframeComponents';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -45,30 +41,13 @@
 		if (forceMentor) {
 			newMessageForMentor = true;
 		}
-		//loadMessages();
-		//onKeyDown
-		// io.emit('setEventId', {
-		// 	eventId: $EventStore.id,
-		// 	userId: $UserStore.id
-		// });
+
 		document.addEventListener('keydown', onKeyDown);
 	});
 	onDestroy(() => {
 		document.removeEventListener('keydown', onKeyDown);
 	});
 
-	// io.on('answer', async (answer) => {
-	// 	const aiMessage = new Message({
-	// 		body: escapeHTML(answer),
-	// 		user: 'Mentor',
-	// 		event: $EventStore.id,
-	// 		pinned: false
-	// 	});
-	// 	newMessageBody = '';
-	// 	const createdMessage = await sendChatMessage(aiMessage);
-	// 	const utterance = new SpeechSynthesisUtterance(unescapeHTML(createdMessage.body));
-	// 	speechSynthesis.speak(utterance);
-	// });
 	const onMessageSendClicked = async () => {
 		if (newMessageBody.trim() === '') return;
 		if (newMessageForMentor && !forceMentor) {
@@ -81,12 +60,14 @@
 			event: $EventStore.id,
 			pinned: newMessagePinned
 		});
-		await sendChatMessage(newMessage);
+		if (!newMessageGenerateImage) {
+			await sendChatMessage(newMessage);
+		}
 		busy = false;
 		if (newMessageGenerateImage) {
 			waitingForAIAnswer = true;
 			const promise = new GenerateImage(newMessageBody);
-			promise.onDone = async (file) => {
+			promise.onDone(async (file) => {
 				const mentor = await axios
 					.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
 					.then((res) => res.data);
@@ -97,8 +78,9 @@
 					body: 'generated image',
 					url: file.url
 				});
+				console.log('sending image', message, mentor);
 				const createdMessage = await sendChatMessage(message);
-			};
+			});
 			newMessageBody = '';
 			waitingForAIAnswer = false;
 			return;
@@ -121,6 +103,7 @@
 				.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
 				.then((res) => res.data);
 			console.log({ mentor });
+			if (!aiSpeaks) return;
 			aiSpeaksOut(createdMessage.body, forceMentor ? null : Users.find(mentor.user) || null);
 		} else {
 			//io.emit('statement', newMessageBody);
@@ -140,6 +123,7 @@
 	let recognition;
 	export let micActive: boolean = false;
 	let newMessageGenerateImage = false;
+	let aiSpeaks = true;
 </script>
 
 <div
@@ -200,20 +184,36 @@
 			</button>
 		</div>
 	{/if}
-
-	<div>
-		<button
-			data-tooltip={_('@Mentor')}
-			class="circle-button"
-			small
-			on:click={() => {
-				newMessageForMentor = !newMessageForMentor;
-			}}
-			style:opacity={newMessageForMentor ? 1 : 0.5}
-		>
-			<Icon icon="person" />
-		</button>
-	</div>
+	{#if !forceMentor}
+		<div>
+			<button
+				data-tooltip={_('@Mentor')}
+				class="circle-button"
+				small
+				on:click={() => {
+					newMessageForMentor = !newMessageForMentor;
+				}}
+				style:opacity={newMessageForMentor ? 1 : 0.5}
+			>
+				<Icon icon="person" />
+			</button>
+		</div>
+	{/if}
+	{#if newMessageForMentor}
+		<div>
+			<button
+				style:opacity={aiSpeaks ? 1 : 0.5}
+				data-tooltip={_('AI Speaks')}
+				class="circle-button"
+				small
+				on:click={() => {
+					aiSpeaks = !aiSpeaks;
+				}}
+			>
+				<Icon icon="campaign" />
+			</button>
+		</div>
+	{/if}
 	<div style="text-align:right;flex:1">
 		<button
 			data-tooltip={_('Generate Image')}
@@ -259,9 +259,6 @@
 </div>
 
 <style>
-	#chat-textarea textarea {
-		color: white;
-	}
 	.pill-icon-button {
 		height: 2rem;
 		border-radius: 1rem;

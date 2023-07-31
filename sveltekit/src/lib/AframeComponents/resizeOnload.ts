@@ -1,5 +1,3 @@
-import 'aframe';
-
 AFRAME.registerComponent('resize-onload', {
 	init: function () {
 		this.el.addEventListener('materialtextureloaded', () => {

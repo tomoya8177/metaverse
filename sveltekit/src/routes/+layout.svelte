@@ -15,14 +15,14 @@
 		{$Toast.message}
 	</div>
 {/if}
-{#if PUBLIC_IS_DEV=='true'}
+{#if PUBLIC_IS_DEV == 'true'}
 	DEV Environment
 {/if}
 
 <style>
 	.toast-bottom {
 		position: fixed;
-		background-color: darkred;
+		background-color: lightseagreen;
 		color: white;
 		bottom: 1rem;
 		right: 1rem;

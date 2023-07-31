@@ -1,4 +1,3 @@
-import 'aframe';
 AFRAME.registerComponent('rotate-at-position', {
 	init: function () {
 		this.parent = this.el.parentNode;

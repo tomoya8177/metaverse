@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { THREE, type ThreeLib } from 'aframe';
 	// import { Scene } from 'three/src/scenes/Scene.js';
 	// import { PerspectiveCamera } from 'three/src/cameras/PerspectiveCamera.js';
 	// import { WebGLRenderer } from 'three/src/renderers/WebGLRenderer.js';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-	import type { Object3D } from 'three';
 	import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 	export let url: string;
 

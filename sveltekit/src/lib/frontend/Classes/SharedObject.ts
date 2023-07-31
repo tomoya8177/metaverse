@@ -1,7 +1,6 @@
 import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
-import { ItemsInPreview, type xyz } from '$lib/store';
-import * as THREE from 'three';
+import type { xyz } from '$lib/store';
 type shortType = 'image' | 'video' | 'model' | 'screen';
 
 export class SharedObject {

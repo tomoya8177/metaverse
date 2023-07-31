@@ -15,6 +15,7 @@
 	let authors: User[] = [];
 	let messages: Message[] = [];
 	const sendChatMessage = async (message: Message) => {
+		console.log('sending message', message);
 		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
 		messages = [
 			...messages,
@@ -68,7 +69,7 @@
 		<AvatarThumbnail url={mentor.userData.avatarURL} />
 		{mentor.userData.nickname}
 	</div>
-	<div style="position:absolute;bottom:0px" class="container">
+	<div style="position:absolute;bottom:0px;width:calc(100% - 2rem)">
 		<ChatBox
 			forceMentor={mentor.id}
 			forceNoPin

@@ -1,13 +1,9 @@
 <script lang="ts">
-	import 'aframe';
-	import 'aframe-environment-component';
-	import 'aframe-extras';
 	import { onMount } from 'svelte';
 	import { EventStore, RigStore, UserStore, type xyz } from '$lib/store';
 	import axios from 'axios';
 	import { Unit } from '$lib/frontend/Classes/Unit';
 
-	import '$lib/AframeComponents';
 	import { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { VideoChat } from '$lib/frontend/Classes/VideoChat';

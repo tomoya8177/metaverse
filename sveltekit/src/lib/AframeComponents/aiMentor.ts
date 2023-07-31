@@ -1,4 +1,3 @@
-import 'aframe';
 import { UserStore } from '$lib/store';
 import type { User } from '$lib/frontend/Classes/User';
 import { degree2radian } from '$lib/math/degree2radians';

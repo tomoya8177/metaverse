@@ -132,5 +132,8 @@ export default {
 	'Microphone access denied by the user.': 'ユーザーによってマイクへのアクセスが拒否されました。',
 	'Delete Organization': 'チームを削除',
 	Icon: 'アイコン',
-	'Have AI to generate Icon': 'AIにアイコンを生成させる'
+	'Have AI to generate Icon': 'AIにアイコンを生成させる',
+	'Your prompt is sent to AI. It may take up to 1 minute to generate an image.':
+		'あなたのプロンプトはAIに送信されました。画像を生成するには最大1分かかる場合があります。',
+	'Your image is ready!': '画像ができました！'
 };

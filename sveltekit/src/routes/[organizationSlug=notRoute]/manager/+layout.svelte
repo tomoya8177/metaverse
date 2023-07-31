@@ -46,20 +46,26 @@
 						<li>
 							<a href={`/${organization.slug}/manager/users`}>
 								<Icon icon="group" />
-								{_('Users')}</a
-							>
+								<span>
+									{_('Users')}
+								</span>
+							</a>
 						</li>
 						<li>
 							<a href={`/${organization.slug}/manager/rooms`}>
 								<Icon icon="vrpano" />
-								{_('Rooms')}</a
-							>
+								<span>
+									{_('Rooms')}
+								</span>
+							</a>
 						</li>
 						<li>
 							<a href={`/${organization.slug}/manager/mentors`}>
 								<Icon icon="person_book" />
-								{_('VirtuaMentors')}</a
-							>
+								<span>
+									{_('VirtuaMentors')}
+								</span>
+							</a>
 						</li>
 					</ul>
 				</nav>
@@ -74,6 +80,19 @@
 <style>
 	.menu {
 		width: 14rem;
+		margin-right: 1rem;
+	}
+	@media (max-width: 800px) {
+		.menu {
+			max-width: 4rem;
+		}
+		.menu span {
+			font-size: small;
+			display: block;
+		}
+		.menu a {
+			text-align: center;
+		}
 	}
 	.content {
 		flex: 1;

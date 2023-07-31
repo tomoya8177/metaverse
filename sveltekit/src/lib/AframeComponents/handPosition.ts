@@ -1,5 +1,4 @@
 import { degree2radian } from '$lib/math/degree2radians';
-import 'aframe';
 AFRAME.registerComponent('hand-position', {
 	init: function () {
 		this.el.addEventListener('model-loaded', () => {

@@ -15,6 +15,12 @@
 	}
 </script>
 
+<svelte:head>
+	<title>
+		{_('Admin Console')} | VirtuaCampus
+	</title>
+</svelte:head>
+
 {#if !loggedIn}
 	<Login />
 {:else}
@@ -28,20 +34,26 @@
 							<li>
 								<a href="/admin/users">
 									<Icon icon="group" />
-									{_('Users')}</a
-								>
+									<span>
+										{_('Users')}
+									</span>
+								</a>
 							</li>
 							<li>
 								<a href="/admin/organizations">
 									<Icon icon="apartment" />
-									{_('Organizations')}</a
-								>
+									<span>
+										{_('Organizations')}
+									</span>
+								</a>
 							</li>
 							<li>
 								<a href="/admin/rooms">
 									<Icon icon="vrpano" />
-									{_('Rooms')}</a
-								>
+									<span>
+										{_('Rooms')}
+									</span>
+								</a>
 							</li>
 						</ul>
 					</nav>
@@ -57,6 +69,19 @@
 <style>
 	.menu {
 		width: 10rem;
+		margin-right: 1rem;
+	}
+	@media (max-width: 800px) {
+		.menu {
+			max-width: 4rem;
+		}
+		.menu span {
+			font-size: small;
+			display: block;
+		}
+		.menu a {
+			text-align: center;
+		}
 	}
 	.content {
 		flex: 1;

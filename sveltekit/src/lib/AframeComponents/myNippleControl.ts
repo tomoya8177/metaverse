@@ -1,5 +1,4 @@
 import { nippleControl } from '$lib/frontend/Classes/NippleControl';
-import 'aframe';
 AFRAME.registerComponent('my-nipple-control', {
 	schema: {
 		userId: { type: 'string' }

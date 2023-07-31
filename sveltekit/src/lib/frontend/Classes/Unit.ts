@@ -10,7 +10,6 @@ import axios from 'axios';
 import { degree2radian } from '$lib/math/degree2radians';
 import { sharedObjects } from './SharedObjects';
 import { pollAudioLevel } from '../pollAudioLevel';
-import * as THREE from 'three';
 import { SharedObject } from './SharedObject';
 let event: Event;
 EventStore.subscribe((value) => {

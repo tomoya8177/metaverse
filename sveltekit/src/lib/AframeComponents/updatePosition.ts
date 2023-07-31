@@ -1,7 +1,6 @@
 import { Users } from '$lib/frontend/Classes/Users';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { UserStore, type xyz } from '$lib/store';
-import 'aframe';
 let user: User;
 UserStore.subscribe((u) => {
 	user = u;

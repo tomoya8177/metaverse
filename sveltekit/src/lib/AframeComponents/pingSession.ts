@@ -1,7 +1,6 @@
 import type { Event } from '$lib/frontend/Classes/Event';
 import { sessionPing } from '$lib/frontend/Classes/sessionPing';
 import { EventStore } from '$lib/store';
-import 'aframe';
 import axios from 'axios';
 let event: Event;
 EventStore.subscribe((value) => {

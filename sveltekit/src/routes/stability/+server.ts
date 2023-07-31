@@ -46,7 +46,7 @@ export const POST = async ({ request, params }): Promise<Response> => {
 		})
 	}).then(async (response) => {
 		if (!response.ok) {
-			throw new Error(`Non-200 response: ${await response.text()}`);
+			return new Response(`Non-200 response: ${await response.text()}`);
 		}
 
 		const responseJSON = (await response.json()) as GenerationResponse;

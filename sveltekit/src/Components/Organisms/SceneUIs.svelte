@@ -2,9 +2,6 @@
 	import ActionButtons from './ActionButtons.svelte';
 	import ChatBox from './ChatBox.svelte';
 
-	import 'aframe';
-	import 'aframe-environment-component';
-	import 'aframe-extras';
 	import { onDestroy, onMount } from 'svelte';
 	import {
 		PreviewPanelOpen,
@@ -15,7 +12,6 @@
 	} from '$lib/store';
 	import axios from 'axios';
 
-	import '$lib/AframeComponents';
 	import type { User } from '$lib/frontend/Classes/User';
 	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
 	import { Message } from '$lib/frontend/Classes/Message';
@@ -405,8 +401,15 @@
 		border-radius: 0.4rem;
 		bottom: 6rem;
 		right: 0;
-		background-color: rgba(0, 0, 0, 0.7);
-		color: white;
+		/* color: white; */
+		background-color: rgba(255, 255, 255, 0.7);
 		display: grid;
+	}
+	/* background color based on browder dark setting */
+	@media (prefers-color-scheme: dark) {
+		.chat-box {
+			background-color: rgba(0, 0, 0, 0.7);
+			/* color: black; */
+		}
 	}
 </style>
