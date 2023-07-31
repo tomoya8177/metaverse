@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_IS_DEV } from '$env/static/public';
-	import { Toast } from '$lib/store';
+	import { _ } from '$lib/i18n';
+	import { ConfirmDialog, Toast } from '$lib/store';
 	import { fade } from 'svelte/transition';
 </script>
 
@@ -15,9 +16,36 @@
 		{$Toast.message}
 	</div>
 {/if}
-{#if PUBLIC_IS_DEV == 'true'}
-	DEV Environment
-{/if}
+<dialog open={$ConfirmDialog.open}>
+	<article>
+		{$ConfirmDialog.message}
+		<div style="display:flex; margin-top:1rem">
+			<div style="flex:1;">
+				<a
+					href={'#'}
+					role="button"
+					on:click={() => {
+						$ConfirmDialog.result = true;
+					}}
+				>
+					{_('OK')}
+				</a>
+			</div>
+			<div>
+				<a
+					class="secondary"
+					role="button"
+					href={'#'}
+					on:click={() => {
+						$ConfirmDialog.result = false;
+					}}
+				>
+					{_('Cancel')}
+				</a>
+			</div>
+		</div>
+	</article>
+</dialog>
 
 <style>
 	.toast-bottom {
@@ -29,6 +57,7 @@
 		padding: 1rem;
 		border-radius: 0.5rem;
 		z-index: 1000;
+		max-width: calc(100vw - 2rem);
 	}
 	.toast-top {
 		position: fixed;
@@ -39,5 +68,6 @@
 		padding: 1rem;
 		border-radius: 0.5rem;
 		z-index: 1000;
+		max-width: calc(100vw - 2rem);
 	}
 </style>

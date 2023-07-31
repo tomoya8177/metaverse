@@ -11,7 +11,7 @@
 	import { _ } from '$lib/i18n';
 	import { checkSlugForOrganization } from '$lib/frontend/checkSlugForOrganization';
 	import { deleteOrganization } from '$lib/frontend/deleteOrganization';
-	import { myAlert } from '$lib/frontend/toast';
+	import { myAlert, myConfirm } from '$lib/frontend/toast';
 	let editOrganization: Organization = EmptyOrganization;
 	let editMode: 'update' | 'create' = 'update';
 	let organizations: Organization[] = [];
@@ -43,6 +43,7 @@
 		});
 		modalOpen = false;
 	};
+	let deleteBusy = false;
 </script>
 
 <h2>{_('Organizations')}</h2>
@@ -107,9 +108,13 @@
 				>
 				<button
 					class="secondary"
+					aria-busy={deleteBusy}
 					on:click={async () => {
-						if (!confirm(_('Are you sure that you want to delete this organization?'))) return;
+						if (!(await myConfirm(_('Are you sure that you want to delete this organization?'))))
+							return;
+						deleteBusy = true;
 						await deleteOrganization(editOrganization);
+						deleteBusy = false;
 						modalOpen = false;
 						organizations = organizations.filter((org) => org.id != editOrganization.id);
 					}}

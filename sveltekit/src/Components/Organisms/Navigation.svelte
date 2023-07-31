@@ -146,7 +146,16 @@
 						</li>
 						{#if $UserStore.isAdmin}
 							<li>
-								<a href="/admin" role="button"> Admin console</a>
+								<a
+									href={'#'}
+									on:click={() => {
+										videoChat.leave();
+										EventStore.set(EmptyEvent);
+										location.href = '/admin';
+									}}
+								>
+									Admin console</a
+								>
 							</li>
 						{/if}
 						<li>
