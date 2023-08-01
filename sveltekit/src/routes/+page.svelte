@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
+	import { page } from '$app/stores';
 	import { UserStore } from '$lib/store';
 	import { onMount } from 'svelte';
 	import Icon from '../Components/Atom/Icon.svelte';
@@ -12,6 +13,7 @@
 	import { fade } from 'svelte/transition';
 	import { User } from '$lib/frontend/Classes/User';
 	import { cookies } from '$lib/frontend/cookies';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	let mentor: Mentor | null = null;
 	let intro: string = '';
 	let invite: string = '';

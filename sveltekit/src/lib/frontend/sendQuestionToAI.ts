@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { Message } from './Classes/Message';
 import { escapeHTML } from '$lib/math/escapeHTML';
+import { actionHistory } from './Classes/actionHistory';
 
 export const sendQuestionToAI = async (
 	mentorId: string,
@@ -8,6 +9,7 @@ export const sendQuestionToAI = async (
 	newMessage: Message
 ) => {
 	console.log({ eventId });
+	actionHistory.send('sendQuestionToAI', newMessage);
 	const response = await axios
 		.post('/mentor/' + mentorId, {
 			eventId,

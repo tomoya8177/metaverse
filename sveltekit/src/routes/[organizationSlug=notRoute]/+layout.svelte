@@ -8,9 +8,11 @@
 	let organization: Organization;
 	import { UserStore } from '$lib/store';
 	import type { PageData } from './$types';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 
 	export let data: PageData;
 	organization = data.organization;
+	actionHistory.organization = organization.id;
 	console.log({ user: $UserStore });
 </script>
 

@@ -18,6 +18,7 @@
 	import { _ } from '$lib/i18n';
 	import { speechInterval } from '$lib/frontend/aiSpeaksOut';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 
 	export let message: Message;
 	export let onDelete: (id: string) => void;
@@ -37,6 +38,7 @@
 			'https://www.filestackapi.com/api/file/' + message.handle + '/metadata'
 		);
 		console.log(response);
+		actionHistory.send('sendFileFromChatToRoom', { file: { ...response.data, url: message.url } });
 		appendObjectInTheRoom({
 			eventId: $EventStore.id,
 			userId: $UserStore.id,
@@ -108,6 +110,7 @@
 					message = await axios
 						.put('/api/messages/' + message.id, { pinned: !message.pinned })
 						.then((res) => res.data);
+					actionHistory.send('pinOrUnpinMessage', { message });
 				}}
 			>
 				<Icon icon="push_pin" />
@@ -118,6 +121,7 @@
 				href={'#'}
 				on:click={async () => {
 					await axios.delete('/api/messages/' + message.id);
+					actionHistory.send('deleteMessage', { message });
 					onDelete(message.id);
 				}}
 			>

@@ -128,5 +128,54 @@ export default {
 	Unock: '잠금 해제',
 	Lock: '잠금',
 	'Add To Preview Pane': '미리보기 패널에 추가',
-	'Microphone access denied by the user.': '사용자에 의해 마이크에 접근이 거부되었습니다.'
+	'Microphone access denied by the user.': '사용자에 의해 마이크에 접근이 거부되었습니다.',
+	'Delete Organization': '조직 삭제',
+	Icon: '아이콘',
+	'Have AI to generate Icon': 'AI로 아이콘 생성하기',
+	'Your prompt is sent to AI. It may take up to 1 minute to generate an image.':
+		'지시 사항이 AI에 전송되었습니다. 이미지를 생성하는 데 최대 1분이 걸릴 수 있습니다.',
+	'Your image is ready!': '이미지가 준비되었습니다!',
+	'Generate Image': '이미지 생성',
+	'AI Speaks': 'AI 음성',
+	'Have AI to write the introduction': 'AI로 소개 글 작성하기',
+	'Specify the language you want it to speak. If not specified, AI mentor will talk in English.':
+		'AI가 말할 언어를 지정하세요. 지정하지 않으면 AI 멘토는 영어로 말할 것입니다.',
+	"Feed documents to the mentor's brain. The AI will answer questions based on these documents.":
+		'멘토의 뇌에 문서를 입력하세요. AI는 이러한 문서를 기반으로 질문에 대답합니다.',
+	'In addition to the documents fed to the mentor, you can feed additional documents that will be used specifically in this room.':
+		'멘토에게 입력된 문서 외에도 이 방에서 특정하게 사용될 추가 문서를 입력할 수 있습니다.',
+	'In addition to the prompt given to the mentor, you can feed additional prompt specific to this room.':
+		'멘토에게 주어진 지시 사항 외에도 이 방에 특정한 추가 지시 사항을 입력할 수 있습니다.',
+	'With Metaverse': '메타버스와 함께',
+	'Environment Preset': '환경 프리셋',
+	'Environment Model': '환경 모델',
+	'Object is in locked position.': '객체가 잠긴 위치에 있습니다.',
+	'Leave Room': '방 나가기',
+	'Admin console': '관리자 콘솔',
+	'Room Setting': '방 설정',
+	'Organization Setting': '조직 설정',
+	'Who can enter': '입장할 수 있는 사람',
+	'Users outside the organization': '조직 외부 사용자',
+	'User will become a member of the organization': '사용자는 조직의 구성원이 됩니다',
+	'Organization Members': '조직 구성원',
+	'Selected Organization Members': '선택한 조직 구성원',
+	'Invite user': '사용자 초대',
+	'One email address at a time.': '한 번에 하나의 이메일 주소를 입력하세요.',
+	'Invite by Email': '이메일로 초대하기',
+	'This user is not a member of this organization. Do you want to invite him?':
+		'이 사용자는 이 조직의 구성원이 아닙니다. 초대하시겠습니까?',
+	'This user is not allowed to join this room. Do you want to allow this user to join this room?':
+		'이 사용자는 이 방에 참여할 수 없습니다. 이 사용자를 이 방에 참여할 수 있도록 허용하시겠습니까?',
+	'This user is not a member of this organization. Do you want to invite him and allow this user to join this room?':
+		'이 사용자는 이 조직의 구성원이 아닙니다. 이 사용자를 초대하고 이 방에 참여할 수 있도록 허용하시겠습니까?',
+	'Hello,': '안녕하세요,',
+	'is inviting you to the metaverse world.': '은 메타버스 세계로 초대하고 있습니다.',
+	'Please click the link below to enter the room!': '아래의 링크를 클릭하여 방에 입장하세요!',
+	'Invitation from VirtuaCampus': 'VirtuaCampus로부터 초대',
+	'Invitation sent': '초대가 전송되었습니다',
+	Invite: '초대',
+	'Rate This Metaverse!': '이 메타버스 평가하기!',
+	'Give us your feedback': '의견을 주세요',
+	'Thank you for your feedback!': '피드백 주셔서 감사합니다!',
+	Later: '나중에'
 };

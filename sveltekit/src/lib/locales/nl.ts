@@ -131,5 +131,55 @@ export default {
 	Unock: 'Ontgrendelen',
 	Lock: 'Vergrendelen',
 	'Add To Preview Pane': 'Toevoegen aan voorbeeldpaneel',
-	'Microphone access denied by the user.': 'Toegang tot microfoon is geweigerd door de gebruiker.'
+	'Microphone access denied by the user.': 'Toegang tot microfoon is geweigerd door de gebruiker.',
+	'Delete Organization': 'Organisatie verwijderen',
+	Icon: 'Pictogram',
+	'Have AI to generate Icon': 'Laat AI een pictogram genereren',
+	'Your prompt is sent to AI. It may take up to 1 minute to generate an image.':
+		'Uw aanwijzing is verzonden naar AI. Het kan tot 1 minuut duren om een afbeelding te genereren.',
+	'Your image is ready!': 'Uw afbeelding is klaar!',
+	'Generate Image': 'Afbeelding genereren',
+	'AI Speaks': 'AI spreekt',
+	'Have AI to write the introduction': 'Laat AI de introductie schrijven',
+	'Specify the language you want it to speak. If not specified, AI mentor will talk in English.':
+		'Geef de taal op waarin u wilt dat het spreekt. Als dit niet wordt gespecificeerd, zal de AI-mentor in het Engels spreken.',
+	"Feed documents to the mentor's brain. The AI will answer questions based on these documents.":
+		'Voed documenten aan de hersenen van de mentor. De AI zal vragen beantwoorden op basis van deze documenten.',
+	'In addition to the documents fed to the mentor, you can feed additional documents that will be used specifically in this room.':
+		'Naast de documenten die aan de mentor zijn gevoed, kunt u aanvullende documenten invoeren die specifiek in deze ruimte worden gebruikt.',
+	'In addition to the prompt given to the mentor, you can feed additional prompt specific to this room.':
+		'Naast de aanwijzing die aan de mentor is gegeven, kunt u een aanvullende aanwijzing invoeren die specifiek is voor deze ruimte.',
+	'With Metaverse': 'Met Metaverse',
+	'Environment Preset': 'Omgeving Voorinstelling',
+	'Environment Model': 'Omgeving Model',
+	'Object is in locked position.': 'Object is in een vergrendelde positie.',
+	'Leave Room': 'Vertrek uit de kamer',
+	'Admin console': 'Beheerdersconsole',
+	'Room Setting': 'Kamersinstelling',
+	'Organization Setting': 'Organisatie-instelling',
+	'Who can enter': 'Wie kan binnenkomen',
+	'Users outside the organization': 'Gebruikers buiten de organisatie',
+	'User will become a member of the organization': 'Gebruiker wordt lid van de organisatie',
+	'Organization Members': 'Organisatieleden',
+	'Selected Organization Members': 'Geselecteerde organisatieleden',
+	'Invite user': 'Gebruiker uitnodigen',
+	'One email address at a time.': 'Één e-mailadres per keer.',
+	'Invite by Email': 'Nodig uit via e-mail',
+	'This user is not a member of this organization. Do you want to invite him?':
+		'Deze gebruiker is geen lid van deze organisatie. Wilt u hem uitnodigen?',
+	'This user is not allowed to join this room. Do you want to allow this user to join this room?':
+		'Deze gebruiker mag niet deelnemen aan deze kamer. Wilt u toestaan dat deze gebruiker deelneemt aan deze kamer?',
+	'This user is not a member of this organization. Do you want to invite him and allow this user to join this room?':
+		'Deze gebruiker is geen lid van deze organisatie. Wilt u hem uitnodigen en toestaan dat hij deelneemt aan deze kamer?',
+	'Hello,': 'Hallo,',
+	'is inviting you to the metaverse world.': 'nodigt u uit voor de metaverse-wereld.',
+	'Please click the link below to enter the room!':
+		'Klik op de link hieronder om de kamer binnen te gaan!',
+	'Invitation from VirtuaCampus': 'Uitnodiging van VirtuaCampus',
+	'Invitation sent': 'Uitnodiging verzonden',
+	Invite: 'Uitnodigen',
+	'Rate This Metaverse!': 'Beoordeel deze metaverse!',
+	'Give us your feedback': 'Geef ons uw feedback',
+	'Thank you for your feedback!': 'Bedankt voor uw feedback!',
+	Later: 'Later'
 };

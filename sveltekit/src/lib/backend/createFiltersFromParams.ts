@@ -51,5 +51,17 @@ export const createFiltersFromParams = async (
 	}
 	let filter = filters.join(' and ');
 	if (!filter) filter = '1';
+	//if orderBy is set
+	if (searchParams.get('orderBy')) {
+		const orderBy = searchParams.get('orderBy');
+		const order = searchParams.get('order') || 'asc';
+		filter += ` order by ${orderBy} ${order}`;
+	}
+	//if limit is set
+	if (searchParams.get('limit')) {
+		const limit = searchParams.get('limit');
+		const offset = searchParams.get('offset') || 0;
+		filter += ` limit ${offset},${limit}`;
+	}
 	return filter;
 };

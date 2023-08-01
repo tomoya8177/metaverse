@@ -1,9 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_IS_DEV } from '$env/static/public';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	import { _ } from '$lib/i18n';
-	import { ConfirmDialog, Toast } from '$lib/store';
+	import { ConfirmDialog, Toast, UserStore } from '$lib/store';
 	import { fade } from 'svelte/transition';
+	actionHistory.send('visit', {
+		path: $page.url.pathname
+	});
 </script>
 
 <slot />

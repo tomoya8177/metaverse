@@ -19,6 +19,7 @@
 	import { myAlert } from '$lib/frontend/toast';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let textChatOpen = false;
 	export let waitingForAIAnswer: boolean;
 	const scrolToBottom = (element: Element) => {
@@ -89,6 +90,7 @@
 			on:click={async () => {
 				try {
 					if (await videoChat.startMyCamera()) {
+						actionHistory.send('startMyCamera');
 						$UserStore.onVideoMute = false;
 					}
 				} catch (e) {
@@ -105,6 +107,7 @@
 			class="circle-button"
 			on:click={() => {
 				videoChat.unpublishMyTrack('camera');
+				actionHistory.send('hideMyCamera');
 				me?.hideCamera();
 				$UserStore.onVideoMute = true;
 			}}
@@ -118,6 +121,7 @@
 			class="circle-button"
 			on:click={() => {
 				videoChat.unpublishMyTrack('screen');
+				actionHistory.send('hideMyScreen');
 				me?.hideScreen();
 				$UserStore.onScreenShare = false;
 			}}
@@ -131,6 +135,7 @@
 			on:click={async () => {
 				try {
 					const publicationTrackSid = await videoChat.startMyScreen();
+					actionHistory.send('startMyScreen');
 					if (!publicationTrackSid) return console.error(`Couldn't get access to the Screen`);
 					const el = document.getElementById(publicationTrackSid);
 					if (!el) return console.error(`Couldn't get access to the Screen`);
@@ -168,6 +173,7 @@
 			uploader.launchPicker(['image/*', 'video/*', '.glb', 'gltf'], 1, (res) => {
 				//when done
 				console.log(res);
+				actionHistory.send('uploadToScene', { files: res.filesUploaded });
 				res.filesUploaded.forEach(async (file) => {
 					appendObjectInTheRoom({
 						eventId: $EventStore.id,

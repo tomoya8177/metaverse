@@ -23,6 +23,7 @@
 	import DocumentForAiRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
 	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
 	import type { PageData } from './$types';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let data: PageData;
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
@@ -75,6 +76,7 @@
 		mentors = [...mentors.filter((mentor) => mentor.id != editEvent.mentor), mentor];
 		busy = false;
 		modalOpen = false;
+		actionHistory.send('createRoom', { room: newEvent });
 	};
 	const onUpdateClicked = async () => {
 		if (!(await editEvent.validate())) return;
@@ -87,6 +89,7 @@
 		});
 		busy = false;
 		modalOpen = false;
+		actionHistory.send('updateRoom', { room: updatedEvent });
 	};
 	const onDeleteClicked = async () => {
 		if (!confirm(_('Are you sure you want to delete this room?'))) return;
@@ -95,6 +98,7 @@
 		events = events.filter((event) => event.id != editEvent.id);
 
 		modalOpen = false;
+		actionHistory.send('deleteRoom', { room: editEvent });
 	};
 	let busy = false;
 </script>

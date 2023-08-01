@@ -17,6 +17,13 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { loadSharedObjects } from '$lib/frontend/loadSharedObjects';
 	import { Unit } from '$lib/frontend/Classes/Unit';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { myAlert, toast } from '$lib/frontend/toast';
+	import ModalCloseButton from '../../../Components/Atom/ModalCloseButton.svelte';
+	import { _ } from '$lib/i18n';
+	import Icon from '../../../Components/Atom/Icon.svelte';
+	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';
+	import { escapeHTML } from '$lib/math/escapeHTML';
 
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -32,6 +39,7 @@
 	let readyToConnect = false;
 	let me: Me | null = null;
 	const onSceneLoaded = async () => {
+		actionHistory.send('enteringRoom');
 		me = new Me($UserStore.id);
 		me.nickname = $UserStore.nickname;
 		Users.add(me);
@@ -57,16 +65,89 @@
 	onDestroy(() => {
 		messageUnlisteners();
 	});
+	let QADialogOpen = false;
+	let starValue = 5;
+	let feedback = '';
 </script>
 
 {#if !readyToConnect}
 	<EnterRoomDialog
-		whenChatConnected={() => {
+		whenChatConnected={async () => {
 			loadSharedObjects($EventStore.id);
+			const existingFeedback = await axios
+				.get('/api/feedbacks?campaign=1&user=' + $UserStore.id)
+				.then((res) => res.data);
+			if (!existingFeedback.length) {
+				setTimeout(() => {
+					QADialogOpen = true;
+				}, 120000); //in 2 minutes, the QA dialog will show up
+			}
 		}}
 		{me}
 		bind:readyToConnect
 	/>
+{/if}
+{#if QADialogOpen}
+	<dialog open>
+		<article>
+			<ModalCloseButton
+				onClick={() => {
+					QADialogOpen = false;
+				}}
+			/>
+			<h3>
+				{_('Rate This Metaverse!')}
+			</h3>
+			<section>
+				<div style="display:flex">
+					{#each [1, 2, 3, 4, 5] as i}
+						<a
+							href={'#'}
+							on:click={() => {
+								starValue = i;
+							}}
+							class="star"
+							class:selected={starValue >= i}
+						>
+							<Icon size={4} icon="star" />
+						</a>
+					{/each}
+				</div>
+			</section>
+			<InputWithLabel label={_('Give us your feedback')} type="textarea" bind:value={feedback} />
+			<button
+				on:click={async () => {
+					const feedbackObj = {
+						organization: $EventStore.organization,
+						event: $EventStore.id,
+						user: $UserStore.id,
+						star: starValue,
+						data: JSON.stringify({
+							comment: escapeHTML(feedback)
+						}),
+						campaign: '1'
+					};
+					await axios.post('/api/feedbacks', feedbackObj);
+					actionHistory.send('feedback', feedbackObj);
+					QADialogOpen = false;
+					toast(_('Thank you for your feedback!'));
+				}}
+			>
+				{_('Send')}
+			</button>
+			<button
+				class="secondary"
+				on:click={() => {
+					QADialogOpen = false;
+					setTimeout(() => {
+						QADialogOpen = true;
+					}, 120000);
+				}}
+			>
+				{_('Later')}
+			</button>
+		</article>
+	</dialog>
 {/if}
 <a-scene
 	on-scene-loaded
@@ -123,3 +204,15 @@
 {#if sceneLoaded}
 	<SceneUIs {me} />
 {/if}
+
+<style>
+	.star {
+		flex: 1;
+		text-align: center;
+		display: inline-block;
+		color: gray;
+	}
+	.star.selected {
+		color: orange;
+	}
+</style>

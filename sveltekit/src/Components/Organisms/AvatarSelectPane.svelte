@@ -3,6 +3,7 @@
 	import AvatarPreview from '../Atom/AvatarPreview.svelte';
 	import { fade } from 'svelte/transition';
 	import { _ } from '$lib/i18n';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let url: string;
 
 	let avatarSelectOpen = false;
@@ -33,6 +34,7 @@
 						href={'#'}
 						on:click={() => {
 							url = avatar.url;
+							actionHistory.send('selectAvatar', { url: avatar.url });
 						}}
 					>
 						<img src={avatar.thumbnailURL} alt="" style="margin-bottom:0.4rem;" />

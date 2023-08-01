@@ -13,6 +13,7 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
 	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let me: Me | null;
 
 	export let readyToConnect;
@@ -24,6 +25,7 @@
 	});
 	export let whenChatConnected: () => void;
 	const onLeaveClicked = () => {
+		actionHistory.send('leaveRoom');
 		videoChat.leave();
 		EventStore.set(EmptyEvent);
 		if ($UserStore?.isMember) {
@@ -47,6 +49,7 @@
 				{me}
 				label={_('Enter')}
 				onUpdateDone={async () => {
+					actionHistory.send('enterRoom');
 					readyToConnect = true;
 					if (!videoChat.connected) {
 						videoChat.init($UserStore, $EventStore);

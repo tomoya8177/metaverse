@@ -175,5 +175,9 @@ export default {
 		'以下のリンクをクリックしてルームに入ってください！',
 	'Invitation from VirtuaCampus': 'VirtuaCampusからの招待',
 	'Invitation sent': '招待が送信されました',
-	Invite: '招待'
+	Invite: '招待',
+	'Rate This Metaverse!': 'このメタバースを評価してください！',
+	'Give us your feedback': 'フィードバックをお願いします',
+	'Thank you for your feedback!': 'フィードバックありがとうございます！',
+	Later: '後で'
 };

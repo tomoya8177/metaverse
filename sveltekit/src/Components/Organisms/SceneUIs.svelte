@@ -30,6 +30,7 @@
 	import NippleControl from '../Atom/NippleControl.svelte';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { myAlert } from '$lib/frontend/toast';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -166,6 +167,7 @@
 	let newMessageBody = '';
 
 	const sendChatMessage = async (message: Message) => {
+		actionHistory.send('sendChatMessage', message);
 		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
 		console.log({ createdMessage });
 		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
@@ -179,21 +181,6 @@
 		return createdMessage;
 	};
 	let filteredItemsInPreview: SharedObject[] = [];
-	// const refreshPreviewPane = (ifOpen: boolean) => {
-	// 	filteredItemsInPreview = [];
-	// 	if (!ifOpen) return;
-	// 	sharedObjects.items.forEach((item) => {
-	// 		setTimeout(() => {
-	// 			//check if the item has the function
-	// 			if (!item.appendAssetToPreviewPane) return;
-	// 			item.appendAssetToPreviewPane();
-	// 		}, 100);
-	// 		filteredItemsInPreview.push(item);
-	// 	});
-	// 	filteredItemsInPreview = filteredItemsInPreview;
-	// 	console.log({ filteredItemsInPreview });
-	// };
-	// $: refreshPreviewPane($PreviewPanelOpen);
 </script>
 
 {#if $FocusObjectStore.id}

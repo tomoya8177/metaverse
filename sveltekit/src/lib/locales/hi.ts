@@ -131,5 +131,55 @@ export default {
 	Unock: 'अनलॉक',
 	Lock: 'लॉक',
 	'Add To Preview Pane': 'पूर्वावलोकन पैनल में जोड़ें',
-	'Microphone access denied by the user.': 'उपयोगकर्ता ने माइक्रोफोन तक पहुंच अस्वीकार की है।'
+	'Microphone access denied by the user.': 'उपयोगकर्ता द्वारा माइक्रोफोन एक्सेस अस्वीकृत।',
+	'Delete Organization': 'संगठन हटाएँ',
+	Icon: 'आइकन',
+	'Have AI to generate Icon': 'आईकॉन उत्पन्न करने के लिए AI का उपयोग करें',
+	'Your prompt is sent to AI. It may take up to 1 minute to generate an image.':
+		'आपकी प्रेरणा AI को भेजी गई है। छवि उत्पन्न करने में अधिकतम 1 मिनट लग सकता है।',
+	'Your image is ready!': 'आपकी छवि तैयार है!',
+	'Generate Image': 'छवि उत्पन्न करें',
+	'AI Speaks': 'AI बोलता है',
+	'Have AI to write the introduction': 'परिचय लिखने के लिए AI का उपयोग करें',
+	'Specify the language you want it to speak. If not specified, AI mentor will talk in English.':
+		'आप उस भाषा को निर्दिष्ट करें जिसमें आप चाहते हैं कि वह बोले। यदि निर्दिष्ट नहीं किया गया हो, तो AI मेंटर अंग्रेज़ी में बोलेगा।',
+	"Feed documents to the mentor's brain. The AI will answer questions based on these documents.":
+		'मेंटर के दिमाग में दस्तावेज़ भरें। AI इन दस्तावेज़ों के आधार पर प्रश्नों का जवाब देगा।',
+	'In addition to the documents fed to the mentor, you can feed additional documents that will be used specifically in this room.':
+		'मेंटर को खिलाये गए दस्तावेज़ों के अलावा, आप इस कक्ष में विशेष रूप से उपयोग किए जाने वाले अतिरिक्त दस्तावेज़ भर सकते हैं।',
+	'In addition to the prompt given to the mentor, you can feed additional prompt specific to this room.':
+		'मेंटर को दिए गए प्रोम्प्ट के अतिरिक्त, आप इस कक्ष के लिए विशेष रूप से अतिरिक्त प्रोम्प्ट भर सकते हैं।',
+	'With Metaverse': 'मेटावर्स के साथ',
+	'Environment Preset': 'वातावरण पूर्वनिर्धारित',
+	'Environment Model': 'वातावरण मॉडल',
+	'Object is in locked position.': 'वस्तु ताले बंद स्थिति में है।',
+	'Leave Room': 'कक्ष छोड़ें',
+	'Admin console': 'व्यवस्थापक कंसोल',
+	'Room Setting': 'कक्ष सेटिंग',
+	'Organization Setting': 'संगठन सेटिंग',
+	'Who can enter': 'कौन प्रवेश कर सकता है',
+	'Users outside the organization': 'संगठन के बाहर के उपयोगकर्ता',
+	'User will become a member of the organization': 'उपयोगकर्ता संगठन का सदस्य बन जाएगा',
+	'Organization Members': 'संगठन के सदस्य',
+	'Selected Organization Members': 'चयनित संगठन के सदस्य',
+	'Invite user': 'उपयोगकर्ता को आमंत्रित करें',
+	'One email address at a time.': 'एक ईमेल पता एक समय में।',
+	'Invite by Email': 'ईमेल द्वारा आमंत्रित करें',
+	'This user is not a member of this organization. Do you want to invite him?':
+		'यह उपयोगकर्ता इस संगठन का सदस्य नहीं है। क्या आप उसे आमंत्रित करना चाहते हैं?',
+	'This user is not allowed to join this room. Do you want to allow this user to join this room?':
+		'इस उपयोगकर्ता को इस कक्ष में शामिल होने की अनुमति नहीं है। क्या आप इस उपयोगकर्ता को इस कक्ष में शामिल होने की अनुमति देना चाहते हैं?',
+	'This user is not a member of this organization. Do you want to invite him and allow this user to join this room?':
+		'यह उपयोगकर्ता इस संगठन का सदस्य नहीं है। क्या आप उसे आमंत्रित करना चाहते हैं और इस उपयोगकर्ता को इस कक्ष में शामिल होने की अनुमति देना चाहते हैं?',
+	'Hello,': 'नमस्ते,',
+	'is inviting you to the metaverse world.': 'आपको मेटावर्स विश्व में आमंत्रित कर रहा है।',
+	'Please click the link below to enter the room!':
+		'कृपया कक्ष में प्रवेश करने के लिए नीचे दिए गए लिंक पर क्लिक करें!',
+	'Invitation from VirtuaCampus': 'वर्चुअलकैंपस से आमंत्रण',
+	'Invitation sent': 'आमंत्रण भेज दिया गया है',
+	Invite: 'आमंत्रित करें',
+	'Rate This Metaverse!': 'कृपया इस मेटावर्स को रेट करें!',
+	'Give us your feedback': 'हमें अपनी प्रतिक्रिया दें',
+	'Thank you for your feedback!': 'आपकी प्रतिक्रिया के लिए धन्यवाद!',
+	Later: 'बाद में'
 };

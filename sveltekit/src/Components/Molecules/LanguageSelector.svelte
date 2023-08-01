@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	import { cookies } from '$lib/frontend/cookies';
 	import { onMount } from 'svelte';
 	let chosenLanguage: string;
@@ -13,6 +14,7 @@
 		//set it to cookie
 		console.log(chosenLanguage);
 		cookies.set('locale', chosenLanguage, { expires: 365 * 10 });
+		actionHistory.send('changeLanguage', { language: chosenLanguage });
 		location.reload();
 	}}
 >

@@ -15,6 +15,7 @@
 	import LanguageSelector from '../Molecules/LanguageSelector.svelte';
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let organization: Organization | null = null;
 	export let open = false;
 	let invitingEmail = '';
@@ -155,6 +156,9 @@
 						subject: _('Invitation from VirtuaCampus'), // Subject line
 						text: body, // plain text body
 						html: html
+					});
+					actionHistory.send('inviteUser', {
+						user: existingUser
 					});
 					toast(_('Invitation sent'));
 					inviteBusy = false;

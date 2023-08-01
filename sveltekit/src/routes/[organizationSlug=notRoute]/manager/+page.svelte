@@ -3,6 +3,7 @@
 	import { deleteOrganization } from '$lib/frontend/deleteOrganization';
 	import { _ } from '$lib/i18n';
 	import type { PageData } from './$types';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let data: PageData;
 	let organization = data.organization;
 </script>
@@ -18,6 +19,7 @@
 <button
 	on:click={async () => {
 		if (!confirm(_('Are you sure that you want to delete this organization?'))) return;
+		actionHistory.send('deleteOrganization', { organization });
 		await deleteOrganization(organization);
 		location.href = '/';
 	}}

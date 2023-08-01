@@ -127,5 +127,54 @@ export default {
 	Unock: '解锁',
 	Lock: '锁定',
 	'Add To Preview Pane': '添加到预览面板',
-	'Microphone access denied by the user.': '用户拒绝访问麦克风。'
+	'Microphone access denied by the user.': '用户拒绝访问麦克风。',
+	'Delete Organization': '删除组织',
+	Icon: '图标',
+	'Have AI to generate Icon': '使用AI生成图标',
+	'Your prompt is sent to AI. It may take up to 1 minute to generate an image.':
+		'您的提示已发送给AI。可能需要最多1分钟才能生成图像。',
+	'Your image is ready!': '您的图像已准备好！',
+	'Generate Image': '生成图像',
+	'AI Speaks': 'AI发言',
+	'Have AI to write the introduction': '让AI编写介绍',
+	'Specify the language you want it to speak. If not specified, AI mentor will talk in English.':
+		'请指定您希望它说话的语言。如果未指定，AI导师将以英语交谈。',
+	"Feed documents to the mentor's brain. The AI will answer questions based on these documents.":
+		'将文档输入导师的大脑。 AI将根据这些文档回答问题。',
+	'In addition to the documents fed to the mentor, you can feed additional documents that will be used specifically in this room.':
+		'除了提供给导师的文件之外，您还可以提供其他专门用于此房间的文件。',
+	'In addition to the prompt given to the mentor, you can feed additional prompt specific to this room.':
+		'除了给导师的提示外，您还可以提供特定于此房间的其他提示。',
+	'With Metaverse': '使用Metaverse',
+	'Environment Preset': '环境预设',
+	'Environment Model': '环境模型',
+	'Object is in locked position.': '对象被锁定在位置。',
+	'Leave Room': '离开房间',
+	'Admin console': '管理员控制台',
+	'Room Setting': '房间设置',
+	'Organization Setting': '组织设置',
+	'Who can enter': '谁可以进入',
+	'Users outside the organization': '组织外的用户',
+	'User will become a member of the organization': '用户将成为组织的成员',
+	'Organization Members': '组织成员',
+	'Selected Organization Members': '已选择的组织成员',
+	'Invite user': '邀请用户',
+	'One email address at a time.': '每次一个电子邮件地址。',
+	'Invite by Email': '通过电子邮件邀请',
+	'This user is not a member of this organization. Do you want to invite him?':
+		'此用户不是此组织的成员。您要邀请他吗？',
+	'This user is not allowed to join this room. Do you want to allow this user to join this room?':
+		'此用户不允许加入此房间。您要允许此用户加入此房间吗？',
+	'This user is not a member of this organization. Do you want to invite him and allow this user to join this room?':
+		'此用户不是此组织的成员。您要邀请他并允许此用户加入此房间吗？',
+	'Hello,': '您好，',
+	'is inviting you to the metaverse world.': '邀请您进入元宇宙世界。',
+	'Please click the link below to enter the room!': '请点击下面的链接进入房间！',
+	'Invitation from VirtuaCampus': '来自VirtuaCampus的邀请',
+	'Invitation sent': '邀请已发送',
+	Invite: '邀请',
+	'Rate This Metaverse!': '评价这个元宇宙！',
+	'Give us your feedback': '给我们您的反馈',
+	'Thank you for your feedback!': '感谢您的反馈！',
+	Later: '稍后'
 };

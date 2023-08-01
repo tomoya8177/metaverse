@@ -11,6 +11,7 @@
 	import { myAlert } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let organization: string = '';
 	export let event: Event | null = null;
 	let loggedIn: boolean | null = null;
@@ -32,6 +33,7 @@
 		});
 		busy = false;
 		verificationMode = true;
+		actionHistory.send('login', { email });
 	};
 	let verificationCode: string = '';
 	const onVerifyClicked = async () => {
@@ -52,6 +54,7 @@
 			}, 2000);
 		}
 		busy = false;
+		actionHistory.send('verify', { email });
 	};
 	const onLoginClicked = async () => {
 		if (!email) {

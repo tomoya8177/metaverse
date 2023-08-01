@@ -100,7 +100,7 @@ export const PUT = async ({ request, params }) => {
 			return;
 		console.log('rewriting storedChat for event');
 
-		const messages = event.prompt || '';
+		const messages = event?.prompt || '';
 		const eventPromptDocs = await textSplitter.createDocuments([messages]);
 
 		const documents: DocumentForAI[] = await db.query(

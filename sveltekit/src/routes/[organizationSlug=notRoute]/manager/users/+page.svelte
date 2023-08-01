@@ -12,6 +12,7 @@
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 	import AvatarThumbnail from '../../../../Components/Atom/AvatarThumbnail.svelte';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let data: PageData;
 	export let users: User[] = data.users;
 	export let userRoles: UserRole[] = data.userRoles;
@@ -57,6 +58,7 @@
 		users = [...users, filledUser].sort((a: User, b: User) => (a.createdAt > b.createdAt ? -1 : 1));
 		updateBusy = false;
 		newUserModalOpen = false;
+		actionHistory.send('createUser', { user: filledUser });
 	};
 	const onUpdateClicked = async () => {
 		if (!editUser.email) {
@@ -76,6 +78,7 @@
 		});
 		updateBusy = false;
 		newUserModalOpen = false;
+		actionHistory.send('updateUser', { user: filledUser });
 	};
 	const onDeleteClicked = async () => {
 		if (!confirm(_('Are you sure that you want to delete this user?'))) return;
@@ -87,6 +90,7 @@
 		deleteBusy = false;
 		users = users.filter((user) => user.id != editUser.id);
 		newUserModalOpen = false;
+		actionHistory.send('deleteUser', { user: editUser });
 	};
 	let updateBusy = false;
 	let deleteBusy = false;

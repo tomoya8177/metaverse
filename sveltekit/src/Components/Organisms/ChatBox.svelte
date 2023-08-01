@@ -22,6 +22,7 @@
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { _ } from '$lib/i18n';
 	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let virtuaMentorReady = false;
 	export let messages: Message[] = [];
 	export let newMessagePinned = false;
@@ -66,6 +67,7 @@
 		busy = false;
 		if (newMessageGenerateImage) {
 			waitingForAIAnswer = true;
+			actionHistory.send('generateImage', { message: newMessageBody });
 			const promise = new GenerateImage(newMessageBody);
 			promise.onDone(async (file) => {
 				const mentor = await axios
@@ -168,6 +170,7 @@
 				on:click={() => {
 					uploader.launchPicker(undefined, 1, async (res) => {
 						res.filesUploaded.forEach(async (file) => {
+							actionHistory.send('uploadToChat', file);
 							console.log(file);
 
 							const message = new Message({

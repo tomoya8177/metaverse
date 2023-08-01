@@ -28,6 +28,7 @@
 	import { nl2br } from '$lib/math/nl2br';
 	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let data: PageData;
 	let paginated: Mentor[] = [];
 	export let organization: Organization = data.organization;
@@ -81,6 +82,7 @@
 		await reinstallAIBrain(createdMentor);
 		busy = false;
 		newMentorModalOpen = false;
+		actionHistory.send('createMentor', { mentor: createdMentor });
 	};
 	const onUpdateClicked = async () => {
 		if (!validateMentorData(editMentor)) return;
@@ -115,6 +117,7 @@
 		await reinstallAIBrain(updatedMentor);
 		busy = false;
 		newMentorModalOpen = false;
+		actionHistory.send('updateMentor', { mentor: updatedMentor });
 	};
 	const onDeleteClicked = async () => {
 		if (!confirm('Are you sure that you want to delete this mentor?')) return;
@@ -124,6 +127,7 @@
 		await axios.delete('/api/documentsForAI?mentor=' + editMentor.id).then((res) => res.data);
 		newMentorModalOpen = false;
 		mentors = mentors.filter((mentor) => mentor.id != editMentor.id);
+		actionHistory.send('deleteMentor', { mentor: editMentor });
 	};
 </script>
 

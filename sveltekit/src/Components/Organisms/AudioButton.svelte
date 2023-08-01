@@ -4,6 +4,7 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { _ } from '$lib/i18n';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	let busy = false;
 </script>
 
@@ -19,6 +20,7 @@
 					await videoChat.connect();
 				}
 				await videoChat.startMyAudio();
+				actionHistory.send('connectAudio');
 				$UserStore.onMute = false;
 			} catch (e) {
 				console.log(e);
@@ -39,6 +41,8 @@
 		class="circle-button"
 		on:click={() => {
 			videoChat.unpublishMyTrack('audio');
+			actionHistory.send('disconnectAudio');
+
 			$UserStore.onMute = true;
 		}}
 	>

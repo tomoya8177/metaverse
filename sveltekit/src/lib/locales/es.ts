@@ -133,5 +133,56 @@ export default {
 	Unock: 'Desbloquear',
 	Lock: 'Bloquear',
 	'Add To Preview Pane': 'Agregar al Panel de Vista Previa',
-	'Microphone access denied by the user.': 'Acceso al micrófono denegado por el usuario.'
+	'Microphone access denied by the user.': 'Acceso al micrófono denegado por el usuario.',
+	'Delete Organization': 'Eliminar Organización',
+	Icon: 'Ícono',
+	'Have AI to generate Icon': 'Hacer que el AI genere el ícono',
+	'Your prompt is sent to AI. It may take up to 1 minute to generate an image.':
+		'Tu indicación ha sido enviada al AI. Puede tomar hasta 1 minuto generar una imagen.',
+	'Your image is ready!': '¡Tu imagen está lista!',
+	'Generate Image': 'Generar Imagen',
+	'AI Speaks': 'El AI Habla',
+	'Have AI to write the introduction': 'Hacer que el AI escriba la introducción',
+	'Specify the language you want it to speak. If not specified, AI mentor will talk in English.':
+		'Especifica el idioma en el que deseas que hable. Si no se especifica, el mentor AI hablará en inglés.',
+	"Feed documents to the mentor's brain. The AI will answer questions based on these documents.":
+		'Alimenta documentos al cerebro del mentor. El AI responderá preguntas basadas en estos documentos.',
+	'In addition to the documents fed to the mentor, you can feed additional documents that will be used specifically in this room.':
+		'Además de los documentos proporcionados al mentor, puedes alimentar documentos adicionales que se utilizarán específicamente en esta sala.',
+	'In addition to the prompt given to the mentor, you can feed additional prompt specific to this room.':
+		'Además de la indicación dada al mentor, puedes proporcionar una indicación adicional específica para esta sala.',
+	'With Metaverse': 'Con Metaverso',
+	'Environment Preset': 'Configuración del Entorno',
+	'Environment Model': 'Modelo del Entorno',
+	'Object is in locked position.': 'El objeto está en posición bloqueada.',
+	'Leave Room': 'Salir de la Sala',
+	'Admin console': 'Consola de Administrador',
+	'Room Setting': 'Configuración de la Sala',
+	'Organization Setting': 'Configuración de la Organización',
+	'Who can enter': 'Quién puede ingresar',
+	'Users outside the organization': 'Usuarios fuera de la organización',
+	'User will become a member of the organization':
+		'El usuario se convertirá en miembro de la organización',
+	'Organization Members': 'Miembros de la Organización',
+	'Selected Organization Members': 'Miembros de la Organización Seleccionados',
+	'Invite user': 'Invitar Usuario',
+	'One email address at a time.': 'Una dirección de correo electrónico a la vez.',
+	'Invite by Email': 'Invitar por Correo Electrónico',
+	'This user is not a member of this organization. Do you want to invite him?':
+		'Este usuario no es miembro de esta organización. ¿Deseas invitarlo?',
+	'This user is not allowed to join this room. Do you want to allow this user to join this room?':
+		'A este usuario no se le permite unirse a esta sala. ¿Deseas permitir que este usuario se una a esta sala?',
+	'This user is not a member of this organization. Do you want to invite him and allow this user to join this room?':
+		'Este usuario no es miembro de esta organización. ¿Deseas invitarlo y permitir que se una a esta sala?',
+	'Hello,': 'Hola,',
+	'is inviting you to the metaverse world.': 'te está invitando al mundo del metaverso.',
+	'Please click the link below to enter the room!':
+		'¡Haz clic en el enlace de abajo para ingresar a la sala!',
+	'Invitation from VirtuaCampus': 'Invitación de VirtuaCampus',
+	'Invitation sent': 'Invitación enviada',
+	Invite: 'Invitar',
+	'Rate This Metaverse!': '¡Califica este Metaverso!',
+	'Give us your feedback': 'Danos tu opinión',
+	'Thank you for your feedback!': '¡Gracias por tu opinión!',
+	Later: 'Más tarde'
 };

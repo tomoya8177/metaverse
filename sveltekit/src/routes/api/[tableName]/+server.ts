@@ -12,7 +12,8 @@ export async function GET({ request, params, cookies }) {
 		return new Response('not authorized', { status: 401 });
 	}
 	const filter = await createFiltersFromParams(request, params, checkResult);
-	const rows = await db.query(`select * from ${params.tableName} where ${filter}`);
+	const query = `select * from ${params.tableName} where ${filter}`;
+	const rows = await db.query(query);
 	return new Response(JSON.stringify(rows));
 }
 

@@ -21,10 +21,12 @@
 	import LanguageSelector from '../Molecules/LanguageSelector.svelte';
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
 	const onLogoutClicked = () => {
+		actionHistory.send('logout');
 		videoChat.leave();
 		EventStore.set(EmptyEvent);
 		cookies.remove('login');
@@ -44,6 +46,7 @@
 	const onChangeEmailDoClicked = async () => {
 		if (!confirm('Are you sure that ' + newEmail + ' is your email?')) return;
 		busy = true;
+		actionHistory.send('changeEmail', { newEmail });
 		const existingUser = await axios.get('/api/users?email=' + newEmail).then((res) => res.data);
 		if (existingUser.length) {
 			//email already exists
@@ -67,6 +70,7 @@
 
 	const onLeaveClicked = async () => {
 		if (!confirm(_('Are you sure that you want to leave this room?'))) return;
+		actionHistory.send('leaveRoom');
 		videoChat.leave();
 		const organization: Organization = await axios
 			.get('/api/organizations/' + $EventStore.organization)
@@ -248,8 +252,11 @@
 			<ProfileEditInputs
 				withName
 				withDescription
-				user={$UserStore}
+				bind:user={$UserStore}
 				onUpdateDone={() => {
+					actionHistory.send('profileUpdate', {
+						user: $UserStore
+					});
 					profileDialogOpen = false;
 				}}
 			/>
