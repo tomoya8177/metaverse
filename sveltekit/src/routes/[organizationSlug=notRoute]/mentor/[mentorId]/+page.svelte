@@ -11,6 +11,7 @@
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	export let data: PageData;
+	let aiSpeaks = true;
 	const mentor = data.mentor;
 	let authors: User[] = [];
 	let messages: Message[] = [];
@@ -56,12 +57,19 @@
 
 			await sendChatMessage(newMessage);
 			waitingForAIAnswer = true;
-			const aiMessage = await sendQuestionToAI(mentor.id, undefined, newMessage);
+			const aiMessage = await sendQuestionToAI(mentor.id, 'none', newMessage);
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
+			if (!aiSpeaks) return;
 			aiSpeaksOut(createdMessage.body);
 		}
 	};
+	onMount(async () => {
+		const res = await axios.put('/mentor/' + mentor.id, {
+			eventId: 'none'
+		});
+		console.log(res.data);
+	});
 </script>
 
 <div class="container" style="position:relative;height:calc(100svh - 3rem)">
@@ -73,6 +81,7 @@
 		<ChatBox
 			forceMentor={mentor.id}
 			forceNoPin
+			bind:aiSpeaks
 			{authors}
 			{micActive}
 			{messages}

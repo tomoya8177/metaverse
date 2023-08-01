@@ -8,19 +8,21 @@ import { db } from '$lib/backend/db';
 import type { Event } from '$lib/frontend/Classes/Event';
 import type { Mentor } from '$lib/types/Mentor';
 import type { Document } from 'langchain/document';
+import type { DocumentForAI } from '$lib/types/DocumentForAI';
+import { loadDocument } from '$lib/backend/loadDocument';
 
 type StoredChat = {
 	mentorId?: string;
 	eventId?: string;
-	chatHistory: ChatMessageHistory;
-	chain: ConversationChain | ConversationalRetrievalQAChain | null;
-	docs: Document<Record<string, any>>[] | null;
+	chain: ConversationalRetrievalQAChain | null;
 };
 
 class StoredChats extends Array {
 	constructor() {
 		super();
+		//this.initialize();
 	}
+
 	findStoredChatAndEvent = async (
 		eventId: string
 	): Promise<{ storedChat: StoredChat | false; event: Event | false }> => {
@@ -53,17 +55,37 @@ class StoredChats extends Array {
 		);
 		if (!storedChat) {
 			//create new chat
-			storedChat = {
-				mentorId: mentorId,
-				eventId: eventId,
-				chatHistory: new ChatMessageHistory([]),
-				chain: null,
-				docs: null
-			};
-			storedChats.push(storedChat);
+			// storedChat = {
+			// 	mentorId: mentorId,
+			// 	eventId: eventId,
+			// 	chatHistory: new ChatMessageHistory([]),
+			// 	chain: null,
+			// 	docs: null
+			// };
+			// storedChats.push(storedChat);
 		}
 		return { storedChat, mentor, event };
 	};
+	add(storedChat: StoredChat) {
+		//filter existing storedChats
+		if (
+			this.some(
+				(storedChat2) =>
+					storedChat2.eventId === storedChat.eventId && storedChat2.mentorId === storedChat.mentorId
+			)
+		) {
+			this.splice(
+				this.findIndex(
+					(storedChat2) =>
+						storedChat2.eventId === storedChat.eventId &&
+						storedChat2.mentorId === storedChat.mentorId
+				),
+				1
+			);
+		}
+		this.push(storedChat);
+		console.log({ storedChats });
+	}
 }
 
 export const storedChats = new StoredChats();

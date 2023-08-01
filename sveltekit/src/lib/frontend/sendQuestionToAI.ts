@@ -4,7 +4,7 @@ import { escapeHTML } from '$lib/math/escapeHTML';
 
 export const sendQuestionToAI = async (
 	mentorId: string,
-	eventId: string | undefined = undefined,
+	eventId: string = 'none',
 	newMessage: Message
 ) => {
 	console.log({ eventId });
@@ -14,7 +14,7 @@ export const sendQuestionToAI = async (
 			...newMessage
 		})
 		.then((res) => res.data);
-	console.log(response);
+	console.log({ response });
 	const aiMessage = new Message({
 		body: escapeHTML(response.response || response.text),
 		user: 'Mentor',

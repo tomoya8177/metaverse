@@ -95,7 +95,7 @@
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(
 				forceMentor || $EventStore.mentor,
-				$EventStore.id,
+				$EventStore.id || 'none',
 				newMessage
 			);
 			waitingForAIAnswer = false;

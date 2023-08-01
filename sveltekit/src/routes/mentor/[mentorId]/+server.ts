@@ -1,29 +1,20 @@
 import { db } from '$lib/backend/db.js';
 import { storedChats } from '$lib/memory/StoredChats.js';
 
-import { ChatOpenAI } from 'langchain/chat_models/openai';
-import { BufferMemory } from 'langchain/memory';
-import { ConversationalRetrievalQAChain, ConversationChain } from 'langchain/chains';
-import { OPENAI_API_KEY } from '$env/static/private';
-import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { MemoryVectorStore } from 'langchain/vectorstores/memory';
-import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
-import type { Document } from 'langchain/document';
-import { loadDocument } from '$lib/backend/loadDocument.js';
 import type { User } from '$lib/frontend/Classes/User.js';
 import type { DocumentForAI } from '$lib/types/DocumentForAI.js';
-import { virtuaMentorPrompt } from '$lib/preset/VirtuaMentorPrompt.js';
 import type { UserRole } from '$lib/types/UserRole.js';
 import type { Event } from '$lib/frontend/Classes/Event.js';
-import {
-	ChatPromptTemplate,
-	HumanMessagePromptTemplate,
-	MessagesPlaceholder,
-	SystemMessagePromptTemplate
-} from 'langchain/prompts';
+import { loadDocuments } from '$lib/backend/loadDocuments.js';
+import { createVectorStoreModelChain } from '$lib/backend/createVectorStoreModelChain.js';
+import { HumanMessage, SystemMessage } from 'langchain/schema';
+import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 
 //get for AI mentor initialize
 export const GET = async ({ params, request }) => {
+	const result = 'now no use';
+	return new Response(JSON.stringify({ result }));
+
 	const events = (await db.query(
 		`select * from events where mentor='${params.mentorId}'`
 	)) as Event[];
@@ -34,34 +25,41 @@ export const GET = async ({ params, request }) => {
 		);
 		return { storedChat, mentor, event };
 	});
-	const result = await Promise.all(promises).then((res) => res);
+	//const result = await Promise.all(promises).then((res) => res);
 	console.log({ promises, result });
 	return new Response(JSON.stringify({ result }));
 };
 
 //put for loading documents
 export const PUT = async ({ request, params }) => {
+	console.log({ storedChats });
 	const body = await request.json();
 
-	const { storedChat, mentor } = await storedChats.findStoredChatAndMentor(
-		params.mentorId,
-		body.eventId
+	const mentor = (await db.query(`select * from mentors where id='${params.mentorId}'`))[0];
+	mentor.userData = (await db.query(`select * from users where id='${mentor.user}'`))[0];
+	const organization = (
+		await db.query(`select * from organizations where id='${mentor.organization}'`)
+	)[0];
+
+	// refresh mentor brain for all events or for specific event, and for non-event chat
+	let events = [];
+	if (body.eventId) {
+		//for a specific event
+		events.push((await db.query(`select * from events where id='${body.eventId}'`))[0]);
+	} else {
+		//for all events
+		events = await db.query(`select * from events where mentor='${params.mentorId}'`);
+	}
+	//load mentor's documents first
+	const documents: DocumentForAI[] = await db.query(
+		`select * from documentsForAI where mentor='${params.mentorId}'`
 	);
-	console.log({ storedChat, mentor });
-	if (!storedChat || !mentor)
-		return new Response(JSON.stringify({ error: 'mentor not found' }), { status: 404 });
-	const user = (await db.query(`select * from users where id='${mentor.user}'`))[0];
-	mentor.userData = user;
-	const documents = [
-		...(await db.query(`select * from documentsForAI where mentor='${params.mentorId}'`)),
+	const { failedDocuments, succeededDocuments } = await loadDocuments(documents);
 
-		...(body.eventId
-			? await db.query(`select * from documentsForAI where event='${body.eventId}'`)
-			: [])
-	];
+	//load first prompt
 
-	console.log({ documents });
-
+	const failedDocumentsMom = failedDocuments;
+	//load users data
 	const userRoles: UserRole[] = await db.query(
 		`select * from userRoles where organization='${mentor.organization}'`
 	);
@@ -70,99 +68,65 @@ export const PUT = async ({ request, params }) => {
 	);
 	//load user data as json to docs
 	const usersJson = JSON.stringify(users);
-	const failedLogs: DocumentForAI[] = [];
-	if (documents.length > 0) {
-		let docs: Document<Record<string, any>>[] = [];
-		const thePrompt = virtuaMentorPrompt({
-			name: mentor.userData.nickname,
-			additionalPrompt: mentor.prompt,
-			widhDocumentsForAI: true
-		});
-
-		//get it into the docs
-		const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
-		docs = [
-			...docs,
-			...(await textSplitter.createDocuments([
-				thePrompt,
-				`Below is the list of users in the class with some details about each users.`,
-				usersJson
-			]))
-		];
-		docs = [
-			...docs,
-			...(await textSplitter.createDocuments([
-				`Following contents are the context of this class. Please answer questions based on these contexts.`
-			]))
-		];
-
-		const Promises: Promise<Document<Record<string, any>>[] | false>[] = [];
-
-		documents.forEach((document: DocumentForAI) => {
-			if (document.type.includes('text')) {
-				Promises.push(loadDocument(document.filename, 'text'));
-			}
-			// for docx files
-			if (document.type.includes('docx') || document.type.includes('officedocument')) {
-				Promises.push(loadDocument(document.filename, 'docx'));
-			}
-			if (document.type.includes('pdf')) {
-				Promises.push(loadDocument(document.filename, 'pdf'));
-			}
-			if (document.type.includes('csv')) {
-				Promises.push(loadDocument(document.filename, 'csv'));
-			}
-		});
-		await Promise.all(Promises).then((res) => {
-			res.forEach((d, i) => {
-				if (!d) {
-					const failedDocument = documents[i];
-					console.log({ failedDocument });
-					failedLogs.push(failedDocument);
-					return;
-				}
-				docs = [...docs, ...d];
-			});
-		});
-		storedChat.docs = docs;
-
-		//document is already loaded
-		const vectorStore = await MemoryVectorStore.fromDocuments(
-			storedChat.docs,
-			new OpenAIEmbeddings({ openAIApiKey: OPENAI_API_KEY })
-		);
-
-		const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-3.5-turbo' });
-		storedChat.chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), {
-			memory: new BufferMemory({ chatHistory: storedChat.chatHistory, memoryKey: 'chat_history' })
-		});
-	} else {
-		//no document. lets create a generic conversation chain
-		const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-3.5-turbo' });
-		let string = `${virtuaMentorPrompt({
-			name: mentor.userData.nickname,
-			additionalPrompt: mentor.prompt,
-			widhDocumentsForAI: false
-		})}
-							Below is the list of users in the class with some details about each users.
-							${usersJson}
-							`;
-		string = string.replace(/({|})/g, '$&$&');
-		const template = SystemMessagePromptTemplate.fromTemplate(string);
-		console.log({ template });
-		const chatPrompt = ChatPromptTemplate.fromPromptMessages([
-			template,
-			new MessagesPlaceholder('history'),
-			HumanMessagePromptTemplate.fromTemplate('{question}')
-		]);
-		console.log({ chatPrompt });
-		storedChat.chain = new ConversationChain({
-			memory: new BufferMemory({ returnMessages: true, memoryKey: 'history' }),
-			prompt: chatPrompt,
-			llm: model
-		});
+	const messages =
+		`You are a helpful AI mentor named ${mentor.userData.nickname} at an organization called ${organization.title}. ${mentor.prompt}. You'll answer questions based on the given context, but don't give away any extra information from the context when the question is not related to the context. You can answer questions using your knowledge. You can also ask questions to the user to get more information.` +
+		`Below is the list of users in the class with some details about each users.` +
+		usersJson;
+	const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
+	const promptDocs = await textSplitter.createDocuments([messages]);
+	//store mentor's memory first
+	const { model, chain } = await createVectorStoreModelChain([
+		...promptDocs,
+		...succeededDocuments
+	]);
+	if (body.refresh && !storedChats.some((s) => s.mentorId == mentor.id && s.eventId == 'none')) {
+		const storedChat = {
+			mentorId: params.mentorId,
+			eventId: 'none',
+			chain
+		};
+		console.log('rewriting storedChat for mentor');
+		storedChats.add(storedChat);
 	}
-	return new Response(JSON.stringify({ storedChat, failedLogs }));
+	console.log({ storedChats });
+
+	const succeededDocumentsMom = succeededDocuments;
+	//load event's documents
+	const eventLoadPromises = events.map(async (event: Event) => {
+		if (
+			!body.refresh &&
+			storedChats.some((s) => s.mentorId == mentor.id && s.eventId == (event?.id || 'none'))
+		)
+			return;
+		console.log('rewriting storedChat for event');
+
+		const documents: DocumentForAI[] = await db.query(
+			`select * from documentsForAI where event='${event?.id}'`
+		);
+		const { failedDocuments, succeededDocuments } = await loadDocuments(documents);
+		failedDocumentsMom.push(...failedDocuments);
+		const { model, chain } = await createVectorStoreModelChain([
+			...promptDocs,
+			...succeededDocumentsMom,
+			...succeededDocuments
+		]);
+		const storedChat = {
+			mentorId: params.mentorId,
+			eventId: event?.id || 'none',
+			chain
+		};
+		storedChats.add(storedChat);
+	});
+	console.log({ storedChats });
+
+	const res = await Promise.all(eventLoadPromises);
+	return new Response(
+		JSON.stringify({
+			result: 'success',
+			storedChats,
+			failedDocuments: failedDocumentsMom
+		})
+	);
 };
 
 //post for chat
@@ -187,8 +151,17 @@ export const POST = async ({ request, params }) => {
 	}
 	// const res = await chain.call({ question, chatHistory: pastMessages });
 	//const res = await chain.call({ question });
+	// const res = await storedChat.chain.call([
+	// 	new SystemMessage(`Following is a message from ${user?.nickname || 'a user'}.`),
+	// 	new HumanMessage(question)
+	// ]);
+	const messages = [
+		new SystemMessage(`Following is a message from ${user.nickname}.`),
+		new HumanMessage(question)
+	];
+
 	const res = await storedChat.chain.call({
-		question: `I am ${user?.nickname || 'not registered'}. ${question}`
+		question: question
 	});
 
 	/* Return the response */

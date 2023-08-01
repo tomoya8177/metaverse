@@ -77,16 +77,16 @@
 		document.addEventListener('keydown', onKeyDown);
 		loadMessages(messages);
 		if ($EventStore.mentor) {
-			axios.get('/mentor/' + $EventStore.mentor).then(async (res) => {
-				//this is okay to be delaied
-				virtuaMentorReady = true;
-				if (res.data.chain == null) {
-					//put action
-					const res = await axios.put('/mentor/' + $EventStore.mentor, {
-						eventId: $EventStore.id
-					});
-				}
-			}); //ping to wake up the server
+			axios
+				.put('/mentor/' + $EventStore.mentor, {
+					eventId: $EventStore.id,
+					refresh: false
+				})
+				.then(async (res) => {
+					console.log({ res });
+					//this is okay to be delaied
+					virtuaMentorReady = true;
+				}); //ping to wake up the server
 		}
 		videoChat.listenTo('textMessage', async (data) => {
 			messages = [...messages, data];
@@ -104,6 +104,7 @@
 			}, 100);
 			if (data.user === 'Mentor') {
 				data.isTalking = true;
+				if (!aiSpeaks) return;
 				aiSpeaksOut(data.body);
 			}
 		});
@@ -144,7 +145,11 @@
 
 			await sendChatMessage(newMessage);
 			waitingForAIAnswer = true;
-			const aiMessage = await sendQuestionToAI($EventStore.mentor, $EventStore.id, newMessage);
+			const aiMessage = await sendQuestionToAI(
+				$EventStore.mentor,
+				$EventStore.id || 'none',
+				newMessage
+			);
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
 			const mentor = await axios.get('/api/mentors/' + $EventStore.mentor).then((res) => res.data);

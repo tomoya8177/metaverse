@@ -6,25 +6,13 @@ import { _ } from '$lib/i18n';
 
 export const reinstallAIBrain = async (mentor: Mentor | undefined) => {
 	if (!mentor) return;
-	const response = await axios.get('/mentor/' + mentor.id);
-	console.log({ response });
-	const events = await axios.get('/api/events?mentor=' + mentor.id).then((res) => res.data);
-	const noEventChat = await axios.put('/mentor/' + mentor.id, {}); // brain with no event attached
-	console.log({ noEventChat });
-	const promises = events.map(async (event: Event) => {
-		const data = await axios
-			.put('/mentor/' + mentor.id, {
-				eventId: event.id
-			})
-			.then((res) => {
-				return res.data;
-			});
-		return data;
+	const res = await axios.put('/mentor/' + mentor.id, {
+		eventId: 'none'
 	});
-	const result = await Promise.all(promises).then((res) => res);
-	console.log({ result });
-	if (result.some((res) => res.failedLogs.length)) {
-		const failedDocuments: DocumentForAI[][] = result.map((res) => res.failedLogs);
+
+	console.log({ res });
+	if (res.data.failedDocuments.length) {
+		const failedDocuments = res.data.failedDocuments;
 		console.log({ failedDocuments });
 		alert(
 			_('Failed to load documents:') +

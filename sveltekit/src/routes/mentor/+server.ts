@@ -1,4 +1,5 @@
 import { OPENAI_API_KEY } from '$env/static/private';
+import { storedChats } from '$lib/memory/StoredChats.js';
 import { Configuration, OpenAIApi } from 'openai';
 import { Body } from 'twilio/lib/twiml/MessagingResponse.js';
 const configuration = new Configuration({
@@ -13,4 +14,8 @@ export const POST = async ({ request }) => {
 		temperature: 0.6
 	});
 	return new Response(JSON.stringify({ response: chat_completion.data.choices[0].message }));
+};
+
+export const GET = async () => {
+	//initialize all mentors
 };
