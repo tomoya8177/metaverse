@@ -56,7 +56,7 @@
 				location.reload();
 				return;
 			}
-			if (!event.isOpen && !event.allowedUsersArray?.includes($UserStore.id)) {
+			if (!event.isOpen && !$EventStore.allowedUsersArray?.includes($UserStore.id)) {
 				noEvent = true;
 				return;
 			}
@@ -91,7 +91,7 @@
 		</div>
 	{/if}
 	<div class="top">
-		<Navigation title={$EventStore.title} />
+		<Navigation title={$EventStore.title} {organization} />
 	</div>
 {/if}
 

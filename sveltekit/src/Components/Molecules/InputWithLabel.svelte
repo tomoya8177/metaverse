@@ -84,7 +84,14 @@
 					</label>
 				{:else if type == 'switch'}
 					<label>
-						<input type="checkbox" role="switch" bind:checked={value} {disabled} {readonly} />
+						<input
+							type="checkbox"
+							role="switch"
+							bind:checked={value}
+							on:change={onChange}
+							{disabled}
+							{readonly}
+						/>
 						{label}
 					</label>
 				{:else if type == 'select'}

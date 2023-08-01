@@ -150,5 +150,14 @@ export default {
 	'With Metaverse': 'メタバースを利用する',
 	'Environment Preset': '背景プリセット',
 	'Environment Model': '背景モデル',
-	'Object is in locked position.': 'オブジェクトはロックされた位置にあります。'
+	'Object is in locked position.': 'オブジェクトはロックされた位置にあります。',
+	'Leave Room': 'ルームを退出',
+	'Admin console': '管理者コンソール',
+	'Room Setting': 'ルーム設定',
+	'Organization Setting': 'チーム設定',
+	'Who can enter': '入室可能なユーザー',
+	'Users outside the organization': 'チーム外のユーザー',
+	'User will become a member of the organization': 'ユーザーはチームのメンバーになります',
+	'Organization Mambers': 'チームメンバー',
+	'Selected Organization Mambers': '選択されたチームメンバー'
 };
