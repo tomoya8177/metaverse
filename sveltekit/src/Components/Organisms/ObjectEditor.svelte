@@ -12,6 +12,8 @@
 	import { _ } from '$lib/i18n';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { toast } from '$lib/frontend/toast';
+	import ObjectLockSelect from '../Molecules/ObjectLockSelect.svelte';
+	import { getPositionFromLockedPosition } from '$lib/frontend/getPositionFromLockedPosition';
 
 	const onDeleteClicked = async () => {
 		if ($FocusObjectStore.title == 'Shared Screen') {
@@ -121,6 +123,28 @@
 						</div>
 					</li>
 				{/if}
+				<li>
+					{#if $FocusObjectStore.lockedPosition}
+						{_('Object is in locked position.')}
+					{:else}
+						{_('Lock object to a fixed position.')}
+					{/if}
+					<ObjectLockSelect
+						bind:object={$FocusObjectStore}
+						readonly={$FocusObjectStore.locked}
+						onUpdate={(value) => {
+							$FocusObjectStore.lockedPosition = value;
+							const position = getPositionFromLockedPosition(value);
+							console.log({ position });
+							//animate to the position
+							$FocusObjectStore.el?.setAttribute('animation', {
+								property: 'position',
+								to: `${position.x} ${position.y} ${position.z}`,
+								dur: 1000
+							});
+						}}
+					/>
+				</li>
 
 				{#if $FocusObjectStore.title != 'Shared Screen'}
 					<li>

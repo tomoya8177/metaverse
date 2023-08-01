@@ -1,9 +1,12 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
 	import { ClockPositions } from '$lib/preset/ClockPositions';
+	import axios from 'axios';
 	import Icon from '../../../../../../Components/Atom/Icon.svelte';
 	import InputWithLabel from '../../../../../../Components/Molecules/InputWithLabel.svelte';
 	import type { PageData } from './$types';
+	import { toast } from '$lib/frontend/toast';
+	import ObjectLockSelect from '../../../../../../Components/Molecules/ObjectLockSelect.svelte';
 	export let data: PageData;
 	let objects = data.objects;
 </script>
@@ -32,7 +35,7 @@
 				{/if}
 			</td>
 			<td>
-				<InputWithLabel type="select" selects={ClockPositions} bind:value={object.lockedPosition} />
+				<ObjectLockSelect bind:object />
 			</td>
 		</tr>
 	{/each}

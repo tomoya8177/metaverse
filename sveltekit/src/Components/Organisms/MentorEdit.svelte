@@ -35,6 +35,11 @@
 		type="textarea"
 	/>
 	<div>{_('Brain Documents')}</div>
+	<small>
+		{_(
+			"Feed documents to the mentor's brain. The AI will answer questions based on these documents."
+		)}
+	</small>
 	{#each editMentor.documents || [] as document}
 		<DocumentForAIRow
 			{document}

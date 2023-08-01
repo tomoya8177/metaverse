@@ -140,5 +140,15 @@ export default {
 	'AI Speaks': 'AI読み上げ',
 	'Have AI to write the introduction': 'AIに自己紹介を書かせる',
 	'Specify the language you want it to speak. If not specified, AI mentor will talk in English.':
-		'話してほしい言語を指定してください。指定しない場合、AIメンターは英語で話します。'
+		'話してほしい言語を指定してください。指定しない場合、AIメンターは英語で話します。',
+	"Feed documents to the mentor's brain. The AI will answer questions based on these documents.":
+		'メンターの脳にドキュメントをフィードします。AIはこれらのドキュメントに基づいて質問に答えます。',
+	'In addition to the documents fed to the mentor, you can feed additional documents that will be used specifically in this room.':
+		'メンターにフィードされたドキュメントに加えて、このルームで特に使用される追加のドキュメントをフィードすることができます。',
+	'In addition to the prompt given to the mentor, you can feed additional prompt specific to this room.':
+		'メンターに与えられたプロンプトに加えて、このルームに特有の追加のプロンプトをフィードすることができます。',
+	'With Metaverse': 'メタバースを利用する',
+	'Environment Preset': '背景プリセット',
+	'Environment Model': '背景モデル',
+	'Object is in locked position.': 'オブジェクトはロックされた位置にあります。'
 };

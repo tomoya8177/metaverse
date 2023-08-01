@@ -163,12 +163,21 @@ AFRAME.registerComponent('editable-object', {
 					if (Math.abs(diff.x) == 0 && Math.abs(diff.y) == 0 && Math.abs(diff.z) == 0) return;
 					if (!this.object) return console.error('object is null');
 					if (this.transportMode == 'position') {
-						this.el.setAttribute(
-							'position',
-							`${this.el.getAttribute('position').x + diff.x}
-							${this.el.getAttribute('position').y + diff.y}
-							${this.el.getAttribute('position').z + diff.z}`
-						);
+						if (this.object?.lockedPosition) {
+							this.el.setAttribute(
+								'position',
+								`${this.el.getAttribute('position').x}
+								${this.el.getAttribute('position').y + diff.y}
+								${this.el.getAttribute('position').z}`
+							);
+						} else {
+							this.el.setAttribute(
+								'position',
+								`${this.el.getAttribute('position').x + diff.x}
+								${this.el.getAttribute('position').y + diff.y}
+								${this.el.getAttribute('position').z + diff.z}`
+							);
+						}
 					} else if (this.transportMode == 'rotation') {
 						//the diff shoukld be calculated with pointsrelative to the raycatcher
 						const relativeDiff = this.getRelativeDiff(intersection);

@@ -126,6 +126,11 @@
 />
 {#if editEvent.mentor}
 	<div>{_('Room Specific Materials')}</div>
+	<small
+		>{_(
+			'In addition to the documents fed to the mentor, you can feed additional documents that will be used specifically in this room.'
+		)}</small
+	>
 	{#each editEvent.documents || [] as document}
 		<DocumentForAiRow
 			{document}
@@ -159,7 +164,14 @@
 	{#if progress > 0}
 		<progress max={100} value={progress} />
 	{/if}
-	<InputWithLabel type="textarea" label={_('Prompt')} bind:value={editEvent.prompt} />
+	<InputWithLabel
+		meta={_(
+			'In addition to the prompt given to the mentor, you can feed additional prompt specific to this room.'
+		)}
+		type="textarea"
+		label={_('Prompt')}
+		bind:value={editEvent.prompt}
+	/>
 	{#if editEvent.mentor}
 		<small>
 			{_("VirtuaMentor's memory will be refreshed")}

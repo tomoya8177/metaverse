@@ -1,5 +1,6 @@
 export const ClockPositions = [
 	{ name: 'Not Set', value: 0 },
+	{ name: '12:00', value: 12 },
 	{ name: '1:00', value: 1 },
 	{ name: '2:00', value: 2 },
 	{ name: '3:00', value: 3 },
@@ -10,6 +11,5 @@ export const ClockPositions = [
 	{ name: '8:00', value: 8 },
 	{ name: '9:00', value: 9 },
 	{ name: '10:00', value: 10 },
-	{ name: '11:00', value: 11 },
-	{ name: '12:00', value: 12 }
+	{ name: '11:00', value: 11 }
 ];

@@ -119,16 +119,6 @@
 			visible="false"
 		/>
 	{/if}
-	<a-plane
-		id="screenshare-container"
-		width="8"
-		height="6"
-		position="0 4 -10"
-		rotation="0 0 0"
-		color="#7BC8A4"
-		material="side: double;"
-		name="Plane"
-	/>
 </a-scene>
 {#if sceneLoaded}
 	<SceneUIs {me} />

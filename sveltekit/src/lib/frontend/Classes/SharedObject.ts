@@ -1,6 +1,7 @@
 import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
 import type { xyz } from '$lib/store';
+import { getPositionFromLockedPosition } from '../getPositionFromLockedPosition';
 type shortType = 'image' | 'video' | 'model' | 'screen';
 
 export class SharedObject {
@@ -23,6 +24,7 @@ export class SharedObject {
 	scene: Entity | null = null;
 	asset: Entity | null = null;
 	shortType: shortType = 'image';
+	lockedPosition: number;
 	constructor(data: any) {
 		this.id = data.id;
 		if (!this.id) return;
@@ -38,6 +40,7 @@ export class SharedObject {
 		this.handle = data.handle;
 		this.linkTo = data.linkTo;
 		this.isSphere = data.isSphere;
+		this.lockedPosition = data.lockedPosition || 0;
 		let entity = document.createElement('a-entity') as Entity;
 		this.el = entity;
 		this.scene = document.querySelector('a-scene');
@@ -77,7 +80,13 @@ export class SharedObject {
 		if (shortType != 'model' && this.asset) {
 			document.querySelector('a-assets')?.appendChild(this.asset);
 		}
-		entity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
+		if (this.lockedPosition) {
+			const position = getPositionFromLockedPosition(this.lockedPosition);
+
+			entity.setAttribute('position', `${position.x} ${this.position.y} ${position.z}`);
+		} else {
+			entity.setAttribute('position', `${this.position.x} ${this.position.y} ${this.position.z}`);
+		}
 		if (this.isSphere) {
 			entity.setAttribute('rotation', `0 ${this.rotation.y} 0`);
 			entity.setAttribute('scale', `-1 1 1`);

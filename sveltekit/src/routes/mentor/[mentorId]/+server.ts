@@ -100,6 +100,9 @@ export const PUT = async ({ request, params }) => {
 			return;
 		console.log('rewriting storedChat for event');
 
+		const messages = event.prompt;
+		const eventPromptDocs = await textSplitter.createDocuments([messages]);
+
 		const documents: DocumentForAI[] = await db.query(
 			`select * from documentsForAI where event='${event?.id}'`
 		);
@@ -107,6 +110,7 @@ export const PUT = async ({ request, params }) => {
 		failedDocumentsMom.push(...failedDocuments);
 		const { model, chain } = await createVectorStoreModelChain([
 			...promptDocs,
+			...eventPromptDocs,
 			...succeededDocumentsMom,
 			...succeededDocuments
 		]);
@@ -149,12 +153,7 @@ export const POST = async ({ request, params }) => {
 	if (!storedChat || !storedChat.chain) {
 		return new Response(JSON.stringify({ error: 'mentor not initialized' }));
 	}
-	// const res = await chain.call({ question, chatHistory: pastMessages });
-	//const res = await chain.call({ question });
-	// const res = await storedChat.chain.call([
-	// 	new SystemMessage(`Following is a message from ${user?.nickname || 'a user'}.`),
-	// 	new HumanMessage(question)
-	// ]);
+
 	const messages = [
 		new SystemMessage(`Following is a message from ${user.nickname}.`),
 		new HumanMessage(question)

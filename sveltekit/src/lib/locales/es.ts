@@ -1,3 +1,4 @@
+// follow the pattern in ./ja.ts
 export default {
 	Users: 'Usuarios',
 	'Change Email': 'Cambiar Correo Electrónico',
