@@ -159,5 +159,21 @@ export default {
 	'Users outside the organization': 'チーム外のユーザー',
 	'User will become a member of the organization': 'ユーザーはチームのメンバーになります',
 	'Organization Mambers': 'チームメンバー',
-	'Selected Organization Mambers': '選択されたチームメンバー'
+	'Selected Organization Mambers': '選択されたチームメンバー',
+	'Invite user': 'ユーザーを招待',
+	'One email address at a time.': '1つのメールアドレスずつ。',
+	'Invite by Email': 'メールで招待',
+	'This user is not a member of this organization. Do you want to invite him?':
+		'このユーザーはこのチームのメンバーではありません。招待しますか？',
+	'This user is not allowed to join this room. Do you want to allow this user to join this room?':
+		'このユーザーはこのルームに参加することはできません。このユーザーをこのルームに参加できるようにしますか？',
+	'This user is not a member of this organization. Do you want to invite him and allow this user to join this room?':
+		'このユーザーはこのチームのメンバーではありません。このユーザーを招待し、このユーザーをこのルームに参加できるようにしますか？',
+	'Hello,': 'こんにちは、',
+	'is inviting you to the metaverse world.': 'はあなたをメタバースの世界に招待しています。',
+	'Please click the link below to enter the room!':
+		'以下のリンクをクリックしてルームに入ってください！',
+	'Invitation from VirtuaCampus': 'VirtuaCampusからの招待',
+	'Invitation sent': '招待が送信されました',
+	Invite: '招待'
 };
