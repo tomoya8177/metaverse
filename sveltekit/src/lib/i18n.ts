@@ -10,9 +10,14 @@ class I18N {
 			this.locale = cookies.get('locale');
 		} else {
 			//get browser language
-			const browserLanguage = navigator.language;
-			if (browserLanguage) {
-				this.locale = browserLanguage;
+			if (typeof navigator == 'undefined' || !navigator) {
+				console.log('no navigator');
+				this.locale = 'en';
+			} else {
+				const browserLanguage = navigator.language;
+				if (browserLanguage) {
+					this.locale = browserLanguage;
+				}
 			}
 		}
 		this.load();

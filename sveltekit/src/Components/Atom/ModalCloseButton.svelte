@@ -1,9 +1,5 @@
 <script lang="ts">
-  export let onClick:()=>void;
+	export let onClick: () => void;
 </script>
-<a
-				href={'#'}
-				on:click={onClick}
-				aria-label="Close"
-				class="close"
-			/>
+
+<a href={'#'} on:click={onClick} aria-label="Close" class="close" />

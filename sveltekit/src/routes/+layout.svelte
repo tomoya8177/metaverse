@@ -20,7 +20,7 @@
 		{$Toast.message}
 	</div>
 {/if}
-<dialog open={$ConfirmDialog.open}>
+<dialog id="myConfirmDialog" open={$ConfirmDialog.open}>
 	<article>
 		{$ConfirmDialog.message}
 		<div style="display:flex; margin-top:1rem">
