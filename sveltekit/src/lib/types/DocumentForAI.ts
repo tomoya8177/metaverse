@@ -3,7 +3,7 @@ export type DocumentForAI = {
 	filename: string;
 	type: string;
 	createdAt: string;
-	event: string;
+	room: string;
 	mentor: string;
 	title: string;
 };

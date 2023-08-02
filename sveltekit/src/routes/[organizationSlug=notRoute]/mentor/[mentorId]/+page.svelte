@@ -66,7 +66,7 @@
 	};
 	onMount(async () => {
 		const res = await axios.put('/mentor/' + mentor.id, {
-			eventId: 'none'
+			roomId: 'none'
 		});
 		console.log(res.data);
 	});

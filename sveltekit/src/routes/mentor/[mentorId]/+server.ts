@@ -4,7 +4,7 @@ import { storedChats } from '$lib/memory/StoredChats.js';
 import type { User } from '$lib/frontend/Classes/User.js';
 import type { DocumentForAI } from '$lib/types/DocumentForAI.js';
 import type { UserRole } from '$lib/types/UserRole.js';
-import type { Event } from '$lib/frontend/Classes/Event.js';
+import type { Room } from '$lib/frontend/Classes/Room.js';
 import { loadDocuments } from '$lib/backend/loadDocuments.js';
 import { createVectorStoreModelChain } from '$lib/backend/createVectorStoreModelChain.js';
 import { HumanMessage, SystemMessage } from 'langchain/schema';
@@ -14,26 +14,12 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 export const GET = async ({ params, request }) => {
 	const result = 'now no use';
 	return new Response(JSON.stringify({ result }));
-
-	const events = (await db.query(
-		`select * from events where mentor='${params.mentorId}'`
-	)) as Event[];
-	const promises = events.map(async (event) => {
-		const { storedChat, mentor } = await storedChats.findStoredChatAndMentor(
-			params.mentorId,
-			event.id
-		);
-		return { storedChat, mentor, event };
-	});
-	//const result = await Promise.all(promises).then((res) => res);
-	console.log({ promises, result });
-	return new Response(JSON.stringify({ result }));
 };
 
 //put for loading documents
 export const PUT = async ({ request, params }) => {
-	console.log({ storedChats });
 	const body = await request.json();
+	console.log({ body });
 
 	const mentor = (await db.query(`select * from mentors where id='${params.mentorId}'`))[0];
 	mentor.userData = (await db.query(`select * from users where id='${mentor.user}'`))[0];
@@ -41,14 +27,12 @@ export const PUT = async ({ request, params }) => {
 		await db.query(`select * from organizations where id='${mentor.organization}'`)
 	)[0];
 
-	// refresh mentor brain for all events or for specific event, and for non-event chat
-	let events = [];
-	if (body.eventId) {
-		//for a specific event
-		events.push((await db.query(`select * from events where id='${body.eventId}'`))[0]);
+	let rooms: Room[] = [];
+	if (body.roomId != 'none') {
+		rooms.push((await db.query(`select * from rooms where id='${body.roomId}'`))[0]);
 	} else {
-		//for all events
-		events = await db.query(`select * from events where mentor='${params.mentorId}'`);
+		//for all rooms
+		rooms = await db.query(`select * from rooms where mentor='${params.mentorId}'`);
 	}
 	//load mentor's documents first
 	const documents: DocumentForAI[] = await db.query(
@@ -79,51 +63,50 @@ export const PUT = async ({ request, params }) => {
 		...promptDocs,
 		...succeededDocuments
 	]);
-	if (body.refresh && !storedChats.some((s) => s.mentorId == mentor.id && s.eventId == 'none')) {
+	if (body.refresh && !storedChats.some((s) => s.mentorId == mentor.id && s.roomId == 'none')) {
 		const storedChat = {
 			mentorId: params.mentorId,
-			eventId: 'none',
+			roomId: 'none',
 			chain
 		};
 		console.log('rewriting storedChat for mentor');
 		storedChats.add(storedChat);
 	}
-	console.log({ storedChats });
+	console.log({ rooms });
 
 	const succeededDocumentsMom = succeededDocuments;
-	//load event's documents
-	const eventLoadPromises = events.map(async (event: Event) => {
+	const roomLoadPromises = rooms.map(async (room: Room) => {
 		if (
 			!body.refresh &&
-			storedChats.some((s) => s.mentorId == mentor.id && s.eventId == (event?.id || 'none'))
+			storedChats.some((s) => s.mentorId == mentor.id && s.roomId == (room?.id || 'none'))
 		)
 			return;
-		console.log('rewriting storedChat for event');
+		console.log('rewriting storedChat for room');
 
-		const messages = event?.prompt || '';
-		const eventPromptDocs = await textSplitter.createDocuments([messages]);
+		const messages = room?.prompt || '';
+		const roomPromptDocs = await textSplitter.createDocuments([messages]);
 
 		const documents: DocumentForAI[] = await db.query(
-			`select * from documentsForAI where event='${event?.id}'`
+			`select * from documentsForAI where room='${room?.id}'`
 		);
 		const { failedDocuments, succeededDocuments } = await loadDocuments(documents);
 		failedDocumentsMom.push(...failedDocuments);
 		const { model, chain } = await createVectorStoreModelChain([
 			...promptDocs,
-			...eventPromptDocs,
+			...roomPromptDocs,
 			...succeededDocumentsMom,
 			...succeededDocuments
 		]);
 		const storedChat = {
 			mentorId: params.mentorId,
-			eventId: event?.id || 'none',
+			roomId: room?.id || 'none',
 			chain
 		};
 		storedChats.add(storedChat);
 	});
 	console.log({ storedChats });
 
-	const res = await Promise.all(eventLoadPromises);
+	const res = await Promise.all(roomLoadPromises);
 	return new Response(
 		JSON.stringify({
 			result: 'success',
@@ -141,11 +124,11 @@ export const POST = async ({ request, params }) => {
 	const user = (await db.query(`select * from users where id='${body.user}'`))[0];
 	console.log({ storedChats });
 	let storedChat = storedChats.find((storedChat) => {
-		if (body.eventId) {
-			return storedChat.mentorId === params.mentorId && storedChat.eventId === body.eventId;
+		if (body.roomId) {
+			return storedChat.mentorId === params.mentorId && storedChat.roomId === body.roomId;
 		} else {
-			console.log(typeof storedChat.eventId, storedChat.mentorId, params.mentorId);
-			return storedChat.mentorId == params.mentorId && typeof storedChat.eventId == 'undefined';
+			console.log(typeof storedChat.roomId, storedChat.mentorId, params.mentorId);
+			return storedChat.mentorId == params.mentorId && typeof storedChat.roomId == 'undefined';
 		}
 	});
 	console.log({ storedChat });

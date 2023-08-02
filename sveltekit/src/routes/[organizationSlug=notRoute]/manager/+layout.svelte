@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { checkLogin } from '$lib/frontend/checkLogin';
 	import { onMount, setContext } from 'svelte';
-	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
+	import { RoomStore, FocusObjectStore, UserStore } from '$lib/store';
 	import Icon from '../../../Components/Atom/Icon.svelte';
 	import { _, lang } from '$lib/i18n';
 	import Navigation from '../../../Components/Organisms/Navigation.svelte';
@@ -12,7 +12,7 @@
 	import { organizationFromSlug } from '$lib/frontend/organizationFromSlug';
 	import type { PageData } from './$types';
 	import { Users } from '$lib/frontend/Classes/Users';
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	export let data: PageData;
 	const organization: Organization = data.organization;
@@ -32,7 +32,7 @@
 	onMount(async () => {
 		console.log('manager dashboard mount');
 		FocusObjectStore.set(EmptyObject);
-		EventStore.set(EmptyEvent);
+		RoomStore.set(EmptyRoom);
 		Users.clear();
 	});
 </script>
@@ -64,6 +64,14 @@
 								<Icon icon="person_book" />
 								<span>
 									{_('VirtuaMentors')}
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href={`/${organization.slug}/manager/events`}>
+								<Icon icon="calendar_month" />
+								<span>
+									{_('Events')}
 								</span>
 							</a>
 						</li>

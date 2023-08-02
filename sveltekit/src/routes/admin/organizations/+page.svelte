@@ -12,20 +12,19 @@
 	import { checkSlugForOrganization } from '$lib/frontend/checkSlugForOrganization';
 	import { deleteOrganization } from '$lib/frontend/deleteOrganization';
 	import { myAlert, myConfirm } from '$lib/frontend/toast';
+	import type { PageData } from './$types';
 	let editOrganization: Organization = EmptyOrganization;
 	let editMode: 'update' | 'create' = 'update';
-	let organizations: Organization[] = [];
+	export let data: PageData;
+	let organizations: Organization[] = data.organizations;
 	let modalOpen = false;
 	let paginated: Organization[] = [];
-	onMount(async () => {
-		organizations = await axios.get('/api/organizations').then((res) => res.data);
-	});
 
 	const onCreateClicked = async () => {
 		if (!(await checkSlugForOrganization(editOrganization.slug, editOrganization))) return;
 		if (!editOrganization.title) return myAlert(_('Please enter a title'));
 		const newOrg = await axios.post('/api/organizations', editOrganization).then((res) => res.data);
-		organizations = [...organizations, newOrg].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+		organizations = [newOrg, ...organizations];
 		modalOpen = false;
 	};
 	const onUpdateClicked = async () => {

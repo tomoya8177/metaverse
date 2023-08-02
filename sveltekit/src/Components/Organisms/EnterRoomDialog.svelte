@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, UserStore } from '$lib/store';
+	import { RoomStore, UserStore } from '$lib/store';
 
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
@@ -12,7 +12,7 @@
 	import axios from 'axios';
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let me: Me | null;
 
@@ -20,14 +20,14 @@
 	let organization: Organization | null = null;
 	onMount(async () => {
 		organization = await axios
-			.get('/api/organizations/' + $EventStore.organization)
+			.get('/api/organizations/' + $RoomStore.organization)
 			.then((res) => res.data);
 	});
 	export let whenChatConnected: () => void;
 	const onLeaveClicked = () => {
 		actionHistory.send('leaveRoom');
 		videoChat.leave();
-		EventStore.set(EmptyEvent);
+		RoomStore.set(EmptyRoom);
 		if ($UserStore?.isMember) {
 			location.href = '/' + organization?.slug;
 		} else {
@@ -39,7 +39,7 @@
 <dialog open>
 	<article>
 		<div>{_('Room Title')}</div>
-		<h4>{$EventStore.title}</h4>
+		<h4>{$RoomStore.title}</h4>
 		{#if organization}
 			<div>{_('Organization')}</div>
 			<h5>{organization?.title}</h5>
@@ -52,7 +52,7 @@
 					actionHistory.send('enterRoom');
 					readyToConnect = true;
 					if (!videoChat.connected) {
-						videoChat.init($UserStore, $EventStore);
+						videoChat.init($UserStore, $RoomStore);
 						await videoChat.connect();
 						whenChatConnected();
 					}

@@ -1,8 +1,8 @@
 <script lang="ts">
 	import RoomTitleForManagers from '../Molecules/RoomTitleForManagers.svelte';
 
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
-	import { Event } from '$lib/frontend/Classes/Event';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
+	import type { Room } from '$lib/frontend/Classes/Room';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -27,30 +27,30 @@
 	uploader.progress.subscribe((value) => {
 		progress = value;
 	});
-	let events: Event[] = [];
+	let rooms: Room[] = [];
 	export let mentors: Mentor[] = [];
 	export let users: User[];
 	let documents: DocumentForAI[] = [];
 
-	export let editEvent: Event = EmptyEvent;
+	export let editRoom: Room = EmptyRoom;
 	let environmentPreset: string;
 	const updateEnvironmentModel = (modelURL: string | undefined) => {
 		if (typeof modelURL == 'undefined') return;
 		const setup = EnvironmentModelPresets.find((p) => p.modelURL == modelURL);
 		if (setup) {
-			editEvent.navMeshModelURL = setup.navMeshURL;
+			editRoom.navMeshModelURL = setup.navMeshURL;
 		}
 	};
-	$: updateEnvironmentModel(editEvent.environmentModelURL);
+	$: updateEnvironmentModel(editRoom.environmentModelURL);
 </script>
 
-<InputWithLabel label={_('Title')} bind:value={editEvent.title} />
-<InputWithLabel label={_('Slug')} bind:value={editEvent.slug} />
-<InputWithLabel label={_('With Metaverse')} type="switch" bind:value={editEvent.withMetaverse} />
-{#if editEvent.withMetaverse}
+<InputWithLabel label={_('Title')} bind:value={editRoom.title} />
+<InputWithLabel label={_('Slug')} bind:value={editRoom.slug} />
+<InputWithLabel label={_('With Metaverse')} type="switch" bind:value={editRoom.withMetaverse} />
+{#if editRoom.withMetaverse}
 	<InputWithLabel
 		label={_('Environment Preset')}
-		bind:value={editEvent.environmentPreset}
+		bind:value={editRoom.environmentPreset}
 		selects={environmentPresets}
 		type="select"
 	/>
@@ -61,7 +61,7 @@
 					<a
 						href={'#'}
 						on:click={() => {
-							editEvent.environmentPreset = preset.value;
+							editRoom.environmentPreset = preset.value;
 						}}
 					>
 						<img
@@ -83,24 +83,24 @@
 				value: preset.modelURL
 			};
 		})}
-		bind:value={editEvent.environmentModelURL}
+		bind:value={editRoom.environmentModelURL}
 	/>
 {/if}
 
-<InputWithLabel type="switch" label={_('Allow Audio')} bind:value={editEvent.allowAudio} />
-<InputWithLabel type="switch" label={_('Allow Video')} bind:value={editEvent.allowVideo} />
-<InputWithLabel type="switch" label={_('Open for Anyone')} bind:value={editEvent.isPublic} />
-{#if !editEvent.isPublic}
+<InputWithLabel type="switch" label={_('Allow Audio')} bind:value={editRoom.allowAudio} />
+<InputWithLabel type="switch" label={_('Allow Video')} bind:value={editRoom.allowVideo} />
+<InputWithLabel type="switch" label={_('Open for Anyone')} bind:value={editRoom.isPublic} />
+{#if !editRoom.isPublic}
 	<InputWithLabel
 		type="switch"
 		label={_('Open for Anyone in the organization')}
-		bind:value={editEvent.isOpen}
+		bind:value={editRoom.isOpen}
 	/>
-	{#if !editEvent.isOpen}
+	{#if !editRoom.isOpen}
 		Allowed Users
 		{#each users as user}
 			<label>
-				<input type="checkbox" bind:group={editEvent.allowedUsersArray} value={user.id} />
+				<input type="checkbox" bind:group={editRoom.allowedUsersArray} value={user.id} />
 				{user.nickname}
 				({user.email})
 			</label>
@@ -122,20 +122,20 @@
 			};
 		})
 	]}
-	bind:value={editEvent.mentor}
+	bind:value={editRoom.mentor}
 />
-{#if editEvent.mentor}
+{#if editRoom.mentor}
 	<div>{_('Room Specific Materials')}</div>
 	<small
 		>{_(
 			'In addition to the documents fed to the mentor, you can feed additional documents that will be used specifically in this room.'
 		)}</small
 	>
-	{#each editEvent.documents || [] as document}
+	{#each editRoom.documents || [] as document}
 		<DocumentForAiRow
 			{document}
 			onDeleteDone={() => {
-				editEvent.documents = editEvent.documents.filter((doc) => doc.id != document.id);
+				editRoom.documents = editRoom.documents.filter((doc) => doc.id != document.id);
 			}}
 		/>
 	{/each}
@@ -144,7 +144,7 @@
 		accept=".pdf,.txt,.docx"
 		multiple
 		on:change={async (e) => {
-			//get files from event
+			//get files from room
 			const files = e.target.files;
 			const res = await uploader.uploadLocally(files);
 			const promises = res.data.map(async (file) => {
@@ -152,12 +152,12 @@
 					filename: file.filename,
 					title: file.title,
 					type: file.type,
-					event: editEvent.id
+					room: editRoom.id
 				});
 				return res.data;
 			});
 			const fileDatas = await Promise.all(promises);
-			editEvent.documents = [...editEvent.documents, ...fileDatas];
+			editRoom.documents = [...editRoom.documents, ...fileDatas];
 			e.target.value = '';
 		}}
 	/>
@@ -170,9 +170,9 @@
 		)}
 		type="textarea"
 		label={_('Prompt')}
-		bind:value={editEvent.prompt}
+		bind:value={editRoom.prompt}
 	/>
-	{#if editEvent.mentor}
+	{#if editRoom.mentor}
 		<small>
 			{_("VirtuaMentor's memory will be refreshed")}
 		</small>

@@ -10,9 +10,9 @@
 	import axios from 'axios';
 	import { myAlert, toast } from '$lib/frontend/toast';
 	import type { User } from '$lib/frontend/Classes/User';
-	import EventEdit from '../../Components/Organisms/EventEdit.svelte';
-	import { Event } from '$lib/frontend/Classes/Event';
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import RoomEdit from '../../Components/Organisms/RoomEdit.svelte';
+	import { Room } from '$lib/frontend/Classes/Room';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import MentorEdit from '../../Components/Organisms/MentorEdit.svelte';
 	import type { Mentor } from '$lib/types/Mentor';
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
@@ -26,10 +26,10 @@
 	console.log(data);
 	let loggedIn = data.loggedIn;
 	let user = data.user;
-	let process: 'organization' | 'event' | 'mentor' = 'organization';
+	let process: 'organization' | 'room' | 'mentor' = 'organization';
 	let organization: Organization = EmptyOrganization;
-	let event: Event = new Event({
-		...EmptyEvent,
+	let room: Room = new Room({
+		...EmptyRoom,
 		slug: crypto.randomUUID(),
 		allowAudio: true,
 		allowVideo: true
@@ -77,7 +77,7 @@
 						organization: newOrg.id,
 						role: 'manager'
 					});
-					event.organization = newOrg.id;
+					room.organization = newOrg.id;
 					mentor.organization = newOrg.id;
 					if (!mentor.userData) mentor.userData = emptyUser;
 					mentor.userData.nickname = _('My First AI Mentor');
@@ -122,29 +122,29 @@
 						.then((res) => res.data);
 					mentor.id = updatedMentor.id;
 					updatedMentor.userData = updatedUser;
-					event.mentor = updatedMentor.id;
+					room.mentor = updatedMentor.id;
 					console.log({ updatedMentor, updatedUser });
 					busy = false;
-					process = 'event';
+					process = 'room';
 				}}
 			>
 				{_('Next')}
 			</button>
-		{:else if process == 'event'}
+		{:else if process == 'room'}
 			<h4>
 				{_('Room')}
 			</h4>
-			<EventEdit bind:editEvent={event} users={[user]} mentors={[mentor]} />
+			<RoomEdit bind:editRoom={room} users={[user]} mentors={[mentor]} />
 			<button
 				aria-busy={busy}
 				on:click={async () => {
-					if (!(await event.validate())) return;
+					if (!(await room.validate())) return;
 					busy = true;
-					console.log({ event });
-					const { newEvent, mentor } = await event.create();
-					console.log({ newEvent, mentor });
+					console.log({ room });
+					const { newRoom, mentor } = await room.create();
+					console.log({ newRoom, mentor });
 					busy = false;
-					location.href = `/${organization.slug}/${newEvent.slug}`;
+					location.href = `/${organization.slug}/${newRoom.slug}`;
 				}}
 			>
 				{_('Next')}

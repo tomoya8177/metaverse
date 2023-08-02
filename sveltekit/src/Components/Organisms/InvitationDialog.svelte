@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { EventStore, UserStore } from '$lib/store';
+	import { RoomStore, UserStore } from '$lib/store';
 	import axios from 'axios';
+	import { page } from '$app/stores';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { fade } from 'svelte/transition';
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { UsersStore } from '$lib/frontend/Classes/Users';
 	import { _, lang } from '$lib/i18n';
 	import Login from './Login.svelte';
@@ -16,6 +17,7 @@
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
 	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { sendInvitedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
 	export let organization: Organization | null = null;
 	export let open = false;
 	let invitingEmail = '';
@@ -52,10 +54,10 @@
 						.get('/api/userRoles?user=' + existingUser?.id + '&organization=' + organization.id)
 						.then((res) => res.data[0]);
 					console.log({ existingUserRole });
-					if ($EventStore.isPublic) {
+					if ($RoomStore.isPublic) {
 						//pass
 					} else {
-						if ($EventStore.isOpen) {
+						if ($RoomStore.isOpen) {
 							if (existingUserRole) {
 								//pass
 							} else {
@@ -80,12 +82,14 @@
 									user: existingUser.id,
 									organization: organization.id
 								});
+								const url = `${$page.url.protocol}//${$page.url.host}/${organization.slug}/${$RoomStore.slug}`;
+								await sendInvitedToOrganizationEmail($UserStore, invitingEmail, organization, url);
 							}
 						} else {
 							if (
 								existingUserRole &&
 								existingUser &&
-								$EventStore.allowedUsersArray.includes(existingUser.id)
+								$RoomStore.allowedUsersArray.includes(existingUser.id)
 							) {
 								//pass
 							} else if (existingUserRole) {
@@ -100,12 +104,12 @@
 									inviteBusy = false;
 									return;
 								}
-								$EventStore.allowedUsersArray = $EventStore.allowedUsersArray.concat([
+								$RoomStore.allowedUsersArray = $RoomStore.allowedUsersArray.concat([
 									existingUser.id
 								]);
-								$EventStore.allowedUsers = JSON.stringify($EventStore.allowedUsersArray);
-								await axios.put('/api/events/' + $EventStore.id, {
-									allowedUsers: $EventStore.allowedUsers
+								$RoomStore.allowedUsers = JSON.stringify($RoomStore.allowedUsersArray);
+								await axios.put('/api/rooms/' + $RoomStore.id, {
+									allowedUsers: $RoomStore.allowedUsers
 								});
 							} else {
 								//not a member. so we will make him a member
@@ -131,12 +135,14 @@
 									user: existingUser.id,
 									organization: organization.id
 								});
-								$EventStore.allowedUsersArray = $EventStore.allowedUsersArray.concat([
+								const url = `${$page.url.protocol}//${$page.url.host}/${organization.slug}/${$RoomStore.slug}`;
+								await sendInvitedToOrganizationEmail($UserStore, invitingEmail, organization, url);
+								$RoomStore.allowedUsersArray = $RoomStore.allowedUsersArray.concat([
 									existingUser.id
 								]);
-								$EventStore.allowedUsers = JSON.stringify($EventStore.allowedUsersArray);
-								await axios.put('/api/events/' + $EventStore.id, {
-									allowedUsers: $EventStore.allowedUsers
+								$RoomStore.allowedUsers = JSON.stringify($RoomStore.allowedUsersArray);
+								await axios.put('/api/rooms/' + $RoomStore.id, {
+									allowedUsers: $RoomStore.allowedUsers
 								});
 							}
 						}
@@ -176,23 +182,23 @@
 				disabled={!$UserStore.isManager}
 				type="switch"
 				label={_('Open for Anyone')}
-				bind:value={$EventStore.isPublic}
+				bind:value={$RoomStore.isPublic}
 				onChange={async () => {
-					await axios.put('/api/events/' + $EventStore.id, {
-						isPublic: $EventStore.isPublic
+					await axios.put('/api/rooms/' + $RoomStore.id, {
+						isPublic: $RoomStore.isPublic
 					});
 					toast(_('Updated'));
 				}}
 			/>
-			{#if !$EventStore.isPublic}
+			{#if !$RoomStore.isPublic}
 				<InputWithLabel
 					disabled={!$UserStore.isManager}
 					type="switch"
 					label={_('Open for Anyone in the organization')}
-					bind:value={$EventStore.isOpen}
+					bind:value={$RoomStore.isOpen}
 					onChange={async () => {
-						await axios.put('/api/events/' + $EventStore.id, {
-							isOpen: $EventStore.isOpen
+						await axios.put('/api/rooms/' + $RoomStore.id, {
+							isOpen: $RoomStore.isOpen
 						});
 						toast(_('Updated'));
 					}}
@@ -225,9 +231,9 @@
 				{_('Users outside the organization')}
 			</div>
 			<div>
-				{#if $EventStore.isPublic}
+				{#if $RoomStore.isPublic}
 					<Icon icon="check" />
-				{:else if $EventStore.isOpen && organization?.allowRegistration}
+				{:else if $RoomStore.isOpen && organization?.allowRegistration}
 					<div style="text-align:center">
 						<Icon icon="check" /><br />
 						<small>
@@ -244,9 +250,9 @@
 				{_('Organization Mambers')}
 			</div>
 			<div>
-				{#if $EventStore.isPublic}
+				{#if $RoomStore.isPublic}
 					<Icon icon="check" />
-				{:else if $EventStore.isOpen}
+				{:else if $RoomStore.isOpen}
 					<Icon icon="check" />
 				{:else}
 					<Icon icon="close" />

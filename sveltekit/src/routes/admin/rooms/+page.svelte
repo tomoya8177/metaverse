@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
-	import { Event } from '$lib/frontend/Classes/Event';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
+	import { Room } from '$lib/frontend/Classes/Room';
 	import axios from 'axios';
 	import ModalCloseButton from '../../../Components/Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';
@@ -14,22 +14,22 @@
 	import { _ } from '$lib/i18n';
 	import RoomTitleForManagers from '../../../Components/Molecules/RoomTitleForManagers.svelte';
 
-	let events: Event[] = [];
-	let paginated: Event[] = [];
-	let editEvent: Event = EmptyEvent;
+	let rooms: Room[] = [];
+	let paginated: Room[] = [];
+	let editRoom: Room = EmptyRoom;
 	let organizations: Organization[] = [];
 	onMount(async () => {
 		organizations = await axios.get('/api/organizations').then((res) => res.data);
 
-		const results = await axios.get('/api/events').then((res) => {
-			res.data.forEach((event: Event) => {
-				event.organizationTitle =
-					organizations.find((org) => org.id == event.organization)?.title || '';
-				events.push(new Event(event));
+		const results = await axios.get('/api/rooms').then((res) => {
+			res.data.forEach((room: Room) => {
+				room.organizationTitle =
+					organizations.find((org) => org.id == room.organization)?.title || '';
+				rooms.push(new Room(room));
 			});
 			return res.data;
 		});
-		events = events.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+		rooms = rooms.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 	});
 	let editMode: 'update' | 'create' = 'update';
 	let modalOpen = false;
@@ -37,7 +37,7 @@
 
 <h3>{_('Rooms')}</h3>
 
-<FilterPagination inputArray={events} bind:paginated />
+<FilterPagination inputArray={rooms} bind:paginated />
 <table>
 	<thead>
 		<tr>
@@ -48,28 +48,28 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each paginated as event}
-			{@const organization = organizations.find((org) => org.id == event.organization)}
+		{#each paginated as room}
+			{@const organization = organizations.find((org) => org.id == room.organization)}
 			<tr>
 				<td>
 					{#if organization}
-						<RoomTitleForManagers {event} {organization} />
+						<RoomTitleForManagers {room} {organization} />
 					{/if}
 				</td>
-				<td>{event.slug}</td>
+				<td>{room.slug}</td>
 				<td>{organization?.title}</td>
 
 				<td>
 					<InputWithLabel
 						type="switch"
 						label={_('Open for Anyone')}
-						bind:value={editEvent.isPublic}
+						bind:value={editRoom.isPublic}
 						disabled
 					/>
 					<InputWithLabel
 						type="switch"
 						label={_('Open for Anyone in the organization')}
-						bind:value={editEvent.isOpen}
+						bind:value={editRoom.isOpen}
 						disabled
 					/>
 				</td>

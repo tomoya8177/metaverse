@@ -1,6 +1,6 @@
-import type { Event } from '$lib/frontend/Classes/Event';
+import type { Room } from '$lib/frontend/Classes/Room';
 
-export const EmptyEvent: Event = {
+export const EmptyRoom: Room = {
 	id: '',
 	title: '',
 	slug: '',

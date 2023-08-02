@@ -4,7 +4,8 @@ const dbConfig = {
 	host: DBHost,
 	user: DBUser,
 	password: DBPassword,
-	database: DBName
+	database: DBName,
+	timezone: 'Z'
 };
 
 class DB {

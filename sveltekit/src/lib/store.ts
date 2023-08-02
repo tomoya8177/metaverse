@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Event } from './frontend/Classes/Event';
+import type { Room } from './frontend/Classes/Room';
 import { emptyUser } from './preset/EmptyUser';
 import type { SharedObject } from './frontend/Classes/SharedObject';
 import { EmptyObject } from './preset/EmptyObject';
@@ -24,7 +24,7 @@ export const RigStore = writable({
 		z: 0
 	}
 });
-export const EventStore = writable({} as Event);
+export const RoomStore = writable({} as Room);
 export type xyz = {
 	x: number;
 	y: number;

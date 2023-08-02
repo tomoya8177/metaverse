@@ -1,7 +1,7 @@
 import { DBObject } from './DBObject';
 
 export class Message extends DBObject {
-	event: string;
+	room: string;
 	user: string;
 	body: string;
 	type: string | null = null;
@@ -12,7 +12,7 @@ export class Message extends DBObject {
 	handle: string = '';
 	constructor(data: any) {
 		super(data);
-		this.event = data.event;
+		this.room = data.room;
 		this.user = data.user;
 		this.body = data.body;
 		this.isTalking = data.isTalking || false;

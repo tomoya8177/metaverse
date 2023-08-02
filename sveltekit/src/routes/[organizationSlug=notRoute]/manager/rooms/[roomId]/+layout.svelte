@@ -4,12 +4,12 @@
 	import RoomTitleForManagers from '../../../../../Components/Molecules/RoomTitleForManagers.svelte';
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
-	import EventEdit from '../../../../../Components/Organisms/EventEdit.svelte';
-	import { Event } from '$lib/frontend/Classes/Event';
+	import RoomEdit from '../../../../../Components/Organisms/RoomEdit.svelte';
+	import { Room } from '$lib/frontend/Classes/Room';
 	import { toast } from '$lib/frontend/toast';
 	import { fade } from 'svelte/transition';
 	export let data: PageData;
-	let event = new Event(data.event);
+	let room = new Room(data.room);
 	const organization = data.organization;
 	const mentor = data.mentor;
 	const mentors = data.mentors;
@@ -21,13 +21,13 @@
 </script>
 
 <h3>
-	<RoomTitleForManagers {event} {organization} />
+	<RoomTitleForManagers {room} {organization} />
 </h3>
 
 <InputWithLabel
 	label={_('URL')}
 	type="url"
-	value={`${$page.url.protocol}//${$page.url.host}/${organization.slug}/${event.slug}`}
+	value={`${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.slug}`}
 	readonly
 	copiable
 />
@@ -36,7 +36,7 @@
 	<ul>
 		<li>
 			<a
-				href={`/${organization.slug}/manager/rooms/${event.id}`}
+				href={`/${organization.slug}/manager/rooms/${room.id}`}
 				on:click={() => {
 					tab = 'basic';
 				}}
@@ -48,7 +48,7 @@
 		</li>
 		<li>
 			<a
-				href={`/${organization.slug}/manager/rooms/${event.id}/objects`}
+				href={`/${organization.slug}/manager/rooms/${room.id}/objects`}
 				on:click={() => {
 					tab = 'objects';
 				}}

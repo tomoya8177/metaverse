@@ -6,14 +6,14 @@
 	import InputWithLabel from '../../Components/Molecules/InputWithLabel.svelte';
 	import { cookies } from '$lib/frontend/cookies';
 	import { fade } from 'svelte/transition';
-	import type { Event } from '$lib/frontend/Classes/Event';
+	import type { Room } from '$lib/frontend/Classes/Room';
 	import { _ } from '$lib/i18n';
 	import { myAlert } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
 	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 	export let organization: string = '';
-	export let event: Event | null = null;
+	export let room: Room | null = null;
 	let loggedIn: boolean | null = null;
 	let verificationMode = false;
 	let email = '';
@@ -73,18 +73,18 @@
 			const organiatinData = await axios
 				.get('/api/organizations/' + organization)
 				.then((res) => res.data[0]);
-			if (!organiatinData.allowRegistration && (event === null || !event.isPublic)) {
+			if (!organiatinData.allowRegistration && (room === null || !room.isPublic)) {
 				busy = false;
 				myAlert(_('This organization does not allow registration'));
 				return;
 			}
-			if (event !== null && event.isPublic) {
-				//event is free to access. no registration under organization
+			if (room !== null && room.isPublic) {
+				//room is free to access. no registration under organization
 				const res = await axios.post('/api/register', {
 					email
 				});
 			} else {
-				//event is not public. register under organization
+				//room is not public. register under organization
 				const res = await axios.post('/api/register', {
 					email,
 					organization

@@ -1,18 +1,18 @@
 import { unescapeHTML } from '$lib/math/escapeHTML';
-import { EventStore, ItemsInPreview, UserStore, type xyz } from '$lib/store';
+import { RoomStore, ItemsInPreview, UserStore, type xyz } from '$lib/store';
 import type { Entity } from 'aframe';
 import type { LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
 import { videoChat } from './VideoChat';
 import { sessionPing } from '$lib/frontend/Classes/sessionPing';
-import type { Event } from './Event';
+import type { Room } from './Room';
 import type { User } from '$lib/frontend/Classes/User';
 import axios from 'axios';
 import { degree2radian } from '$lib/math/degree2radians';
 import { sharedObjects } from './SharedObjects';
 import { pollAudioLevel } from '../pollAudioLevel';
 import { SharedObject } from './SharedObject';
-let event: Event;
-EventStore.subscribe((value) => {
+let room: Room;
+RoomStore.subscribe((value) => {
 	event = value;
 });
 
@@ -157,7 +157,7 @@ export class Unit {
 					instanceId: sid,
 					user: this.userId,
 					type: 'screen',
-					event: event.id
+					room: room.id
 				},
 				video
 			);

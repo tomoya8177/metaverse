@@ -9,7 +9,7 @@ describe('DocumentForAIRow', () => {
 		const document = {
 			id: crypto.randomUUID(),
 			filename: '3dee1f59-a087-454e-8366-079744b6872f-0-envelope216.pdf',
-			event: 'a02861b2-f8c3-4c38-ae49-99b866d8a532',
+			room: 'a02861b2-f8c3-4c38-ae49-99b866d8a532',
 			type: 'application/pdf',
 			title: 'envelope216.pdf',
 			mentor: null,

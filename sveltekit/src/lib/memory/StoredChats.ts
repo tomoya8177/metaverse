@@ -5,7 +5,7 @@ import type {
 	ConversationChain
 } from 'langchain/chains';
 import { db } from '$lib/backend/db';
-import type { Event } from '$lib/frontend/Classes/Event';
+import type { Room } from '$lib/frontend/Classes/Room';
 import type { Mentor } from '$lib/types/Mentor';
 import type { Document } from 'langchain/document';
 import type { DocumentForAI } from '$lib/types/DocumentForAI';
@@ -13,7 +13,7 @@ import { loadDocument } from '$lib/backend/loadDocument';
 
 type StoredChat = {
 	mentorId?: string;
-	eventId?: string;
+	roomId?: string;
 	chain: ConversationalRetrievalQAChain | null;
 };
 
@@ -24,16 +24,16 @@ class StoredChats extends Array {
 	}
 
 	findStoredChatAndEvent = async (
-		eventId: string
-	): Promise<{ storedChat: StoredChat | false; event: Event | false }> => {
-		const event = (await db.query(`select * from events where id='${eventId}'`))[0];
-		//if (!event) return { storedChat: false, event: false };
+		roomId: string
+	): Promise<{ storedChat: StoredChat | false; room: Room | false }> => {
+		const event = (await db.query(`select * from rooms where id='${roomId}'`))[0];
+		//if (!event) return { storedChat: false, room: false };
 		//check if chat is already stored
-		let storedChat = storedChats.find((storedChat) => storedChat.eventId === eventId);
+		let storedChat = storedChats.find((storedChat) => storedChat.roomId === roomId);
 		if (!storedChat) {
 			//create new chat
 			storedChat = {
-				eventId: eventId,
+				roomId: roomId,
 				chatHistory: new ChatMessageHistory([]),
 				chain: null,
 				docs: null
@@ -44,20 +44,20 @@ class StoredChats extends Array {
 	};
 	findStoredChatAndMentor = async (
 		mentorId: string,
-		eventId: string
-	): Promise<{ storedChat: StoredChat | false; mentor: Mentor | false; event: Event | false }> => {
-		const event = (await db.query(`select * from events where id='${eventId}'`))[0];
+		roomId: string
+	): Promise<{ storedChat: StoredChat | false; mentor: Mentor | false; room: Room | false }> => {
+		const event = (await db.query(`select * from rooms where id='${roomId}'`))[0];
 		const mentor = (await db.query(`select * from mentors where id='${mentorId}'`))[0];
-		if (!mentor) return { storedChat: false, mentor: false, event: false };
+		if (!mentor) return { storedChat: false, mentor: false, room: false };
 		//check if chat is already stored
 		let storedChat = storedChats.find(
-			(storedChat) => storedChat.mentorId === mentorId && storedChat.eventId === eventId
+			(storedChat) => storedChat.mentorId === mentorId && storedChat.roomId === roomId
 		);
 		if (!storedChat) {
 			//create new chat
 			// storedChat = {
 			// 	mentorId: mentorId,
-			// 	eventId: eventId,
+			// 	roomId: roomId,
 			// 	chatHistory: new ChatMessageHistory([]),
 			// 	chain: null,
 			// 	docs: null
@@ -71,14 +71,13 @@ class StoredChats extends Array {
 		if (
 			this.some(
 				(storedChat2) =>
-					storedChat2.eventId === storedChat.eventId && storedChat2.mentorId === storedChat.mentorId
+					storedChat2.roomId === storedChat.roomId && storedChat2.mentorId === storedChat.mentorId
 			)
 		) {
 			this.splice(
 				this.findIndex(
 					(storedChat2) =>
-						storedChat2.eventId === storedChat.eventId &&
-						storedChat2.mentorId === storedChat.mentorId
+						storedChat2.roomId === storedChat.roomId && storedChat2.mentorId === storedChat.mentorId
 				),
 				1
 			);

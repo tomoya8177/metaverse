@@ -3,10 +3,10 @@ import { SharedObject } from './Classes/SharedObject';
 import { sharedObjects } from './Classes/SharedObjects';
 import { videoChat } from './Classes/VideoChat';
 
-export const appendObjectInTheRoom = async ({ eventId, file, userId, me }) => {
+export const appendObjectInTheRoom = async ({ roomId, file, userId, me }) => {
 	const createdFile = await axios
 		.post('/api/objects', {
-			event: eventId,
+			room: roomId,
 			type: file.mimetype,
 			url: file.url,
 			title: file.filename,

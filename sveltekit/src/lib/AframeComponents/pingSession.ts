@@ -1,10 +1,10 @@
-import type { Event } from '$lib/frontend/Classes/Event';
+import type { Room } from '$lib/frontend/Classes/Room';
 import { sessionPing } from '$lib/frontend/Classes/sessionPing';
-import { EventStore } from '$lib/store';
+import { RoomStore } from '$lib/store';
 import axios from 'axios';
-let event: Event;
-EventStore.subscribe((value) => {
-	event = value;
+let room: Room;
+RoomStore.subscribe((value) => {
+	room = value;
 });
 AFRAME.registerComponent('ping-session', {
 	schema: {
@@ -17,7 +17,7 @@ AFRAME.registerComponent('ping-session', {
 			{
 				user: this.data.user,
 				type: this.data.type,
-				event: event.id
+				room: room.id
 			},
 			this.el
 		);

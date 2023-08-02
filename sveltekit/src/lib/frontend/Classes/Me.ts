@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Unit } from './Unit';
 import { connect, createLocalTracks } from 'twilio-video';
-import type { Event } from './Event';
+import type { Room } from './Room';
 import type { Component, Entity, ObjectMap, System } from 'aframe';
 
 export class Me extends Unit {
@@ -28,9 +28,9 @@ export class Me extends Unit {
 
 		this.el.setAttribute('ping-session', `user:${userId};type:unit`);
 	}
-	async setLastPosition(event: Event): Promise<void> {
+	async setLastPosition(room: Room): Promise<void> {
 		const sessions = await axios
-			.get(`/api/sessions?user=${this.userId}&event=${event.id}&type=unit`)
+			.get(`/api/sessions?user=${this.userId}&room=${room.id}&type=unit`)
 			.then((res) => res.data.sort((a, b) => (a.startAt < b.startAt ? 1 : -1)));
 		console.log({ sessions });
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AvatarSelectPane from './AvatarSelectPane.svelte';
 
-	import { EventStore, UserStore } from '$lib/store';
+	import { RoomStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -13,7 +13,7 @@
 	import { onMount } from 'svelte';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { fade } from 'svelte/transition';
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { _ } from '$lib/i18n';
 	export let onUpdateDone: () => void;
 	export let me: Me;

@@ -6,7 +6,7 @@
 	import 'aframe-extras';
 	import 'aframe-audio-analyser';
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, UserStore } from '$lib/store';
+	import { RoomStore, UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/frontend/Classes/Me';
@@ -43,15 +43,15 @@
 		me = new Me($UserStore.id);
 		me.nickname = $UserStore.nickname;
 		Users.add(me);
-		await me.setLastPosition($EventStore);
+		await me.setLastPosition($RoomStore);
 		me.avatarURL =
 			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		sceneLoaded = true;
-		//me.twilioConnect($EventStore.id)
+		//me.twilioConnect($RoomStore.id)
 
 		//load mentor user
-		if ($EventStore.mentor) {
-			const mentor = await axios.get('/api/mentors/' + $EventStore.mentor).then((res) => res.data);
+		if ($RoomStore.mentor) {
+			const mentor = await axios.get('/api/mentors/' + $RoomStore.mentor).then((res) => res.data);
 			mentor.userData = await axios.get('/api/users/' + mentor.user).then((res) => res.data);
 			const mentorUnit = new Unit(mentor.userData.id);
 			mentorUnit.nickname = mentor.userData.nickname;
@@ -73,7 +73,7 @@
 {#if !readyToConnect}
 	<EnterRoomDialog
 		whenChatConnected={async () => {
-			loadSharedObjects($EventStore.id);
+			loadSharedObjects($RoomStore.id);
 			const existingFeedback = await axios
 				.get('/api/feedbacks?campaign=1&user=' + $UserStore.id)
 				.then((res) => res.data);
@@ -118,8 +118,8 @@
 			<button
 				on:click={async () => {
 					const feedbackObj = {
-						organization: $EventStore.organization,
-						event: $EventStore.id,
+						organization: $RoomStore.organization,
+						room: $RoomStore.id,
 						user: $UserStore.id,
 						star: starValue,
 						data: JSON.stringify({
@@ -168,10 +168,10 @@
 		rotation="0 0 0"
 		visible="false"
 	/>
-	{#if $EventStore.environmentPreset != 'none'}
+	{#if $RoomStore.environmentPreset != 'none'}
 		<a-entity
 			environment="
-        preset:{$EventStore.environmentPreset || 'default'};
+        preset:{$RoomStore.environmentPreset || 'default'};
         groundYScale:20
         "
 		/>
@@ -183,11 +183,11 @@
 				"
 		/>
 	{/if}
-	{#if $EventStore.environmentModelURL}
-		<a-gltf-model src={$EventStore.environmentModelURL} position="0 0.01 0" />
+	{#if $RoomStore.environmentModelURL}
+		<a-gltf-model src={$RoomStore.environmentModelURL} position="0 0.01 0" />
 	{/if}
-	{#if $EventStore.navMeshModelURL}
-		<a-gltf-model src={$EventStore.navMeshModelURL} position="0 0.01 0" visible="false" nav-mesh />
+	{#if $RoomStore.navMeshModelURL}
+		<a-gltf-model src={$RoomStore.navMeshModelURL} position="0 0.01 0" visible="false" nav-mesh />
 	{:else}
 		<a-plane
 			id="ground"

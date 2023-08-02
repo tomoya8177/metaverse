@@ -4,27 +4,27 @@
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
-	import { EventStore, FocusObjectStore, UserStore } from '$lib/store';
+	import { RoomStore, FocusObjectStore, UserStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
 	import type { Mentor } from '$lib/types/Mentor';
 	import axios from 'axios';
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
-	import { Event } from '$lib/frontend/Classes/Event';
+	import { Room } from '$lib/frontend/Classes/Room';
 	import RoomTitleForManagers from '../../Components/Molecules/RoomTitleForManagers.svelte';
 	import AvatarThumbnail from '../../Components/Atom/AvatarThumbnail.svelte';
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 
 	export let data: PageData;
 	const organization: Organization = data.organization;
 	let mentors: Mentor[] = [];
-	let events: Event[] = [];
+	let rooms: Room[] = [];
 	onMount(async () => {
 		console.log('dashboard mount');
 		FocusObjectStore.set(EmptyObject);
-		EventStore.set(EmptyEvent);
+		RoomStore.set(EmptyRoom);
 		Users.clear();
 		mentors = await axios
 			.get('/api/mentors?organization=' + organization.id)
@@ -36,13 +36,13 @@
 			mentor.userData = users.find((user) => user.id == mentor.user);
 			return mentor;
 		});
-		const unfilteredEvents = await axios
-			.get('/api/events?organization=' + organization.id)
+		const unfilteredRooms = await axios
+			.get('/api/rooms?organization=' + organization.id)
 			.then((res) => res.data);
-		events = unfilteredEvents.filter((event) => {
-			if (event.isPublic) return true;
-			if (event.isOpen) return true;
-			if (event.allowedUsers.includes($UserStore.id)) return true;
+		rooms = unfilteredRooms.filter((room) => {
+			if (room.isPublic) return true;
+			if (room.isOpen) return true;
+			if (room.allowedUsers.includes($UserStore.id)) return true;
 			return false;
 		});
 	});
@@ -62,9 +62,9 @@
 				<div>
 					{_('Available Rooms')}
 				</div>
-				{#each events as event}
+				{#each rooms as room}
 					<div style="margin-bottom:0.4rem;">
-						<RoomTitleForManagers {event} {organization} />
+						<RoomTitleForManagers {room} {organization} />
 					</div>
 				{/each}
 			</section>

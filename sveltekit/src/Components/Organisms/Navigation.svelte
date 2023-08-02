@@ -5,14 +5,14 @@
 	import { page } from '$app/stores';
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
 	import { cookies } from '$lib/frontend/cookies';
-	import { EventStore, UserStore } from '$lib/store';
+	import { RoomStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { fade } from 'svelte/transition';
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { UsersStore } from '$lib/frontend/Classes/Users';
 	import { _, lang } from '$lib/i18n';
 	import Login from './Login.svelte';
@@ -28,7 +28,7 @@
 	const onLogoutClicked = () => {
 		actionHistory.send('logout');
 		videoChat.leave();
-		EventStore.set(EmptyEvent);
+		RoomStore.set(EmptyRoom);
 		cookies.remove('login');
 		location.reload();
 	};
@@ -44,7 +44,7 @@
 	let newEmail = '';
 	let emailAlreadyExists = false;
 	const onChangeEmailDoClicked = async () => {
-		if (!confirm('Are you sure that ' + newEmail + ' is your email?')) return;
+		if (!(await myConfirm('Are you sure that ' + newEmail + ' is your email?'))) return;
 		busy = true;
 		actionHistory.send('changeEmail', { newEmail });
 		const existingUser = await axios.get('/api/users?email=' + newEmail).then((res) => res.data);
@@ -69,13 +69,13 @@
 	};
 
 	const onLeaveClicked = async () => {
-		if (!confirm(_('Are you sure that you want to leave this room?'))) return;
+		if (!(await myConfirm(_('Are you sure that you want to leave this room?')))) return;
 		actionHistory.send('leaveRoom');
 		videoChat.leave();
 		const organization: Organization = await axios
-			.get('/api/organizations/' + $EventStore.organization)
+			.get('/api/organizations/' + $RoomStore.organization)
 			.then((res) => res.data);
-		EventStore.set(EmptyEvent);
+		RoomStore.set(EmptyRoom);
 		location.href = '/' + organization.slug;
 	};
 	let chosenLanguage: string = cookies.get('locale') || 'en';
@@ -98,8 +98,8 @@
 </script>
 
 <nav>
-	<ul class:hiddenInSmallScreen={$EventStore.id}>
-		<li>
+	<ul class:hiddenInSmallScreen={$RoomStore.id}>
+		<li style="max-width:20rem">
 			<a href={logoLinkTo || '#'}>
 				{#if thumbnailURL}
 					<SquareThumbnail url={thumbnailURL} />
@@ -118,7 +118,7 @@
 	<ul>
 		<li style="flex:1" />
 		{#if $UserStore.id}
-			{#if $UsersStore.length && $EventStore.id}
+			{#if $UsersStore.length && $RoomStore.id}
 				<li>
 					<a
 						href={'#'}
@@ -159,7 +159,7 @@
 						</div>
 					</summary>
 					<ul role="listbox">
-						{#if $EventStore?.id}
+						{#if $RoomStore?.id}
 							<li>
 								<button on:click={onLeaveClicked} class="secondary">{_('Leave Room')}</button>
 							</li>
@@ -174,7 +174,7 @@
 									href={'#'}
 									on:click={() => {
 										videoChat.leave();
-										EventStore.set(EmptyEvent);
+										RoomStore.set(EmptyRoom);
 										location.href = '/admin';
 									}}
 								>

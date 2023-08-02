@@ -1,5 +1,5 @@
 import { PUBLIC_IS_DEV } from '$env/static/public';
-import { EventStore, UserStore } from '$lib/store';
+import { RoomStore, UserStore } from '$lib/store';
 import axios from 'axios';
 
 type Actions =
@@ -44,7 +44,7 @@ type Actions =
 class ActionHistory {
 	id: string;
 	user: string;
-	event: string;
+	room: string;
 	organization: string;
 
 	constructor(
@@ -64,7 +64,7 @@ class ActionHistory {
 		await axios.post('/api/actions', {
 			session: this.id,
 			user: this.user,
-			event: this.event,
+			room: this.event,
 			organization: this.organization,
 			action: action,
 			data: JSON.stringify(data)
@@ -76,6 +76,6 @@ export const actionHistory = new ActionHistory(null);
 UserStore.subscribe((value) => {
 	actionHistory.user = value?.id || '';
 });
-EventStore.subscribe((value) => {
+RoomStore.subscribe((value) => {
 	actionHistory.event = value?.id || '';
 });

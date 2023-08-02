@@ -5,7 +5,7 @@ export const load = async ({ params }) => {
 	mentor.userData = await axios.get('/api/users/' + mentor.user).then((res) => res.data);
 	//await axios.get('/mentor/' + mentor.id);
 	await axios.put('/mentor/' + mentor.id, {
-		eventId: 'none'
+		roomId: 'none'
 	});
 	return {
 		mentor

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { EventStore, RigStore, UserStore, type xyz } from '$lib/store';
+	import { RoomStore, RigStore, UserStore, type xyz } from '$lib/store';
 	import axios from 'axios';
 	import { Unit } from '$lib/frontend/Classes/Unit';
 
@@ -40,7 +40,7 @@
 		console.log(response);
 		actionHistory.send('sendFileFromChatToRoom', { file: { ...response.data, url: message.url } });
 		appendObjectInTheRoom({
-			eventId: $EventStore.id,
+			roomId: $RoomStore.id,
 			userId: $UserStore.id,
 			me: Users.find($UserStore.id),
 			file: { ...response.data, url: message.url }

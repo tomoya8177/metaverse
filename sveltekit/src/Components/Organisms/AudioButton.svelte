@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { EventStore, UserStore } from '$lib/store';
+	import { RoomStore, UserStore } from '$lib/store';
 
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -16,7 +16,7 @@
 			busy = true;
 			try {
 				if (!videoChat.connected) {
-					videoChat.init($UserStore, $EventStore);
+					videoChat.init($UserStore, $RoomStore);
 					await videoChat.connect();
 				}
 				await videoChat.startMyAudio();

@@ -21,7 +21,7 @@
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import Icon from '../../../../Components/Atom/Icon.svelte';
 	import { cookies } from '$lib/frontend/cookies';
-	import type { Event } from '$lib/frontend/Classes/Event';
+	import type { Room } from '$lib/frontend/Classes/Room';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
 	import type { PageData } from './$types';

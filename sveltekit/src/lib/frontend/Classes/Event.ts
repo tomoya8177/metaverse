@@ -1,108 +1,123 @@
-import axios from 'axios';
-import { reinstallAIBrain } from '../reinstallAIBrain';
 import { _ } from '$lib/i18n';
-import type { DocumentForAI } from '$lib/types/DocumentForAI';
 import { myAlert } from '../toast';
+import { DBObject } from './DBObject';
+import { DateTime } from 'luxon';
 
-export class Event {
-	id: string;
-	slug: string;
-	title: string;
-	allowAudio: boolean;
-	allowVideo: boolean;
+export class Event extends DBObject {
+	object: string;
+	description: string;
+	summary: string;
+	location: string;
+	url: string;
+	start: string;
+	end: string;
 	organization: string;
-	allowedUsers: string;
-	isPublic: boolean;
-	isOpen: boolean;
-	organizationTitle?: string;
-	allowedUsersArray: string[];
-	createdAt: string;
-	mentor: string;
-	prompt: string;
-	documents: DocumentForAI[];
-	environmentPreset?: string;
-	environmentModelURL?: string;
-	navMeshModelURL?: string;
-	withMetaverse?: boolean;
 	constructor(obj: any) {
-		this.id = obj.id;
-		this.slug = obj.slug;
-		this.title = obj.title;
-		this.allowAudio = obj.allowAudio;
-		this.allowVideo = obj.allowVideo;
-		this.organization = obj.organization;
-		this.allowedUsers = obj.allowedUsers;
-		this.isPublic = obj.isPublic;
-		this.isOpen = obj.isOpen;
-		this.createdAt = obj.createdAt;
-		this.organizationTitle = obj.organizationTitle;
-		this.mentor = obj.mentor;
-		this.prompt = obj.prompt;
-		this.documents = obj.documents || [];
-		this.environmentPreset = obj.environmentPreset;
-		this.environmentModelURL = obj.environmentModelURL;
-		this.navMeshModelURL = obj.navMeshModelURL;
-		this.withMetaverse = obj.withMetaverse;
-
-		if (this.allowedUsers == '') {
-			this.allowedUsersArray = [];
+		obj.table = 'events';
+		super(obj);
+		this.object = obj.object || '';
+		this.description = obj.description || '';
+		this.summary = obj.summary || '';
+		this.location = obj.location || '';
+		this.url = obj.url || '';
+		this.start = obj.start || '';
+		this.end = obj.end || '';
+		this.organization = obj.organization || '';
+	}
+	get allDay(): boolean {
+		if (!this.start) return false;
+		if (!this.end) return false;
+		return DateTime.fromISO(this.start).toISOTime() === DateTime.fromISO(this.end).toISOTime();
+	}
+	set allDay(val: boolean) {
+		if (!this.start) {
+			this.start = DateTime.now().toISO();
+		}
+		if (val) {
+			//use DateTime from luxon
+			//setting it all day makes the end time the same as the start time
+			this.endTime = DateTime.fromISO(this.start).toISOTime();
+			//if end date is the same as start date or it is not set, make it the next day
+			if (this.endDate === this.startDate || !this.endDate || this.startDate > this.endDate) {
+				this.endDate = this.startDate;
+			}
+			console.log(this.end);
 		} else {
-			console.log(this.allowedUsers);
-			this.allowedUsersArray = JSON.parse(this.allowedUsers);
+			//make the end time different from start time
+			this.endTime = DateTime.fromISO(this.start).plus({ hours: 1 }).toISOTime();
+			//make the end date the same day as the start date
+			this.endDate = DateTime.fromISO(this.start).toISODate();
 		}
 	}
-	async validate(): Promise<boolean> {
-		if (!this.title) {
-			myAlert(_('Please enter a title for the room.'));
+	set startDate(val: string) {
+		const startTime = this.start?.split('T')[1] || '00:00:00';
+		this.start = val + 'T' + startTime;
+		//if end date is before start date, make it the same as start date
+		if (this.endDate < this.startDate) {
+			this.endDate = this.startDate;
+		}
+	}
+	set startTime(val: string) {
+		const startDate = this.start?.split('T')[0] || DateTime.now().toISODate();
+		this.start = startDate + 'T' + val;
+	}
+	get startDate(): string {
+		if (!this.start) return '';
+		return this.start.split('T')[0];
+	}
+	get startTime(): string {
+		if (!this.start) return '';
+		return this.start.split('T')[1].substring(0, 5);
+	}
+	set endDate(val: string) {
+		const endTime = this.end?.split('T')[1] || '00:00:00';
+		//if allday, return a next date
+		if (this.allDay) val = DateTime.fromISO(val).plus({ days: 1 }).toISODate();
+		this.end = val + 'T' + endTime;
+	}
+	set endTime(val: string) {
+		const endDate = this.end?.split('T')[0] || DateTime.now().toISODate();
+		this.end = endDate + 'T' + val;
+	}
+	get endDate(): string {
+		if (!this.end) return '';
+		//if allday, return a previous date
+		if (this.allDay) return DateTime.fromISO(this.end).minus({ days: 1 }).toISODate();
+		return this.end.split('T')[0];
+	}
+	get endTime(): string {
+		if (!this.end) return '';
+		//convert to fit into time input
+		return this.end.split('T')[1].substring(0, 5);
+	}
+
+	validate(): boolean {
+		if (!this.summary) {
+			myAlert(_('Please enter a summary'));
 			return false;
 		}
-		if (!this.organization) {
-			myAlert(_('Please select an organization for the room.'));
-			return false;
-		}
-		if (!this.slug) {
-			myAlert(_('Please enter a slug for the room.'));
-			return false;
-		}
-		const existingEventWithSlug = await axios
-			.get('/api/events?slug=' + this.slug + '&organiation=' + this.organization)
-			.then((res) => res.data);
-		if (existingEventWithSlug.length && existingEventWithSlug[0].id != this.id) {
-			myAlert(_('Slug already exists'));
+		if (!this.start) {
+			myAlert(_('Please enter a start date'));
 			return false;
 		}
 		return true;
 	}
-	get capacity(): number {
-		return 50;
+	toFullCalendarEvent() {
+		return {
+			...this,
+			url: '',
+			title: this.summary,
+			allDay: this.allDay as boolean,
+			start: DateTime.fromISO(this.start, {
+				zone: 'utc'
+			})
+				.toLocal()
+				.toJSDate(),
+			end: DateTime.fromISO(this.end, {
+				zone: 'utc'
+			})
+				.toLocal()
+				.toJSDate()
+		};
 	}
-	create = async () => {
-		this.allowedUsers = JSON.stringify(this.allowedUsersArray);
-		const newEvent = await axios.post('/api/events', { ...this }).then((res) => res.data);
-		let mentor;
-		if (this.mentor) {
-			mentor = await axios.get('/api/mentors/' + this.mentor).then((res) => res.data);
-			await reinstallAIBrain(mentor);
-		}
-		return { newEvent, mentor };
-	};
-	update = async () => {
-		this.allowedUsers = JSON.stringify(this.allowedUsersArray);
-		const updatedEvent = await axios
-			.put('/api/events/' + this.id, { ...this })
-			.then((res) => res.data);
-
-		let mentor;
-		if (this.mentor) {
-			mentor = await axios.get('/api/mentors/' + this.mentor).then((res) => res.data);
-			await reinstallAIBrain(mentor);
-		}
-		return { updatedEvent, mentor };
-	};
-	delete = async () => {
-		await axios.delete('/api/events/' + this.id);
-		await axios.delete('/api/sessions?event=' + this.id);
-		await axios.delete('/api/messages?event=' + this.id);
-		const results = await axios.delete('/api/objects?event=' + this.id).then((res) => res.data);
-	};
 }

@@ -9,40 +9,19 @@
 	import type { UserRole } from '$lib/types/UserRole';
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
-
-	let users: User[] = [];
+	import { fillOrganization } from './fillOrganization';
+	import type { PageData } from './$types';
+	export let data: PageData;
+	let users: User[] = data.users;
 	let paginated: User[] = [];
-	let organizations: Organization[] = [];
-	let userRoles: UserRole[] = [];
-	const fillOrganization = (user: User) => {
-		const filteredUserRoles: UserRole[] = userRoles.filter((userRole) => userRole.user == user.id);
-		if (!filteredUserRoles.length) return user;
-		user.userRoles = filteredUserRoles;
-		user.organizations = organizations.filter((org) =>
-			filteredUserRoles.find((userRole) => userRole.organization == org.id)
-		);
-		return user;
-	};
+	let organizations: Organization[] = data.organizations;
+	let userRoles: UserRole[] = data.userRoles;
 
-	onMount(async () => {
-		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
-		console.log({ userRoles });
-		organizations = await axios.get('/api/organizations').then((res) => res.data);
-		console.log({ organizations });
-		users = await axios.get(`/api/users`).then((res) => res.data.filter((user) => !!user.email));
-		users = users
-			.map((user) => {
-				user = fillOrganization(user);
-				return new User(user);
-			})
-			.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-		console.log({ users });
-	});
 	let newUserModalOpen = false;
 	let editUser: User = emptyUser;
 	let editMode: 'update' | 'create' = 'update';
 
-	const createUserRoles = async (userId: string) => {
+	const createUserRoles = async (userId: string): Promise<UserRole[]> => {
 		let promises: Promise<UserRole>[] = [];
 		organizations.forEach((org) => {
 			console.log({ org });
@@ -59,9 +38,9 @@
 				);
 			}
 		});
-		await Promise.all(promises).then((results) => {
-			console.log(results);
-		});
+		const results = await Promise.all(promises);
+
+		return results;
 	};
 	const deleteExistinguserRoles = (userRoles: UserRole[]) => {
 		let promises: Promise<UserRole>[] = [];
@@ -72,14 +51,15 @@
 	};
 	const onCreateClicked = async () => {
 		if (!editUser.email) {
+			console.log('no email', editUser);
 			alert('Email is required');
 			return;
 		}
 		const result = await axios.post('/api/users', editUser).then((res) => res.data);
-		await createUserRoles(result.id);
-		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
-		const filledUser = fillOrganization(result);
-		users = [...users, filledUser].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+		const createdUserRoles = await createUserRoles(result.id);
+		userRoles = [...createdUserRoles, ...userRoles];
+		const filledUser = fillOrganization(result, userRoles, organizations);
+		users = [filledUser, ...users];
 
 		newUserModalOpen = false;
 	};
@@ -92,8 +72,7 @@
 		await deleteExistinguserRoles(editUser.userRoles || []);
 		await createUserRoles(result.id);
 
-		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
-		const filledUser = fillOrganization(result);
+		const filledUser = fillOrganization(result, userRoles, organizations);
 		users = users.map((user) => {
 			if (user.id == result.id) {
 				return filledUser;
@@ -104,7 +83,10 @@
 	};
 	const onDeleteClicked = async () => {
 		if (!confirm('Are you sure that you want to delete this user?')) return;
-		await new User(editUser).delete();
+		const userRoles = await axios.get('/api/userRoles?user=' + editUser.id).then((res) => res.data);
+		await deleteExistinguserRoles(userRoles);
+		await axios.delete('/api/users/' + editUser.id).then((res) => res.data);
+		//		await new User(editUser).delete();
 		users = users.filter((user) => user.id != editUser.id);
 		newUserModalOpen = false;
 	};
@@ -113,6 +95,7 @@
 <h2>{_('Users')}</h2>
 <div style="width:10rem">
 	<button
+		data-testid="newUserButton"
 		on:click={() => {
 			editUser = emptyUser;
 			editMode = 'create';
@@ -129,18 +112,23 @@
 	<table>
 		<thead>
 			<tr>
-				<th>{_('Nickname')}</th>
-				<th>{_('Email')}</th>
+				<th>{_('Nickname')}/{_('Email')}</th>
 				<th>{_('Is Admin')}</th>
 				<th>{_('Organizations')}</th>
 				<th>{_('Edit')}</th>
 			</tr>
 		</thead>
 		<tbody>
-			{#each paginated as user}
-				<tr>
-					<td>{user.nickname}</td>
-					<td>{user.email}</td>
+			{#each paginated as user, i}
+				<tr data-testid={'user' + i}>
+					<td>
+						<div>
+							{user.nickname}
+						</div>
+						<small>
+							{user.email}
+						</small>
+					</td>
 					<td>
 						<input type="checkbox" disabled role="switch" bind:checked={user.isAdmin} />
 					</td>
@@ -159,6 +147,7 @@
 					</td>
 					<td>
 						<button
+							data-testid="editButton{i}"
 							on:click={() => {
 								editUser = { ...user };
 								editMode = 'update';
@@ -182,10 +171,20 @@
 {#if newUserModalOpen}
 	<dialog open>
 		<article>
-			<ModalCloseButton onClick={() => (newUserModalOpen = false)} />
-			<InputWithLabel label={_('Nickname')} bind:value={editUser.nickname} />
-			<InputWithLabel label={_('Email')} bind:value={editUser.email} type="email" />
-			<InputWithLabel label={_('Is Admin')} bind:value={editUser.isAdmin} type="switch" />
+			<ModalCloseButton testId="closeButton" onClick={() => (newUserModalOpen = false)} />
+			<InputWithLabel testId="nicknameInput" label={_('Nickname')} bind:value={editUser.nickname} />
+			<InputWithLabel
+				testId="emailInput"
+				label={_('Email')}
+				bind:value={editUser.email}
+				type="email"
+			/>
+			<InputWithLabel
+				testId="adminSwitch"
+				label={_('Is Admin')}
+				bind:value={editUser.isAdmin}
+				type="switch"
+			/>
 			<div style="margin-top:1rem">{_('Organizations')}</div>
 			<ul>
 				{#each organizations as org}

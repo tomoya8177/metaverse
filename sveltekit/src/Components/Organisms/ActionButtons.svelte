@@ -2,7 +2,7 @@
 	import AudioButton from './AudioButton.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import {
-		EventStore,
+		RoomStore,
 		UserStore,
 		PreviewPanelOpen,
 		FocusObjectStore,
@@ -58,7 +58,7 @@
 	export let micActive: boolean;
 </script>
 
-{#if $EventStore.mentor}
+{#if $RoomStore.mentor}
 	<button
 		data-tooltip={_('Ask AI Mentor')}
 		style:background-color={micActive ? 'red' : ''}
@@ -79,10 +79,10 @@
 	</button>
 </div>
 
-{#if $EventStore.allowAudio}
+{#if $RoomStore.allowAudio}
 	<AudioButton />
 {/if}
-{#if $EventStore.allowVideo}
+{#if $RoomStore.allowVideo}
 	{#if $UserStore.onVideoMute}
 		<button
 			data-tooltip={_('Start My Camera')}
@@ -176,7 +176,7 @@
 				actionHistory.send('uploadToScene', { files: res.filesUploaded });
 				res.filesUploaded.forEach(async (file) => {
 					appendObjectInTheRoom({
-						eventId: $EventStore.id,
+						roomId: $RoomStore.id,
 						file,
 						userId: $UserStore.id,
 						me

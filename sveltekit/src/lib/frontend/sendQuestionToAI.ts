@@ -5,14 +5,14 @@ import { actionHistory } from './Classes/actionHistory';
 
 export const sendQuestionToAI = async (
 	mentorId: string,
-	eventId: string = 'none',
+	roomId: string = 'none',
 	newMessage: Message
 ) => {
-	console.log({ eventId });
+	console.log({ roomId });
 	actionHistory.send('sendQuestionToAI', newMessage);
 	const response = await axios
 		.post('/mentor/' + mentorId, {
-			eventId,
+			roomId,
 			...newMessage
 		})
 		.then((res) => res.data);
@@ -20,7 +20,7 @@ export const sendQuestionToAI = async (
 	const aiMessage = new Message({
 		body: escapeHTML(response.response || response.text),
 		user: 'Mentor',
-		event: eventId,
+		room: roomId,
 		pinned: false,
 		isTalking: true
 	});

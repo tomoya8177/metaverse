@@ -13,7 +13,7 @@ import {
 	type LocalTrack,
 	LocalParticipant
 } from 'twilio-video';
-import type { Event } from './Event';
+import type { Room as RoomType } from './Room';
 import axios from 'axios';
 import { Users } from './Users';
 import type { User } from '$lib/frontend/Classes/User';
@@ -59,11 +59,11 @@ export class VideoChat {
 	constructor() {
 		//do nothing,
 	}
-	init(user: User, event: Event) {
+	init(user: User, room: RoomType) {
 		this.user = user;
 		this.userId = user.id;
-		this.roomId = event.id;
-		this.audioOnly = !event.allowAudio || !event.allowVideo;
+		this.roomId = room.id;
+		this.audioOnly = !room.allowAudio || !room.allowVideo;
 	}
 	sendMessage(message: any) {
 		if (typeof dataTrackPublished.promise === 'undefined')
@@ -161,7 +161,7 @@ export class VideoChat {
 			{
 				user: this.userId,
 				type: 'audio',
-				event: this.roomId
+				room: this.roomId
 			},
 			null
 		);
@@ -196,7 +196,7 @@ export class VideoChat {
 			{
 				user: this.userId,
 				type: 'camera',
-				event: this.roomId
+				room: this.roomId
 			},
 			null
 		);

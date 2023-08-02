@@ -1,0 +1,125 @@
+<script lang="ts">
+	import EventEdit from './EventEdit.svelte';
+
+	import { Event } from '$lib/frontend/Classes/Event';
+	import { myConfirm, toast } from '$lib/frontend/toast';
+	import { _ } from '$lib/i18n';
+	import ModalCloseButton from '../../../../Components/Atom/ModalCloseButton.svelte';
+	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
+	import type { PageData } from './$types';
+	import { DateTime } from 'luxon';
+	import ActionButtons from '../../../../Components/Organisms/ActionButtons.svelte';
+	import Icon from '../../../../Components/Atom/Icon.svelte';
+	import { convertLocalToUTC, convertUTCToLocal } from '$lib/frontend/convertLocalToUTC';
+	import { onMount } from 'svelte';
+	import { Calendar } from '@fullcalendar/core';
+	import dayGridPlugin from '@fullcalendar/daygrid';
+	import timeGridPlugin from '@fullcalendar/timegrid';
+	import listPlugin from '@fullcalendar/list';
+	import { cookies } from '$lib/frontend/cookies';
+
+	export let data: PageData;
+	let events = data.events;
+	let organization = data.organization;
+	let modalOpen = false;
+	let rooms = data.rooms;
+	let editEvent: Event;
+	let editMode: 'create' | 'update' = 'update';
+	let calendar: Calendar;
+	onMount(() => {
+		setTimeout(() => {
+			const el = document.getElementById('calendar') as HTMLElement;
+			calendar = new Calendar(el, {
+				events: events.map((event) => event.toFullCalendarEvent()),
+				plugins: [dayGridPlugin, timeGridPlugin, listPlugin],
+				themeSystem: 'Flatly',
+				buttonText: {
+					today: _('today'),
+					month: _('month'),
+					week: _('week'),
+					day: _('day'),
+					list: _('list')
+				},
+				headerToolbar: {
+					left: 'title',
+					right: 'dayGridMonth,timeGridWeek,listWeek'
+				},
+				footerToolbar: {
+					center: 'prev,today,next'
+				},
+				locale: cookies.get('locale') || 'en',
+				initialView: 'dayGridMonth',
+				titleFormat: { year: 'numeric', month: 'short' },
+				eventClick: function (info) {
+					onEventClicked(info.event.id);
+				}
+			});
+			calendar.render();
+		}, 1000);
+	});
+	const onEventClicked = (eventId: string) => {
+		editEvent = events.find((event) => event.id == eventId) || new Event({});
+		if (!editEvent.id) return;
+		//convert to local
+		editEvent.start = convertUTCToLocal(editEvent.start);
+		editEvent.end = convertUTCToLocal(editEvent.end);
+		modalOpen = true;
+		editMode = 'update';
+	};
+</script>
+
+<h3>
+	{_('Events')}
+</h3>
+<section>
+	<a
+		role="button"
+		href={'#'}
+		on:click={() => {
+			editEvent = new Event({
+				organization: organization.id
+			});
+			modalOpen = true;
+			editMode = 'create';
+		}}
+	>
+		{_('Add Event')}
+	</a>
+</section>
+<div id="calendar" />
+
+{#if modalOpen}
+	<dialog open>
+		<article>
+			<ModalCloseButton onClick={() => (modalOpen = false)} />
+			<EventEdit
+				{organization}
+				{rooms}
+				{editMode}
+				{editEvent}
+				bind:modalOpen
+				onCreateDone={(createdEvent) => {
+					modalOpen = false;
+					events.push(createdEvent);
+					events = events.sort((a, b) => a.start.localeCompare(b.start));
+					calendar.addEvent(createdEvent.toFullCalendarEvent());
+				}}
+				onUpdateDone={(editEvent) => {
+					modalOpen = false;
+
+					calendar.getEventById(editEvent.id)?.remove();
+					calendar.addEvent(editEvent.toFullCalendarEvent());
+				}}
+				onDeleteDone={(editEvent) => {
+					modalOpen = false;
+
+					calendar.getEventById(editEvent.id)?.remove();
+					events = events.filter((event) => event.id != editEvent.id);
+				}}
+			/>
+		</article>
+	</dialog>
+{/if}
+
+<style>
+</style>

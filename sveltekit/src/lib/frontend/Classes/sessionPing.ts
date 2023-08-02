@@ -5,7 +5,7 @@ type Session = {
 	id?: string;
 	instanceId?: string;
 	type: string;
-	event: string;
+	room: string;
 	user: string;
 	startAt?: string;
 	endAt?: string;
@@ -25,7 +25,7 @@ export class sessionPing {
 				instanceId: this.session.instanceId,
 				type: this.session.type,
 				user: this.session.user,
-				event: this.session.event
+				room: this.session.event
 			})
 			.then((res) => res.data);
 		this.interval = setInterval(() => {

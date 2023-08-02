@@ -1,10 +1,10 @@
 <script lang="ts">
-	import EventEdit from '../../../../Components/Organisms/EventEdit.svelte';
+	import RoomEdit from '../../../../Components/Organisms/RoomEdit.svelte';
 
 	import RoomTitleForManagers from '../../../../Components/Molecules/RoomTitleForManagers.svelte';
 
-	import { EmptyEvent } from '$lib/preset/EmptyEvent';
-	import { Event } from '$lib/frontend/Classes/Event';
+	import { EmptyRoom } from '$lib/preset/EmptyRoom';
+	import { Room } from '$lib/frontend/Classes/Room';
 	import axios from 'axios';
 	import ModalCloseButton from '../../../../Components/Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
@@ -29,9 +29,9 @@
 	uploader.progress.subscribe((value) => {
 		progress = value;
 	});
-	let events: Event[] = [];
-	let paginated: Event[] = [];
-	let editEvent: Event = EmptyEvent;
+	let rooms: Room[] = [];
+	let paginated: Room[] = [];
+	let editRoom: Room = EmptyRoom;
 	let editMode: 'update' | 'create' = 'update';
 	let modalOpen = false;
 	let organizations: Organization[] = [];
@@ -40,15 +40,15 @@
 	let mentors: Mentor[] = [];
 	let documents: DocumentForAI[] = [];
 	onMount(async () => {
-		const results = await axios.get('/api/events?organization=' + organization.id).then((res) => {
-			res.data.forEach((event: Event) => {
-				event.organizationTitle =
-					organizations.find((org) => org.id == event.organization)?.title || '';
-				events.push(new Event(event));
+		const results = await axios.get('/api/rooms?organization=' + organization.id).then((res) => {
+			res.data.forEach((room: Room) => {
+				room.organizationTitle =
+					organizations.find((org) => org.id == room.organization)?.title || '';
+				rooms.push(new Room(room));
 			});
 			return res.data;
 		});
-		events = events.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+		rooms = rooms.sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 		mentors = await axios
 			.get('/api/mentors?organization=' + organization.id)
 			.then((res) => res.data);
@@ -60,45 +60,45 @@
 			return mentor;
 		});
 		documents = await axios
-			.get(`/api/documentsForAI?event=in:'${events.map((event) => event.id).join("','")}'`)
+			.get(`/api/documentsForAI?room=in:'${rooms.map((room) => room.id).join("','")}'`)
 			.then((res) => res.data);
-		events = events.map((event) => {
-			event.documents = documents.filter((document) => document.event == event.id);
-			return event;
+		rooms = rooms.map((room) => {
+			room.documents = documents.filter((document) => document.room == room.id);
+			return room;
 		});
 	});
 
 	const onCreateClicked = async () => {
-		if (!(await editEvent.validate())) return;
+		if (!(await editRoom.validate())) return;
 		busy = true;
-		const { newEvent, mentor } = await editEvent.create();
-		events = [...events, new Event(newEvent)].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-		mentors = [...mentors.filter((mentor) => mentor.id != editEvent.mentor), mentor];
+		const { newRoom, mentor } = await editRoom.create();
+		rooms = [...rooms, new Room(newRoom)].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
+		mentors = [...mentors.filter((mentor) => mentor.id != editRoom.mentor), mentor];
 		busy = false;
 		modalOpen = false;
-		actionHistory.send('createRoom', { room: newEvent });
+		actionHistory.send('createRoom', { room: newRoom });
 	};
 	const onUpdateClicked = async () => {
-		if (!(await editEvent.validate())) return;
+		if (!(await editRoom.validate())) return;
 		busy = true;
-		const { updatedEvent, mentor } = await editEvent.update();
+		const { updatedRoom, mentor } = await editRoom.update();
 		mentors = [...mentors.filter((m) => m.id != mentor.id), mentor];
-		events = events.map((event) => {
-			if (event.id == updatedEvent.id) return new Event(updatedEvent);
-			return event;
+		rooms = rooms.map((room) => {
+			if (room.id == updatedRoom.id) return new Room(updatedRoom);
+			return room;
 		});
 		busy = false;
 		modalOpen = false;
-		actionHistory.send('updateRoom', { room: updatedEvent });
+		actionHistory.send('updateRoom', { room: updatedRoom });
 	};
 	const onDeleteClicked = async () => {
 		if (!confirm(_('Are you sure you want to delete this room?'))) return;
-		await editEvent.delete();
+		await editRoom.delete();
 
-		events = events.filter((event) => event.id != editEvent.id);
+		rooms = rooms.filter((room) => room.id != editRoom.id);
 
 		modalOpen = false;
-		actionHistory.send('deleteRoom', { room: editEvent });
+		actionHistory.send('deleteRoom', { room: editRoom });
 	};
 	let busy = false;
 </script>
@@ -108,8 +108,8 @@
 	href={'#'}
 	role="button"
 	on:click={() => {
-		editEvent = new Event({
-			...EmptyEvent,
+		editRoom = new Room({
+			...EmptyRoom,
 			slug: crypto.randomUUID(),
 			organization: organization.id
 		});
@@ -119,7 +119,7 @@
 >
 	{_('New Room')}
 </a>
-<FilterPagination inputArray={events} bind:paginated />
+<FilterPagination inputArray={rooms} bind:paginated />
 <table>
 	<thead>
 		<tr>
@@ -129,16 +129,16 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each paginated as event}
+		{#each paginated as room}
 			<tr>
 				<td>
-					<RoomTitleForManagers forManager {event} {organization} />
+					<RoomTitleForManagers forManager {room} {organization} />
 				</td>
-				<td>{event.slug}</td>
+				<td>{room.slug}</td>
 				<td>
 					<button
 						on:click={() => {
-							editEvent = event;
+							editRoom = room;
 							editMode = 'update';
 							modalOpen = true;
 						}}
@@ -154,7 +154,7 @@
 	<dialog open transition:fade>
 		<article>
 			<ModalCloseButton onClick={() => (modalOpen = false)} />
-			<EventEdit {editEvent} {users} {mentors} />
+			<RoomEdit {editRoom} {users} {mentors} />
 			{#if editMode == 'create'}
 				<button
 					aria-busy={busy}

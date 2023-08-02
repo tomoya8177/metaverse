@@ -7,8 +7,12 @@
 	import type { PageData } from './$types';
 	import { toast } from '$lib/frontend/toast';
 	import ObjectLockSelect from '../../../../../../Components/Molecules/ObjectLockSelect.svelte';
+	import SquareThumbnail from '../../../../../../Components/Organisms/SquareThumbnail.svelte';
+	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	export let data: PageData;
-	let objects = data.objects;
+	let objects = data.objects.map((object) => {
+		return new SharedObject(object);
+	});
 </script>
 
 <table>
@@ -22,6 +26,9 @@
 	{#each objects as object}
 		<tr>
 			<td>
+				{#if object.shortType == 'image'}
+					<SquareThumbnail url={object.url} />
+				{/if}
 				{object.title}
 				<a href={object.url} target="_blank">
 					<Icon icon="open_in_new" />

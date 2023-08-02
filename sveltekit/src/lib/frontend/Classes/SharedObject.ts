@@ -12,7 +12,7 @@ export class SharedObject {
 	title: string = '';
 	createdAt?: string;
 	components: string = '';
-	event: string = '';
+	room: string = '';
 	user: string = '';
 	editable: boolean = false;
 	handle?: string;
@@ -34,7 +34,7 @@ export class SharedObject {
 		this.title = data.title;
 		this.createdAt = data.createdAt;
 		this.components = data.components;
-		this.event = data.event;
+		this.room = data.room;
 		this.user = data.user;
 		this.editable = data.editable;
 		this.handle = data.handle;
@@ -99,7 +99,7 @@ export class SharedObject {
 		if (this.editable) {
 			entity.classList.add('clickable');
 		}
-		this.scene.appendChild(entity);
+		this.scene?.appendChild(entity);
 	}
 	setImageAspectRatio() {
 		if (!this.asset || !this.el) return console.error('asset is null');

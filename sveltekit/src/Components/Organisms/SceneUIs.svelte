@@ -5,7 +5,7 @@
 	import { onDestroy, onMount } from 'svelte';
 	import {
 		PreviewPanelOpen,
-		EventStore,
+		RoomStore,
 		UserStore,
 		ItemsInPreview,
 		FocusObjectStore
@@ -40,7 +40,7 @@
 	const loadMessages = async (existings: Message[] = []) => {
 		messages = [
 			...(await axios
-				.get('/api/messages?event=' + $EventStore.id + '&pinned=1')
+				.get('/api/messages?room=' + $RoomStore.id + '&pinned=1')
 				.then((res) => res.data)),
 			...existings
 		].filter((thing, index, self) => self.findIndex((t) => t.id === thing.id) === index);
@@ -77,10 +77,10 @@
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
 		loadMessages(messages);
-		if ($EventStore.mentor) {
+		if ($RoomStore.mentor) {
 			axios
-				.put('/mentor/' + $EventStore.mentor, {
-					eventId: $EventStore.id,
+				.put('/mentor/' + $RoomStore.mentor, {
+					roomId: $RoomStore.id,
 					refresh: false
 				})
 				.then(async (res) => {
@@ -140,20 +140,20 @@
 			const newMessage = new Message({
 				body: escapeHTML(recognition.body) + ' @Mentor',
 				user: $UserStore.id,
-				event: $EventStore.id,
+				room: $RoomStore.id,
 				pinned: newMessagePinned
 			});
 
 			await sendChatMessage(newMessage);
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(
-				$EventStore.mentor,
-				$EventStore.id || 'none',
+				$RoomStore.mentor,
+				$RoomStore.id || 'none',
 				newMessage
 			);
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
-			const mentor = await axios.get('/api/mentors/' + $EventStore.mentor).then((res) => res.data);
+			const mentor = await axios.get('/api/mentors/' + $RoomStore.mentor).then((res) => res.data);
 			console.log({ mentor });
 			if (!aiSpeaks) {
 				return;

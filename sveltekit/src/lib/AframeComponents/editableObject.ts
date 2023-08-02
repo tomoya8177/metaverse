@@ -4,7 +4,7 @@ import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { _ } from '$lib/i18n';
 import { EmptyObject } from '$lib/preset/EmptyObject';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
-import type { Entity, Event } from 'aframe';
+import type { Entity, Room } from 'aframe';
 import axios from 'axios';
 let userId = '';
 UserStore.subscribe((user) => {
@@ -26,7 +26,7 @@ AFRAME.registerComponent('editable-object', {
 		this.cursorEl = document.querySelector('[raycaster]');
 		this.rayCatcher = document.getElementById('rayCatcher') as Entity;
 
-		this.el.addEventListener('mousedown', (e: Event) => {
+		this.el.addEventListener('mousedown', (e: Room) => {
 			this.object = sharedObjects.get(this.el.id);
 			if (!this.object || !this.rayCatcher) return console.error('object is null');
 			console.log({ object: this.object });

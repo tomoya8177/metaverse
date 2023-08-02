@@ -7,6 +7,7 @@
 	export let value: string | number | boolean = '';
 	export let readonly: boolean = false;
 	export let copiable: boolean = false;
+	export let testId: string = '';
 	export let type:
 		| 'number'
 		| 'checkbox'
@@ -24,8 +25,8 @@
 	export let selects: { name: string | undefined; value: string | number | undefined }[] = [];
 	export let disabled: boolean = false;
 	export let required: boolean = false;
-	export let onChange: (e: Event) => void = () => {};
-	export let onInput: (e: Event) => void = () => {};
+	export let onChange: (e: Room) => void = () => {};
+	export let onInput: (e: Room) => void = () => {};
 	export let step = 1;
 	export let min = 0;
 	export let max = 100;
@@ -48,25 +49,82 @@
 
 			<div class="control">
 				{#if type == 'text'}
-					<input on:change={onChange} type="text" bind:value {disabled} {readonly} />
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="text"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
 				{:else if type == 'url'}
-					<input on:change={onChange} type="url" bind:value {disabled} {readonly} />
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="url"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
 				{:else if type == 'tel'}
-					<input on:change={onChange} type="tel" bind:value {disabled} {readonly} />
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="tel"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
 				{:else if type == 'number'}
-					<input on:change={onChange} type="number" bind:value {disabled} {readonly} />
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="number"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
 				{:else if type == 'email'}
-					<input on:change={onChange} type="email" bind:value {disabled} {readonly} />
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="email"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
 				{:else if type == 'date'}
-					<input on:change={onChange} type="date" bind:value {disabled} {readonly} />
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="date"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
 				{:else if type == 'time'}
-					<input on:change={onChange} type="time" bind:value {disabled} {readonly} />
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="time"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
 				{:else if type == 'password'}
-					<input on:change={onChange} type="password" bind:value {disabled} {readonly} />
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="password"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
 				{:else if type == 'textarea'}
 					<textarea on:change={onChange} class="textarea" bind:value {disabled} {readonly} />
 				{:else if type == 'range'}
 					<input
+						data-testid={testId}
 						type="range"
 						{min}
 						{step}
@@ -79,12 +137,19 @@
 					/>
 				{:else if type == 'checkbox'}
 					<label>
-						<input type="checkbox" bind:checked={value} {disabled} {readonly} />
+						<input
+							data-testid={testId}
+							type="checkbox"
+							bind:checked={value}
+							{disabled}
+							{readonly}
+						/>
 						{label}
 					</label>
 				{:else if type == 'switch'}
 					<label>
 						<input
+							data-testid={testId}
 							type="checkbox"
 							role="switch"
 							bind:checked={value}
@@ -95,7 +160,7 @@
 						{label}
 					</label>
 				{:else if type == 'select'}
-					<select bind:value {disabled} on:change={onChange}>
+					<select data-testid={testId} bind:value {disabled} on:change={onChange}>
 						{#each selects as option}
 							{#if typeof option.value != 'undefined'}
 								<option value={option.value}>{option.name}</option>

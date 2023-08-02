@@ -2,7 +2,7 @@
 	import TextChatMessage from '../Molecules/TextChatMessage.svelte';
 
 	import { onDestroy, onMount } from 'svelte';
-	import { EventStore, UserStore } from '$lib/store';
+	import { RoomStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -58,7 +58,7 @@
 		let newMessage = new Message({
 			body: escapeHTML(newMessageBody),
 			user: $UserStore.id,
-			event: $EventStore.id,
+			room: $RoomStore.id,
 			pinned: newMessagePinned
 		});
 		if (!newMessageGenerateImage) {
@@ -71,11 +71,11 @@
 			const promise = new GenerateImage(newMessageBody);
 			promise.onDone(async (file) => {
 				const mentor = await axios
-					.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
+					.get('/api/mentors/' + (forceMentor || $RoomStore.mentor))
 					.then((res) => res.data);
 				console.log({ file });
 				const message = new Message({
-					event: $EventStore.id,
+					room: $RoomStore.id,
 					type: 'attachment',
 					user: mentor.user,
 					body: 'generated image',
@@ -96,15 +96,15 @@
 			//send message to mentor
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(
-				forceMentor || $EventStore.mentor,
-				$EventStore.id || 'none',
+				forceMentor || $RoomStore.mentor,
+				$RoomStore.id || 'none',
 				newMessage
 			);
 			waitingForAIAnswer = false;
 			newMessageBody = '';
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
 			const mentor = await axios
-				.get('/api/mentors/' + (forceMentor || $EventStore.mentor))
+				.get('/api/mentors/' + (forceMentor || $RoomStore.mentor))
 				.then((res) => res.data);
 			console.log({ mentor });
 			if (!aiSpeaks) return;
@@ -148,7 +148,7 @@
 </div>
 <hr />
 <div style="display:flex; gap:0.4rem;">
-	{#if forceMentor || $EventStore.mentor}
+	{#if forceMentor || $RoomStore.mentor}
 		<div>
 			<button
 				small
@@ -174,7 +174,7 @@
 							console.log(file);
 
 							const message = new Message({
-								event: $EventStore.id,
+								room: $RoomStore.id,
 								type: 'attachment',
 								user: $UserStore.id,
 								body: file.filename,
