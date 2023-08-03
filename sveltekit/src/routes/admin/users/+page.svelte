@@ -29,7 +29,7 @@
 			if (org.checked) {
 				promises.push(
 					axios
-						.post(PUBLIC_LOCALHOST + '/api/userRoles', {
+						.post('/api/userRoles', {
 							user: userId,
 							organization: org.id,
 							role: org.isManager ? 'manager' : 'subscriber'
@@ -45,18 +45,14 @@
 	const deleteExistinguserRoles = (userRoles: UserRole[]) => {
 		let promises: Promise<UserRole>[] = [];
 		userRoles.forEach((userRole) => {
-			promises.push(
-				axios.delete(PUBLIC_LOCALHOST + '/api/userRoles/' + userRole.id).then((res) => res.data)
-			);
+			promises.push(axios.delete('/api/userRoles/' + userRole.id).then((res) => res.data));
 		});
 		return Promise.all(promises);
 	};
 	const onCreateClicked = async () => {
 		if (!editUser.validate()) return;
 
-		const result = await axios
-			.post(PUBLIC_LOCALHOST + '/api/users', editUser)
-			.then((res) => res.data);
+		const result = await axios.post('/api/users', editUser).then((res) => res.data);
 		const createdUserRoles = await createUserRoles(result.id);
 		userRoles = [...createdUserRoles, ...userRoles];
 		const filledUser = fillOrganization(result, userRoles, organizations);
@@ -67,9 +63,7 @@
 	const onUpdateClicked = async () => {
 		if (!editUser.validate()) return;
 
-		const result = await axios
-			.put(PUBLIC_LOCALHOST + '/api/users/' + editUser.id, editUser)
-			.then((res) => res.data);
+		const result = await axios.put('/api/users/' + editUser.id, editUser).then((res) => res.data);
 		await deleteExistinguserRoles(editUser.userRoles || []);
 		await createUserRoles(result.id);
 
@@ -84,11 +78,9 @@
 	};
 	const onDeleteClicked = async () => {
 		if (!(await myConfirm('Are you sure that you want to delete this user?'))) return;
-		const userRoles = await axios
-			.get(PUBLIC_LOCALHOST + '/api/userRoles?user=' + editUser.id)
-			.then((res) => res.data);
+		const userRoles = await axios.get('/api/userRoles?user=' + editUser.id).then((res) => res.data);
 		await deleteExistinguserRoles(userRoles);
-		await axios.delete(PUBLIC_LOCALHOST + '/api/users/' + editUser.id).then((res) => res.data);
+		await axios.delete('/api/users/' + editUser.id).then((res) => res.data);
 		//		await new User(editUser).delete();
 		users = users.filter((user) => user.id != editUser.id);
 		newUserModalOpen = false;

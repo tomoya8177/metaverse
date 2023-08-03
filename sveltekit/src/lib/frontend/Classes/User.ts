@@ -41,9 +41,7 @@ export class User extends DBObject {
 			myAlert(_('Nickname is required'));
 			return false;
 		}
-		const existing = await axios
-			.get(PUBLIC_LOCALHOST + '/api/users?email=' + this.email)
-			.then((res) => res.data);
+		const existing = await axios.get('/api/users?email=' + this.email).then((res) => res.data);
 		if (existing.length > 0 && existing[0].id != this.id) {
 			myAlert(_('Email already exists'));
 			return false;
