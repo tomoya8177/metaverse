@@ -218,5 +218,6 @@ export default {
 	'Are you sure?': 'よろしいですか？',
 	OK: 'OK',
 	Cancel: 'キャンセル',
-	'Sent invitations to users.': 'ユーザーに招待を送りました。'
+	'Sent invitations to users.': 'ユーザーに招待を送りました。',
+	Created: '作成しました'
 };

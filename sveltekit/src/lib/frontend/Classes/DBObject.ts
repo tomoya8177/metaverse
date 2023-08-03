@@ -31,9 +31,7 @@ export class DBObject {
 	async read(): Promise<any> {
 		if (!this.table) return console.error('DBObject.load() called without table name');
 
-		const data = await axios
-			.get(`${PUBLIC_LOCALHOST}/api/${this.table}/${this.id}`)
-			.then((res) => res.data);
+		const data = await axios.get(`/api/${this.table}/${this.id}`).then((res) => res.data);
 		//unescape values
 		for (const key in data) {
 			if (typeof data[key] == 'string') {
@@ -52,15 +50,11 @@ export class DBObject {
 				data[key] = escapeHTML(data[key] as string) as any;
 			}
 		}
-		return await axios
-			.put(`${PUBLIC_LOCALHOST}/api/${this.table}/${this.id}`, data)
-			.then((res) => res.data);
+		return await axios.put(`/api/${this.table}/${this.id}`, data).then((res) => res.data);
 	}
 	async delete(): Promise<any> {
 		if (!this.table) return console.error('DBObject.load() called without table name');
-		return await axios
-			.delete(`${PUBLIC_LOCALHOST}/api/${this.table}/${this.id}`)
-			.then((res) => res.data);
+		return await axios.delete(`/api/${this.table}/${this.id}`).then((res) => res.data);
 	}
 	async create(): Promise<any> {
 		if (!this.table) return console.error('DBObject.load() called without table name');
@@ -72,6 +66,6 @@ export class DBObject {
 				data[key] = escapeHTML(data[key] as string) as any;
 			}
 		}
-		return await axios.post(`${PUBLIC_LOCALHOST}/api/${this.table}`, data).then((res) => res.data);
+		return await axios.post(`/api/${this.table}`, data).then((res) => res.data);
 	}
 }
