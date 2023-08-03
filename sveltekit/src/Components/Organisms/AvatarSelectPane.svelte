@@ -3,7 +3,7 @@
 	import AvatarPreview from '../Atom/AvatarPreview.svelte';
 	import { fade } from 'svelte/transition';
 	import { _ } from '$lib/i18n';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let url: string;
 
 	let avatarSelectOpen = false;

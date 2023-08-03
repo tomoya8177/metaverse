@@ -18,7 +18,7 @@
 	import { _ } from '$lib/i18n';
 	import { speechInterval } from '$lib/frontend/aiSpeaksOut';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 
 	export let message: Message;
 	export let onDelete: (id: string) => void;

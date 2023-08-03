@@ -28,7 +28,7 @@
 	import { nl2br } from '$lib/math/nl2br';
 	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let data: PageData;
 	let paginated: Mentor[] = [];
 	export let organization: Organization = data.organization;

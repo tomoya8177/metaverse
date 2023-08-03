@@ -12,7 +12,7 @@
 	import { page } from '$app/stores';
 	import type { PageData } from './$types';
 	import AvatarThumbnail from '../../../../Components/Atom/AvatarThumbnail.svelte';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let data: PageData;
 	export let users: User[] = data.users;
 	export let userRoles: UserRole[] = data.userRoles;

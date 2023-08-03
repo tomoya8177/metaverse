@@ -19,7 +19,7 @@
 	import { myAlert } from '$lib/frontend/toast';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let textChatOpen = false;
 	export let waitingForAIAnswer: boolean;
 	const scrolToBottom = (element: Element) => {

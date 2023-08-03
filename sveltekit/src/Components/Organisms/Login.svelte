@@ -11,7 +11,7 @@
 	import { myAlert } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let organization: string = '';
 	export let room: Room | null = null;
 	let loggedIn: boolean | null = null;

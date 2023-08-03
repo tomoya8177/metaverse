@@ -23,7 +23,7 @@
 	import DocumentForAiRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
 	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
 	import type { PageData } from './$types';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let data: PageData;
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
