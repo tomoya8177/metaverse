@@ -3,8 +3,8 @@
 	import { deleteOrganization } from '$lib/frontend/deleteOrganization';
 	import { _ } from '$lib/i18n';
 	import type { PageData } from './$types';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
-	import ActionHistory from '../../admin/ActionHistory.svelte';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import ActionHistoryTable from '../../admin/ActionHistoryTable.svelte';
 	import { onMount } from 'svelte';
 	export let data: PageData;
 	let organization = data.organization;
@@ -22,7 +22,7 @@
 </section>
 <section>
 	<h3>{_('Access Logs')}</h3>
-	<ActionHistory {actionHistories} />
+	<ActionHistoryTable {actionHistories} />
 </section>
 
 <h3>{_('Delete Organization')}</h3>

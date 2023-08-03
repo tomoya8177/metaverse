@@ -3,10 +3,7 @@ import { RoomStore, UserStore } from '$lib/store';
 import axios from 'axios';
 import { DBObject } from './DBObject';
 import { page } from '$app/stores';
-let thisPage: any;
-page.subscribe((value) => {
-	thisPage = value;
-});
+
 type Actions =
 	| 'login'
 	| 'logout'
@@ -48,11 +45,15 @@ type Actions =
 	| 'dashboard'
 	| 'managerConsole';
 
-class ActionHistory extends DBObject {
+export class ActionHistory extends DBObject {
 	user: string;
 	room: string;
 	organization: string;
 	session: string;
+	page: any;
+	param: string;
+	userData?: any;
+	roomData?: any;
 	constructor(data: any) {
 		data.table = 'actions';
 		super(data);
@@ -60,6 +61,8 @@ class ActionHistory extends DBObject {
 		this.user = data?.user || '';
 		this.room = data?.room || '';
 		this.organization = data?.organization || '';
+		this.page = null;
+		this.param = data?.param || '';
 	}
 	async send(action: Actions, data: any = {}) {
 		if (PUBLIC_IS_DEV == 'true') return;
@@ -70,8 +73,11 @@ class ActionHistory extends DBObject {
 			organization: this.organization,
 			action: action,
 			data: JSON.stringify(data),
-			path: thisPage.url.pathname
+			path: location.href
 		});
+	}
+	get paramData() {
+		return JSON.parse(this.param);
 	}
 }
 

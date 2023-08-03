@@ -8,7 +8,7 @@
 	let organization: Organization;
 	import { UserStore } from '$lib/store';
 	import type { PageData } from './$types';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 
 	export let data: PageData;
 	organization = data.organization;

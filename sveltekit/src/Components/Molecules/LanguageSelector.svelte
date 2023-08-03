@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { cookies } from '$lib/frontend/cookies';
 	import { onMount } from 'svelte';
 	let chosenLanguage: string;

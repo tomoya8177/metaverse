@@ -30,7 +30,7 @@
 	import NippleControl from '../Atom/NippleControl.svelte';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { myAlert } from '$lib/frontend/toast';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};

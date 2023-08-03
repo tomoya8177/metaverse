@@ -17,7 +17,7 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { loadSharedObjects } from '$lib/frontend/loadSharedObjects';
 	import { Unit } from '$lib/frontend/Classes/Unit';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { myAlert, toast } from '$lib/frontend/toast';
 	import ModalCloseButton from '../../../Components/Atom/ModalCloseButton.svelte';
 	import { _ } from '$lib/i18n';

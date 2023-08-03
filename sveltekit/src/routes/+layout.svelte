@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { PUBLIC_IS_DEV } from '$env/static/public';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { _ } from '$lib/i18n';
 	import { ConfirmDialog, Toast, UserStore } from '$lib/store';
 	import { fade } from 'svelte/transition';

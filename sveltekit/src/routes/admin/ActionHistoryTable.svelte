@@ -2,9 +2,7 @@
 	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import { DateTime } from 'luxon';
-	import type { User } from '$lib/frontend/Classes/User';
-	import type { ActionHistory } from '$lib/types/ActionHistory';
-	export let actionHistories: ActionHistory[] = [];
+	export let actionHistories: any[] = [];
 	onMount(async () => {
 		const actions = await axios
 			.get('/api/actions?orderBy=createdAt&order=desc&limit=100')
@@ -31,7 +29,7 @@
 			{actionHistory.action}
 		</div>
 		<div>
-			{actionHistory.param}
+			{actionHistory.dataData?.path || actionHistory.roomData?.title || ''}
 		</div>
 		<div>
 			@

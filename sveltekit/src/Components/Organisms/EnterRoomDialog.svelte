@@ -13,7 +13,7 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let me: Me | null;
 
 	export let readyToConnect;

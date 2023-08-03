@@ -16,7 +16,7 @@
 	import LanguageSelector from '../Molecules/LanguageSelector.svelte';
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { sendInvitedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
 	export let organization: Organization | null = null;
 	export let open = false;

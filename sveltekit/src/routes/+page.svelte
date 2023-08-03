@@ -13,7 +13,7 @@
 	import { fade } from 'svelte/transition';
 	import { User } from '$lib/frontend/Classes/User';
 	import { cookies } from '$lib/frontend/cookies';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	let mentor: Mentor | null = null;
 	let intro: string = '';
 	let invite: string = '';

@@ -4,21 +4,22 @@ import axios from 'axios';
 
 export const load = async ({ params }) => {
 	const organization: Organization = await axios
-		.get(`/api/organizations?slug=${params.organizationSlug}`)
+		.get(`/api/organizations`)
 		.then((res) => res.data[0]);
 	const actions = await axios
-		.get('/api/actions?organization=' + organization.id + '&orderBy=createdAt&order=desc&limit=100')
+		.get('/api/actions?orderBy=createdAt&order=desc&limit=100')
 		.then((res) => res.data);
 	const users = await axios.get('/api/users').then((res) => res.data);
-	const rooms = await axios
-		.get('/api/rooms?organization=' + organization.id)
-		.then((res) => res.data);
+	const rooms = await axios.get('/api/rooms').then((res) => res.data);
 	const actionHistories = actions.map((action) => {
 		action.userData = users.find((user: User) => user.id == action.user);
 		action.roomData = rooms.find((room) => room.id == action.room) || null;
+		try {
+			action.dataData = JSON.parse(action.data);
+		} catch (error) {}
 		return action;
 	});
-	console.log({ organization });
+	console.log({ organization, actionHistories });
 	return {
 		organization,
 		actionHistories

@@ -22,7 +22,7 @@
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { _ } from '$lib/i18n';
 	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let virtuaMentorReady = false;
 	export let messages: Message[] = [];
 	export let newMessagePinned = false;

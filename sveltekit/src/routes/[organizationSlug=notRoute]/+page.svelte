@@ -16,7 +16,7 @@
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
-	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 
 	export let data: PageData;
 	const organization: Organization = data.organization;

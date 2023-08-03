@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Message } from './Classes/Message';
 import { escapeHTML } from '$lib/math/escapeHTML';
-import { actionHistory } from './Classes/actionHistory';
+import { actionHistory } from './Classes/ActionHistory';
 
 export const sendQuestionToAI = async (
 	mentorId: string,
