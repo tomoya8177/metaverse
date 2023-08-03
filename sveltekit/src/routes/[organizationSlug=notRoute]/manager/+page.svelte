@@ -4,8 +4,14 @@
 	import { _ } from '$lib/i18n';
 	import type { PageData } from './$types';
 	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
+	import ActionHistory from '../../admin/ActionHistory.svelte';
+	import { onMount } from 'svelte';
 	export let data: PageData;
 	let organization = data.organization;
+	let actionHistories = data.actionHistories;
+	onMount(() => {
+		actionHistory.send('managerConsole', { organization });
+	});
 </script>
 
 <section>
@@ -14,6 +20,11 @@
 		<TeamIconEditor {organization} />
 	</div>
 </section>
+<section>
+	<h3>{_('Access Logs')}</h3>
+	<ActionHistory {actionHistories} />
+</section>
+
 <h3>{_('Delete Organization')}</h3>
 
 <button

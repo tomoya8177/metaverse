@@ -25,8 +25,8 @@
 	export let selects: { name: string | undefined; value: string | number | undefined }[] = [];
 	export let disabled: boolean = false;
 	export let required: boolean = false;
-	export let onChange: (e: Room) => void = () => {};
-	export let onInput: (e: Room) => void = () => {};
+	export let onChange: (e: Event) => void = () => {};
+	export let onInput: (e: Event) => void = () => {};
 	export let step = 1;
 	export let min = 0;
 	export let max = 100;

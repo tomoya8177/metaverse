@@ -16,7 +16,6 @@
 		"test:unit": "vitest"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.36.2",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.20.4",
 		"@testing-library/jest-dom": "^5.17.0",
@@ -26,12 +25,9 @@
 		"@typescript-eslint/eslint-plugin": "^5.45.0",
 		"@typescript-eslint/parser": "^5.45.0",
 		"@vitest/browser": "^0.33.0",
-		"axios-mock-adapter": "^1.21.5",
-		"axios-mock-jest": "^0.0.3",
 		"eslint": "^8.28.0",
 		"eslint-config-prettier": "^8.5.0",
 		"eslint-plugin-svelte": "^2.30.0",
-		"jest-dom": "^4.0.0",
 		"jsdom": "^22.1.0",
 		"prettier": "^2.8.0",
 		"prettier-plugin-svelte": "^2.10.1",
@@ -57,6 +53,7 @@
 		"axios": "^1.4.0",
 		"filestack-js": "^3.26.1",
 		"fullcalendar": "^6.1.8",
+		"ics": "^3.2.0",
 		"js-cookie": "^3.0.5",
 		"jsonwebtoken": "^9.0.0",
 		"langchain": "^0.0.107",

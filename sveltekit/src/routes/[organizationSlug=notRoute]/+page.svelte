@@ -16,12 +16,14 @@
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
+	import { actionHistory } from '$lib/frontend/Classes/actionHistory';
 
 	export let data: PageData;
 	const organization: Organization = data.organization;
 	let mentors: Mentor[] = [];
 	let rooms: Room[] = [];
 	onMount(async () => {
+		actionHistory.send('dashboard', { organization });
 		console.log('dashboard mount');
 		FocusObjectStore.set(EmptyObject);
 		RoomStore.set(EmptyRoom);

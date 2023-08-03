@@ -13,7 +13,7 @@ import { pollAudioLevel } from '../pollAudioLevel';
 import { SharedObject } from './SharedObject';
 let room: Room;
 RoomStore.subscribe((value) => {
-	event = value;
+	room = value;
 });
 
 export class Unit {

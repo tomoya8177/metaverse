@@ -1,8 +1,11 @@
 import type { Organization } from '$lib/types/Organization';
 import type { UserRole } from '../../types/UserRole';
 import axios from 'axios';
-export class User {
-	id: string;
+import { DBObject } from './DBObject';
+import { myAlert } from '../toast';
+import { _ } from '$lib/i18n';
+import { PUBLIC_LOCALHOST } from '$env/static/public';
+export class User extends DBObject {
 	nickname: string;
 	email: string;
 	avatarURL: string | '';
@@ -20,7 +23,8 @@ export class User {
 	lastName?: string;
 	description: string = '';
 	constructor(data: any) {
-		this.id = data.id;
+		data.table = 'users';
+		super(data);
 		this.nickname = data.nickname;
 		this.email = data.email;
 		this.avatarURL = data.avatarURL;
@@ -32,10 +36,18 @@ export class User {
 		this.onVideoMute = true;
 		this.description = data.description;
 	}
-	async delete(userRoleId: string) {
-		await axios.delete('/api/userRoles/' + userRoleId);
-		// await axios.delete('/api/sessions?user=' + this.id);
-		// await axios.delete('/api/messages?user=' + this.id);
-		// await axios.delete('/api/objects?user=' + this.id);
+	async validate(): Promise<boolean> {
+		if (!this.nickname) {
+			myAlert(_('Nickname is required'));
+			return false;
+		}
+		const existing = await axios
+			.get(PUBLIC_LOCALHOST + '/api/users?email=' + this.email)
+			.then((res) => res.data);
+		if (existing.length > 0 && existing[0].id != this.id) {
+			myAlert(_('Email already exists'));
+			return false;
+		}
+		return true;
 	}
 }

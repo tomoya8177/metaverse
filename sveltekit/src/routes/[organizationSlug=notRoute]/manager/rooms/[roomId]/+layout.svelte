@@ -43,7 +43,7 @@
 				role="button"
 				class:secondary={tab != 'basic'}
 			>
-				Basic Setting
+				{_('Basic Setting')}
 			</a>
 		</li>
 		<li>
@@ -55,7 +55,7 @@
 				role="button"
 				class:secondary={tab != 'objects'}
 			>
-				Objects
+				{_('Objects')}
 			</a>
 		</li>
 	</ul>

@@ -1,6 +1,7 @@
 import { PUBLIC_IS_DEV } from '$env/static/public';
 import { RoomStore, UserStore } from '$lib/store';
 import axios from 'axios';
+import { DBObject } from './DBObject';
 
 type Actions =
 	| 'login'
@@ -39,32 +40,29 @@ type Actions =
 	| 'createMentor'
 	| 'updateMentor'
 	| 'deleteMentor'
-	| 'feedback';
+	| 'feedback'
+	| 'dashboard'
+	| 'managerConsole';
 
-class ActionHistory {
-	id: string;
+class ActionHistory extends DBObject {
 	user: string;
 	room: string;
 	organization: string;
-
-	constructor(
-		data: {
-			user?: string;
-			event?: string;
-			organization?: string;
-		} | null
-	) {
-		this.id = crypto.randomUUID();
+	session: string;
+	constructor(data: any) {
+		data.table = 'actions';
+		super(data);
+		this.session = crypto.randomUUID();
 		this.user = data?.user || '';
-		this.event = data?.event || '';
+		this.room = data?.room || '';
 		this.organization = data?.organization || '';
 	}
 	async send(action: Actions, data: any = {}) {
 		if (PUBLIC_IS_DEV == 'true') return;
 		await axios.post('/api/actions', {
-			session: this.id,
+			session: this.session,
 			user: this.user,
-			room: this.event,
+			room: this.room,
 			organization: this.organization,
 			action: action,
 			data: JSON.stringify(data)
@@ -72,10 +70,10 @@ class ActionHistory {
 	}
 }
 
-export const actionHistory = new ActionHistory(null);
+export const actionHistory = new ActionHistory({});
 UserStore.subscribe((value) => {
 	actionHistory.user = value?.id || '';
 });
 RoomStore.subscribe((value) => {
-	actionHistory.event = value?.id || '';
+	actionHistory.room = value?.id || '';
 });

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ActionHistory from './ActionHistory.svelte';
+
 	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import { DateTime } from 'luxon';
@@ -21,30 +23,4 @@
 	});
 </script>
 
-{#each actionHistories as actionHistory, i}
-	{@const sameSession = actionHistory.session == actionHistories[i - 1]?.session}
-	<div style="display:flex;gap:1rem">
-		<div style="width:4rem">
-			{#if !sameSession}
-				<small>
-					{actionHistory.session.substring(0, 6)}
-				</small>
-			{/if}
-		</div>
-		<div style="width:8rem">
-			{#if !sameSession}
-				{actionHistory.userData?.nickname || '???'}
-			{/if}
-		</div>
-		<div style="flex:1">
-			{actionHistory.action}
-		</div>
-		<div>
-			{actionHistory.param}
-		</div>
-		<div>
-			@
-			{DateTime.fromISO(actionHistory.createdAt).toLocaleString(DateTime.DATETIME_MED)}
-		</div>
-	</div>
-{/each}
+<ActionHistory {actionHistories} />

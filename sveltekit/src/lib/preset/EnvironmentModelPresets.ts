@@ -1,32 +1,39 @@
+import { _ } from '$lib/i18n';
+
 export const EnvironmentModelPresets = [
 	{
-		name: 'None',
+		name: _('None'),
 		modelURL: '',
 		navMeshURL: ''
 	},
 	{
-		name: 'Classroom',
+		name: _('Classroom'),
 		modelURL: '/models/classroom_merged.glb',
 		navMeshURL: ''
 	},
 	{
-		name: 'Floating Restaurant',
+		name: _('Floating Restaurant'),
 		modelURL: '/models/floating_restaurant.glb',
 		navMeshURL: ''
 	},
 	{
-		name: 'House',
+		name: _('House'),
 		modelURL: '/models/black_office.glb',
 		navMeshURL: ''
 	},
 	{
-		name: 'Office',
+		name: _('Office'),
 		modelURL: '/models/studio_office.glb',
 		navMeshURL: ''
 	},
 	{
-		name: 'Conference Room',
+		name: _('Conference Room'),
 		modelURL: '/models/conference_room.glb',
+		navMeshURL: ''
+	},
+	{
+		name: _('UFSQ'),
+		modelURL: '/models/usfq/USFQ.gltf',
 		navMeshURL: ''
 	}
 ];

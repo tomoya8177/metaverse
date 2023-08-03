@@ -43,7 +43,7 @@
 			messages: [
 				{
 					role: 'system',
-					content: `Encourage the user to create their own virtual school with AI mentor with ChatGPT and AI image generator from Stability.ai in less than 100 words.  make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
+					content: `Encourage the user to create their own virtual school with AI mentor and AI image generator in less than 100 words. Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
 						'locale'
 					)}.`
 				}

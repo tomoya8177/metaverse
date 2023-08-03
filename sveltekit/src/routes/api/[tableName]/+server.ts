@@ -35,8 +35,10 @@ export async function POST({ request, params, cookies }) {
 }
 
 export async function DELETE({ request, params, cookies }) {
+	const isLocalhost = request.headers.get('host')?.includes('localhost');
+
 	const checkResult = await Auth.check(cookies.get('login'));
-	if (!checkResult.result) {
+	if (!checkResult.result || !isLocalhost) {
 		return new Response('not authorized', { status: 401 });
 	}
 	const filter = await createFiltersFromParams(request, params, checkResult);

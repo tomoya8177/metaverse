@@ -183,7 +183,7 @@
 	let filteredItemsInPreview: SharedObject[] = [];
 </script>
 
-{#if $FocusObjectStore.id}
+{#if $FocusObjectStore.id && $FocusObjectStore.id != ''}
 	<nav class="objectEditorNav">
 		<ul />
 		<ul

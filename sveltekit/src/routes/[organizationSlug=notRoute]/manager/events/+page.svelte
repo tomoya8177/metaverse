@@ -26,6 +26,7 @@
 	let editEvent: Event;
 	let editMode: 'create' | 'update' = 'update';
 	let calendar: Calendar;
+	let users = data.users;
 	onMount(() => {
 		setTimeout(() => {
 			const el = document.getElementById('calendar') as HTMLElement;
@@ -77,7 +78,10 @@
 		href={'#'}
 		on:click={() => {
 			editEvent = new Event({
-				organization: organization.id
+				id: crypto.randomUUID(),
+				organization: organization.id,
+				start: DateTime.now().toISO(),
+				end: DateTime.now().plus({ hours: 1 }).toISO()
 			});
 			modalOpen = true;
 			editMode = 'create';
@@ -93,6 +97,7 @@
 		<article>
 			<ModalCloseButton onClick={() => (modalOpen = false)} />
 			<EventEdit
+				{users}
 				{organization}
 				{rooms}
 				{editMode}
@@ -122,4 +127,7 @@
 {/if}
 
 <style>
+	article {
+		max-width: calc(100vw - 2rem);
+	}
 </style>

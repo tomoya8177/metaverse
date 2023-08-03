@@ -1,8 +1,10 @@
 import { _ } from '$lib/i18n';
+import axios from 'axios';
 import { myAlert } from '../toast';
 import { DBObject } from './DBObject';
 import { DateTime } from 'luxon';
-
+import * as ics from 'ics';
+import type { User } from './User';
 export class Event extends DBObject {
 	object: string;
 	description: string;
@@ -12,17 +14,17 @@ export class Event extends DBObject {
 	start: string;
 	end: string;
 	organization: string;
-	constructor(obj: any) {
-		obj.table = 'events';
-		super(obj);
-		this.object = obj.object || '';
-		this.description = obj.description || '';
-		this.summary = obj.summary || '';
-		this.location = obj.location || '';
-		this.url = obj.url || '';
-		this.start = obj.start || '';
-		this.end = obj.end || '';
-		this.organization = obj.organization || '';
+	constructor(data: any) {
+		data.table = 'events';
+		super(data);
+		this.object = this.unescapedData.object || '';
+		this.description = this.unescapedData.description || '';
+		this.summary = this.unescapedData.summary || '';
+		this.location = this.unescapedData.location || '';
+		this.url = this.unescapedData.url || '';
+		this.start = this.unescapedData.start || '';
+		this.end = this.unescapedData.end || '';
+		this.organization = this.unescapedData.organization || '';
 	}
 	get allDay(): boolean {
 		if (!this.start) return false;
@@ -119,5 +121,65 @@ export class Event extends DBObject {
 				.toLocal()
 				.toJSDate()
 		};
+	}
+	async ical(users: User[]) {
+		const start = DateTime.fromISO(this.start);
+		const end = DateTime.fromISO(this.end);
+		const duration = end.diff(start, ['days', 'hours', 'minutes']).toObject();
+		//remove if the value was 0
+		for (const key in duration) {
+			if (duration[key] == 0) {
+				delete duration[key];
+			}
+		}
+		const event = {
+			start: [
+				Number(start.toFormat('yyyy')),
+				Number(start.toFormat('M')),
+				Number(start.toFormat('d')),
+				Number(start.toFormat('HH')),
+				Number(start.toFormat('m'))
+			] as ics.DateArray,
+			duration: duration,
+			title: this.summary,
+			description: this.description,
+			location: this.location
+		};
+		if (this.url) event.description = 'URL:\n' + this.url + '\n\n' + event.description;
+		const { error, value } = await ics.createEvent(event);
+		if (error) {
+			console.log(error);
+		}
+		console.log({ value });
+
+		const promises = users.map((user) => {
+			return axios.post('/api/email', {
+				to: user.email,
+				subject: `${_('Invitation for an event')} ${this.summary}`,
+				body: `${_('You are invited to an event')} ${this.summary} ${_('on')} ${DateTime.fromISO(
+					this.start
+				).toLocaleString(this.allDay ? DateTime.DATE : DateTime.DATETIME_FULL)}. ${_(
+					'Please click the attchment to add it to your calendar.'
+				)}`,
+				attachments: [
+					{
+						filename: `${this.summary}.ics`,
+						content: value,
+						contentType: 'text/calendar',
+						encoding: 'utf8'
+					}
+				]
+			});
+		});
+		await Promise.all(promises);
+		return;
+	}
+	escapeICalString(input: string): string {
+		return input
+			.replace(/;/g, `\;`) // Escape semicolons
+			.replace(/,/g, `\,`) // Escape commas
+			.replace(/:/g, `\:`) // Escape colons
+			.replace(/'/g, `\'`) // Escape single quotes
+			.replace(/"/g, `\"`); // Escape double quotes
 	}
 }

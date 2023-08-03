@@ -11,6 +11,8 @@
 	import { _ } from '$lib/i18n';
 	import { fillOrganization } from './fillOrganization';
 	import type { PageData } from './$types';
+	import { PUBLIC_LOCALHOST } from '$env/static/public';
+	import { myConfirm } from '$lib/frontend/toast';
 	export let data: PageData;
 	let users: User[] = data.users;
 	let paginated: User[] = [];
@@ -24,12 +26,10 @@
 	const createUserRoles = async (userId: string): Promise<UserRole[]> => {
 		let promises: Promise<UserRole>[] = [];
 		organizations.forEach((org) => {
-			console.log({ org });
 			if (org.checked) {
-				console.log('posting');
 				promises.push(
 					axios
-						.post('/api/userRoles', {
+						.post(PUBLIC_LOCALHOST + '/api/userRoles', {
 							user: userId,
 							organization: org.id,
 							role: org.isManager ? 'manager' : 'subscriber'
@@ -45,17 +45,18 @@
 	const deleteExistinguserRoles = (userRoles: UserRole[]) => {
 		let promises: Promise<UserRole>[] = [];
 		userRoles.forEach((userRole) => {
-			promises.push(axios.delete('/api/userRoles/' + userRole.id).then((res) => res.data));
+			promises.push(
+				axios.delete(PUBLIC_LOCALHOST + '/api/userRoles/' + userRole.id).then((res) => res.data)
+			);
 		});
 		return Promise.all(promises);
 	};
 	const onCreateClicked = async () => {
-		if (!editUser.email) {
-			console.log('no email', editUser);
-			alert('Email is required');
-			return;
-		}
-		const result = await axios.post('/api/users', editUser).then((res) => res.data);
+		if (!editUser.validate()) return;
+
+		const result = await axios
+			.post(PUBLIC_LOCALHOST + '/api/users', editUser)
+			.then((res) => res.data);
 		const createdUserRoles = await createUserRoles(result.id);
 		userRoles = [...createdUserRoles, ...userRoles];
 		const filledUser = fillOrganization(result, userRoles, organizations);
@@ -64,11 +65,11 @@
 		newUserModalOpen = false;
 	};
 	const onUpdateClicked = async () => {
-		if (!editUser.email) {
-			alert('Email is required');
-			return;
-		}
-		const result = await axios.put('/api/users/' + editUser.id, editUser).then((res) => res.data);
+		if (!editUser.validate()) return;
+
+		const result = await axios
+			.put(PUBLIC_LOCALHOST + '/api/users/' + editUser.id, editUser)
+			.then((res) => res.data);
 		await deleteExistinguserRoles(editUser.userRoles || []);
 		await createUserRoles(result.id);
 
@@ -82,10 +83,12 @@
 		newUserModalOpen = false;
 	};
 	const onDeleteClicked = async () => {
-		if (!confirm('Are you sure that you want to delete this user?')) return;
-		const userRoles = await axios.get('/api/userRoles?user=' + editUser.id).then((res) => res.data);
+		if (!(await myConfirm('Are you sure that you want to delete this user?'))) return;
+		const userRoles = await axios
+			.get(PUBLIC_LOCALHOST + '/api/userRoles?user=' + editUser.id)
+			.then((res) => res.data);
 		await deleteExistinguserRoles(userRoles);
-		await axios.delete('/api/users/' + editUser.id).then((res) => res.data);
+		await axios.delete(PUBLIC_LOCALHOST + '/api/users/' + editUser.id).then((res) => res.data);
 		//		await new User(editUser).delete();
 		users = users.filter((user) => user.id != editUser.id);
 		newUserModalOpen = false;
@@ -97,7 +100,7 @@
 	<button
 		data-testid="newUserButton"
 		on:click={() => {
-			editUser = emptyUser;
+			editUser = new User({});
 			editMode = 'create';
 			organizations.forEach((org) => {
 				org.checked = false;
@@ -149,7 +152,7 @@
 						<button
 							data-testid="editButton{i}"
 							on:click={() => {
-								editUser = { ...user };
+								editUser = user;
 								editMode = 'update';
 								organizations.forEach((org) => {
 									org.checked = !!user.organizations?.find((userOrg) => userOrg.id == org.id);
@@ -198,6 +201,7 @@
 			</ul>
 			{#if editMode == 'create'}
 				<button
+					data-testid="createButton"
 					on:click={() => {
 						onCreateClicked();
 					}}>{_('Create')}</button

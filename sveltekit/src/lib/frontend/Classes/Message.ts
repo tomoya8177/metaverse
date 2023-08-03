@@ -11,6 +11,7 @@ export class Message extends DBObject {
 	pinned?: boolean = false;
 	handle: string = '';
 	constructor(data: any) {
+		data.table = 'messages';
 		super(data);
 		this.room = data.room;
 		this.user = data.user;

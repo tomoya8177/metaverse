@@ -11,12 +11,24 @@
 			href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,0,0"
 		/>
 		<style>
+			.flexOnWideScreen {
+				display: flex;
+				gap: 1rem;
+			}
+
+			.fc-button {
+				/* nowrap*/
+				white-space: nowrap;
+			}
 			table {
 				margin-bottom: 0px !important;
 			}
 			@media (max-width: 768px) {
 				.hiddenInSmallScreen {
 					display: none;
+				}
+				.flexOnWideScreen {
+					display: block;
 				}
 			}
 			.previewPaneItem img,

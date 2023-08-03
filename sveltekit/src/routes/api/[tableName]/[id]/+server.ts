@@ -36,7 +36,9 @@ export async function PUT({ request, params, cookies }) {
 	return new Response(JSON.stringify(null));
 }
 
-export async function DELETE({ params, cookies }) {
+export async function DELETE({ params, cookies, request }) {
+	const isLocalhost = request.headers.get('host')?.includes('localhost');
+
 	if (!(await Auth.check(cookies.get('login'))).result) {
 		return new Response('not authorized', { status: 401 });
 	}
