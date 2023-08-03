@@ -52,6 +52,7 @@ AFRAME.registerComponent('editable-object', {
 				`${this.distance / 5} ${this.distance / 5} ${this.distance / 5} `
 			);
 			this.rig.setAttribute('look-controls', 'enabled:false');
+			this.rig.setAttribute('touch-controls', 'enabled:false');
 			this.state = 'moving';
 		});
 		//attach shift key to move object up and down
@@ -96,11 +97,16 @@ AFRAME.registerComponent('editable-object', {
 					}, 3000);
 					this.readyToLink = true;
 				}
+				setTimeout(() => {
+					//deselect object
+					this.deselect();
+				}, 4000);
 				return;
 			}
 			if (!this.rayCatcher) return console.error('raycatcher is null');
 			this.rayCatcher.setAttribute('position', '0 -100 0');
 			this.rig?.setAttribute('look-controls', 'enabled:true');
+			this.rig?.setAttribute('touch-controls', 'enabled:true');
 			this.state = 'idle';
 			this.initialPos = null;
 			//lets' save position
@@ -123,10 +129,13 @@ AFRAME.registerComponent('editable-object', {
 			} else if (evt.key == 'Escape') {
 				console.log('escape');
 				//scale
+				this.deselect();
+				return;
 				if (!this.rayCatcher) return console.error('raycatcher is null');
 
 				this.rayCatcher.setAttribute('position', '0 -100 0');
 				this.rig?.setAttribute('look-controls', 'enabled:true');
+				this.rig?.setAttribute('touch-controls', 'enabled:true');
 				this.state = 'idle';
 				this.initialPos = null;
 				FocusObjectStore.set(EmptyObject);
@@ -141,6 +150,16 @@ AFRAME.registerComponent('editable-object', {
 				this.transportMode = 'position';
 			}
 		});
+	},
+	deselect: function () {
+		if (!this.rayCatcher) return console.error('raycatcher is null');
+
+		this.rayCatcher.setAttribute('position', '0 -100 0');
+		this.rig?.setAttribute('look-controls', 'enabled:true');
+		this.rig?.setAttribute('touch-controls', 'enabled:true');
+		this.state = 'idle';
+		this.initialPos = null;
+		FocusObjectStore.set(EmptyObject);
 	},
 	tick: function (e) {
 		if (this.state === 'moving') {

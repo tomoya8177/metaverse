@@ -67,7 +67,11 @@
 	</section>
 	<section style="text-align:center">
 		<div style="display:inline-block;">
-			<a role="button" href={'/create-organization'} style="margin-right:0.3rem">
+			<a
+				role="button"
+				href={'/create-organization'}
+				style="margin-right:0.3rem;margin-bottom:0.6rem"
+			>
 				<Icon icon="apartment" />
 
 				{_('Create New Organization')}

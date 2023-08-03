@@ -67,7 +67,7 @@
 		"
 		on:click={onMicClicked}
 	>
-		<Icon icon="mic" />
+		<Icon icon="record_voice_over" />
 		<span aria-busy={waitingForAIAnswer} class="hiddenInSmallScreen">
 			{_('Ask AI Mentor')}
 		</span>

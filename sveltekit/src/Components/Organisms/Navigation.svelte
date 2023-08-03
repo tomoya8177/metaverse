@@ -5,7 +5,7 @@
 	import { page } from '$app/stores';
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
 	import { cookies } from '$lib/frontend/cookies';
-	import { RoomStore, UserStore } from '$lib/store';
+	import { FocusObjectStore, RoomStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -22,6 +22,7 @@
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import { EmptyObject } from '$lib/preset/EmptyObject';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
@@ -99,7 +100,7 @@
 
 <nav>
 	<ul class:hiddenInSmallScreen={$RoomStore.id}>
-		<li style="max-width:20rem">
+		<li style="max-width:18rem">
 			<a href={logoLinkTo || '#'}>
 				{#if thumbnailURL}
 					<SquareThumbnail url={thumbnailURL} />
@@ -123,6 +124,7 @@
 					<a
 						href={'#'}
 						on:click={() => {
+							FocusObjectStore.set(EmptyObject);
 							inviteDialogOpen = !inviteDialogOpen;
 						}}
 					>

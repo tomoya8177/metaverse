@@ -29,8 +29,12 @@
 	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import NippleControl from '../Atom/NippleControl.svelte';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
-	import { myAlert } from '$lib/frontend/toast';
+	import { myAlert, toast } from '$lib/frontend/toast';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
+	import { getPositionFromLockedPosition } from '$lib/frontend/getPositionFromLockedPosition';
+	import ObjectLockSelect from '../Molecules/ObjectLockSelect.svelte';
+	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -181,6 +185,34 @@
 		return createdMessage;
 	};
 	let filteredItemsInPreview: SharedObject[] = [];
+	let objectEditorOpen = false;
+	const onDeleteClicked = async () => {
+		if ($FocusObjectStore.title == 'Shared Screen') {
+			//check if the screen belong to myself. otherwise you can't relete it.
+			if (!$UserStore.onScreenShare) return alert('You are not sharing your screen.');
+			videoChat.unpublishMyTrack('screen');
+			const me = Users.find($UserStore.id);
+			if (!me) return console.error('me is null');
+			me?.hideScreen();
+			$UserStore.onScreenShare = false;
+			return;
+		}
+
+		const file = sharedObjects.get($FocusObjectStore.id);
+		console.log({ file });
+		await axios.delete('/api/objects/' + file.id);
+		// uploader.client.remove(file.handle, {
+		// 	policy: PUBLIC_FileStackPolicy,
+		// 	signature: PUBLIC_FileStackSignature
+		// });
+		file.remove();
+		videoChat.sendMessage({
+			key: 'objectDelete',
+			id: $FocusObjectStore.id
+		});
+		FocusObjectStore.set(EmptyObject);
+		toast(_('Deleted'));
+	};
 </script>
 
 {#if $FocusObjectStore.id && $FocusObjectStore.id != ''}
@@ -192,9 +224,10 @@
 	border-radius:0.6rem;
 	height:3rem;
 	background-color:rgba(0,0,0,0.3)
+	max-width:100vw
 	"
 		>
-			<ObjectEditor />
+			<ObjectEditor bind:modalOpen={objectEditorOpen} />
 			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
 				<li>
 					<button
@@ -236,6 +269,195 @@
 		</ul>
 		<ul />
 	</nav>
+	{#if objectEditorOpen}
+		<dialog open style="position:absolute">
+			<article>
+				<ModalCloseButton
+					onClick={() => {
+						objectEditorOpen = false;
+					}}
+				/>
+				{#if $FocusObjectStore.type.includes('video')}
+					<div style="display:flex;gap:0.4rem">
+						{#if !$FocusObjectStore.playing}
+							<div>
+								<button
+									small
+									class="circle-button"
+									on:click={() => {
+										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+										video?.play();
+										$FocusObjectStore.playing = true;
+									}}
+								>
+									<Icon icon="play_arrow" />
+								</button>
+							</div>
+						{:else}
+							<div>
+								<button
+									small
+									class="circle-button"
+									on:click={() => {
+										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+										video?.pause();
+										$FocusObjectStore.playing = false;
+									}}
+								>
+									<Icon icon="pause" />
+								</button>
+							</div>
+						{/if}
+						<div>
+							<button
+								small
+								class="circle-button"
+								on:click={() => {
+									const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+									if (!video) return console.error('video is null');
+									video.currentTime = 0;
+								}}
+							>
+								<Icon icon="replay" />
+							</button>
+						</div>
+						<div>
+							<!-- mute button-->
+							<button
+								small
+								class="circle-button"
+								on:click={() => {
+									const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+									if (!video) return console.error('video is null');
+									video.muted = !video.muted;
+									$FocusObjectStore.muted = video.muted;
+								}}
+							>
+								{#if $FocusObjectStore.muted}
+									<Icon icon="volume_off" />
+								{:else}
+									<Icon icon="volume_up" />
+								{/if}
+							</button>
+						</div>
+					</div>
+				{/if}
+				<div>
+					{#if $FocusObjectStore.lockedPosition}
+						{_('Object is in locked position.')}
+					{:else}
+						{_('Lock object to a fixed position.')}
+					{/if}
+					<ObjectLockSelect
+						bind:object={$FocusObjectStore}
+						readonly={$FocusObjectStore.locked}
+						onUpdate={(value) => {
+							$FocusObjectStore.lockedPosition = value;
+							const position = getPositionFromLockedPosition(value);
+							console.log({ position });
+							//animate to the position
+							$FocusObjectStore.el?.setAttribute('animation', {
+								property: 'position',
+								to: `${position.x} ${position.y} ${position.z}`,
+								dur: 1000
+							});
+						}}
+					/>
+				</div>
+
+				{#if $FocusObjectStore.title != 'Shared Screen'}
+					<div>
+						<InputWithLabel
+							label={_('Title')}
+							bind:value={$FocusObjectStore.title}
+							readonly={$FocusObjectStore.locked}
+						/>
+					</div>
+					<div style="position:relative">
+						<InputWithLabel
+							label={_('Link To')}
+							bind:value={$FocusObjectStore.linkTo}
+							readonly={$FocusObjectStore.locked}
+							copiable={!!$FocusObjectStore.linkTo}
+						/>
+					</div>
+					{#if $FocusObjectStore.linkTo}
+						<div>
+							<a href={$FocusObjectStore.linkTo} target="_blank">
+								<Icon icon="link" />
+								{_('Go To Link')}
+							</a>
+						</div>
+					{/if}
+					{#if !$FocusObjectStore.locked}
+						{#if $FocusObjectStore.type.includes('image') || $FocusObjectStore.type.includes('video')}
+							<div>
+								{#if !$FocusObjectStore.isSphere}
+									<button
+										on:click={async () => {
+											const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
+												isSphere: true
+											});
+											$FocusObjectStore.isSphere = true;
+											$FocusObjectStore.updateEntityGeometryAndMaterial();
+											videoChat.sendMessage({
+												key: 'objectUpdate',
+												id: $FocusObjectStore.id,
+												isSphere: true
+											});
+										}}>{_('Convert To 360 Sphere')}</button
+									>
+								{:else}
+									<button
+										on:click={async () => {
+											const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
+												isSphere: false
+											});
+											$FocusObjectStore.isSphere = false;
+											$FocusObjectStore.updateEntityGeometryAndMaterial();
+											videoChat.sendMessage({
+												key: 'objectUpdate',
+												id: $FocusObjectStore.id,
+												isSphere: false
+											});
+										}}>{_('Convert To Flat Image')}</button
+									>
+								{/if}
+							</div>
+						{/if}
+						<div>
+							<button
+								on:click={async () => {
+									await axios.put('/api/objects/' + $FocusObjectStore.id, {
+										title: $FocusObjectStore.title,
+										linkTo: $FocusObjectStore.linkTo
+									});
+									toast(_(`Updated`));
+									videoChat.sendMessage({
+										key: 'objectUpdate',
+										id: $FocusObjectStore.id,
+										title: $FocusObjectStore.title,
+										linkTo: $FocusObjectStore.linkTo
+									});
+								}}>{_('Update')}</button
+							>
+						</div>
+					{/if}
+				{/if}
+				<button
+					class="secondary"
+					on:click={() => {
+						//simulate escape key
+					}}>{_('Deselect')}</button
+				>
+				{#if !$FocusObjectStore.locked}
+					<div>
+						<button on:click={onDeleteClicked} class="secondary">{_('Delete')}</button>
+					</div>
+				{/if}
+			</article>
+		</dialog>
+	{/if}
 {/if}
 <div class="filePreviewContainer" class:hidden={!$PreviewPanelOpen}>
 	<div style="display:flex">
@@ -383,21 +605,23 @@
 	}
 
 	.action-buttons {
+		max-width: calc(100vw - 1rem);
 		position: absolute;
-		bottom: 1rem;
-		right: 1rem;
+		bottom: 0rem;
+		right: 0.5rem;
 		display: flex;
 		gap: 0.4rem;
 	}
 
 	.chat-box {
-		max-height: calc(100svh - 9rem);
+		max-height: calc(100svh - 6rem);
+		max-width: 100vw;
 		overflow: auto;
 		width: 26rem;
 		position: absolute;
 		padding: 0.4rem;
 		border-radius: 0.4rem;
-		bottom: 6rem;
+		bottom: 5rem;
 		right: 0;
 		/* color: white; */
 		background-color: rgba(255, 255, 255, 0.7);

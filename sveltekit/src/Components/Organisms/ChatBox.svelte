@@ -131,8 +131,8 @@
 </script>
 
 <div
-	style="overflow-y:auto;max-height:calc(100svh - 23rem)"
-	style:max-height={forceMentor ? 'calc(100svh - 16rem)' : 'calc(100svh - 23rem)'}
+	style="overflow-y:auto;max-height:calc(100svh - 19rem)"
+	style:max-height={forceMentor ? 'calc(100svh - 16rem)' : 'calc(100svh - 19rem)'}
 >
 	{#each messages.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)) as message}
 		<TextChatMessage
@@ -157,7 +157,7 @@
 				style:background-color={micActive ? 'red' : ''}
 				on:click={onMicClicked}
 			>
-				<Icon icon="mic" />
+				<Icon icon="record_voice_over" />
 			</button>
 		</div>
 	{/if}
