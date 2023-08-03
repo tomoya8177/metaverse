@@ -5,6 +5,7 @@
 	import { _ } from '$lib/i18n';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let url: string;
+	export let thumbnailURL: string;
 
 	let avatarSelectOpen = false;
 </script>
@@ -14,7 +15,7 @@
 	<div style="margin-left:auto; margin-right:auto;width:180px;margin-bottom:0.4rem;">
 		{#if url}
 			{#key url}
-				<AvatarPreview {url} />
+				<AvatarPreview {url} {thumbnailURL} />
 			{/key}
 		{/if}
 	</div>

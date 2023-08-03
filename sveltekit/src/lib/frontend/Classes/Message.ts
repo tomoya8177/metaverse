@@ -13,13 +13,13 @@ export class Message extends DBObject {
 	constructor(data: any) {
 		data.table = 'messages';
 		super(data);
-		this.room = data.room;
-		this.user = data.user;
-		this.body = data.body;
-		this.isTalking = data.isTalking || false;
-		this.pinned = data.pinned || false;
-		this.type = data.type || null;
-		this.url = data.url || null;
-		this.handle = data.handle || '';
+		this.room = this.unescapedData.room;
+		this.user = this.unescapedData.user;
+		this.body = this.unescapedData.body;
+		this.isTalking = this.unescapedData.isTalking || false;
+		this.pinned = this.unescapedData.pinned || false;
+		this.type = this.unescapedData.type || null;
+		this.url = this.unescapedData.url || null;
+		this.handle = this.unescapedData.handle || '';
 	}
 }

@@ -5,6 +5,7 @@ import { DBObject } from './DBObject';
 import { DateTime } from 'luxon';
 import * as ics from 'ics';
 import type { User } from './User';
+import type { Attendance } from './Attendance';
 export class Event extends DBObject {
 	object: string;
 	description: string;
@@ -122,7 +123,7 @@ export class Event extends DBObject {
 				.toJSDate()
 		};
 	}
-	async ical(users: User[]) {
+	async ical(users: User[], attendances: Attendance[], organizer: User = null) {
 		const start = DateTime.fromISO(this.start);
 		const end = DateTime.fromISO(this.end);
 		const duration = end.diff(start, ['days', 'hours', 'minutes']).toObject();
@@ -143,9 +144,24 @@ export class Event extends DBObject {
 			duration: duration,
 			title: this.summary,
 			description: this.description,
-			location: this.location
+			location: this.url,
+			busyStatus: 'BUSY',
+			organizer: organizer ? { name: organizer.nickname, email: organizer.email } : {},
+			attendees: attendances.map((attendance) => {
+				return {
+					name: attendance.userData.firstName + ' ' + attendance.userData.lastName,
+					email: attendance.userData.email,
+					rsvp: true,
+					partstat:
+						attendance.status == 'attending'
+							? 'ACCEPTED'
+							: attendance.status == 'notAttending'
+							? 'DECLINED'
+							: 'NEEDS-ACTION',
+					role: 'REQ-PARTICIPANT'
+				};
+			})
 		};
-		if (this.url) event.description = 'URL:\n' + this.url + '\n\n' + event.description;
 		const { error, value } = await ics.createEvent(event);
 		if (error) {
 			console.log(error);

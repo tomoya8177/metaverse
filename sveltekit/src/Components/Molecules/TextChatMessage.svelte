@@ -14,7 +14,7 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { escapeHTML } from '$lib/math/escapeHTML';
-	import { User } from '$lib/frontend/Classes/User';
+	import type { User } from '$lib/frontend/Classes/User';
 	import { _ } from '$lib/i18n';
 	import { speechInterval } from '$lib/frontend/aiSpeaksOut';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
@@ -24,6 +24,7 @@
 	export let onDelete: (id: string) => void;
 	export let author: User | null;
 	export let forceNoPin = false;
+	export let withPinWithTrash = true;
 	onMount(async () => {
 		//author = await axios.get('/api/users/' + message.user).then((res) => res.data);
 		const interval = setInterval(() => {
@@ -50,11 +51,12 @@
 </script>
 
 {#if message}
+	{@const messageIsUsers = message.user == $UserStore.id}
 	<div
 		style="position:relative;display:flex;gap:0.1rem;margin-bottom:0.4rem;padding:0.4rem;border-radius:0.4rem;"
-		style:background-color={message.user == $UserStore.id ? 'rgba(100,100,100,0.5)' : ''}
+		style:background-color={messageIsUsers ? 'rgba(100,100,100,0.5)' : ''}
 	>
-		<div style="flex:1">
+		<div style="flex:1" style:text-align={messageIsUsers ? 'right' : 'left'}>
 			{#if author}
 				<div style="font-size:0.9rem;">
 					<a href={'#'}>
@@ -102,31 +104,33 @@
 				{DateTime.fromISO(message.createdAt).setZone().toRelative()}
 			</div>
 		</div>
-		{#if !forceNoPin}
-			<a
-				href={'#'}
-				style:opacity={message.pinned ? 1 : 0.5}
-				on:click={async () => {
-					message = await axios
-						.put('/api/messages/' + message.id, { pinned: !message.pinned })
-						.then((res) => res.data);
-					actionHistory.send('pinOrUnpinMessage', { message });
-				}}
-			>
-				<Icon icon="push_pin" />
-			</a>
-		{/if}
-		{#if message.user == $UserStore.id || message.user == 'Mentor'}
-			<a
-				href={'#'}
-				on:click={async () => {
-					await axios.delete('/api/messages/' + message.id);
-					actionHistory.send('deleteMessage', { message });
-					onDelete(message.id);
-				}}
-			>
-				<Icon icon="delete" />
-			</a>
+		{#if withPinWithTrash}
+			{#if !forceNoPin}
+				<a
+					href={'#'}
+					style:opacity={message.pinned ? 1 : 0.5}
+					on:click={async () => {
+						message = await axios
+							.put('/api/messages/' + message.id, { pinned: !message.pinned })
+							.then((res) => res.data);
+						actionHistory.send('pinOrUnpinMessage', { message });
+					}}
+				>
+					<Icon icon="push_pin" />
+				</a>
+			{/if}
+			{#if message.user == $UserStore.id || message.user == 'Mentor'}
+				<a
+					href={'#'}
+					on:click={async () => {
+						await axios.delete('/api/messages/' + message.id);
+						actionHistory.send('deleteMessage', { message });
+						onDelete(message.id);
+					}}
+				>
+					<Icon icon="delete" />
+				</a>
+			{/if}
 		{/if}
 	</div>
 {/if}

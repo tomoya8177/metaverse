@@ -12,6 +12,7 @@
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
+	import FulllNameInput from '../Atom/FulllNameInput.svelte';
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;
@@ -23,7 +24,14 @@
 </script>
 
 {#if editMentor.userData}
-	<InputWithLabel label={_('Nickname')} bind:value={editMentor.userData.nickname} />
+	<div style="display:flex;gap:0.4rem">
+		<FulllNameInput user={editMentor.userData} />
+	</div>
+	<InputWithLabel
+		meta={_('Only alphabets and numbers allowed for nickname')}
+		label={_('Nickname')}
+		bind:value={editMentor.userData.nickname}
+	/>
 	<AvatarSelectPane bind:url={editMentor.userData.avatarURL} />
 
 	<InputWithLabel
@@ -88,7 +96,7 @@
 				messages: [
 					{
 						role: 'system',
-						content: `Create your introduction in less than 100 words. Your name is ${editMentor.userData?.nickname}. Include your name, the context that you are given to help students. you are told to follow the instruction below. ${editMentor.prompt}`
+						content: `Create your introduction in less than 100 words. Your name is ${editMentor.userData?.firstName} ${editMentor.userData?.lastName}. Include your name, the context that you are given to help students. you are told to follow the instruction below. ${editMentor.prompt}`
 					}
 				]
 			});

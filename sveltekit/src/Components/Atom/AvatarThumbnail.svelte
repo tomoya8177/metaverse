@@ -7,6 +7,7 @@
 
 <img
 	src={PresetAvatars.find((avatar) => avatar.url == url)?.thumbnailURL}
-	style="width:{size};height:{size};border-radius:0.2rem;margin-right:0.4rem"
+	style="width:{size};height:{size};border-radius:{Number(size.replace('rem', '')) /
+		2}rem;margin-right:0.4rem"
 	alt=""
 />

@@ -69,7 +69,10 @@
 	label={_('Nickname')}
 	bind:value={user.nickname}
 />
-<AvatarSelectPane bind:url={user.avatarURL} />
+<AvatarSelectPane
+	bind:url={user.avatarURL}
+	thumbnailURL={PresetAvatars.find((preset) => preset.url == user.avatarURL)?.thumbnailURL || ''}
+/>
 {#if withDescription}
 	<InputWithLabel label={_('Bio')} bind:value={user.description} type="textarea" />
 {/if}

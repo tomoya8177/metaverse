@@ -1,6 +1,6 @@
 import { TWILIO_ACCOUNT_SID, TWILIO_API_KEY, TWILIO_API_SECRET } from '$env/static/private';
 import twilio from 'twilio';
-export const POST = async ({ request }) => {
+export const POST = async ({ request: request }) => {
 	const body = await request.json();
 	const AccessToken = twilio.jwt.AccessToken;
 	const VideoGrant = AccessToken.VideoGrant;

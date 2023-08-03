@@ -64,7 +64,6 @@
 			]}
 		/>
 		<InputWithLabel label={_('URL')} bind:value={editEvent.url} type="url" />
-		<InputWithLabel label={_('Location')} bind:value={editEvent.location} />
 		<InputWithLabel label={_('Description')} bind:value={editEvent.description} type="textarea" />
 	</div>
 	<div>

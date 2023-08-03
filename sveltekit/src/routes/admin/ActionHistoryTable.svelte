@@ -13,16 +13,9 @@
 {#each actionHistories as actionHistory, i}
 	{@const sameSession = actionHistory.session == actionHistories[i - 1]?.session}
 	<div style="display:flex;gap:1rem">
-		<div style="width:4rem">
-			{#if !sameSession}
-				<small>
-					{actionHistory.session.substring(0, 6)}
-				</small>
-			{/if}
-		</div>
 		<div style="width:8rem">
 			{#if !sameSession}
-				{actionHistory.userData?.nickname || '???'}
+				{actionHistory.userData?.nickname || 'Anonymous'}
 			{/if}
 		</div>
 		<div style="flex:1">
@@ -33,7 +26,7 @@
 		</div>
 		<div>
 			@
-			{DateTime.fromISO(actionHistory.createdAt).toLocaleString(DateTime.DATETIME_MED)}
+			{DateTime.fromISO(actionHistory.createdAt).toLocaleString(DateTime.DATETIME_SHORT)}
 		</div>
 	</div>
 {/each}

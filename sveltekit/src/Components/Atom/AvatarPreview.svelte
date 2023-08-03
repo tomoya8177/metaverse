@@ -3,13 +3,19 @@
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 	import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
 	export let url: string;
+	export let thumbnailURL: string;
 	import { THREE } from 'aframe';
+	import { fade } from 'svelte/transition';
 
 	let scene: THREE.Scene;
 	let camera: THREE.PerspectiveCamera;
 	let renderer: THREE.WebGLRenderer;
 
+	let isLoading = true; // Add a new state variable to track loading state
+
 	onMount(() => {
+		// Load the placeholder image
+
 		scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000);
 		renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -24,6 +30,8 @@
 			});
 			console.log({ gltf });
 			scene.add(gltf.scene);
+
+			isLoading = false;
 		});
 
 		const light = new THREE.DirectionalLight(0xffffff, 1);
@@ -54,13 +62,28 @@
 	});
 </script>
 
-<div id="avatarPreview" />
+<div id="avatarPreview">
+	{#if isLoading}
+		<!-- Display the placeholder image while loading -->
+		<img src={thumbnailURL} alt="Loading..." />
+	{/if}
+</div>
 
 <style>
 	#avatarPreview {
+		position: relative;
 		width: 180px;
 		height: 180px;
 		border-radius: 1rem;
 		overflow: hidden;
+	}
+	#avatarPreview * {
+		position: absolute;
+		top: 0px;
+	}
+	#avatarPreview img {
+		min-width: 180px;
+		width: 180px;
+		height: 180px;
 	}
 </style>

@@ -36,6 +36,10 @@ export class User extends DBObject {
 		this.onVideoMute = true;
 		this.description = data.description;
 	}
+	get fullName(): string {
+		if (!this.firstName && !this.lastName) return this.nickname;
+		return this.firstName + ' ' + this.lastName;
+	}
 	async validate(): Promise<boolean> {
 		if (!this.nickname) {
 			myAlert(_('Nickname is required'));

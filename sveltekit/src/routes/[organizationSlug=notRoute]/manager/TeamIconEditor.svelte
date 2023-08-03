@@ -10,33 +10,36 @@
 </script>
 
 {#if organization.thumbnailURL}
-	<div>
+	<div style="text-align:center">
 		<SquareThumbnail url={organization.thumbnailURL} size="12rem" radius="0.4rem" />
 	</div>
 {/if}
-<a
-	role="button"
-	href={'#'}
-	on:click={async () => {
-		uploader.launchPicker('image/*', 1, async (res) => {
-			console.log(res);
-			organization.thumbnailURL = res.filesUploaded[0].url;
-			if (!organization.id) return;
-			await axios.put(`/api/organizations/${organization.id}`, organization);
-		});
-	}}>{_('Upload')}</a
->
-<a
-	aria-busy={thumbnailBusy}
-	role="button"
-	href={'#'}
-	on:click={async () => {
-		thumbnailBusy = true;
-		const promise = new GenerateImage(`Icon image for a team called ${organization.title}`);
-		promise.onDone((file) => {
-			organization.thumbnailURL = file.url;
-			axios.put(`/api/organizations/${organization.id}`, organization);
-			thumbnailBusy = false;
-		});
-	}}>{_('Have AI to generate Icon')}</a
->
+<div style="text-align:center">
+	<a
+		role="button"
+		style="margin-right:0.4rem;margin-bottom:0.4rem"
+		href={'#'}
+		on:click={async () => {
+			uploader.launchPicker('image/*', 1, async (res) => {
+				console.log(res);
+				organization.thumbnailURL = res.filesUploaded[0].url;
+				if (!organization.id) return;
+				await axios.put(`/api/organizations/${organization.id}`, organization);
+			});
+		}}>{_('Upload')}</a
+	>
+	<a
+		aria-busy={thumbnailBusy}
+		role="button"
+		href={'#'}
+		on:click={async () => {
+			thumbnailBusy = true;
+			const promise = new GenerateImage(`Icon image for a team called ${organization.title}`);
+			promise.onDone((file) => {
+				organization.thumbnailURL = file.url;
+				axios.put(`/api/organizations/${organization.id}`, organization);
+				thumbnailBusy = false;
+			});
+		}}>{_('Have AI to generate Icon')}</a
+	>
+</div>

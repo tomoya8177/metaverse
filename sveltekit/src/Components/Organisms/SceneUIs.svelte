@@ -611,7 +611,6 @@
 	.chat-box {
 		max-height: calc(100svh - 6rem);
 		max-width: 100vw;
-		overflow: auto;
 		width: 26rem;
 		position: absolute;
 		padding: 0.4rem;
