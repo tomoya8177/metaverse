@@ -77,7 +77,12 @@
 				{_('Create New Organization')}
 			</a>
 
-			<a role="button" href={'/gnv/firsttest'} class="green-button" style="margin-left:0.3rem">
+			<a
+				role="button"
+				href={cookies.get('locale') == 'ja' ? `/gnv/japan` : `/gnv/firsttest`}
+				class="green-button"
+				style="margin-left:0.3rem"
+			>
 				<Icon icon="login" />
 
 				{_('Enter Sample Room')}
