@@ -196,7 +196,7 @@
 							attendances.map((atte) => users.find((user) => user.id == atte.user))
 						);
 						console.log(data);
-						toast(`${_('Sent an invitation to users.')}`);
+						toast(`${_('Sent invitations to users.')}`);
 					}}
 				>
 					<Icon icon="email" />
