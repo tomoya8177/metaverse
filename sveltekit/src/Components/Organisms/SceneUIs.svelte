@@ -227,7 +227,7 @@
 	max-width:100vw
 	"
 		>
-			<ObjectEditor bind:modalOpen={objectEditorOpen} />
+			<ObjectEditor bind:modalOpen={$FocusObjectStore.editorOpen} />
 			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
 				<li>
 					<button
@@ -269,12 +269,12 @@
 		</ul>
 		<ul />
 	</nav>
-	{#if objectEditorOpen}
+	{#if $FocusObjectStore.editorOpen}
 		<dialog open style="position:absolute">
 			<article>
 				<ModalCloseButton
 					onClick={() => {
-						objectEditorOpen = false;
+						$FocusObjectStore.editorOpen = false;
 					}}
 				/>
 				{#if $FocusObjectStore.type.includes('video')}

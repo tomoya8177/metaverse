@@ -22,6 +22,7 @@ AFRAME.registerComponent('editable-object', {
 	camera: null as Entity | null,
 	rig: null as Entity | null,
 	distance: 0,
+	timeout: '' as string,
 	init: function () {
 		this.cursorEl = document.querySelector('[raycaster]');
 		this.rayCatcher = document.getElementById('rayCatcher') as Entity;
@@ -97,10 +98,18 @@ AFRAME.registerComponent('editable-object', {
 					}, 3000);
 					this.readyToLink = true;
 				}
-				setTimeout(() => {
+				clearTimeout(this.timeout);
+				this.timeout = setTimeout(() => {
 					//deselect object
+					let ifEditorOpen;
+					FocusObjectStore.update((obj) => {
+						ifEditorOpen = obj.editorOpen;
+						return obj;
+					});
+					if (ifEditorOpen) return;
 					this.deselect();
 				}, 4000);
+
 				return;
 			}
 			if (!this.rayCatcher) return console.error('raycatcher is null');
