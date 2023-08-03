@@ -2,7 +2,11 @@ import { PUBLIC_IS_DEV } from '$env/static/public';
 import { RoomStore, UserStore } from '$lib/store';
 import axios from 'axios';
 import { DBObject } from './DBObject';
-
+import { page } from '$app/stores';
+let thisPage: any;
+page.subscribe((value) => {
+	thisPage = value;
+});
 type Actions =
 	| 'login'
 	| 'logout'
@@ -65,7 +69,8 @@ class ActionHistory extends DBObject {
 			room: this.room,
 			organization: this.organization,
 			action: action,
-			data: JSON.stringify(data)
+			data: JSON.stringify(data),
+			path: thisPage.url.pathname
 		});
 	}
 }
