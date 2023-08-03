@@ -444,12 +444,7 @@
 						</div>
 					{/if}
 				{/if}
-				<button
-					class="secondary"
-					on:click={() => {
-						//simulate escape key
-					}}>{_('Deselect')}</button
-				>
+
 				{#if !$FocusObjectStore.locked}
 					<div>
 						<button on:click={onDeleteClicked} class="secondary">{_('Delete')}</button>
