@@ -13,6 +13,8 @@
 	import type { PageData } from './$types';
 	import { PUBLIC_LOCALHOST } from '$env/static/public';
 	import { myConfirm } from '$lib/frontend/toast';
+	import { page } from '$app/stores';
+	import { sendJoinedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
 	export let data: PageData;
 	let users: User[] = data.users;
 	let paginated: User[] = [];
@@ -24,20 +26,25 @@
 	let editMode: 'update' | 'create' = 'update';
 
 	const createUserRoles = async (userId: string): Promise<UserRole[]> => {
-		let promises: Promise<UserRole>[] = [];
-		organizations.forEach((org) => {
-			if (org.checked) {
-				promises.push(
-					axios
-						.post('/api/userRoles', {
-							user: userId,
-							organization: org.id,
-							role: org.isManager ? 'manager' : 'subscriber'
-						})
-						.then((res) => res.data)
+		let promises = organizations
+			.filter((org) => org.checked)
+			.map(async (org) => {
+				let userRole: UserRole;
+				userRole = await axios
+					.post('/api/userRoles', {
+						user: userId,
+						organization: org.id,
+						role: org.isManager ? 'manager' : 'subscriber'
+					})
+					.then((res) => res.data);
+				const organization = organizations.find((o) => org.id == o.id) as Organization;
+				await sendJoinedToOrganizationEmail(
+					editUser.email,
+					organization,
+					$page.url.protocol + '//' + $page.url.host + '/' + organization.slug
 				);
-			}
-		});
+				return userRole;
+			});
 		const results = await Promise.all(promises);
 
 		return results;

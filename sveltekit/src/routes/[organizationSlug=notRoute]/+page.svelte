@@ -79,10 +79,12 @@
 						<a data-tooltip={_('Start Chat')} href={`/${organization.slug}/mentor/${mentor.id}`}>
 							{#if mentor.userData?.avatarURL}
 								<AvatarThumbnail url={mentor.userData.avatarURL} />
-							{/if}
+							{/if}<br />
 							{mentor.userData?.nickname || ''}
 						</a>
-						{@html nl2br(unescapeHTML(mentor.userData?.description) || '')}
+						<p>
+							{@html nl2br(unescapeHTML(mentor.userData?.description) || '')}
+						</p>
 					</div>
 				{/each}
 			</section>

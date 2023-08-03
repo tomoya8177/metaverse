@@ -57,44 +57,51 @@
 <Navigation />
 <div class="container">
 	<section>
-		{#if mentor}
-			{#if mentor.userData}
-				<div transition:fade>
-					<AvatarThumbnail size="4rem" url={mentor.userData.avatarURL} />
-				</div>
-			{/if}
-		{/if}
-		{#if intro}
-			<div transition:fade>
-				{intro}
-			</div>
-		{:else}
-			<span aria-busy="true" />
-		{/if}
-	</section>
-
-	<section style="">
-		<a role="button" href={'/gnv/firsttest'}>
-			<Icon icon="login" />
-
-			{_('Enter Sample Room')}
-		</a>
-	</section>
-	<section>
 		{#if invite}
 			<div transition:fade>
 				{invite}
 			</div>
 		{:else}
-			<span aria-busy="true" />
+			<span aria-busy="true">{_('AI is generating the content...')}</span>
+		{/if}
+	</section>
+	<section style="text-align:center">
+		<div style="display:inline-block;">
+			<a role="button" href={'/create-organization'} style="margin-right:0.3rem">
+				<Icon icon="apartment" />
+
+				{_('Create New Organization')}
+			</a>
+
+			<a role="button" href={'/gnv/firsttest'} class="green-button" style="margin-left:0.3rem">
+				<Icon icon="login" />
+
+				{_('Enter Sample Room')}
+			</a>
+		</div>
+	</section>
+	<section>
+		{#if mentor}
+			{#if mentor.userData}
+				<div transition:fade>
+					<AvatarThumbnail size="4rem" url={mentor.userData.avatarURL} />
+					<p>
+						{mentor.userData.nickname}
+						<br />
+						{_('AI Mentor')}
+					</p>
+				</div>
+			{/if}
 		{/if}
 	</section>
 	<section>
-		<a role="button" href={'/create-organization'}>
-			<Icon icon="apartment" />
-
-			{_('Create New Organization')}
-		</a>
+		{#if intro}
+			<div transition:fade>
+				{intro}
+			</div>
+		{:else}
+			<span aria-busy="true">{_('AI is generating the content...')}</span>
+		{/if}
 	</section>
 </div>
 
@@ -104,5 +111,15 @@
 	}
 	section {
 		text-align: center;
+	}
+	.green-button {
+		background-color: rgb(32, 178, 170);
+		color: white;
+		border-color: lightseagreen;
+	}
+	.green-button:hover {
+		background-color: rgb(40, 188, 180);
+		color: white;
+		border-color: darkseagreen;
 	}
 </style>

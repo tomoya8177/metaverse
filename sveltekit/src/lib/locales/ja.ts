@@ -219,5 +219,10 @@ export default {
 	OK: 'OK',
 	Cancel: 'キャンセル',
 	'Sent invitations to users.': 'ユーザーに招待を送りました。',
-	Created: '作成しました'
+	Created: '作成しました',
+	'Please click the link below to checkout the organization page!':
+		'以下のリンクをクリックしてチームページをチェックアウトしてください！',
+	"You've just joined the organization: ": 'あなたはチームに参加しました: ',
+	'Notification from VirtuaCampus': 'VirtuaCampusからの通知',
+	'AI is generating the content...': 'AIがコンテンツを生成しています...'
 };

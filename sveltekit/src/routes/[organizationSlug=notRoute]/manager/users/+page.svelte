@@ -13,6 +13,8 @@
 	import type { PageData } from './$types';
 	import AvatarThumbnail from '../../../../Components/Atom/AvatarThumbnail.svelte';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import { sendJoinedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
+	import { myConfirm } from '$lib/frontend/toast';
 	export let data: PageData;
 	export let users: User[] = data.users;
 	export let userRoles: UserRole[] = data.userRoles;
@@ -29,13 +31,14 @@
 	let newUserModalOpen = false;
 	let editUser: User = emptyUser;
 	let editMode: 'update' | 'create' = 'update';
+	$: console.log({ users });
 
 	const createUserRoles = async (userId: string) => {
 		return await axios
 			.post('/api/userRoles', {
 				user: userId,
 				organization: organization.id,
-				role: organization.isManager ? 'manager' : 'subscriber'
+				role: editUser.isManager ? 'manager' : 'subscriber'
 			})
 			.then((res) => res.data);
 	};
@@ -53,6 +56,11 @@
 			existingUser = await axios.post('/api/users', editUser).then((res) => res.data);
 		}
 		await createUserRoles(existingUser.id);
+		await sendJoinedToOrganizationEmail(
+			editUser.email,
+			organization,
+			$page.url.protocol + '//' + $page.url.host + '/' + organization.slug
+		);
 		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
 		const filledUser = fillOrganization(existingUser);
 		users = [...users, filledUser].sort((a: User, b: User) => (a.createdAt > b.createdAt ? -1 : 1));
@@ -67,26 +75,34 @@
 		}
 		updateBusy = true;
 		const result = await axios.put('/api/users/' + editUser.id, editUser).then((res) => res.data);
-
-		userRoles = await axios.get('/api/userRoles').then((res) => res.data);
-		const filledUser = fillOrganization(result);
+		const updatedUserRole = await axios
+			.put('/api/userRoles/' + editUser.userRoles[0].id, {
+				role: editUser.isManager ? 'manager' : 'subscriber'
+			})
+			.then((res) => res.data);
+		userRoles = userRoles.map((userRole) => {
+			if (userRole.id == updatedUserRole.id) {
+				return updatedUserRole;
+			}
+			return userRole;
+		});
+		const updatedAndFilledUser = fillOrganization(result);
 		users = users.map((user) => {
-			if (user.id == result.id) {
-				return filledUser;
+			if (user.id == updatedAndFilledUser.id) {
+				return updatedAndFilledUser;
 			}
 			return user;
 		});
 		updateBusy = false;
 		newUserModalOpen = false;
-		actionHistory.send('updateUser', { user: filledUser });
+		actionHistory.send('updateUser', { user: updatedAndFilledUser });
 	};
 	const onDeleteClicked = async () => {
-		if (!confirm(_('Are you sure that you want to delete this user?'))) return;
+		if (!(await myConfirm(_('Are you sure that you want to delete this user?')))) return;
 		deleteBusy = true;
-		const userRole: UserRole = await axios
-			.get(`/api/userRoles?user=${editUser.id}&organization=${organization.id}`)
-			.then((res) => res.data[0]);
-		await new User(editUser).delete(userRole.id);
+		if (!editUser.userRoles) return;
+		await axios.delete(`/api/userRoles/${editUser.userRoles[0].id}`).then((res) => res.data[0]);
+		//await new User(editUser).delete(userRole.id);
 		deleteBusy = false;
 		users = users.filter((user) => user.id != editUser.id);
 		newUserModalOpen = false;
@@ -148,6 +164,7 @@
 						<button
 							on:click={() => {
 								editUser = { ...user };
+								editUser.isManager = userRole?.role == 'manager';
 								editMode = 'update';
 
 								newUserModalOpen = true;
@@ -175,7 +192,7 @@
 				bind:value={editUser.nickname}
 			/>
 			<InputWithLabel label={_('Email')} bind:value={editUser.email} type="email" />
-			<InputWithLabel label={_('Is Manager')} bind:value={editUser.isAdmin} type="switch" />
+			<InputWithLabel label={_('Is Manager')} bind:value={editUser.isManager} type="switch" />
 
 			{#if editMode == 'create'}
 				<button

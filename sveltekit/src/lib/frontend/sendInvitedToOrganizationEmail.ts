@@ -24,3 +24,19 @@ export const sendInvitedToOrganizationEmail = async (
 		html: html
 	});
 };
+export const sendJoinedToOrganizationEmail = async (
+	toEmail: string,
+	organization: Organization,
+	url: string
+) => {
+	const body = `${_(`Hello,`)} ${_(`You've just joined the organization: `)}${organization.title}
+						${_(`Please click the link below to checkout the organization page!`)}
+						${url}`;
+	const html = nl2br(body.replace(url, `<a href="${url}">${url}</a>`));
+	await axios.post('/api/email', {
+		to: toEmail, // list of receivers
+		subject: _('Notification from VirtuaCampus'), // Subject line
+		text: body, // plain text body
+		html: html
+	});
+};
