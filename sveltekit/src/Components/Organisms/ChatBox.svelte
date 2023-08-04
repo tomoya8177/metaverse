@@ -24,10 +24,11 @@
 	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import SendMessageButton from '../Atom/SendMessageButton.svelte';
+	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 	export let newMessagePinned = false;
 	let newMessageBody = '';
 	export let authors: User[] = [];
-	export let forceMentor: string | false = false;
+	export let forceMentor: Mentor | null = null;
 	export let forceNoPin = false;
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (!$TextChatOpen) return;
@@ -78,12 +79,13 @@
 					handle: file.handle,
 					url: file.url
 				});
-				const createdMessage = await sendChatMessage(message);
+
+				await message.createSendOutAndPush();
 				if (!$AISpeaks) {
 					TextChatOpen.set(true);
 					return;
 				}
-				aiSpeaksOut(createdMessage.body, Users.find($RoomStore.mentorData.user) || null);
+				aiSpeaksOut(message.body, Users.find($RoomStore.mentorData.user) || null);
 			});
 			newMessageBody = '';
 			waitingForAIAnswer = false;
@@ -93,19 +95,21 @@
 			newMessageBody = '';
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(
-				$RoomStore.mentorData,
+				$RoomStore.mentorData || forceMentor,
 				$RoomStore.id || 'none',
 				newMessage
 			);
+			await aiMessage.createSendOutAndPush();
+			// console.log({ aiMessage });
 			waitingForAIAnswer = false;
-			const createdMessage = await sendChatMessage(aiMessage);
+			// const createdMessage = await sendChatMessage(aiMessage);
 			if (!$AISpeaks) {
 				TextChatOpen.set(true);
 
 				return;
 			}
 			aiSpeaksOut(
-				createdMessage.body,
+				aiMessage.body,
 				forceMentor ? null : Users.find($RoomStore.mentorData.user) || null
 			);
 		} else {

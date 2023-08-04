@@ -72,7 +72,7 @@ export const PUT = async ({ request, params }) => {
 		...promptDocs,
 		...succeededDocuments
 	]);
-	if (body.refresh && !storedChats.some((s) => s.mentorId == mentor.id && s.roomId == 'none')) {
+	if (body.refresh || !storedChats.some((s) => s.mentorId == mentor.id && s.roomId == 'none')) {
 		const storedChat: StoredChat = {
 			mentorId: params.mentorId,
 			roomId: 'none',
@@ -138,6 +138,7 @@ export const POST = async ({ request, params }) => {
 			return storedChat.mentorId == params.mentorId && storedChat.roomId == 'none';
 		}
 	});
+	console.log({ storedChats });
 	if (!storedChat || !storedChat.chain) {
 		return new Response(JSON.stringify({ error: 'mentor not initialized' }));
 	}

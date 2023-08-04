@@ -19,6 +19,7 @@
 	import { speechInterval } from '$lib/frontend/aiSpeaksOut';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 
 	export let message: Message;
 	export let onDelete: (id: string) => void;
@@ -45,7 +46,7 @@
 			file: { ...response.data, url: message.url }
 		});
 	};
-	export let forceMentor: string | false = false;
+	export let forceMentor: Mentor | null = null;
 </script>
 
 {#if message}

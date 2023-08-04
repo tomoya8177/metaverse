@@ -6,7 +6,7 @@
 	import { Message } from '$lib/frontend/Classes/Message';
 	import axios from 'axios';
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
-	import { UserStore } from '$lib/store';
+	import { UserStore, AISpeaks } from '$lib/store';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
@@ -16,15 +16,8 @@
 	let messages: Message[] = [];
 	const sendChatMessage = async (message: Message) => {
 		console.log('sending message', message);
-		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
-		messages = [
-			...messages,
-			{ ...createdMessage, isTalking: createdMessage.user === 'Mentor' ? true : false }
-		];
-		authors = await axios
-			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
-			.then((res) => res.data);
-		return createdMessage;
+		await message.createSendOutAndPush();
+		return message;
 	};
 	let recognition: VoiceRecognition;
 	let waitingForAIAnswer = false;
@@ -53,21 +46,20 @@
 				user: $UserStore.id,
 				pinned: false
 			});
-
-			await sendChatMessage(newMessage);
+			await newMessage.createSendOutAndPush();
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(mentor, 'none', newMessage);
 			waitingForAIAnswer = false;
-			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
+			await aiMessage.createSendOutAndPush();
 			if (!$AISpeaks) return;
-			aiSpeaksOut(createdMessage.body);
+			aiSpeaksOut(aiMessage.body);
 		}
 	};
 	onMount(async () => {
 		const res = await axios.put('/mentor/' + mentor.id, {
 			roomId: 'none'
 		});
-		console.log(res.data);
+		console.log({ mentorinitialized: res.data });
 	});
 </script>
 
@@ -78,7 +70,7 @@
 	</div>
 	<div style="position:absolute;bottom:0px;width:calc(100% - 2rem)">
 		<ChatBox
-			forceMentor={mentor.id}
+			forceMentor={mentor}
 			forceNoPin
 			{micActive}
 			{sendChatMessage}

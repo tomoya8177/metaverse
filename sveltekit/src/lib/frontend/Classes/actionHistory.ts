@@ -3,6 +3,7 @@ import { RoomStore, UserStore } from '$lib/store';
 import axios from 'axios';
 import { DBObject } from './DBObject';
 import { page } from '$app/stores';
+import { escapeHTML } from '$lib/math/escapeHTML';
 
 type Actions =
 	| 'login'
@@ -72,7 +73,7 @@ export class ActionHistory extends DBObject {
 			room: this.room,
 			organization: this.organization,
 			action: action,
-			data: JSON.stringify(data),
+			data: JSON.stringify(escapeHTML(data)),
 			path: location.href
 		});
 	}
