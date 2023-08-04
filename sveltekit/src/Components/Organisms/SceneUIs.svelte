@@ -8,7 +8,10 @@
 		RoomStore,
 		UserStore,
 		ItemsInPreview,
-		FocusObjectStore
+		FocusObjectStore,
+		ChatMessagesStore,
+		TextChatOpen,
+		AISpeaks
 	} from '$lib/store';
 	import axios from 'axios';
 
@@ -39,31 +42,26 @@
 	import { DateTime } from 'luxon';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { error } from '@sveltejs/kit';
+	import type { Organization } from '$lib/types/Organization';
+	import { cookies } from '$lib/frontend/cookies';
+	export let organization: Organization;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
 	let virtuaMentorReady = false;
-	let messages: Message[] = [];
 	let authors: User[];
-	const loadMessages = async (existings: Message[] = []) => {
-		messages = [
-			...(await axios
-				.get('/api/messages?room=' + $RoomStore.id + '&pinned=1')
-				.then((res) => res.data)),
-			...existings
-		].filter((thing, index, self) => self.findIndex((t) => t.id === thing.id) === index);
-		// authors = await axios
-		// 	.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
-		// 	.then((res) => res.data);
-	};
 	const onTextChatClicked = () => {
-		textChatOpen = !textChatOpen;
-		if (!textChatOpen) return;
-		setTimeout(() => {
-			const element = document.querySelector('.chat-box > div');
-			if (!element) return;
-			scrolToBottom(element);
-		}, 100);
+		TextChatOpen.update((value) => {
+			value = !value;
+			if (value) {
+				setTimeout(() => {
+					const element = document.querySelector('.chat-box > div');
+					if (!element) return;
+					scrolToBottom(element);
+				}, 100);
+			}
+			return value;
+		});
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {
@@ -84,15 +82,9 @@
 	};
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
-		loadMessages(messages);
 		if ($RoomStore.mentor) {
-			const mentor = await axios.get('/api/mentors/' + $RoomStore.mentor).then((res) => {
-				console.log({ res });
-				return new Mentor(res.data);
-			});
-			await mentor.init(); // load userData
-			if (!mentor.userData) return console.error('MentorUser not found');
-			authors = [...authors, mentor.userData];
+			if (!$RoomStore.mentorData.userData) return console.error('MentorUser not found');
+			authors = [...authors, $RoomStore.mentorData.userData];
 			const res = await axios.put('/mentor/' + $RoomStore.mentor, {
 				roomId: $RoomStore.id,
 				refresh: false
@@ -101,43 +93,28 @@
 			console.log({ res });
 			//this is okay to be delaied
 			virtuaMentorReady = true;
-			const response = await axios.post('/mentor/' + $RoomStore.mentor, {
-				action: 'greet',
-				roomId: $RoomStore.id,
-				user: $UserStore.id
-			});
-			console.log({ response });
-			const message = new Message({
-				room: $RoomStore.id,
-				user: mentor.userData.id,
-				body: response.data.text,
-				createdAt: DateTime.now().toISO(),
-				isTalking: true
-			});
-			message.create();
-			messages = [...messages, message];
 		}
 		videoChat.listenTo('textMessage', async (data) => {
-			messages = [...messages, data];
-			const existingAuthor = authors.find((a) => a.id === data.user);
-			if (!existingAuthor) {
-				const author = await axios.get(`/api/users/${data.user}`).then((res) => res.data);
-				authors = [...authors, author];
-			}
-			if (data.user !== $UserStore.id) {
-				const unit = Users.find(data.user);
+			const message = new Message(data);
+			ChatMessagesStore.update((arr) => {
+				arr = [...arr, message];
+				return arr;
+			});
+
+			if (message.user !== $UserStore.id) {
+				const unit = Users.find(message.user);
 				if (unit) unit.say(data.body);
 			}
 			setTimeout(() => {
 				scrollChatToBottom();
 			}, 100);
-			if (data.user === 'Mentor') {
-				data.isTalking = true;
-				if (!aiSpeaks) {
-					textChatOpen = true;
+			if (message.isAIs) {
+				if (!$AISpeaks) {
+					TextChatOpen.set(true);
+
 					return;
 				}
-				aiSpeaksOut(data.body);
+				aiSpeaksOut(message.body);
 			}
 		});
 	});
@@ -146,7 +123,6 @@
 		videoChat.dontListenTo('textMessage');
 	});
 
-	let textChatOpen = false;
 	let recognition: VoiceRecognition;
 	export let me: Me | null = null;
 	let micActive = false;
@@ -169,7 +145,7 @@
 			recognition.stop();
 			if (!recognition.body) return;
 			const newMessage = new Message({
-				body: escapeHTML(recognition.body) + ' @Mentor',
+				body: recognition.body + ' @Mentor',
 				user: $UserStore.id,
 				room: $RoomStore.id,
 				pinned: newMessagePinned
@@ -178,45 +154,36 @@
 			await sendChatMessage(newMessage);
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(
-				$RoomStore.mentor,
+				$RoomStore.mentorData,
 				$RoomStore.id || 'none',
 				newMessage
 			);
 			waitingForAIAnswer = false;
-			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
-			$RoomStore.mentorData = await axios
-				.get('/api/mentors/' + $RoomStore.mentor)
-				.then((res) => res.data);
-			console.log({ mentor: $RoomStore.mentorData });
-			if (!aiSpeaks) {
+			const createdMessage = { ...(await sendChatMessage(aiMessage)) };
+
+			if (!$AISpeaks) {
 				//open chat box
-				textChatOpen = true;
+				TextChatOpen.set(true);
+
 				return;
 			}
 			aiSpeaksOut(createdMessage.body, Users.find($RoomStore.mentorData.user) || null);
 		}
 	};
-	let aiSpeaks = true;
 	let waitingForAIAnswer = false;
 	let newMessagePinned = false;
 	let newMessageBody = '';
 
-	const sendChatMessage = async (message: Message) => {
+	const sendChatMessage = async (message: Message): Promise<Message> => {
 		actionHistory.send('sendChatMessage', message);
-		const createdMessage = await message.create();
-		console.log({ createdMessage });
+		const createdMessage = new Message(await message.create());
 		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
-		messages = [
-			...messages,
-			{ ...createdMessage, isTalking: createdMessage.user === $RoomStore.mentor ? true : false }
-		];
-		// authors = await axios
-		// 	.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
-		// 	.then((res) => res.data);
+		ChatMessagesStore.update((arr) => {
+			arr = [...arr, createdMessage];
+			return arr;
+		});
 		return createdMessage;
 	};
-	let filteredItemsInPreview: SharedObject[] = [];
-	let objectEditorOpen = false;
 	const onDeleteClicked = async () => {
 		if ($FocusObjectStore.title == 'Shared Screen') {
 			//check if the screen belong to myself. otherwise you can't relete it.
@@ -404,6 +371,7 @@
 							readonly={$FocusObjectStore.locked}
 						/>
 						<InputWithLabel
+							type="textarea"
 							label={_('Description')}
 							bind:value={$FocusObjectStore.description}
 							readonly={$FocusObjectStore.locked}
@@ -553,25 +521,22 @@
 <div class="object-editor" />
 
 <div class="action-buttons">
-	<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:textChatOpen bind:micActive {me} />
+	<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:micActive {me} />
 </div>
-<div style:display={textChatOpen ? 'block' : 'none'}>
+<div style:display={$TextChatOpen ? 'block' : 'none'}>
 	<div class="chat-box">
 		<ChatBox
-			bind:aiSpeaks
 			bind:waitingForAIAnswer
 			bind:newMessagePinned
 			{sendChatMessage}
 			{onMicClicked}
-			bind:messages
 			bind:authors
 			bind:micActive
-			{virtuaMentorReady}
 		/>
 	</div>
 </div>
 
-<div style:display={!$UserStore.onVideoMute && !textChatOpen ? 'block' : 'none'}>
+<div style:display={!$UserStore.onVideoMute && !$TextChatOpen ? 'block' : 'none'}>
 	<div id="myCameraPreview" />
 </div>
 

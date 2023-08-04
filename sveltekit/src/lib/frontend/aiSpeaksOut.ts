@@ -1,7 +1,12 @@
 import { unescapeHTML } from '$lib/math/escapeHTML';
+import { AISpeaks } from '$lib/store';
 import type { Unit } from './Classes/Unit';
 
 export let speechInterval;
+let aiSpeaks = false;
+AISpeaks.subscribe((value) => {
+	aiSpeaks = value;
+});
 
 export const aiSpeaksOut = (message: string, unit: Unit | null = null) => {
 	const utterance = new SpeechSynthesisUtterance(unescapeHTML(message));
@@ -9,6 +14,11 @@ export const aiSpeaksOut = (message: string, unit: Unit | null = null) => {
 	console.log({ unit });
 	if (unit) {
 		speechInterval = setInterval(() => {
+			if (!aiSpeaks) {
+				clearInterval(speechInterval);
+				unit.audioLevel = 0;
+				return;
+			}
 			unit.audioLevel = Math.random() * 3 + 5;
 		}, 200);
 		//clear interval when speech ends

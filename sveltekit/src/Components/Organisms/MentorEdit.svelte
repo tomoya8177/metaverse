@@ -9,7 +9,6 @@
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
-	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
 	import FulllNameInput from '../Atom/FulllNameInput.svelte';

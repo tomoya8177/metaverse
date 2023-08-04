@@ -22,18 +22,15 @@
 
 	export let message: Message;
 	export let onDelete: (id: string) => void;
-	export let author: User | null;
 	export let forceNoPin = false;
 	export let withPinWithTrash = true;
 	onMount(async () => {
 		//author = await axios.get('/api/users/' + message.user).then((res) => res.data);
 		const interval = setInterval(() => {
-			if (!message.isTalking) return;
+			if (!message.isAIs) return;
 			if (speechSynthesis.speaking) return;
-			message.isTalking = false;
 			clearInterval(interval);
 		}, 1000);
-		console.log({ author });
 	});
 	const sendToRoomClicked = async (message) => {
 		const response = await axios.get(
@@ -58,12 +55,12 @@
 		style:background-color={messageIsUsers ? 'rgba(100,100,100,0.5)' : ''}
 	>
 		<div style="flex:1" style:text-align={messageIsUsers ? 'right' : 'left'}>
-			{#if author}
+			{#if message.userData}
 				<div style="font-size:0.9rem;">
 					<a href={'#'}>
-						{author.nickname || ''}
+						{message.userData.nickname || ''}
 					</a>
-					{#if message.isTalking}
+					{#if message.isAIs}
 						<a
 							transition:fade
 							href={'#'}
@@ -73,7 +70,7 @@
 								speechSynthesis.cancel();
 								clearInterval(speechInterval);
 
-								message.isTalking = false;
+								//message.isTalking = false;
 							}}
 						>
 							<Icon icon="campaign" />
@@ -82,22 +79,21 @@
 				</div>
 			{/if}
 			{#if message.type == 'attachment'}
-				<a href={message.url} target="_blank">
-					{#if message.type == 'attachment' || message.body.toLowerCase() == 'generated image'}
+				{@html message.body}
+				<div>
+					<a href={message.url} target="_blank">
 						<img
 							src={message.url}
 							style="max-width:100%;max-height:10rem; border-radius:0.2rem"
 							alt={message.body}
 						/>
-						{#if !forceMentor && message.handle}
-							<a href={'#'} on:click={() => sendToRoomClicked(message)}>
-								{_('Send to Room')}
-							</a>
-						{/if}
-					{:else}
-						{message.body}
-					{/if}
-				</a>
+					</a>
+				</div>
+				{#if !forceMentor && message.handle}
+					<a href={'#'} on:click={() => sendToRoomClicked(message)}>
+						{_('Send to Room')}
+					</a>
+				{/if}
 			{:else}
 				{@html nl2br(message.body)}
 			{/if}

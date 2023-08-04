@@ -1,7 +1,7 @@
 import type { SharedObject } from './SharedObject';
 
 class SharedObjects {
-	items: any[] = [];
+	items: SharedObject[] = [];
 	add(item: SharedObject) {
 		this.items.push(item);
 	}

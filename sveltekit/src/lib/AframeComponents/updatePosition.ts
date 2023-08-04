@@ -6,7 +6,9 @@ import type { User } from '$lib/frontend/Classes/User';
 import { Users } from '$lib/frontend/Classes/Users';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
-import { RoomStore, UserStore, type xyz } from '$lib/store';
+import { cookies } from '$lib/frontend/cookies';
+import { RoomStore, TextChatOpen, UserStore, AISpeaks, type xyz } from '$lib/store';
+import axios from 'axios';
 import { DateTime } from 'luxon';
 let user: User;
 UserStore.subscribe((u) => {
@@ -15,6 +17,10 @@ UserStore.subscribe((u) => {
 let room: Room;
 RoomStore.subscribe((r) => {
 	room = r;
+});
+let aiSpeaks = false;
+AISpeaks.subscribe((value) => {
+	aiSpeaks = value;
 });
 AFRAME.registerComponent('update-position', {
 	init: function () {
@@ -54,8 +60,20 @@ AFRAME.registerComponent('update-position', {
 			// 	position: this.me.position,
 			// 	rotation: { ...this.me.rotation }
 			// });
-		} else {
-			if (timeSinceLastPositionChange >= 2000) {
+		}
+		if (
+			positionNotChanged(
+				{
+					position: this.me.position,
+					rotation: this.me.rotation
+				},
+				{
+					position: this.lastPosition,
+					rotation: this.lastRotation
+				}
+			)
+		) {
+			if (timeSinceLastPositionChange >= 1000) {
 				//check if there's any objects near by
 				let closestObject: SharedObject | null = null;
 				sharedObjects.items
@@ -71,21 +89,60 @@ AFRAME.registerComponent('update-position', {
 					});
 				if (!closestObject) return;
 				console.log('closestObject', closestObject);
+				closestObject = closestObject as SharedObject;
 				closestObject.explained = true;
 				if (!closestObject.description) return;
-				const message = new Message({
-					user: room.mentorData?.mentor,
-					body: closestObject.description,
-					room: room.id,
-					createdAt: DateTime.now().toISO(),
-					isTalking: true
-				});
+				axios
+					.post('/mentor', {
+						messages: [
+							{
+								role: 'system',
+								content: `${user.nickname} is looking at the ${closestObject.shortType}, ${
+									closestObject.title
+								}, whose description is: ${closestObject.description}.
+									Tell the context of the description to the user. Try not to make it boring just by reading out the description. Encourage the user to seek more detail about the context. Answer in less than 100 words.
+								Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
+									'locale'
+								)}.`
+							}
+						]
+					})
+					.then((res) => {
+						console.log(res);
+						const message = new Message({
+							user: room.mentorData?.user,
+							body: res.data.response.content,
+							room: room.id,
+							createdAt: DateTime.now().toISO(),
+							isTalking: true
+						});
+						message.createSendOutAndPush();
+						if (!aiSpeaks) {
+							TextChatOpen.set(true);
+							return;
+						}
 
-				aiSpeaksOut(closestObject.description);
+						aiSpeaksOut(res.data.response.content, Users.find(room.mentorData.user) || null);
+					});
 			}
 		}
 	}
 });
+
+const positionNotChanged = (
+	current: { position: xyz; rotation: xyz },
+	past: {
+		position: xyz;
+		rotation: xyz;
+	}
+): boolean => {
+	let threshold = 0.01;
+	return (
+		current.position.x - past.position.x < threshold &&
+		current.position.y - past.position.y < threshold &&
+		current.position.z - past.position.z < threshold
+	);
+};
 
 const positionRotationChanged = (
 	current: { position: xyz; rotation: xyz },

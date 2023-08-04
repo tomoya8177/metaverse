@@ -2,27 +2,27 @@ import axios from 'axios';
 import { Message } from './Classes/Message';
 import { escapeHTML } from '$lib/math/escapeHTML';
 import { actionHistory } from './Classes/ActionHistory';
+import type { Mentor } from './Classes/Mentor';
 
 export const sendQuestionToAI = async (
-	mentorId: string,
+	mentor: Mentor,
 	roomId: string = 'none',
 	newMessage: Message
 ) => {
 	console.log({ roomId });
 	actionHistory.send('sendQuestionToAI', newMessage);
 	const response = await axios
-		.post('/mentor/' + mentorId, {
+		.post('/mentor/' + mentor.id, {
 			roomId,
 			...newMessage
 		})
 		.then((res) => res.data);
 	console.log({ response });
 	const aiMessage = new Message({
-		body: escapeHTML(response.response || response.text),
-		user: 'Mentor',
+		body: response.response || response.text,
+		user: mentor.user,
 		room: roomId,
-		pinned: false,
-		isTalking: true
+		pinned: false
 	});
 	return aiMessage;
 };

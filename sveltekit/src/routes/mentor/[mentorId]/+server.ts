@@ -126,7 +126,10 @@ export const PUT = async ({ request, params }) => {
 //post for chat
 //POST for ask question
 export const POST = async ({ request, params }) => {
-	const body = await request.json();
+	const body: {
+		action: 'greet' | 'system' | undefined;
+		body: string;
+	} = await request.json();
 	const user = (await db.query(`select * from users where id='${body.user}'`))[0];
 	let storedChat = storedChats.find((storedChat) => {
 		if (body.roomId != 'none') {
@@ -144,26 +147,22 @@ export const POST = async ({ request, params }) => {
 	let question = '';
 	let messages: (SystemMessage | AIMessage | HumanMessage)[] = [];
 	switch (body.action) {
-		case 'greet':
-			const room = (await db.query(`select * from rooms where id='${body.roomId}'`))[0];
-			const organization = (
-				await db.query(`select * from organizations where id='${room.organization}'`)
-			)[0];
-			question = `Hi.`;
-			messages = [
-				new SystemMessage(
-					`The user, whose nickname is ${user.nickname}, just joined the conversation. You should greet the user nicely.`
-				)
-			];
+		case 'greet': {
+			const systemMessage = `The user, whose nickname is ${user.nickname}, joined the conversation. Just greet the user nicely.`;
+			messages = [new SystemMessage(systemMessage)];
+			console.log({ systemMessage, question });
 			break;
-		default:
+		}
+		default: {
 			question = `${body.body.replace('@Mentor', '').trim()}`;
-
+			const systemMessage = `Following is a message from ${user.nickname}.`;
 			messages = [
-				new SystemMessage(`Following is a message from ${user.nickname}.`),
+				new SystemMessage(systemMessage),
 				new HumanMessage(question)
 				//new HumanMessage(question)
 			];
+			console.log({ systemMessage, question });
+		}
 	}
 	storedChat.chatHistory.push(...messages);
 
@@ -171,7 +170,10 @@ export const POST = async ({ request, params }) => {
 		question: '',
 		chat_history: storedChat.chatHistory.slice(-10)
 	});
-	storedChat.chatHistory.push(new AIMessage(res.text));
+	console.log(res.text);
+	if (body.action != 'greet') {
+		storedChat.chatHistory.push(new AIMessage(res.text));
+	}
 
 	/* Return the response */
 	return new Response(JSON.stringify(res));

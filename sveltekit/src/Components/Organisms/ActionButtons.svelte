@@ -6,7 +6,8 @@
 		UserStore,
 		PreviewPanelOpen,
 		FocusObjectStore,
-		ItemsInPreview
+		ItemsInPreview,
+		TextChatOpen
 	} from '$lib/store';
 	import Icon from '../Atom/Icon.svelte';
 	import type { Me } from '$lib/frontend/Classes/Me';
@@ -20,19 +21,12 @@
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
-	export let textChatOpen = false;
 	export let waitingForAIAnswer: boolean;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
 	const onTextChatClicked = () => {
-		textChatOpen = !textChatOpen;
-		if (!textChatOpen) return;
-		setTimeout(() => {
-			const element = document.querySelector('.chat-box > div');
-			if (!element) return;
-			scrolToBottom(element);
-		}, 100);
+		TextChatOpen.update((v) => !v);
 	};
 
 	const onKeyDown = (e: KeyboardEvent) => {

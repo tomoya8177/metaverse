@@ -224,5 +224,6 @@ export default {
 		'以下のリンクをクリックしてチームページをチェックアウトしてください！',
 	"You've just joined the organization: ": 'あなたはチームに参加しました: ',
 	'Notification from VirtuaCampus': 'VirtuaCampusからの通知',
-	'AI is generating the content...': 'AIがコンテンツを生成しています...'
+	'AI is generating the content...': 'AIがコンテンツを生成しています...',
+	'AI completed to generate the image for you. @': 'AIがあなたのために画像を生成しました。@'
 };

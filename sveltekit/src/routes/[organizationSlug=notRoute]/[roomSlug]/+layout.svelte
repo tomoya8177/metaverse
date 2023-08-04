@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import axios from 'axios';
-	import { RoomStore, UserStore } from '$lib/store';
+	import { ChatMessagesStore, RoomStore, UserStore } from '$lib/store';
 	import Login from '../../../Components/Organisms/Login.svelte';
 	import { fade } from 'svelte/transition';
 	import { checkLogin } from '$lib/frontend/checkLogin';
@@ -11,12 +11,18 @@
 	import type { UserRole } from '$lib/types/UserRole';
 	import { _ } from '$lib/i18n';
 	import type { Organization } from '$lib/types/Organization';
-	import type { PageData } from '../[eventSlug]/$types';
+	import type { PageData } from './$types';
+	import {
+		sendInvitedToOrganizationEmail,
+		sendJoinedToOrganizationEmail
+	} from '$lib/frontend/sendInvitedToOrganizationEmail';
 	export let data: PageData;
 	let loggedIn: boolean | null = data.loggedIn;
-	let room: any = null;
+	console.log({ data });
+	let room: Room = new Room(data.room);
 	let noRoom: boolean | null = null;
 	let organization: Organization | null = data.organization;
+	ChatMessagesStore.set(data.messages);
 	$: console.log(loggedIn);
 	onMount(async () => {
 		console.log({ organization });
@@ -24,15 +30,12 @@
 			noRoom = true;
 			return;
 		}
-		room = await axios
-			.get(`/api/rooms?slug=${$page.params.roomSlug}&organization=${organization.id}`)
-			.then((res) => res.data[0]);
+
 		if (!room) {
 			noRoom = true;
 			return;
 		}
-		RoomStore.set(new Room(room));
-		console.log($RoomStore, $UserStore);
+		RoomStore.set(room);
 		if (!loggedIn) return;
 		const userRole: UserRole | undefined = $UserStore.userRole;
 		if (userRole?.role == 'manager') {
@@ -42,7 +45,6 @@
 			if (!userRole) {
 				//room exists, but you are not a mamber of this organization
 				//check if the ogranization accepts registration
-				console.log({ organization });
 				if (!organization.allowRegistration) {
 					noRoom = true;
 					return;
@@ -53,6 +55,8 @@
 					organization: room.organization
 				};
 				const res = await axios.post('/api/userRoles', newUserRole);
+				const url = $page.url.protocol + '//' + $page.url.host + '/' + organization.slug;
+				await sendJoinedToOrganizationEmail($UserStore.email, organization, url);
 				//let's do it again.
 				location.reload();
 				return;

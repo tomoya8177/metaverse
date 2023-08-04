@@ -13,6 +13,7 @@ export const POST = async ({ request }) => {
 		messages: body.messages,
 		temperature: 0.6
 	});
+	console.log(body.messages);
 	return new Response(JSON.stringify({ response: chat_completion.data.choices[0].message }));
 };
 

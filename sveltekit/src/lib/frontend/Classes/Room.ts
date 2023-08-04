@@ -3,9 +3,10 @@ import { reinstallAIBrain } from '../reinstallAIBrain';
 import { _ } from '$lib/i18n';
 import type { DocumentForAI } from '$lib/types/DocumentForAI';
 import { myAlert } from '../toast';
+import { DBObject } from './DBObject';
+import type { Mentor } from './Mentor';
 
-export class Room {
-	id: string;
+export class Room extends DBObject {
 	slug: string;
 	title: string;
 	allowAudio: boolean;
@@ -24,25 +25,29 @@ export class Room {
 	environmentModelURL?: string;
 	navMeshModelURL?: string;
 	withMetaverse?: boolean;
-	constructor(obj: any) {
-		this.id = obj.id;
-		this.slug = obj.slug;
-		this.title = obj.title;
-		this.allowAudio = obj.allowAudio;
-		this.allowVideo = obj.allowVideo;
-		this.organization = obj.organization;
-		this.allowedUsersData = obj.allowedUsers;
-		this.isPublic = obj.isPublic;
-		this.isOpen = obj.isOpen;
-		this.createdAt = obj.createdAt;
-		this.organizationTitle = obj.organizationTitle;
-		this.mentor = obj.mentor;
-		this.prompt = obj.prompt;
-		this.documents = obj.documents || [];
-		this.environmentPreset = obj.environmentPreset;
-		this.environmentModelURL = obj.environmentModelURL;
-		this.navMeshModelURL = obj.navMeshModelURL;
-		this.withMetaverse = obj.withMetaverse;
+	mentorData: Mentor;
+	constructor(data: any) {
+		data.table = 'rooms';
+		super(data);
+		this.id = this.unescapedData.id;
+		this.slug = this.unescapedData.slug;
+		this.title = this.unescapedData.title;
+		this.allowAudio = this.unescapedData.allowAudio;
+		this.allowVideo = this.unescapedData.allowVideo;
+		this.organization = this.unescapedData.organization;
+		this.allowedUsersData = this.unescapedData.allowedUsers;
+		this.isPublic = this.unescapedData.isPublic;
+		this.isOpen = this.unescapedData.isOpen;
+		this.createdAt = this.unescapedData.createdAt;
+		this.organizationTitle = this.unescapedData.organizationTitle;
+		this.mentor = this.unescapedData.mentor;
+		this.prompt = this.unescapedData.prompt;
+		this.documents = this.unescapedData.documents || [];
+		this.environmentPreset = this.unescapedData.environmentPreset;
+		this.environmentModelURL = this.unescapedData.environmentModelURL;
+		this.navMeshModelURL = this.unescapedData.navMeshModelURL;
+		this.withMetaverse = this.unescapedData.withMetaverse;
+		this.mentorData = this.unescapedData.mentorData;
 
 		if (this.allowedUsers == '') {
 			this.allowedUsersArray = [];

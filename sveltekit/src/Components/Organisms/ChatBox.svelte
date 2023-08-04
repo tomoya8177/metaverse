@@ -2,7 +2,7 @@
 	import TextChatMessage from '../Molecules/TextChatMessage.svelte';
 
 	import { onDestroy, onMount } from 'svelte';
-	import { RoomStore, UserStore } from '$lib/store';
+	import { ChatMessagesStore, RoomStore, UserStore, TextChatOpen, AISpeaks } from '$lib/store';
 	import axios from 'axios';
 
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -24,16 +24,13 @@
 	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import SendMessageButton from '../Atom/SendMessageButton.svelte';
-	export let virtuaMentorReady = false;
-	export let messages: Message[] = [];
 	export let newMessagePinned = false;
 	let newMessageBody = '';
 	export let authors: User[] = [];
-	export let textChatOpen = false;
 	export let forceMentor: string | false = false;
 	export let forceNoPin = false;
 	const onKeyDown = (e: KeyboardEvent) => {
-		if (!textChatOpen) return;
+		if (!$TextChatOpen) return;
 		if (document.activeElement?.tagName === 'TEXTAREA' && e.key === 'Enter' && e.ctrlKey) {
 			onMessageSendClicked();
 			return;
@@ -72,48 +69,45 @@
 			actionHistory.send('generateImage', { message: newMessageBody });
 			const promise = new GenerateImage(newMessageBody);
 			promise.onDone(async (file) => {
-				const mentor = await axios
-					.get('/api/mentors/' + (forceMentor || $RoomStore.mentor))
-					.then((res) => res.data);
 				console.log({ file });
 				const message = new Message({
 					room: $RoomStore.id,
 					type: 'attachment',
-					user: mentor.user,
-					body: 'generated image',
+					user: $RoomStore.mentorData.user,
+					body: _(`AI completed to generate the image for you. @`) + $UserStore.nickname,
 					handle: file.handle,
 					url: file.url
 				});
-				console.log('sending image', message, mentor);
 				const createdMessage = await sendChatMessage(message);
+				if (!$AISpeaks) {
+					TextChatOpen.set(true);
+					return;
+				}
+				aiSpeaksOut(createdMessage.body, Users.find($RoomStore.mentorData.user) || null);
 			});
 			newMessageBody = '';
 			waitingForAIAnswer = false;
 			return;
 		}
 		if (newMessageBody.includes('@Mentor') || forceMentor) {
-			console.log({ newMessage });
-			//io.emit('question', newMessageBody);
 			newMessageBody = '';
-			//send message to mentor
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(
-				forceMentor || $RoomStore.mentor,
+				$RoomStore.mentorData,
 				$RoomStore.id || 'none',
 				newMessage
 			);
 			waitingForAIAnswer = false;
-			newMessageBody = '';
-			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
-			const mentor = await axios
-				.get('/api/mentors/' + (forceMentor || $RoomStore.mentor))
-				.then((res) => res.data);
-			console.log({ mentor });
-			if (!aiSpeaks) {
-				textChatOpen = true;
+			const createdMessage = await sendChatMessage(aiMessage);
+			if (!$AISpeaks) {
+				TextChatOpen.set(true);
+
 				return;
 			}
-			aiSpeaksOut(createdMessage.body, forceMentor ? null : Users.find(mentor.user) || null);
+			aiSpeaksOut(
+				createdMessage.body,
+				forceMentor ? null : Users.find($RoomStore.mentorData.user) || null
+			);
 		} else {
 			//io.emit('statement', newMessageBody);
 		}
@@ -132,21 +126,19 @@
 	let recognition;
 	export let micActive: boolean = false;
 	let newMessageGenerateImage = false;
-	export let aiSpeaks = true;
 </script>
 
 <div
 	style="overflow-y:auto;max-height:calc(100svh - 19rem)"
 	style:max-height={forceMentor ? 'calc(100svh - 16rem)' : 'calc(100svh - 19rem)'}
 >
-	{#each messages.sort((a, b) => (a.createdAt > b.createdAt ? 1 : -1)) as message}
+	{#each $ChatMessagesStore as message}
 		<TextChatMessage
 			bind:message
 			{forceNoPin}
 			{forceMentor}
-			author={authors.find((a) => a.id === message.user)}
 			onDelete={(messageId) => {
-				messages = messages.filter((m) => m.id !== messageId);
+				ChatMessagesStore.update((m) => m.filter((m) => m.id !== messageId));
 			}}
 		/>
 	{/each}
@@ -213,12 +205,17 @@
 	{/if}
 	<div>
 		<button
-			style:opacity={aiSpeaks ? 1 : 0.5}
+			style:opacity={$AISpeaks ? 1 : 0.5}
 			data-tooltip={_('AI Speaks')}
 			class="circle-button"
 			small
 			on:click={() => {
-				aiSpeaks = !aiSpeaks;
+				AISpeaks.update((v) => {
+					if (v) {
+						speechSynthesis.cancel();
+					}
+					return !v;
+				});
 			}}
 		>
 			<Icon icon="campaign" />

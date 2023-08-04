@@ -6,7 +6,7 @@
 	import 'aframe-extras';
 	import 'aframe-audio-analyser';
 	import { onDestroy, onMount } from 'svelte';
-	import { RoomStore, UserStore } from '$lib/store';
+	import { ChatMessagesStore, RoomStore, TextChatOpen, UserStore, AISpeaks } from '$lib/store';
 
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/frontend/Classes/Me';
@@ -24,7 +24,13 @@
 	import Icon from '../../../Components/Atom/Icon.svelte';
 	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';
 	import { escapeHTML } from '$lib/math/escapeHTML';
-
+	import type { PageData } from './$types';
+	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
+	import { Message } from '$lib/frontend/Classes/Message';
+	import { DateTime } from 'luxon';
+	import { cookies } from '$lib/frontend/cookies';
+	export let data: PageData;
+	let organization: Organization = data.organization;
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
 			this.el.addEventListener('loaded', () => {
@@ -83,6 +89,36 @@
 					QADialogOpen = true;
 				}, 120000); //in 2 minutes, the QA dialog will show up
 			}
+			console.log('now initialize the chat');
+			const response = await axios.post('/mentor', {
+				messages: [
+					{
+						role: 'system',
+						content: `The user, whose nickname is ${$UserStore.nickname}, joined the room "${
+							$RoomStore.title
+						}" of the organization "${
+							organization.title
+						}". Just greet the user nicely. Make sure you answer in the language user prefers. User's locale setting is ${cookies.get(
+							'locale'
+						)}.`
+					}
+				]
+			});
+			console.log({ response });
+			const message = new Message({
+				room: $RoomStore.id,
+				user: $RoomStore.mentorData.userData.id,
+				body: response.data.response.content,
+				createdAt: DateTime.now().toISO(),
+				isTalking: true
+			});
+			message.createSendOutAndPush();
+
+			TextChatOpen.set(true);
+			if (!$AISpeaks) {
+				return;
+			}
+			aiSpeaksOut(message.body, Users.find($RoomStore.mentorData.user) || null);
 		}}
 		{me}
 		bind:readyToConnect
@@ -203,7 +239,7 @@
 	{/if}
 </a-scene>
 {#if sceneLoaded}
-	<SceneUIs {me} />
+	<SceneUIs {me} {organization} />
 {/if}
 
 <style>

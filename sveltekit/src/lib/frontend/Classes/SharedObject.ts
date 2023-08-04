@@ -26,6 +26,7 @@ export class SharedObject {
 	shortType: shortType = 'image';
 	lockedPosition: number;
 	description: string = '';
+	explained: boolean = false;
 	constructor(data: any) {
 		this.id = data.id;
 		if (!this.id) return;
