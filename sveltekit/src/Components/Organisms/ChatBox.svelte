@@ -43,6 +43,7 @@
 		if (forceMentor) {
 			newMessageForMentor = true;
 		}
+		console.log({ authors });
 
 		document.addEventListener('keydown', onKeyDown);
 	});
@@ -108,7 +109,10 @@
 				.get('/api/mentors/' + (forceMentor || $RoomStore.mentor))
 				.then((res) => res.data);
 			console.log({ mentor });
-			if (!aiSpeaks) return;
+			if (!aiSpeaks) {
+				textChatOpen = true;
+				return;
+			}
 			aiSpeaksOut(createdMessage.body, forceMentor ? null : Users.find(mentor.user) || null);
 		} else {
 			//io.emit('statement', newMessageBody);
@@ -140,7 +144,7 @@
 			bind:message
 			{forceNoPin}
 			{forceMentor}
-			author={authors.find((a) => a.id === message.user) || { nickname: 'AI' }}
+			author={authors.find((a) => a.id === message.user)}
 			onDelete={(messageId) => {
 				messages = messages.filter((m) => m.id !== messageId);
 			}}

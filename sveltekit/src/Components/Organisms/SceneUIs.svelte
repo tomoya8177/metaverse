@@ -35,12 +35,16 @@
 	import { getPositionFromLockedPosition } from '$lib/frontend/getPositionFromLockedPosition';
 	import ObjectLockSelect from '../Molecules/ObjectLockSelect.svelte';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
+	import MentorEdit from './MentorEdit.svelte';
+	import { DateTime } from 'luxon';
+	import { Mentor } from '$lib/frontend/Classes/Mentor';
+	import { error } from '@sveltejs/kit';
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
 	let virtuaMentorReady = false;
 	let messages: Message[] = [];
-	let authors: User[] = [];
+	let authors: User[];
 	const loadMessages = async (existings: Message[] = []) => {
 		messages = [
 			...(await axios
@@ -48,9 +52,9 @@
 				.then((res) => res.data)),
 			...existings
 		].filter((thing, index, self) => self.findIndex((t) => t.id === thing.id) === index);
-		authors = await axios
-			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
-			.then((res) => res.data);
+		// authors = await axios
+		// 	.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
+		// 	.then((res) => res.data);
 	};
 	const onTextChatClicked = () => {
 		textChatOpen = !textChatOpen;
@@ -82,16 +86,36 @@
 		document.addEventListener('keydown', onKeyDown);
 		loadMessages(messages);
 		if ($RoomStore.mentor) {
-			axios
-				.put('/mentor/' + $RoomStore.mentor, {
-					roomId: $RoomStore.id,
-					refresh: false
-				})
-				.then(async (res) => {
-					console.log({ res });
-					//this is okay to be delaied
-					virtuaMentorReady = true;
-				}); //ping to wake up the server
+			const mentor = await axios.get('/api/mentors/' + $RoomStore.mentor).then((res) => {
+				console.log({ res });
+				return new Mentor(res.data);
+			});
+			await mentor.init(); // load userData
+			if (!mentor.userData) return console.error('MentorUser not found');
+			authors = [...authors, mentor.userData];
+			const res = await axios.put('/mentor/' + $RoomStore.mentor, {
+				roomId: $RoomStore.id,
+				refresh: false
+			});
+
+			console.log({ res });
+			//this is okay to be delaied
+			virtuaMentorReady = true;
+			const response = await axios.post('/mentor/' + $RoomStore.mentor, {
+				action: 'greet',
+				roomId: $RoomStore.id,
+				user: $UserStore.id
+			});
+			console.log({ response });
+			const message = new Message({
+				room: $RoomStore.id,
+				user: mentor.userData.id,
+				body: response.data.text,
+				createdAt: DateTime.now().toISO(),
+				isTalking: true
+			});
+			message.create();
+			messages = [...messages, message];
 		}
 		videoChat.listenTo('textMessage', async (data) => {
 			messages = [...messages, data];
@@ -109,7 +133,10 @@
 			}, 100);
 			if (data.user === 'Mentor') {
 				data.isTalking = true;
-				if (!aiSpeaks) return;
+				if (!aiSpeaks) {
+					textChatOpen = true;
+					return;
+				}
 				aiSpeaksOut(data.body);
 			}
 		});
@@ -157,12 +184,16 @@
 			);
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)), isTalking: true };
-			const mentor = await axios.get('/api/mentors/' + $RoomStore.mentor).then((res) => res.data);
-			console.log({ mentor });
+			$RoomStore.mentorData = await axios
+				.get('/api/mentors/' + $RoomStore.mentor)
+				.then((res) => res.data);
+			console.log({ mentor: $RoomStore.mentorData });
 			if (!aiSpeaks) {
+				//open chat box
+				textChatOpen = true;
 				return;
 			}
-			aiSpeaksOut(createdMessage.body, Users.find(mentor.user) || null);
+			aiSpeaksOut(createdMessage.body, Users.find($RoomStore.mentorData.user) || null);
 		}
 	};
 	let aiSpeaks = true;
@@ -172,16 +203,16 @@
 
 	const sendChatMessage = async (message: Message) => {
 		actionHistory.send('sendChatMessage', message);
-		const createdMessage = await axios.post('/api/messages', message).then((res) => res.data);
+		const createdMessage = await message.create();
 		console.log({ createdMessage });
 		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
 		messages = [
 			...messages,
-			{ ...createdMessage, isTalking: createdMessage.user === 'Mentor' ? true : false }
+			{ ...createdMessage, isTalking: createdMessage.user === $RoomStore.mentor ? true : false }
 		];
-		authors = await axios
-			.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
-			.then((res) => res.data);
+		// authors = await axios
+		// 	.get(`/api/users?id=in:'${messages.map((m) => m.user).join("','")}'`)
+		// 	.then((res) => res.data);
 		return createdMessage;
 	};
 	let filteredItemsInPreview: SharedObject[] = [];
@@ -372,6 +403,11 @@
 							bind:value={$FocusObjectStore.title}
 							readonly={$FocusObjectStore.locked}
 						/>
+						<InputWithLabel
+							label={_('Description')}
+							bind:value={$FocusObjectStore.description}
+							readonly={$FocusObjectStore.locked}
+						/>
 					</div>
 					<div style="position:relative">
 						<InputWithLabel
@@ -430,14 +466,16 @@
 								on:click={async () => {
 									await axios.put('/api/objects/' + $FocusObjectStore.id, {
 										title: $FocusObjectStore.title,
-										linkTo: $FocusObjectStore.linkTo
+										linkTo: $FocusObjectStore.linkTo,
+										description: $FocusObjectStore.description
 									});
 									toast(_(`Updated`));
 									videoChat.sendMessage({
 										key: 'objectUpdate',
 										id: $FocusObjectStore.id,
 										title: $FocusObjectStore.title,
-										linkTo: $FocusObjectStore.linkTo
+										linkTo: $FocusObjectStore.linkTo,
+										description: $FocusObjectStore.description
 									});
 								}}>{_('Update')}</button
 							>

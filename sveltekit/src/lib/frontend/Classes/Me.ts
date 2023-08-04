@@ -8,8 +8,8 @@ export class Me extends Unit {
 	cameraRig: Entity;
 	constructor(userId: string) {
 		super(userId);
-		this.el.setAttribute('look-controls', '');
 		this.el.setAttribute('update-position', '');
+		this.el.setAttribute('look-controls', '');
 		const camera = document.createElement('a-camera');
 		camera.setAttribute('id', 'camera');
 		camera.setAttribute('look-controls-enabled', 'false');

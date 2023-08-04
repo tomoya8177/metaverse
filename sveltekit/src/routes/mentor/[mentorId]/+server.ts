@@ -7,8 +7,18 @@ import type { UserRole } from '$lib/types/UserRole.js';
 import type { Room } from '$lib/frontend/Classes/Room.js';
 import { loadDocuments } from '$lib/backend/loadDocuments.js';
 import { createVectorStoreModelChain } from '$lib/backend/createVectorStoreModelChain.js';
-import { HumanMessage, SystemMessage } from 'langchain/schema';
+import { AIMessage, HumanMessage, SystemMessage } from 'langchain/schema';
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
+import type { ConversationalRetrievalQAChain } from 'langchain/chains.js';
+import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
+import type { System } from 'aframe';
+
+type StoredChat = {
+	mentorId: string;
+	roomId: string;
+	chatHistory: (HumanMessage | SystemMessage | AIMessage)[];
+	chain: ConversationalRetrievalQAChain;
+};
 
 //get for AI mentor initialize
 export const GET = async ({ params, request }) => {
@@ -19,7 +29,6 @@ export const GET = async ({ params, request }) => {
 //put for loading documents
 export const PUT = async ({ request, params }) => {
 	const body = await request.json();
-	console.log({ body });
 
 	const mentor = (await db.query(`select * from mentors where id='${params.mentorId}'`))[0];
 	mentor.userData = (await db.query(`select * from users where id='${mentor.user}'`))[0];
@@ -64,15 +73,14 @@ export const PUT = async ({ request, params }) => {
 		...succeededDocuments
 	]);
 	if (body.refresh && !storedChats.some((s) => s.mentorId == mentor.id && s.roomId == 'none')) {
-		const storedChat = {
+		const storedChat: StoredChat = {
 			mentorId: params.mentorId,
 			roomId: 'none',
-			chain
+			chain,
+			chatHistory: []
 		};
-		console.log('rewriting storedChat for mentor');
 		storedChats.add(storedChat);
 	}
-	console.log({ rooms });
 
 	const succeededDocumentsMom = succeededDocuments;
 	const roomLoadPromises = rooms.map(async (room: Room) => {
@@ -81,7 +89,6 @@ export const PUT = async ({ request, params }) => {
 			storedChats.some((s) => s.mentorId == mentor.id && s.roomId == (room?.id || 'none'))
 		)
 			return;
-		console.log('rewriting storedChat for room');
 
 		const messages = room?.prompt || '';
 		const roomPromptDocs = await textSplitter.createDocuments([messages]);
@@ -97,16 +104,16 @@ export const PUT = async ({ request, params }) => {
 			...succeededDocumentsMom,
 			...succeededDocuments
 		]);
-		const storedChat = {
+		const storedChat: StoredChat = {
 			mentorId: params.mentorId,
 			roomId: room?.id || 'none',
-			chain
+			chain,
+			chatHistory: []
 		};
 		storedChats.add(storedChat);
 	});
-	console.log({ storedChats });
 
-	const res = await Promise.all(roomLoadPromises);
+	await Promise.all(roomLoadPromises);
 	return new Response(
 		JSON.stringify({
 			result: 'success',
@@ -119,32 +126,52 @@ export const PUT = async ({ request, params }) => {
 //post for chat
 //POST for ask question
 export const POST = async ({ request, params }) => {
-	console.log({ params });
 	const body = await request.json();
 	const user = (await db.query(`select * from users where id='${body.user}'`))[0];
-	console.log({ storedChats });
 	let storedChat = storedChats.find((storedChat) => {
-		if (body.roomId) {
+		if (body.roomId != 'none') {
 			return storedChat.mentorId === params.mentorId && storedChat.roomId === body.roomId;
 		} else {
-			console.log(typeof storedChat.roomId, storedChat.mentorId, params.mentorId);
-			return storedChat.mentorId == params.mentorId && typeof storedChat.roomId == 'undefined';
+			return storedChat.mentorId == params.mentorId && storedChat.roomId == 'none';
 		}
 	});
-	console.log({ storedChat });
-	const question = `${body.body.replace('@Mentor', '').trim()}`;
 	if (!storedChat || !storedChat.chain) {
 		return new Response(JSON.stringify({ error: 'mentor not initialized' }));
 	}
+	if (typeof storedChat.chatHistory == 'undefined') {
+		storedChat.chatHistory = [];
+	}
+	let question = '';
+	let messages: (SystemMessage | AIMessage | HumanMessage)[] = [];
+	switch (body.action) {
+		case 'greet':
+			const room = (await db.query(`select * from rooms where id='${body.roomId}'`))[0];
+			const organization = (
+				await db.query(`select * from organizations where id='${room.organization}'`)
+			)[0];
+			question = `Hi.`;
+			messages = [
+				new SystemMessage(
+					`The user, whose nickname is ${user.nickname}, just joined the conversation. You should greet the user nicely.`
+				)
+			];
+			break;
+		default:
+			question = `${body.body.replace('@Mentor', '').trim()}`;
 
-	const messages = [
-		new SystemMessage(`Following is a message from ${user.nickname}.`),
-		new HumanMessage(question)
-	];
+			messages = [
+				new SystemMessage(`Following is a message from ${user.nickname}.`),
+				new HumanMessage(question)
+				//new HumanMessage(question)
+			];
+	}
+	storedChat.chatHistory.push(...messages);
 
 	const res = await storedChat.chain.call({
-		question: question
+		question: '',
+		chat_history: storedChat.chatHistory.slice(-10)
 	});
+	storedChat.chatHistory.push(new AIMessage(res.text));
 
 	/* Return the response */
 	return new Response(JSON.stringify(res));

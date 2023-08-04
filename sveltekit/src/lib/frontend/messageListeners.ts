@@ -48,6 +48,7 @@ export const messageListeners = () => {
 		if (!object) return;
 		object.title = data.title;
 		object.linkTo = data.linkTo;
+		object.description = data.description;
 		if (data.isSphere != undefined) {
 			object.isSphere = data.isSphere;
 			object.updateEntityGeometryAndMaterial();

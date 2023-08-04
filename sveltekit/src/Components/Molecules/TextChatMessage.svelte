@@ -33,6 +33,7 @@
 			message.isTalking = false;
 			clearInterval(interval);
 		}, 1000);
+		console.log({ author });
 	});
 	const sendToRoomClicked = async (message) => {
 		const response = await axios.get(

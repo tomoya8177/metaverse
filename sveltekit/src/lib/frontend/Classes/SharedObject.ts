@@ -25,6 +25,7 @@ export class SharedObject {
 	asset: Entity | null = null;
 	shortType: shortType = 'image';
 	lockedPosition: number;
+	description: string = '';
 	constructor(data: any) {
 		this.id = data.id;
 		if (!this.id) return;
@@ -40,6 +41,7 @@ export class SharedObject {
 		this.handle = data.handle;
 		this.linkTo = data.linkTo;
 		this.isSphere = data.isSphere;
+		this.description = data.description;
 		this.lockedPosition = data.lockedPosition || 0;
 		let entity = document.createElement('a-entity') as Entity;
 		this.el = entity;

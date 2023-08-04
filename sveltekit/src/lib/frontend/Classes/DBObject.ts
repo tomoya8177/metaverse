@@ -66,6 +66,8 @@ export class DBObject {
 				data[key] = escapeHTML(data[key] as string) as any;
 			}
 		}
-		return await axios.post(`/api/${this.table}`, data).then((res) => res.data);
+		const createdObject = await axios.post(`/api/${this.table}`, data).then((res) => res.data);
+		this.id = createdObject.id;
+		return createdObject;
 	}
 }

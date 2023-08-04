@@ -46,7 +46,6 @@ export const load = async ({ params }) => {
 			});
 		});
 
-	console.log({ users });
 	return {
 		organization,
 		userRoles,
