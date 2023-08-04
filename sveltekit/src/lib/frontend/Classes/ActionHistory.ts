@@ -65,9 +65,9 @@ export class ActionHistory extends DBObject {
 		this.page = null;
 		this.param = data?.param || '';
 	}
-	async send(action: Actions, data: any = {}) {
+	async send(action: Actions, data: any = {}): Promise<any> {
 		if (PUBLIC_IS_DEV == 'true') return;
-		await axios.post('/api/actions', {
+		const response = await axios.post('/api/actions', {
 			session: this.session,
 			user: this.user,
 			room: this.room,
@@ -76,6 +76,7 @@ export class ActionHistory extends DBObject {
 			data: JSON.stringify(data),
 			path: location.href
 		});
+		return response.data;
 	}
 	get paramData() {
 		return JSON.parse(this.param);
