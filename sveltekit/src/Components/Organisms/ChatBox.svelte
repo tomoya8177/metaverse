@@ -67,7 +67,7 @@
 		busy = false;
 		if (newMessageGenerateImage) {
 			waitingForAIAnswer = true;
-			actionHistory.send('generateImage', { message: newMessageBody });
+			actionHistory.send('generateImage', { message: escapeHTML(newMessageBody) });
 			const promise = new GenerateImage(newMessageBody);
 			promise.onDone(async (file) => {
 				console.log({ file });

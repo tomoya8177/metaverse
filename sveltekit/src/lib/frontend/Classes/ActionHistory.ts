@@ -73,7 +73,7 @@ export class ActionHistory extends DBObject {
 			room: this.room,
 			organization: this.organization,
 			action: action,
-			data: JSON.stringify(escapeHTML(data)),
+			data: JSON.stringify(data),
 			path: location.href
 		});
 	}
