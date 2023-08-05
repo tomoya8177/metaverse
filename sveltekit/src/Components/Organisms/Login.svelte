@@ -72,7 +72,7 @@
 			//register if organiatin allow to do so
 			const organiatinData = await axios
 				.get('/api/organizations/' + organization)
-				.then((res) => res.data[0]);
+				.then((res) => res.data);
 			if (!organiatinData.allowRegistration && (room === null || !room.isPublic)) {
 				busy = false;
 				myAlert(_('This organization does not allow registration'));
