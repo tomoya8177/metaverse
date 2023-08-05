@@ -70,24 +70,31 @@
 			return;
 		} else {
 			//register if organiatin allow to do so
-			const organiatinData = await axios
-				.get('/api/organizations/' + organization)
-				.then((res) => res.data);
-			if (!organiatinData.allowRegistration && (room === null || !room.isPublic)) {
-				busy = false;
-				myAlert(_('This organization does not allow registration'));
-				return;
-			}
-			if (room !== null && room.isPublic) {
-				//room is free to access. no registration under organization
+			if (organization) {
+				const organiatinData = await axios
+					.get('/api/organizations/' + organization)
+					.then((res) => res.data);
+				if (!organiatinData.allowRegistration && (room === null || !room.isPublic)) {
+					busy = false;
+					myAlert(_('This organization does not allow registration'));
+					return;
+				}
+				if (room !== null && room.isPublic) {
+					//room is free to access. no registration under organization
+					const res = await axios.post('/api/register', {
+						email
+					});
+				} else {
+					//room is not public. register under organization
+					const res = await axios.post('/api/register', {
+						email,
+						organization
+					});
+				}
+			} else {
+				//no organization. just register
 				const res = await axios.post('/api/register', {
 					email
-				});
-			} else {
-				//room is not public. register under organization
-				const res = await axios.post('/api/register', {
-					email,
-					organization
 				});
 			}
 			await login(email);
