@@ -5,6 +5,7 @@ import type { Room } from './Room';
 import { ChatMessagesStore, RoomStore } from '$lib/store';
 import { actionHistory } from './ActionHistory';
 import { videoChat } from './VideoChat';
+import { PUBLIC_LOCALHOST } from '$env/static/public';
 
 const usersMemory: User[] = [];
 let room: Room;
@@ -38,7 +39,7 @@ export class Message extends DBObject {
 		if (existingUser) {
 			this.userData = existingUser;
 		} else {
-			axios.get('/api/users/' + this.user).then((res) => {
+			axios.get(PUBLIC_LOCALHOST + '/api/users/' + this.user).then((res) => {
 				this.userData = new User(res.data);
 				usersMemory.push(this.userData);
 			});

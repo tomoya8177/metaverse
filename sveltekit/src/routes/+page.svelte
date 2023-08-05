@@ -8,7 +8,6 @@
 	import Navigation from '../Components/Organisms/Navigation.svelte';
 	import UnderConstruction from '../Components/Templates/UnderConstruction.svelte';
 	import axios from 'axios';
-	import type { Mentor } from '$lib/types/Mentor';
 	import AvatarThumbnail from '../Components/Atom/AvatarThumbnail.svelte';
 	import { fade } from 'svelte/transition';
 	import { User } from '$lib/frontend/Classes/User';
@@ -19,9 +18,9 @@
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import TextChatMessage from '../Components/Molecules/TextChatMessage.svelte';
-	let mentor: Mentor | null = null;
-	let intro: string = '';
-	let invite: string = '';
+	import { PUBLIC_LOCALHOST } from '$env/static/public';
+	import { Mentor } from '$lib/frontend/Classes/Mentor';
+	export let mentor: Mentor | null = null; // can be fed by system when testing
 	let firstPrompt: {
 		role: string;
 		content: string;
@@ -36,18 +35,19 @@
 			}
 		});
 		const mentors = await axios
-			.get('/api/mentors?organization=086694b4-bdb4-4f34-b036-b39598132085')
+			.get(PUBLIC_LOCALHOST + '/api/mentors?organization=086694b4-bdb4-4f34-b036-b39598132085')
 			.then((res) => res.data);
+
 		//get random one
-		mentor = mentors[Math.floor(Math.random() * mentors.length)];
+		mentor = new Mentor(mentors[Math.floor(Math.random() * mentors.length)]);
 		if (!mentor) return;
-		mentor.userData = await axios.get('/api/users/' + mentor?.user).then((res) => res.data);
+		await mentor.init();
 		firstPrompt = {
 			role: 'system',
 			content: `Below is a friendly conversation between a user and an assistant named ${
-				mentor.userData.fullName
+				mentor.userData?.fullName || mentor.userData?.nickname
 			}. Assistant will initiate the conversation by greeting the user, starting with saying Hello, and mention assistant's name that is ${
-				mentor.userData.nickname
+				mentor.userData?.nickname
 			}. Assistant works for a company Global New Venture as an AI mentor on the project called VirtuaCampus.
 			After getting the hi back from the user, assistant should ask if user wants to do either of the three actions.
 			1) Create New Organization by clicking the blue button,
@@ -57,34 +57,23 @@
 			When choosing 2), he/she can try walking through a metaverse world, and try different things inside.
 			Don't overwhelm the user with a long answer, and just answer question only it is asked. Try to keep one message in less than 50 words.
 			If the conversation includes more than 10 messages, only the recent top 10 messages will be displayed below. So if there are 10 messages and there's no greeting, concider that the greeting is already done.
+			If the conversation includes more then 5 messages, the user hasn't decided what to do. You can recommend that if user is familiar with metaverse world, ht/she can go to 1), and if not, he/she can go to 2).
 			Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
 				'locale'
 			)}.`
 		};
-		const response = await axios.post('/mentor', {
+		const response = await axios.post(PUBLIC_LOCALHOST + '/mentor', {
 			messages: [firstPrompt]
 		});
 		busy = false;
 		console.log({ response });
 		messages = [
 			new Message({
-				user: mentor.userData.id,
+				user: mentor?.userData?.id,
 				body: response.data.response.content,
 				createdAt: DateTime.now().toISO()
 			})
 		];
-		// const response2 = await axios.post('/mentor', {
-		// 	messages: [
-		// 		{
-		// 			role: 'system',
-		// 			content: `Encourage the user to create their own virtual school with AI mentor and AI image generator in less than 100 words. Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
-		// 				'locale'
-		// 			)}.`
-		// 		}
-		// 	]
-		// });
-		// console.log({ response2 });
-		// invite = response2.data.response.content;
 	});
 	let newMessageBody: string = '';
 	const onMessageSendClicked = async () => {
@@ -99,25 +88,29 @@
 			})
 		];
 		newMessageBody = '';
-		const response = await axios.post('/mentor', {
-			messages: [
-				firstPrompt,
-				...messages
-					//get top 10 messages
-					.slice(-10)
-					.map((message) => {
-						return {
-							role: message.user == mentor.user ? 'assistant' : 'user',
-							content: message.body
-						};
-					})
-			]
+		const messagesToAI = [
+			...messages
+				//get top 10 messages
+				.slice(-10)
+				.map((message) => {
+					return {
+						role: message.user == mentor?.user ? 'assistant' : 'user',
+						content: message.body
+					};
+				})
+		];
+		if (firstPrompt) {
+			messagesToAI.unshift(firstPrompt);
+		}
+		console.log({ messagesToAI });
+		const response = await axios.post(PUBLIC_LOCALHOST + '/mentor', {
+			messages: messagesToAI
 		});
 		busy = false;
 		messages = [
 			...messages,
 			new Message({
-				user: mentor.userData.id,
+				user: mentor?.userData?.id,
 				body: response.data.response.content,
 				createdAt: DateTime.now().toISO()
 			})
@@ -141,15 +134,9 @@
 				</div>
 			{/if}
 		{/if}
-		{#each messages as message}
-			<TextChatMessage
-				withPinWithTrash={false}
-				{message}
-				onDelete={() => {}}
-				author={message.user == $UserStore.id
-					? new User({ nickname: $UserStore.fullName || 'User' })
-					: mentor.userData}
-			/>
+		{#each messages as message, i}
+			<div data-testid={'message' + i} style="display:none">Message</div>
+			<TextChatMessage withPinWithTrash={false} {message} onDelete={() => {}} />
 		{/each}
 	</section>
 	<section style="text-align:center">

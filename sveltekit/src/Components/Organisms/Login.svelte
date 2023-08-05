@@ -12,6 +12,7 @@
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import { PUBLIC_LOCALHOST } from '$env/static/public';
 	export let organization: string = '';
 	export let room: Room | null = null;
 	let loggedIn: boolean | null = null;
@@ -25,7 +26,7 @@
   ${_('Please return to the login page and input the verification code below:')}
 	[[code]]
   `;
-		const res = await axios.post('/api/login/sendCode', {
+		const res = await axios.post(PUBLIC_LOCALHOST + '/api/login/sendCode', {
 			email,
 			emailBody,
 			emailBodyHTML: nl2br(unescapeHTML(emailBody)),
@@ -38,7 +39,7 @@
 	let verificationCode: string = '';
 	const onVerifyClicked = async () => {
 		busy = true;
-		const res = await axios.post('/api/login/verifyCode', {
+		const res = await axios.post(PUBLIC_LOCALHOST + '/api/login/verifyCode', {
 			email,
 			code: verificationCode
 		});
@@ -63,7 +64,7 @@
 		}
 		busy = true;
 		const existingUser = await axios
-			.post('/api/login/checkExisting', { email })
+			.post(PUBLIC_LOCALHOST + '/api/login/checkExisting', { email })
 			.then((res) => res.data);
 		if (existingUser.length) {
 			await login(email);
@@ -72,7 +73,7 @@
 			//register if organiatin allow to do so
 			if (organization) {
 				const organiatinData = await axios
-					.get('/api/organizations/' + organization)
+					.get(PUBLIC_LOCALHOST + '/api/organizations/' + organization)
 					.then((res) => res.data);
 				if (!organiatinData.allowRegistration && (room === null || !room.isPublic)) {
 					busy = false;
@@ -81,19 +82,19 @@
 				}
 				if (room !== null && room.isPublic) {
 					//room is free to access. no registration under organization
-					const res = await axios.post('/api/register', {
+					const res = await axios.post(PUBLIC_LOCALHOST + '/api/register', {
 						email
 					});
 				} else {
 					//room is not public. register under organization
-					const res = await axios.post('/api/register', {
+					const res = await axios.post(PUBLIC_LOCALHOST + '/api/register', {
 						email,
 						organization
 					});
 				}
 			} else {
 				//no organization. just register
-				const res = await axios.post('/api/register', {
+				const res = await axios.post(PUBLIC_LOCALHOST + '/api/register', {
 					email
 				});
 			}
