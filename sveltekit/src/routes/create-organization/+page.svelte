@@ -22,6 +22,7 @@
 	import { emptyUser } from '$lib/preset/EmptyUser';
 	import Icon from '../../Components/Atom/Icon.svelte';
 	import TeamIconEditor from '../[organizationSlug=notRoute]/manager/TeamIconEditor.svelte';
+	import { UserStore } from '$lib/store';
 	export let data: PageData;
 	console.log(data);
 	let loggedIn = data.loggedIn;
@@ -42,6 +43,20 @@
 		};
 	});
 	let busy = false;
+	const loggedInUpdated = async (loggedIn: boolean) => {
+		if (!loggedIn) return;
+		const slug = crypto.randomUUID();
+		const id = crypto.randomUUID();
+		organization = await axios
+			.post('http://localhost:5173/api/organizations', {
+				title: '',
+				slug: slug,
+				id: id
+			})
+			.then((res) => res.data);
+		console.log({ organization });
+	};
+	$: loggedInUpdated(loggedIn);
 </script>
 
 <Navigation />
@@ -58,7 +73,7 @@
 				{_('Organization')}
 			</h4>
 			<OrganizationEdit bind:editOrganization={organization} />
-			<div>
+			<div class="teamIcon">
 				<h4>{_('Icon')}</h4>
 				<TeamIconEditor bind:organization />
 			</div>
@@ -70,7 +85,7 @@
 					if (!organization.title) return myAlert(_('Please enter a title'));
 					busy = true;
 					const newOrg = await axios
-						.post('/api/organizations', organization)
+						.put('/api/organizations/' + organization.id, organization)
 						.then((res) => res.data);
 					const newUserRole = await axios.post('/api/userRoles', {
 						user: user.id,
@@ -80,7 +95,7 @@
 					room.organization = newOrg.id;
 					mentor.organization = newOrg.id;
 					if (!mentor.userData) mentor.userData = emptyUser;
-					mentor.userData.nickname = _('My First AI Mentor');
+					mentor.userData.nickname = 'My First AI Mentor';
 					mentor.userData =
 						(await axios.post('/api/users', mentor.userData).then((res) => res.data)) || emptyUser;
 					mentor.user = mentor.userData?.id || '';

@@ -52,6 +52,7 @@
 {#if message}
 	{@const messageIsUsers = message.user == $UserStore.id}
 	<div
+		data-role="message"
 		style="position:relative;display:flex;gap:0.1rem;margin-bottom:0.4rem;padding:0.4rem;border-radius:0.4rem;"
 		style:background-color={messageIsUsers ? 'rgba(100,100,100,0.5)' : ''}
 	>

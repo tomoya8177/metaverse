@@ -141,16 +141,20 @@
 				</div>
 			{/if}
 		{/if}
-		{#each messages as message}
-			<TextChatMessage
-				withPinWithTrash={false}
-				{message}
-				onDelete={() => {}}
-				author={message.user == $UserStore.id
-					? new User({ nickname: $UserStore.fullName || 'User' })
-					: mentor.userData}
-			/>
-		{/each}
+		<ul class="chatMessagesWithAI">
+			{#each messages as message}
+				<li>
+					<TextChatMessage
+						withPinWithTrash={false}
+						{message}
+						onDelete={() => {}}
+						author={message.user == $UserStore.id
+							? new User({ nickname: $UserStore.fullName || 'User' })
+							: mentor.userData}
+					/>
+				</li>
+			{/each}
+		</ul>
 	</section>
 	<section style="text-align:center">
 		{#if busy}
@@ -209,5 +213,10 @@
 		background-color: rgb(40, 188, 180);
 		color: white;
 		border-color: darkseagreen;
+	}
+	ul,
+	li {
+		list-style: none;
+		padding: 0;
 	}
 </style>

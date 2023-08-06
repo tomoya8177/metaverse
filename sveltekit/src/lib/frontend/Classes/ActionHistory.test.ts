@@ -17,7 +17,6 @@ describe('ActionHistory Class', () => {
 		expect(actionHistory.userData).toBeUndefined();
 		expect(actionHistory.roomData).toBeUndefined();
 	});
-
 	it('should correctly set user and room values from store subscriptions', async () => {
 		// const userStoreMock = { subscribe: jest.fn() };
 		// const roomStoreMock = { subscribe: jest.fn() };

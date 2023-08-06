@@ -4,7 +4,6 @@ import axios from 'axios';
 import { DBObject } from './DBObject';
 import { page } from '$app/stores';
 import { escapeHTML } from '$lib/math/escapeHTML';
-
 type Actions =
 	| 'login'
 	| 'logout'

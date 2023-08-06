@@ -17,10 +17,7 @@ export async function GET({ params, cookies, request }) {
 }
 
 export async function PUT({ request, params, cookies }) {
-	if (
-		!isLocalhost(request.headers.get('host')) &&
-		!(await Auth.check(cookies.get('login'))).result
-	) {
+	if (!(await Auth.check(cookies.get('login'))).result) {
 		return new Response('not authorized', { status: 401 });
 	}
 	const updates = await createUpdateQuery(request, params);
@@ -36,9 +33,10 @@ export async function PUT({ request, params, cookies }) {
 }
 
 export async function DELETE({ params, cookies, request }) {
+	console.log('host', request.headers);
 	const isLocalhost = request.headers.get('host')?.includes('localhost');
 
-	if (!(await Auth.check(cookies.get('login'))).result) {
+	if (!(await Auth.check(cookies.get('login'))).result && !isLocalhost) {
 		return new Response('not authorized', { status: 401 });
 	}
 	if (!params.id) {
