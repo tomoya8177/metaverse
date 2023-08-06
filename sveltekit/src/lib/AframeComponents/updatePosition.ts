@@ -1,11 +1,14 @@
+import type { Mentor } from '$lib/frontend/Classes/Mentor';
 import { Message } from '$lib/frontend/Classes/Message';
 import type { Room } from '$lib/frontend/Classes/Room';
 import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+import { Unit } from '$lib/frontend/Classes/Unit';
 import type { User } from '$lib/frontend/Classes/User';
 import { Users } from '$lib/frontend/Classes/Users';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
+import { callAIMentor } from '$lib/frontend/callAIMentor';
 import { cookies } from '$lib/frontend/cookies';
 import { RoomStore, TextChatOpen, UserStore, AISpeaks, type xyz } from '$lib/store';
 import axios from 'axios';
@@ -92,6 +95,8 @@ AFRAME.registerComponent('update-position', {
 				closestObject = closestObject as SharedObject;
 				closestObject.explained = true;
 				if (!closestObject.description) return;
+				callAIMentor(room.mentorData);
+
 				axios
 					.post('/mentor', {
 						messages: [
@@ -103,7 +108,7 @@ AFRAME.registerComponent('update-position', {
 									Tell the context of the description to the user. Try not to make it boring just by reading out the description. Encourage the user to seek more detail about the context. Answer in less than 100 words.
 								Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
 									'locale'
-								)}.`
+								)}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`
 							}
 						]
 					})
@@ -136,7 +141,7 @@ const positionNotChanged = (
 		rotation: xyz;
 	}
 ): boolean => {
-	let threshold = 0.01;
+	let threshold = 0.1;
 	return (
 		current.position.x - past.position.x < threshold &&
 		current.position.y - past.position.y < threshold &&

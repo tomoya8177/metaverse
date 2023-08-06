@@ -156,7 +156,7 @@ export const POST = async ({ request, params }) => {
 		}
 		default: {
 			question = `${body.body.replace('@Mentor', '').trim()}`;
-			const systemMessage = `Following is a message from ${user.nickname}.`;
+			const systemMessage = `Following is a message from ${user.nickname}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`;
 			messages = [
 				new SystemMessage(systemMessage),
 				new HumanMessage(question)

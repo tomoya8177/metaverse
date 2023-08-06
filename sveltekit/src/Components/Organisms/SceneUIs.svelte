@@ -44,6 +44,7 @@
 	import { error } from '@sveltejs/kit';
 	import type { Organization } from '$lib/types/Organization';
 	import { cookies } from '$lib/frontend/cookies';
+	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	export let organization: Organization;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
@@ -160,6 +161,7 @@
 			);
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)) };
+			callAIMentor();
 
 			if (!$AISpeaks) {
 				//open chat box

@@ -25,6 +25,7 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import SendMessageButton from '../Atom/SendMessageButton.svelte';
 	import type { Mentor } from '$lib/frontend/Classes/Mentor';
+	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	export let newMessagePinned = false;
 	let newMessageBody = '';
 	export let authors: User[] = [];
@@ -79,7 +80,7 @@
 					handle: file.handle,
 					url: file.url
 				});
-
+				callAIMentor();
 				await message.createSendOutAndPush();
 				if (!$AISpeaks) {
 					TextChatOpen.set(true);
@@ -100,6 +101,8 @@
 				newMessage
 			);
 			await aiMessage.createSendOutAndPush();
+			callAIMentor();
+
 			// console.log({ aiMessage });
 			waitingForAIAnswer = false;
 			// const createdMessage = await sendChatMessage(aiMessage);

@@ -6,6 +6,14 @@ import axios from 'axios';
 import { SharedObject } from './Classes/SharedObject';
 import { sharedObjects } from './Classes/SharedObjects';
 import type { Entity } from 'aframe';
+import { transportMentor } from './callAIMentor';
+import type { Room } from 'twilio-video';
+import { RoomStore } from '$lib/store';
+
+let room: Room;
+RoomStore.subscribe((r) => {
+	room = r;
+});
 
 export const messageListeners = () => {
 	videoChat.listenTo('handshake', async (data) => {
@@ -59,6 +67,13 @@ export const messageListeners = () => {
 		const object = document.getElementById(data.id);
 		if (!object) return;
 		object.parentNode?.removeChild(object);
+	});
+	videoChat.listenTo('moveMentor', (data) => {
+		transportMentor({
+			mentorEl: document.getElementById(room.mentorData.user) as Entity,
+			position: data.position,
+			rotation: data.rotation
+		});
 	});
 };
 

@@ -29,6 +29,7 @@
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import { cookies } from '$lib/frontend/cookies';
+	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	export let data: PageData;
 	let organization: Organization = data.organization;
 	AFRAME.registerComponent('on-scene-loaded', {
@@ -113,6 +114,7 @@
 				isTalking: true
 			});
 			message.createSendOutAndPush();
+			callAIMentor($RoomStore.mentorData);
 
 			TextChatOpen.set(true);
 			if (!$AISpeaks) {
