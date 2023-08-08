@@ -7,3 +7,4 @@ import './resizeOnload';
 import './aiMentor';
 import './moveMouth';
 import './myNippleControl';
+import './myTouchControls';

@@ -48,7 +48,7 @@
 				mentor.userData.fullName
 			}. Assistant will initiate the conversation by greeting the user, starting with saying Hello, and mention assistant's name that is ${
 				mentor.userData.nickname
-			}. Assistant works for a company Global New Venture as an AI mentor on the project called VirtuaCampus.
+			}. Assistant works for a company Global New Ventures as an AI mentor on the project called VirtuaCampus.
 			After getting the hi back from the user, assistant should ask if user wants to do either of the three actions.
 			1) Create New Organization by clicking the blue button,
 			2) Enter Sample Room by clicking the green button.

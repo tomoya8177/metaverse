@@ -215,6 +215,10 @@
 	};
 </script>
 
+<div style="position:absolute;bottom:11rem;left:1rem;" class="nippleControl">
+	<NippleControl />
+</div>
+
 {#if $FocusObjectStore.id && $FocusObjectStore.id != ''}
 	<nav class="objectEditorNav">
 		<ul />
@@ -522,9 +526,7 @@
 
 <div class="object-editor" />
 
-<div class="action-buttons">
-	<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:micActive {me} />
-</div>
+<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:micActive {me} />
 <div style:display={$TextChatOpen ? 'block' : 'none'}>
 	<div class="chat-box">
 		<ChatBox
@@ -602,15 +604,6 @@
 		border-radius: 50%;
 		overflow: hidden;
 		box-shadow: 0 0 0.4rem 0.4rem rgba(0, 0, 0, 0.2);
-	}
-
-	.action-buttons {
-		max-width: calc(100vw - 1rem);
-		position: absolute;
-		bottom: 0rem;
-		right: 0.5rem;
-		display: flex;
-		gap: 0.4rem;
 	}
 
 	.chat-box {

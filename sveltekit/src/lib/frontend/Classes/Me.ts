@@ -10,6 +10,7 @@ export class Me extends Unit {
 		super(userId);
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
+		this.el.setAttribute('my-touch-controls', 'enabled:false');
 		const camera = document.createElement('a-camera');
 		camera.setAttribute('id', 'camera');
 		camera.setAttribute('look-controls-enabled', 'false');
@@ -23,7 +24,7 @@ export class Me extends Unit {
 
 		this.el.setAttribute(
 			'movement-controls',
-			'constrainToNavMesh: true; camera: #camera; controls: keyboard,touch'
+			'constrainToNavMesh: true; camera: #camera; controls: keyboard'
 		);
 
 		this.el.setAttribute('ping-session', `user:${userId};type:unit`);
@@ -40,5 +41,11 @@ export class Me extends Unit {
 		console.log({ parsedComponents });
 		this.position = parsedComponents.position;
 		this.rotation = parsedComponents.rotation;
+	}
+	enableTouch(): void {
+		this.el.setAttribute('my-touch-controls', 'enabled: true');
+	}
+	disableTouch(): void {
+		this.el.setAttribute('my-touch-controls', 'enabled: false');
 	}
 }

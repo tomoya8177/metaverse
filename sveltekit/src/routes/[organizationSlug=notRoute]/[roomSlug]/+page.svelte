@@ -30,6 +30,7 @@
 	import { DateTime } from 'luxon';
 	import { cookies } from '$lib/frontend/cookies';
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
+	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
 	export let data: PageData;
 	let organization: Organization = data.organization;
 	AFRAME.registerComponent('on-scene-loaded', {
@@ -55,7 +56,19 @@
 			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		sceneLoaded = true;
 		//me.twilioConnect($RoomStore.id)
+		document.addEventListener('touchstart', () => {
+			//activate the nipple control
+			me.enableTouch();
+			nippleControl.show();
+		});
+		document.onkeydown = (e) => {
+			//if key is W
 
+			if (e.key === 'w' || e.key === 'a' || e.key === 's' || e.key === 'd') {
+				me.disableTouch();
+				nippleControl.hide();
+			}
+		};
 		//load mentor user
 		if ($RoomStore.mentor) {
 			const mentor = await axios.get('/api/mentors/' + $RoomStore.mentor).then((res) => res.data);

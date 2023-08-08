@@ -9,6 +9,7 @@ import type { User } from './Classes/User';
 import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
 import { videoChat } from './Classes/VideoChat';
+import { THREE } from 'aframe';
 let room: Room;
 RoomStore.subscribe((r) => {
 	room = r;
@@ -18,7 +19,7 @@ UserStore.subscribe((u) => {
 	user = u;
 });
 
-export const callAIMentor = async (mentor: Mentor = null): Promise<void> => {
+export const callAIMentor = async (mentor: Mentor | null = null): Promise<void> => {
 	if (mentor === null) {
 		mentor = room.mentorData;
 	}

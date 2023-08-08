@@ -4,10 +4,11 @@ import { emptyUser } from './preset/EmptyUser';
 import type { SharedObject } from './frontend/Classes/SharedObject';
 import { EmptyObject } from './preset/EmptyObject';
 import type { Message } from './frontend/Classes/Message';
+import type { User } from './frontend/Classes/User';
 
 export const UserStore = writable({
 	...emptyUser
-});
+} as User);
 export const Toast = writable({
 	open: false,
 	message: '',
