@@ -228,4 +228,7 @@
 		margin-bottom: 0.4rem;
 		height: 3rem;
 	}
+	button:not(.circle-button) {
+		padding-top: 0.6rem;
+	}
 </style>
