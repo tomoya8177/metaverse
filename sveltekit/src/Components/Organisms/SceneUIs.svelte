@@ -221,6 +221,7 @@
 </div>
 
 {#if $FocusObjectStore.id && $FocusObjectStore.title != ''}
+	{@const iCanEdit = $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
 	<div class="objectEditorNav">
 		<Icon icon="deployed_code" />
 		<span style="max-width:15rem;text-wrap:nowrap;overflow:hidden;">
@@ -238,22 +239,20 @@
 	
 	"
 		>
-			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
+			{#if iCanEdit && $FocusObjectStore.type != 'screen'}
 				<div>
 					<a
 						role="button"
 						small
 						class="circle-button"
-						data-tooltip={$FocusObjectStore.user == $UserStore.id || $UserStore.isManager
-							? _('Edit')
-							: _('Info')}
+						data-tooltip={iCanEdit ? _('Edit') : _('Info')}
 						href={`/${organization.slug}/${$RoomStore.slug}/editCard/${$FocusObjectStore.id}`}
 					>
 						<Icon icon="edit" />
 					</a>
 				</div>
 			{/if}
-			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
+			{#if iCanEdit}
 				<div>
 					<button
 						data-tooltip={$FocusObjectStore.locked ? _('Unock') : _('Lock')}

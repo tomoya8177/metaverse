@@ -8,7 +8,7 @@
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { messageListeners, messageUnlisteners } from '$lib/frontend/messageListeners';
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
-	import AudioButton from './AudioButton.svelte';
+	import AudioButton from '../Atom/AudioButton.svelte';
 	import axios from 'axios';
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';

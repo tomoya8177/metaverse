@@ -23,7 +23,6 @@ export class Mentor extends DBObject {
 		this.utterance = new SpeechSynthesisUtterance();
 		const synth = window.speechSynthesis;
 		synth.addEventListener('voiceschanged', () => {
-			console.log(synth.getVoices());
 			if (this.voiceURI) {
 				this.utterance.voice =
 					synth.getVoices().find((voice) => {
@@ -41,7 +40,6 @@ export class Mentor extends DBObject {
 		const unit = Users.find(this.user);
 		if (!this.utterance) return console.error('Mentor.utterance is null');
 		this.utterance.text = message;
-		console.log('speaking in voice ', this.voiceURI);
 		speechSynthesis.speak(this.utterance);
 		if (!unit) return;
 		this.speechInterval = setInterval(() => {

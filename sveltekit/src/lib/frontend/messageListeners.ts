@@ -53,14 +53,21 @@ export const messageListeners = () => {
 		object.setAttribute('geometry', { radius: data.radius });
 	});
 	videoChat.listenTo('objectUpdate', (data) => {
+		console.log('received upject update', data);
 		const object = sharedObjects.get(data.id);
 		if (!object) return;
 		object.title = data.title;
 		object.linkTo = data.linkTo;
 		object.description = data.description;
+		object.withCaption = data.withCaption;
+		object.captionUrl = data.captionUrl;
+		object.url = data.url;
 		if (data.isSphere != undefined) {
 			object.isSphere = data.isSphere;
 			object.updateEntityGeometryAndMaterial();
+		}
+		if (object.type.includes('image')) {
+			object.refreshPreview();
 		}
 	});
 	videoChat.listenTo('objectDelete', (data) => {

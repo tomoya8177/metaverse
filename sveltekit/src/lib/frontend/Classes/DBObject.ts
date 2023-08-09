@@ -44,7 +44,13 @@ export class DBObject {
 	async update(): Promise<any> {
 		if (!this.table) return console.error('DBObject.load() called without table name');
 		const data = { ...this };
-		console.log('update', this.table, this);
+		console.log('update', this.table, data);
+		delete data.el;
+		delete data.captionEl;
+		delete data.asset;
+		delete data.captionAsset;
+		delete data.scene;
+		delete data.unescapedData;
 
 		//escape values
 		for (const key in data) {

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import AudioButton from './AudioButton.svelte';
+	import AudioButton from '../Atom/AudioButton.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import {
 		RoomStore,

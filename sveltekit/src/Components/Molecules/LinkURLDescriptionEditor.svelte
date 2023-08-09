@@ -50,7 +50,7 @@
 	]}
 />
 <InputWithLabel label={_('URL')} bind:value={editItem.linkTo} type="url" />
-{#if !editItem.url}
+{#if editItem.linkTo}
 	<strong>
 		{_('Link Icons')}
 	</strong>

@@ -162,7 +162,7 @@ export class Unit {
 					scale: video.getAttribute('scale'),
 					radius: video.getAttribute('geometry')?.radius
 				});
-			}, 1000);
+			}, 3000);
 
 			videoChat.screenPingInterval = new sessionPing(
 				{
