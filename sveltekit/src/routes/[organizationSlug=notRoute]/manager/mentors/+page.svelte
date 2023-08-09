@@ -103,7 +103,8 @@
 		});
 		let updatedMentor = await axios
 			.put('/api/mentors/' + editMentor.id, {
-				prompt: escapeHTML(editMentor.prompt)
+				prompt: escapeHTML(editMentor.prompt),
+				...editMentor
 			})
 			.then((res) => res.data);
 		console.log({ updatedMentor });

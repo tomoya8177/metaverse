@@ -27,8 +27,8 @@
 </script>
 
 <InputWithLabel
-	label={_('Link to Room')}
-	bind:value={editItem.url}
+	label={_('Link to Room/Mentor')}
+	bind:value={editItem.linkTo}
 	type="select"
 	selects={[
 		{
@@ -37,57 +37,48 @@
 		},
 		...rooms.map((room) => {
 			return {
-				name: room.title,
+				name: `[${_('Room')}] ${room.title}`,
 				value: `${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.id}`
 			};
-		})
-	]}
-/>
-<InputWithLabel
-	label={_('Link to 1-on-1 Chat with AI Mentor')}
-	bind:value={editItem.url}
-	type="select"
-	selects={[
-		{
-			name: _('No Link'),
-			value: ''
-		},
+		}),
 		...mentors.map((mentor) => {
 			return {
-				name: mentor.userData?.nickname,
+				name: `[${_('Mentor')}] ${mentor.userData?.nickname}`,
 				value: `${$page.url.protocol}//${$page.url.host}/${organization.slug}/mentor/${mentor.id}`
 			};
 		})
 	]}
 />
-<InputWithLabel label={_('URL')} bind:value={editItem.url} type="url" />
-<strong>
-	{_('Link Icons')}
-</strong>
-<div style="display:flex;flex-wrap:wrap;gap:0.4rem">
-	{#each BrandIcons as icon}
+<InputWithLabel label={_('URL')} bind:value={editItem.linkTo} type="url" />
+{#if !editItem.url}
+	<strong>
+		{_('Link Icons')}
+	</strong>
+	<div style="display:flex;flex-wrap:wrap;gap:0.4rem">
+		{#each BrandIcons as icon}
+			<div>
+				<a
+					href={'#'}
+					on:click={() => {
+						editItem.iconURL = icon.iconURL;
+					}}
+				>
+					<img src={icon.iconURL} alt={icon.name} />
+				</a>
+			</div>
+		{/each}
 		<div>
 			<a
 				href={'#'}
 				on:click={() => {
-					editItem.iconURL = icon.iconURL;
+					editItem.iconURL = '';
 				}}
 			>
-				<img src={icon.iconURL} alt={icon.name} />
-			</a>
+				{_('No Icon')}</a
+			>
 		</div>
-	{/each}
-	<div>
-		<a
-			href={'#'}
-			on:click={() => {
-				editItem.iconURL = '';
-			}}
-		>
-			{_('No Icon')}</a
-		>
 	</div>
-</div>
+{/if}
 <InputWithLabel label={_('Description')} bind:value={editItem.description} type="textarea" />
 
 <style>

@@ -10,6 +10,9 @@ AISpeaks.subscribe((value) => {
 
 export const aiSpeaksOut = (message: string, unit: Unit | null = null) => {
 	const utterance = new SpeechSynthesisUtterance(unescapeHTML(message));
+	const voices = speechSynthesis.getVoices();
+	console.log({ voices });
+	utterance.voice = voices[(Math.random() * voices.length) | 0];
 	speechSynthesis.speak(utterance);
 	console.log({ unit });
 	if (unit) {

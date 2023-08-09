@@ -51,6 +51,7 @@
 		me = new Me($UserStore.id);
 		me.nickname = $UserStore.nickname;
 		Users.add(me);
+		// $UserStore.unit = me;
 		await me.setLastPosition($RoomStore);
 		me.avatarURL =
 			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
@@ -133,7 +134,8 @@
 			if (!$AISpeaks) {
 				return;
 			}
-			aiSpeaksOut(message.body, Users.find($RoomStore.mentorData.user) || null);
+			$RoomStore.mentorData.speak(message.body);
+			//			aiSpeaksOut(message.body, Users.find($RoomStore.mentorData.user) || null);
 		}}
 		{me}
 		bind:readyToConnect

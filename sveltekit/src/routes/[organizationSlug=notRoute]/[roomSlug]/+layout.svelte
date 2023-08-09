@@ -26,6 +26,7 @@
 	if (room.mentor) {
 		room.mentorData = new Mentor(data.mentor);
 		room.mentorData.userData = new User(data.mentorUser);
+		console.log({ mentor: room.mentorData });
 	}
 	let noRoom: boolean | null = null;
 	let organization: Organization | null = data.organization;

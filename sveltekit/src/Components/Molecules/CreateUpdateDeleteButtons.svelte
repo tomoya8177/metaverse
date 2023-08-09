@@ -17,7 +17,7 @@
 	<button aria-busy={busy} on:click={onUpdateClicked}>
 		{_('Update')}
 	</button>
-	<button aria-busy={deleteBusy} on:click={onDeleteClicked}>
+	<button class="secondary" aria-busy={deleteBusy} on:click={onDeleteClicked}>
 		{_('Delete')}
 	</button>
 {/if}

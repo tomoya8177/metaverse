@@ -83,7 +83,6 @@ AFRAME.registerComponent('update-position', {
 					.filter((object) => !object.explained && object.type != 'screen')
 					.forEach((object) => {
 						//if this is already explained, skip
-						console.log({ object });
 						const distance = this.el.object3D.position.distanceTo(object.position);
 						let minimumDistance = 3;
 						if (distance < 3 && distance <= minimumDistance) {
@@ -92,7 +91,6 @@ AFRAME.registerComponent('update-position', {
 						}
 					});
 				if (!closestObject) return;
-				console.log('closestObject', closestObject);
 				closestObject = closestObject as SharedObject;
 				closestObject.explained = true;
 				if (!closestObject.description) return;
@@ -127,8 +125,8 @@ AFRAME.registerComponent('update-position', {
 							TextChatOpen.set(true);
 							return;
 						}
-
-						aiSpeaksOut(res.data.response.content, Users.find(room.mentorData.user) || null);
+						room.mentorData.speak(res.data.response.content);
+						//aiSpeaksOut(res.data.response.content, Users.find(room.mentorData.user) || null);
 					});
 			}
 		}

@@ -144,9 +144,7 @@
 		{_('Send Invitation')}
 		<button
 			on:click={async () => {
-				const data = await editEvent.ical(
-					attendances.map((atte) => users.find((user) => user.id == atte.user))
-				);
+				const data = await editEvent.ical(users, attendances);
 				console.log(data);
 				toast(`${_('Sent invitations to users.')}`);
 			}}

@@ -10,10 +10,9 @@
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
+	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	export let data: PageData;
-	const mentor = data.mentor;
-	let authors: User[] = [];
-	let messages: Message[] = [];
+	const mentor = new Mentor(data.mentor);
 	const sendChatMessage = async (message: Message) => {
 		console.log('sending message', message);
 		await message.createSendOutAndPush();
@@ -52,30 +51,37 @@
 			waitingForAIAnswer = false;
 			await aiMessage.createSendOutAndPush();
 			if (!$AISpeaks) return;
-			aiSpeaksOut(aiMessage.body);
+			mentor.speak(aiMessage.body);
+			//			aiSpeaksOut(aiMessage.body);
 		}
 	};
+	let mentorReady = false;
 	onMount(async () => {
 		const res = await axios.put('/mentor/' + mentor.id, {
 			roomId: 'none'
 		});
 		console.log({ mentorinitialized: res.data });
+		await mentor.init();
+		console.log({ mentor });
+		mentorReady = true;
 	});
 </script>
 
-<div class="container" style="position:relative;height:calc(100svh - 3rem)">
-	<div aria-busy={waitingForAIAnswer}>
-		<AvatarThumbnail url={mentor.userData.avatarURL} />
-		{mentor.userData.nickname}
+{#if mentorReady}
+	<div class="container" style="position:relative;height:calc(100svh - 3rem)">
+		<div aria-busy={waitingForAIAnswer}>
+			<AvatarThumbnail url={mentor.userData?.avatarURL || ''} />
+			{mentor.userData?.nickname}
+		</div>
+		<div style="position:absolute;bottom:0px;width:calc(100% - 2rem)">
+			<ChatBox
+				forceMentor={mentor}
+				forceNoPin
+				{micActive}
+				{sendChatMessage}
+				bind:waitingForAIAnswer
+				{onMicClicked}
+			/>
+		</div>
 	</div>
-	<div style="position:absolute;bottom:0px;width:calc(100% - 2rem)">
-		<ChatBox
-			forceMentor={mentor}
-			forceNoPin
-			{micActive}
-			{sendChatMessage}
-			bind:waitingForAIAnswer
-			{onMicClicked}
-		/>
-	</div>
-</div>
+{/if}

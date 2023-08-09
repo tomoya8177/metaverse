@@ -16,7 +16,7 @@
 			busy = true;
 			try {
 				if (!videoChat.connected) {
-					videoChat.init($UserStore, $RoomStore);
+					videoChat.init({ ...$UserStore }, $RoomStore);
 					await videoChat.connect();
 				}
 				await videoChat.startMyAudio();

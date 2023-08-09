@@ -5,6 +5,7 @@ import { DBObject } from './DBObject';
 import { myAlert } from '../toast';
 import { _ } from '$lib/i18n';
 import { PUBLIC_LOCALHOST } from '$env/static/public';
+import type { Unit } from './Unit';
 export class User extends DBObject {
 	nickname: string;
 	email: string;
@@ -22,6 +23,7 @@ export class User extends DBObject {
 	firstName?: string;
 	lastName?: string;
 	description: string = '';
+	unit: Unit | null = null;
 	constructor(data: any) {
 		data.table = 'users';
 		super(data);

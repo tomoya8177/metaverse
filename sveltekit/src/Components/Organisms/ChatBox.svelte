@@ -24,7 +24,7 @@
 	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import SendMessageButton from '../Atom/SendMessageButton.svelte';
-	import type { Mentor } from '$lib/frontend/Classes/Mentor';
+	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	export let newMessagePinned = false;
 	let newMessageBody = '';
@@ -38,6 +38,7 @@
 			return;
 		}
 	};
+	let mentor: Mentor | null = null;
 	onMount(async () => {
 		if (forceMentor) {
 			newMessageForMentor = true;
@@ -80,13 +81,14 @@
 					handle: file.handle,
 					url: file.url
 				});
-				callAIMentor();
+				if (!forceMentor) callAIMentor();
 				await message.createSendOutAndPush();
 				if (!$AISpeaks) {
 					TextChatOpen.set(true);
 					return;
 				}
-				aiSpeaksOut(message.body, Users.find($RoomStore.mentorData.user) || null);
+				$RoomStore.mentorData.speak(message.body);
+				//aiSpeaksOut(message.body, Users.find($RoomStore.mentorData.user) || null);
 			});
 			newMessageBody = '';
 			waitingForAIAnswer = false;
@@ -101,7 +103,7 @@
 				newMessage
 			);
 			await aiMessage.createSendOutAndPush();
-			callAIMentor();
+			if (!forceMentor) callAIMentor();
 
 			// console.log({ aiMessage });
 			waitingForAIAnswer = false;
@@ -111,10 +113,15 @@
 
 				return;
 			}
-			aiSpeaksOut(
-				aiMessage.body,
-				forceMentor ? null : Users.find($RoomStore.mentorData.user) || null
-			);
+			if (forceMentor) {
+				forceMentor.speak(aiMessage.body);
+			} else {
+				$RoomStore.mentorData.speak(aiMessage.body);
+			}
+			// aiSpeaksOut(
+			// 	aiMessage.body,
+			// 	forceMentor ? null : Users.find($RoomStore.mentorData.user) || null
+			// );
 		} else {
 			//io.emit('statement', newMessageBody);
 		}

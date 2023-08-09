@@ -106,4 +106,23 @@
 	>
 		{_('Have AI to write the introduction')}
 	</button>
+	<InputWithLabel
+		label={_('AI Voice')}
+		bind:value={editMentor.voiceURI}
+		type="select"
+		selects={speechSynthesis
+			.getVoices()
+			.sort((a, b) => (a.lang > b.lang ? 1 : -1)) //sort by language
+			.map((voice) => ({
+				value: voice.voiceURI,
+				name: `${voice.name} (${voice.lang})`
+			}))}
+		onChange={() => {
+			const utterance = new SpeechSynthesisUtterance(editMentor.userData.description);
+			utterance.voice = speechSynthesis
+				.getVoices()
+				.find((voice) => voice.voiceURI == editMentor.voiceURI);
+			speechSynthesis.speak(utterance);
+		}}
+	/>
 {/if}

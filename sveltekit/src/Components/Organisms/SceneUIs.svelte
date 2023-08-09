@@ -115,7 +115,8 @@
 
 					return;
 				}
-				aiSpeaksOut(message.body);
+				$RoomStore.mentorData.speak(message.body);
+				//				aiSpeaksOut(message.body);
 			}
 		});
 	});
@@ -237,24 +238,21 @@
 	
 	"
 		>
-			<div>
-				<button
-					small
-					class="circle-button"
-					data-tooltip={$FocusObjectStore.user == $UserStore.id || $UserStore.isManager
-						? _('Edit')
-						: _('Info')}
-					on:click={() => {
-						$FocusObjectStore.editorOpen = true;
-					}}
-				>
-					{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
+			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
+				<div>
+					<a
+						role="button"
+						small
+						class="circle-button"
+						data-tooltip={$FocusObjectStore.user == $UserStore.id || $UserStore.isManager
+							? _('Edit')
+							: _('Info')}
+						href={`/${organization.slug}/${$RoomStore.slug}/editCard/${$FocusObjectStore.id}`}
+					>
 						<Icon icon="edit" />
-					{:else}
-						<Icon icon="info" />
-					{/if}
-				</button>
-			</div>
+					</a>
+				</div>
+			{/if}
 			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
 				<div>
 					<button

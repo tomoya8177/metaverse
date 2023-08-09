@@ -52,7 +52,7 @@
 					actionHistory.send('enterRoom');
 					readyToConnect = true;
 					if (!videoChat.connected) {
-						videoChat.init($UserStore, $RoomStore);
+						videoChat.init({ ...$UserStore }, $RoomStore);
 						await videoChat.connect();
 						whenChatConnected();
 					}

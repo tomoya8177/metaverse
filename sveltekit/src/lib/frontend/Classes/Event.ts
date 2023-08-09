@@ -94,7 +94,12 @@ export class Event extends DBObject {
 		//convert to fit into time input
 		return this.end.split('T')[1].substring(0, 5);
 	}
-
+	get linkTo(): string {
+		return this.location;
+	}
+	set linkTo(val: string) {
+		this.location = val;
+	}
 	validate(): boolean {
 		if (!this.summary) {
 			myAlert(_('Please enter a summary'));
@@ -125,6 +130,7 @@ export class Event extends DBObject {
 		};
 	}
 	async ical(users: User[], attendances: Attendance[], organizer: User | null = null) {
+		console.log({ users, attendances });
 		const start = DateTime.fromISO(this.start);
 		const end = DateTime.fromISO(this.end);
 		const duration = end.diff(start, ['days', 'hours', 'minutes']).toObject();
@@ -134,6 +140,7 @@ export class Event extends DBObject {
 				delete duration[key];
 			}
 		}
+
 		const event = {
 			start: [
 				Number(start.toFormat('yyyy')),
@@ -145,13 +152,17 @@ export class Event extends DBObject {
 			duration: duration,
 			title: this.summary,
 			description: this.description,
-			location: this.url,
+			location: this.linkTo,
 			busyStatus: 'BUSY',
-			organizer: organizer ? { name: organizer.nickname, email: organizer.email } : {},
 			attendees: attendances.map((attendance) => {
+				const user = users.find((user) => user.id == attendance.user);
+				if (!user) return;
+
+				const userName =
+					user.firstName || user.lastName ? user.firstName + ' ' + user.lastName : user.nickname;
 				return {
-					name: attendance.userData.firstName + ' ' + attendance.userData.lastName,
-					email: attendance.userData.email,
+					name: userName,
+					email: user.email,
 					rsvp: true,
 					partstat:
 						attendance.status == 'attending'
@@ -163,7 +174,11 @@ export class Event extends DBObject {
 				};
 			})
 		};
-		const { error, value } = await ics.createEvent(event);
+		if (organizer) {
+			event.organizer = { name: organizer.nickname, email: organizer.email };
+		}
+		console.log({ event });
+		const { error, value } = ics.createEvent(event);
 		if (error) {
 			console.log(error);
 		}

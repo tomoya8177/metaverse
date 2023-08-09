@@ -44,6 +44,8 @@ export class DBObject {
 	async update(): Promise<any> {
 		if (!this.table) return console.error('DBObject.load() called without table name');
 		const data = { ...this };
+		console.log('update', this.table, this);
+
 		//escape values
 		for (const key in data) {
 			if (typeof data[key] == 'string') {

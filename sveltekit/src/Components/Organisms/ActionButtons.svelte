@@ -208,15 +208,14 @@
 			<Icon icon="add" />
 			{_('Upload')}
 		</button>
-		<button
+		<a
+			role="button"
+			href={`/${organization.slug}/${$RoomStore.slug}/createCard`}
 			data-tooltip={_('Create Link')}
-			on:click={() => {
-				linkEditorOpen = true;
-			}}
 		>
 			<Icon icon="post_add" />
 			{_('Add Text')}
-		</button>
+		</a>
 	</div>
 {/if}
 {#if linkEditorOpen}

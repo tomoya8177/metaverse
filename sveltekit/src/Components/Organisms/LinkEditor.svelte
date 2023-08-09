@@ -39,24 +39,27 @@
 		users = await axios
 			.get(`/api/users?id=in:'${userRoles.map((role) => role.user).join("','")}'`)
 			.then((res) => res.data);
+		console.log({ editObject, editEvent });
 	});
 
 	const putTogetherFile = async () => {
-		const html2canvas = new HTML2Canvas();
-		const blob = await html2canvas.getJpegBlob(
-			document.querySelector('.previewLinkObject'),
-			'image.jpg'
-		);
-		if (!blob) {
-			myAlert('Error');
-			return;
+		if (!editObject.url) {
+			const html2canvas = new HTML2Canvas();
+			const blob = await html2canvas.getJpegBlob(
+				document.querySelector('.previewLinkObject'),
+				'image.jpg'
+			);
+			if (!blob) {
+				myAlert('Error');
+				return;
+			}
+			const file = await uploader.uploadBlob(blob, 'image.jpg');
+			editObject.url = file.url;
+			editObject.type = file.type;
+			editObject.size = file.size;
+			editObject.handle = file.url.split('/').pop();
 		}
-		const file = await uploader.uploadBlob(blob, 'image.jpg');
-		editObject.url = file.url;
-		editObject.type = file.type;
-		editObject.size = file.size;
 		editObject.user = $UserStore.id;
-		editObject.handle = file.url.split('/').pop();
 		editObject.room = $RoomStore.id;
 	};
 
@@ -83,9 +86,17 @@
 
 		await editObject.update();
 		if (attachEvent) {
+			const existing = await axios.get('/api/events/' + editEvent.id).then((res) => res.data);
+			console.log({ existing });
+
 			editEvent.attachObject(editObject);
 			editEvent.organization = organization.id;
-			await editEvent.update();
+			if (existing) {
+				const updated = await editEvent.update();
+				console.log({ updated });
+			} else {
+				await editEvent.create();
+			}
 		}
 		busy = false;
 		onUpdate(editObject);
@@ -95,7 +106,7 @@
 	};
 	let textColor = '#ffffff';
 	let backgroundColor = '#600060';
-	let attachEvent = false;
+	export let attachEvent = false;
 	let busy = false;
 	let deleteBusy = false;
 	let tempImageURL = '';
@@ -130,99 +141,112 @@
 		<h4>
 			{_('Graphics Preview')}
 		</h4>
-		<button
-			on:click={() => {
-				uploader.launchPicker('image/*', 1, (result) => {
-					tempImageURL = result.filesUploaded[0].url;
-				});
-			}}
-		>
-			{_('Upload Graphic')}
-		</button>
-		<button
-			aria-busy={generateImageBusy}
-			on:click={async () => {
-				generateImageBusy = true;
-				const prompt = `Icon for an event titled ${editObject.title} and discribed as below: ${editObject.description}.`;
-				const generator = new GenerateImage(prompt);
-				generator.onDone((file) => {
-					generateImageBusy = false;
-					console.log({ file });
-					tempImageURL = file.url;
-				});
-				console.log({ generator });
-			}}
-		>
-			{_('Generate Graphic with AI')}
-		</button>
-		{#if tempImageURL}
+
+		{#if editObject.url}
 			<button
 				class="secondary"
 				on:click={() => {
-					tempImageURL = '';
+					editObject.url = '';
 				}}
 			>
 				{_('Clear Graphic')}
 			</button>
-		{/if}
-		<div class="previewLinkObject">
-			{#if tempImageURL}
-				<img src={tempImageURL} style="width:20rem;" alt="" crossorigin="anonymous" />
-			{/if}
-			<div
-				style:background-color={backgroundColor || '#600060'}
-				style="width:20rem;max-height:20rem;text-align:center;padding:1rem;overflow:hidden"
+			<img src={editObject.url} style="width:20rem;" alt="" crossorigin="anonymous" />
+		{:else}
+			<button
+				on:click={() => {
+					uploader.launchPicker('image/*', 1, (result) => {
+						tempImageURL = result.filesUploaded[0].url;
+					});
+				}}
 			>
-				{#if editObject.iconURL}
-					<img
-						src={editObject.iconURL}
-						style="width:3rem;margin-bottom:0.8rem;border-radius:0.4rem"
-						alt=""
-					/>
-				{/if}
-				<h2 style:color={textColor} style="margin-bottom:1rem">
-					{editObject.title || _('Sample Title')}
-				</h2>
-				{#if attachEvent}
-					<p style:color={textColor}>
-						{DateTime.fromISO(editEvent.start).toLocaleString(
-							editEvent.allDay ? DateTime.DATE : DateTime.DATETIME_FULL
-						)}
-					</p>
-				{/if}
-				{#if editObject.description}
-					<p style:color={textColor} style="overflow:hidden">
-						{editObject.description}
-					</p>
-				{/if}
-			</div>
-		</div>
-		<small>
-			{#if attachEvent}
-				{_('Time will be displayed in local time of the user.')}<br />
+				{_('Upload Graphic')}
+			</button>
+			<button
+				aria-busy={generateImageBusy}
+				on:click={async () => {
+					generateImageBusy = true;
+					const prompt = `Icon for an event titled ${editObject.title} and discribed as below: ${editObject.description}.`;
+					const generator = new GenerateImage(prompt);
+					generator.onDone((file) => {
+						generateImageBusy = false;
+						console.log({ file });
+						tempImageURL = file.url;
+					});
+					console.log({ generator });
+				}}
+			>
+				{_('Generate Graphic with AI')}
+			</button>
+			{#if tempImageURL}
+				<button
+					class="secondary"
+					on:click={() => {
+						tempImageURL = '';
+					}}
+				>
+					{_('Clear Graphic')}
+				</button>
 			{/if}
-			{_('"Click to open" message will be displayed after one click on the object.')}
-		</small>
-		<div>
-			<strong>
-				{_('Graphic Colors')}
-			</strong>
-			<div class="stylePicker">
-				{#each CardColors as cardColor}
-					<a
-						href={'#'}
-						style:color={cardColor.textColor}
-						style:background-color={cardColor.backgroundColor}
-						on:click={() => {
-							textColor = cardColor.textColor;
-							backgroundColor = cardColor.backgroundColor;
-						}}
-					>
-						{cardColor.name}
-					</a>
-				{/each}
+			<div class="previewLinkObject">
+				{#if tempImageURL}
+					<img src={tempImageURL} style="width:20rem;" alt="" crossorigin="anonymous" />
+				{/if}
+				<div
+					style:background-color={backgroundColor || '#600060'}
+					style="width:20rem;max-height:20rem;text-align:center;padding:1rem;overflow:hidden"
+				>
+					{#if editObject.iconURL}
+						<img
+							src={editObject.iconURL}
+							style="width:3rem;margin-bottom:0.8rem;border-radius:0.4rem"
+							alt=""
+						/>
+					{/if}
+					<h2 style:color={textColor} style="margin-bottom:1rem">
+						{editObject.title || _('Sample Title')}
+					</h2>
+					{#if attachEvent}
+						<p style:color={textColor}>
+							{DateTime.fromISO(editEvent.start).toLocaleString(
+								editEvent.allDay ? DateTime.DATE : DateTime.DATETIME_FULL
+							)}
+						</p>
+					{/if}
+					{#if editObject.description}
+						<p style:color={textColor} style="overflow:hidden">
+							{editObject.description}
+						</p>
+					{/if}
+				</div>
 			</div>
-		</div>
+			<small>
+				{#if attachEvent}
+					{_('Time will be displayed in local time of the user.')}<br />
+				{/if}
+				{_('"Click to open" message will be displayed after one click on the object.')}
+			</small>
+			<div>
+				<strong>
+					{_('Graphic Colors')}
+				</strong>
+				<div class="stylePicker">
+					{#each CardColors as cardColor}
+						<a
+							href={'#'}
+							style:color={cardColor.textColor}
+							style:background-color={cardColor.backgroundColor}
+							on:click={() => {
+								textColor = cardColor.textColor;
+								backgroundColor = cardColor.backgroundColor;
+							}}
+						>
+							{cardColor.name}
+						</a>
+					{/each}
+				</div>
+			</div>
+		{/if}
 	</div>
 </div>
 <CreateUpdateDeleteButtons
