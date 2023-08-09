@@ -10,8 +10,8 @@
 	export let data: PageData;
 	let loggedIn: boolean | null = data.loggedIn;
 	if (!$UserStore.isAdmin) {
-		//not allowed here
-		//location.href = '/';
+		// not allowed here
+		location.href = '/';
 	}
 </script>
 
