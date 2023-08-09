@@ -69,15 +69,6 @@
 				});
 			}}
 			onDelete={(sharedObject) => {
-				if (editObject.type.includes('image')) {
-					const existing = sharedObjects.get(sharedObject.id);
-					if (existing) {
-						editObject.el = existing.el;
-						editObject.asset = existing.asset;
-						editObject.captionAsset = existing.captionAsset;
-					}
-					editObject.refreshPreview();
-				}
 				editObject.remove();
 				sharedObjects.remove(editObject.id);
 				document.getElementById('createCardModalCloseButton')?.click();
