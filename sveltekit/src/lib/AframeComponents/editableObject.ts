@@ -28,9 +28,8 @@ AFRAME.registerComponent('editable-object', {
 		this.rayCatcher = document.getElementById('rayCatcher') as Entity;
 
 		this.el.addEventListener('mousedown', (e: Room) => {
-			this.object = sharedObjects.get(this.el.id);
+			this.object = sharedObjects.get(this.el.id) || null;
 			if (!this.object || !this.rayCatcher) return console.error('object is null');
-			console.log({ object: this.object });
 			FocusObjectStore.set(this.object);
 			this.transportMode = 'position';
 			this.camera = document.getElementById('camera') as Entity;
@@ -136,18 +135,8 @@ AFRAME.registerComponent('editable-object', {
 				//scale
 				this.transportMode = 'scale';
 			} else if (evt.key == 'Escape') {
-				console.log('escape');
 				//scale
 				this.deselect();
-				return;
-				if (!this.rayCatcher) return console.error('raycatcher is null');
-
-				this.rayCatcher.setAttribute('position', '0 -100 0');
-				this.rig?.setAttribute('look-controls', 'enabled:true');
-				this.rig?.setAttribute('touch-controls', 'enabled:true');
-				this.state = 'idle';
-				this.initialPos = null;
-				FocusObjectStore.set(EmptyObject);
 			}
 		});
 		window.addEventListener('keyup', (evt) => {

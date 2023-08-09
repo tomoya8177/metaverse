@@ -28,7 +28,6 @@ AISpeaks.subscribe((value) => {
 AFRAME.registerComponent('update-position', {
 	init: function () {
 		this.me = Users.find(this.el.id);
-		console.log('update position', this.me);
 		this.lastPosition = { ...this.me.position };
 		this.lastRotation = { ...this.me.rotation };
 	},
@@ -112,7 +111,6 @@ AFRAME.registerComponent('update-position', {
 						]
 					})
 					.then((res) => {
-						console.log(res);
 						const message = new Message({
 							user: room.mentorData?.user,
 							body: res.data.response.content,
