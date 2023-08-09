@@ -87,8 +87,6 @@
 	/>
 {/if}
 
-<InputWithLabel type="switch" label={_('Allow Audio')} bind:value={editRoom.allowAudio} />
-<InputWithLabel type="switch" label={_('Allow Video')} bind:value={editRoom.allowVideo} />
 <InputWithLabel type="switch" label={_('Open for Anyone')} bind:value={editRoom.isPublic} />
 {#if !editRoom.isPublic}
 	<InputWithLabel

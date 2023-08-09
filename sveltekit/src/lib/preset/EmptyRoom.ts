@@ -4,8 +4,6 @@ export const EmptyRoom: Room = {
 	id: '',
 	title: '',
 	slug: '',
-	allowAudio: false,
-	allowVideo: false,
 	organization: '',
 	allowedUsers: '',
 	isPublic: false,

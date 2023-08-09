@@ -41,6 +41,7 @@ export const messageListeners = () => {
 	videoChat.listenTo('objectCreate', async (data) => {
 		const objectData = await axios.get('/api/objects/' + data.id).then((res) => res.data);
 		const object = new SharedObject(objectData);
+		object.attachElement();
 		sharedObjects.add(object);
 	});
 	videoChat.listenTo('objectPosition', (data) => {

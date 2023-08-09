@@ -63,7 +63,7 @@ export class VideoChat {
 		this.user = user;
 		this.userId = user.id;
 		this.roomId = room.id;
-		this.audioOnly = !room.allowAudio || !room.allowVideo;
+		this.audioOnly = false;
 	}
 	sendMessage(message: any) {
 		if (typeof dataTrackPublished.promise === 'undefined')

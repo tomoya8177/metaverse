@@ -16,10 +16,17 @@
 		sendInvitedToOrganizationEmail,
 		sendJoinedToOrganizationEmail
 	} from '$lib/frontend/sendInvitedToOrganizationEmail';
+	import { Mentor } from '$lib/frontend/Classes/Mentor';
+	import { User } from '$lib/frontend/Classes/User';
+	import Scene from '../../../Components/Templates/Scene.svelte';
 	export let data: PageData;
 	let loggedIn: boolean | null = data.loggedIn;
 	console.log({ data });
 	let room: Room = new Room(data.room);
+	if (room.mentor) {
+		room.mentorData = new Mentor(data.mentor);
+		room.mentorData.userData = new User(data.mentorUser);
+	}
 	let noRoom: boolean | null = null;
 	let organization: Organization | null = data.organization;
 	ChatMessagesStore.set(data.messages);
@@ -81,6 +88,7 @@
 			</article>
 		</dialog>
 	{:else if $RoomStore.id && !noRoom}
+		<Scene {data} />
 		<slot />
 	{/if}
 	{#if noRoom}

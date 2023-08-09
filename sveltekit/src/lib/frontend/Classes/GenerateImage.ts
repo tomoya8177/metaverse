@@ -2,10 +2,11 @@ import type { Promise } from '$lib/types/Promise';
 import axios from 'axios';
 import { myAlert, toast } from '../toast';
 import { _ } from '$lib/i18n';
+import type { File } from 'filestack-js/build/main/lib/api/upload';
 
 export class GenerateImage {
 	prompt: string;
-	callback: (data: any) => void = () => {};
+	callback: (data: File) => void = () => {};
 	data: any;
 	constructor(prompt: string) {
 		this.prompt = prompt;
@@ -32,7 +33,7 @@ export class GenerateImage {
 						.get('/api/promises/' + res.data.id)
 						.then((res) => res.data);
 					if (!promise.resolved) return;
-					const file = JSON.parse(promise.data);
+					const file: File = JSON.parse(promise.data);
 					toast(_('Your image is ready!'));
 
 					this.callback(file);
@@ -41,7 +42,7 @@ export class GenerateImage {
 			});
 		toast(_('Your prompt is sent to AI. It may take up to 1 minute to generate an image.'));
 	}
-	onDone(func: (data: any) => void) {
+	onDone(func: (data: File) => void) {
 		this.callback = func;
 	}
 }

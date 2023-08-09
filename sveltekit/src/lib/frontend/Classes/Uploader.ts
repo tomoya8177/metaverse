@@ -1,6 +1,7 @@
 import { PUBLIC_FileStackAPIKey } from '$env/static/public';
 import axios, { type AxiosResponse } from 'axios';
 import * as filestack from 'filestack-js';
+import type { File } from 'filestack-js/build/main/lib/api/upload';
 import { writable, type Writable } from 'svelte/store';
 class Uploader {
 	client: filestack.Client;
@@ -40,6 +41,20 @@ class Uploader {
 		});
 		this.progress.set(0);
 		return res;
+	}
+	async uploadBlob(blob: Blob, filename: string): Promise<File> {
+		const formData = new FormData();
+		formData.append('fileUpload', blob, filename);
+		const res = await axios.post(
+			'https://www.filestackapi.com/api/store/S3?key=' + PUBLIC_FileStackAPIKey,
+			formData,
+			{
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				}
+			}
+		);
+		return res.data;
 	}
 }
 export const uploader = new Uploader();

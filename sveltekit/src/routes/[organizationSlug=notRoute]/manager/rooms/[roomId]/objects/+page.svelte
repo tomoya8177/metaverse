@@ -10,8 +10,9 @@
 	import SquareThumbnail from '../../../../../../Components/Organisms/SquareThumbnail.svelte';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	export let data: PageData;
-	let objects = data.objects.map((object) => {
-		return new SharedObject(object);
+	let objects = data.objects.map((object: any) => {
+		const obj = new SharedObject(object);
+		return obj;
 	});
 </script>
 

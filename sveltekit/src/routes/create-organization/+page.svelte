@@ -31,9 +31,7 @@
 	let organization: Organization = EmptyOrganization;
 	let room: Room = new Room({
 		...EmptyRoom,
-		slug: crypto.randomUUID(),
-		allowAudio: true,
-		allowVideo: true
+		slug: crypto.randomUUID()
 	});
 	let mentor: Mentor = EmptyMentor;
 	onMount(() => {

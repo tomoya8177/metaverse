@@ -34,9 +34,9 @@ let confirmDialog: {
 	message: string;
 	result: undefined | boolean;
 };
-ConfirmDialog.subscribe((value) => {
-	confirmDialog = value;
-});
+// ConfirmDialog.subscribe((value) => {
+// 	confirmDialog = value;
+// });
 
 class Confirm {
 	constructor(message: string) {

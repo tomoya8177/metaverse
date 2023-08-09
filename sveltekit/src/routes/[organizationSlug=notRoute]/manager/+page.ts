@@ -1,3 +1,4 @@
+import type { Room } from '$lib/frontend/Classes/Room.js';
 import type { User } from '$lib/frontend/Classes/User.js';
 import type { Organization } from '$lib/types/Organization.js';
 import axios from 'axios';
@@ -15,10 +16,9 @@ export const load = async ({ params }) => {
 		.then((res) => res.data);
 	const actionHistories = actions.map((action) => {
 		action.userData = users.find((user: User) => user.id == action.user);
-		action.roomData = rooms.find((room) => room.id == action.room) || null;
+		action.roomData = rooms.find((room: Room) => room.id == action.room) || null;
 		return action;
 	});
-	console.log({ organization });
 	return {
 		organization,
 		actionHistories

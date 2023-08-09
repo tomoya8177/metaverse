@@ -19,7 +19,7 @@
 </script>
 
 {#if $FocusObjectStore.id}
-	<li>
+	<div>
 		<a
 			href={'#'}
 			on:click={() => {
@@ -31,5 +31,5 @@
 				{$FocusObjectStore.title}
 			</span>
 		</a>
-	</li>
+	</div>
 {/if}

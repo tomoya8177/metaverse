@@ -14,8 +14,6 @@
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import axios from 'axios';
-	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
-	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { _ } from '$lib/i18n';
 	import { myAlert } from '$lib/frontend/toast';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
@@ -24,6 +22,11 @@
 	import { slide } from 'svelte/transition';
 	export let waitingForAIAnswer: boolean;
 	import { quintOut } from 'svelte/easing';
+	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
+	import LinkEditor from './LinkEditor.svelte';
+	import type { Organization } from '$lib/types/Organization';
+	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
@@ -42,8 +45,12 @@
 			onTextChatClicked();
 		}
 	};
+	let organization: Organization;
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
+		organization = await axios
+			.get('/api/organizations/' + $RoomStore.organization)
+			.then((res) => res.data);
 	});
 	onDestroy(() => {
 		document.removeEventListener('keydown', onKeyDown);
@@ -53,6 +60,7 @@
 	export let onMicClicked: () => void;
 	export let micActive: boolean;
 	let more = false;
+	let linkEditorOpen = false;
 </script>
 
 <div class="action-buttons">
@@ -81,48 +89,47 @@
 		</button>
 	</div>
 
-	{#if $RoomStore.allowAudio}
-		<AudioButton />
-	{/if}
-	{#if $RoomStore.allowVideo}
-		{#if $UserStore.onVideoMute}
-			<button
-				data-tooltip={_('Start My Camera')}
-				class="circle-button dim"
-				on:click={async () => {
-					try {
-						if (await videoChat.startMyCamera()) {
-							actionHistory.send('startMyCamera');
-							$UserStore.onVideoMute = false;
-						}
-					} catch (e) {
-						console.log(e);
-						myAlert(_(`Couldn't get access to the Camera`));
+	<AudioButton />
+	{#if $UserStore.onVideoMute}
+		<button
+			data-tooltip={_('Start My Camera')}
+			class="circle-button dim"
+			on:click={async () => {
+				try {
+					if (await videoChat.startMyCamera()) {
+						actionHistory.send('startMyCamera');
+						$UserStore.onVideoMute = false;
 					}
-				}}
-			>
-				<Icon icon="videocam_off" />
-			</button>
-		{:else}
-			<button
-				data-tooltip={_('Hide My Camera')}
-				class="circle-button"
-				on:click={() => {
-					videoChat.unpublishMyTrack('camera');
-					actionHistory.send('hideMyCamera');
-					me?.hideCamera();
-					$UserStore.onVideoMute = true;
-				}}
-			>
-				<Icon icon="videocam" />
-			</button>
-		{/if}
+				} catch (e) {
+					console.log(e);
+					myAlert(_(`Couldn't get access to the Camera`));
+				}
+			}}
+		>
+			<Icon icon="videocam_off" />
+		</button>
+	{:else}
+		<button
+			data-tooltip={_('Hide My Camera')}
+			class="circle-button"
+			on:click={() => {
+				videoChat.unpublishMyTrack('camera');
+				actionHistory.send('hideMyCamera');
+				me?.hideCamera();
+				$UserStore.onVideoMute = true;
+			}}
+		>
+			<Icon icon="videocam" />
+		</button>
 	{/if}
 	<button
 		class="circle-button"
 		data-tooltip={_('More')}
 		on:click={() => {
 			more = !more;
+			if (more) {
+				TextChatOpen.set(false);
+			}
 		}}
 	>
 		<Icon icon="more_vert" />
@@ -187,7 +194,6 @@
 			on:click={() =>
 				uploader.launchPicker(['image/*', 'video/*', '.glb', 'gltf'], 1, (res) => {
 					//when done
-					console.log(res);
 					actionHistory.send('uploadToScene', { files: res.filesUploaded });
 					res.filesUploaded.forEach(async (file) => {
 						appendObjectInTheRoom({
@@ -202,7 +208,37 @@
 			<Icon icon="add" />
 			{_('Upload')}
 		</button>
+		<button
+			data-tooltip={_('Create Link')}
+			on:click={() => {
+				linkEditorOpen = true;
+			}}
+		>
+			<Icon icon="post_add" />
+			{_('Add Text')}
+		</button>
 	</div>
+{/if}
+{#if linkEditorOpen}
+	<dialog open>
+		<article style="max-width:calc(100vw - 2rem)">
+			<ModalCloseButton onClick={() => (linkEditorOpen = false)} />
+			<LinkEditor
+				{organization}
+				onCreate={(sharedObject) => {
+					sharedObject.attachElement();
+					sharedObject.locked = false;
+					sharedObjects.add(sharedObject);
+					sharedObject.moveToMyFront(me.position, me.rotation);
+					linkEditorOpen = false;
+				}}
+				onUpdate={(sharedObject) => {
+					//sharedObject.moveToMyFront(me.position, me.rotation);
+					linkEditorOpen = false;
+				}}
+			/>
+		</article>
+	</dialog>
 {/if}
 
 <style>

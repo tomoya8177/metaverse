@@ -219,21 +219,44 @@
 	<NippleControl />
 </div>
 
-{#if $FocusObjectStore.id && $FocusObjectStore.id != ''}
-	<nav class="objectEditorNav">
-		<ul />
-		<ul
+{#if $FocusObjectStore.id && $FocusObjectStore.title != ''}
+	<div class="objectEditorNav">
+		<Icon icon="deployed_code" />
+		<span style="max-width:15rem;text-wrap:nowrap;overflow:hidden;">
+			{$FocusObjectStore.title}
+		</span>
+		<div
 			style="
-	border:solid 1px #1e88e5;
-	border-radius:0.6rem;
-	height:3rem;
-	background-color:rgba(0,0,0,0.3)
-	max-width:100vw
+			margin-top:0.4rem;
+			align-items:center;
+			display:flex;
+			gap:0.4rem;
+			justify-content: center; 
+		align-items: center;
+			
+	
 	"
 		>
-			<ObjectEditor bind:modalOpen={$FocusObjectStore.editorOpen} />
+			<div>
+				<button
+					small
+					class="circle-button"
+					data-tooltip={$FocusObjectStore.user == $UserStore.id || $UserStore.isManager
+						? _('Edit')
+						: _('Info')}
+					on:click={() => {
+						$FocusObjectStore.editorOpen = true;
+					}}
+				>
+					{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
+						<Icon icon="edit" />
+					{:else}
+						<Icon icon="info" />
+					{/if}
+				</button>
+			</div>
 			{#if $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
-				<li>
+				<div>
 					<button
 						data-tooltip={$FocusObjectStore.locked ? _('Unock') : _('Lock')}
 						class:outline={$FocusObjectStore.locked}
@@ -246,9 +269,9 @@
 					>
 						<Icon icon={$FocusObjectStore.locked ? 'lock' : 'lock_open'} />
 					</button>
-				</li>
+				</div>
 			{/if}
-			<li>
+			<div>
 				<button
 					data-tooltip={_('Add To Preview Pane')}
 					class="circle-button"
@@ -269,10 +292,72 @@
 				>
 					<Icon icon="magnify_fullscreen" />
 				</button>
-			</li>
-		</ul>
-		<ul />
-	</nav>
+			</div>
+			{#if $FocusObjectStore.type.includes('video')}
+				{#if !$FocusObjectStore.playing}
+					<div>
+						<button
+							small
+							class="circle-button"
+							on:click={() => {
+								const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+								video?.play();
+								$FocusObjectStore.playing = true;
+							}}
+						>
+							<Icon icon="play_arrow" />
+						</button>
+					</div>
+				{:else}
+					<div>
+						<button
+							small
+							class="circle-button"
+							on:click={() => {
+								const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+								video?.pause();
+								$FocusObjectStore.playing = false;
+							}}
+						>
+							<Icon icon="pause" />
+						</button>
+					</div>
+				{/if}
+				<div>
+					<button
+						small
+						class="circle-button"
+						on:click={() => {
+							const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+							if (!video) return console.error('video is null');
+							video.currentTime = 0;
+						}}
+					>
+						<Icon icon="replay" />
+					</button>
+				</div>
+				<div>
+					<!-- mute button-->
+					<button
+						small
+						class="circle-button"
+						on:click={() => {
+							const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+							if (!video) return console.error('video is null');
+							video.muted = !video.muted;
+							$FocusObjectStore.muted = video.muted;
+						}}
+					>
+						{#if $FocusObjectStore.muted}
+							<Icon icon="volume_off" />
+						{:else}
+							<Icon icon="volume_up" />
+						{/if}
+					</button>
+				</div>
+			{/if}
+		</div>
+	</div>
 	{#if $FocusObjectStore.editorOpen}
 		<dialog open style="position:absolute">
 			<article>
@@ -281,71 +366,7 @@
 						$FocusObjectStore.editorOpen = false;
 					}}
 				/>
-				{#if $FocusObjectStore.type.includes('video')}
-					<div style="display:flex;gap:0.4rem">
-						{#if !$FocusObjectStore.playing}
-							<div>
-								<button
-									small
-									class="circle-button"
-									on:click={() => {
-										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-										video?.play();
-										$FocusObjectStore.playing = true;
-									}}
-								>
-									<Icon icon="play_arrow" />
-								</button>
-							</div>
-						{:else}
-							<div>
-								<button
-									small
-									class="circle-button"
-									on:click={() => {
-										const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-										video?.pause();
-										$FocusObjectStore.playing = false;
-									}}
-								>
-									<Icon icon="pause" />
-								</button>
-							</div>
-						{/if}
-						<div>
-							<button
-								small
-								class="circle-button"
-								on:click={() => {
-									const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-									if (!video) return console.error('video is null');
-									video.currentTime = 0;
-								}}
-							>
-								<Icon icon="replay" />
-							</button>
-						</div>
-						<div>
-							<!-- mute button-->
-							<button
-								small
-								class="circle-button"
-								on:click={() => {
-									const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-									if (!video) return console.error('video is null');
-									video.muted = !video.muted;
-									$FocusObjectStore.muted = video.muted;
-								}}
-							>
-								{#if $FocusObjectStore.muted}
-									<Icon icon="volume_off" />
-								{:else}
-									<Icon icon="volume_up" />
-								{/if}
-							</button>
-						</div>
-					</div>
-				{/if}
+
 				<div>
 					{#if $FocusObjectStore.lockedPosition}
 						{_('Object is in locked position.')}
@@ -545,6 +566,9 @@
 </div>
 
 <style>
+	button {
+		margin-bottom: 0rem;
+	}
 	.hidden {
 		display: none;
 	}
@@ -553,16 +577,16 @@
 		/* center */
 		left: 50%;
 		transform: translateX(-50%);
-		top: 0.4rem;
+		top: 3.2rem;
 		z-index: 2;
+		text-align: center;
+		background-color: rgba(0, 0, 0, 0.3);
+		max-width: 100vw;
+		padding: 0.4rem;
+		border: solid 1px #1e88e5;
+		border-radius: 0.6rem;
 	}
-	@media (max-width: 1200px) {
-		.objectEditorNav {
-			position: absolute;
-			top: 3rem;
-			width: 100vw;
-		}
-	}
+
 	#filePreview {
 		overflow: auto;
 		display: flex;

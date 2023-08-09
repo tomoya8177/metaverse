@@ -2,10 +2,13 @@ import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
 import type { xyz } from '$lib/store';
 import { getPositionFromLockedPosition } from '../getPositionFromLockedPosition';
+import { myAlert } from '../toast';
+import { _ } from '$lib/i18n';
+import { DBObject } from './DBObject';
 type shortType = 'image' | 'video' | 'model' | 'screen';
 
-export class SharedObject {
-	id: string;
+//export class SharedObject extends DBObject {
+export class SharedObject extends DBObject {
 	url: string = '';
 	type: string = '';
 	size?: number;
@@ -27,23 +30,45 @@ export class SharedObject {
 	lockedPosition: number;
 	description: string = '';
 	explained: boolean = false;
-	constructor(data: any) {
-		this.id = data.id;
-		if (!this.id) return;
+	iconURL?: string = '';
+	constructor(data: any = {}) {
+		data.table = 'objects';
+		super(data);
 		this.url = data.url;
 		this.type = data.type || '';
-		this.size = data.size;
-		this.title = data.title;
-		this.createdAt = data.createdAt;
-		this.components = data.components;
-		this.room = data.room;
-		this.user = data.user;
-		this.editable = data.editable;
-		this.handle = data.handle;
-		this.linkTo = data.linkTo;
-		this.isSphere = data.isSphere;
-		this.description = data.description;
+		this.size = data.size || 1;
+		this.title = data.title || '';
+		this.createdAt = data.createdAt || '';
+		this.components =
+			data.components ||
+			JSON.stringify({
+				position: {
+					x: 0,
+					y: 0,
+					z: 0
+				},
+				rotation: {
+					x: 0,
+					y: 0,
+					z: 0
+				},
+				scale: {
+					x: 1,
+					y: 1,
+					z: 1
+				},
+				radius: 0.5
+			});
+		this.room = data.room || '';
+		this.user = data.user || '';
+		this.editable = data.editable || false;
+		this.handle = data.handle || '';
+		this.linkTo = data.linkTo || '';
+		this.isSphere = data.isSphere || false;
+		this.description = data.description || '';
 		this.lockedPosition = data.lockedPosition || 0;
+	}
+	attachElement() {
 		let entity = document.createElement('a-entity') as Entity;
 		this.el = entity;
 		this.scene = document.querySelector('a-scene');
@@ -208,6 +233,13 @@ export class SharedObject {
 			'position',
 			`${eyePosition.x + vector.x} ${eyePosition.y + 1.65} ${eyePosition.z + vector.z}`
 		);
+	}
+	validate(): boolean {
+		if (this.title == '') {
+			myAlert(_('Please enter a title.'));
+			return false;
+		}
+		return true;
 	}
 
 	//this is not working why?? @copilot

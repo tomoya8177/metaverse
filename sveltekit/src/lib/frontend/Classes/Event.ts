@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 import * as ics from 'ics';
 import type { User } from './User';
 import type { Attendance } from './Attendance';
+import type { SharedObject } from './SharedObject';
 export class Event extends DBObject {
 	object: string;
 	description: string;
@@ -15,7 +16,7 @@ export class Event extends DBObject {
 	start: string;
 	end: string;
 	organization: string;
-	constructor(data: any) {
+	constructor(data: any = {}) {
 		data.table = 'events';
 		super(data);
 		this.object = this.unescapedData.object || '';
@@ -123,7 +124,7 @@ export class Event extends DBObject {
 				.toJSDate()
 		};
 	}
-	async ical(users: User[], attendances: Attendance[], organizer: User = null) {
+	async ical(users: User[], attendances: Attendance[], organizer: User | null = null) {
 		const start = DateTime.fromISO(this.start);
 		const end = DateTime.fromISO(this.end);
 		const duration = end.diff(start, ['days', 'hours', 'minutes']).toObject();
@@ -197,5 +198,11 @@ export class Event extends DBObject {
 			.replace(/:/g, `\:`) // Escape colons
 			.replace(/'/g, `\'`) // Escape single quotes
 			.replace(/"/g, `\"`); // Escape double quotes
+	}
+	attachObject(sharedObject: SharedObject) {
+		this.object = sharedObject.id;
+		this.summary = sharedObject.title;
+		this.description = sharedObject.description;
+		this.location = sharedObject.linkTo;
 	}
 }

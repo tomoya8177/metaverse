@@ -34,6 +34,7 @@ export const appendObjectInTheRoom = async ({ roomId, file, userId, me }) => {
 		})
 		.then((res) => res.data);
 	const object = new SharedObject(createdFile);
+	object.attachElement();
 	if (!me) return console.error('me is null');
 	console.log('me', me);
 	object.moveToMyFront(me.position, me.rotation);

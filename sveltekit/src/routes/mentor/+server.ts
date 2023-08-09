@@ -8,13 +8,17 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 export const POST = async ({ request }) => {
 	const body = await request.json();
-	const chat_completion = await openai.createChatCompletion({
-		model: 'gpt-3.5-turbo',
-		messages: body.messages,
-		temperature: 0.6
-	});
-	console.log(body.messages);
-	return new Response(JSON.stringify({ response: chat_completion.data.choices[0].message }));
+	try {
+		const chat_completion = await openai.createChatCompletion({
+			model: 'gpt-3.5-turbo',
+			messages: body.messages,
+			temperature: 0.6
+		});
+		console.log(body.messages);
+		return new Response(JSON.stringify({ response: chat_completion.data.choices[0].message }));
+	} catch (error) {
+		return new Response(JSON.stringify({ response: `AI is busy right now` }));
+	}
 };
 
 export const GET = async () => {

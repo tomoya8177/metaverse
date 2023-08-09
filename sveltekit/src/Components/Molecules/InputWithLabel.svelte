@@ -11,6 +11,7 @@
 	export let type:
 		| 'number'
 		| 'checkbox'
+		| 'color'
 		| 'text'
 		| 'url'
 		| 'email'
@@ -53,6 +54,15 @@
 						data-testid={testId}
 						on:change={onChange}
 						type="text"
+						bind:value
+						{disabled}
+						{readonly}
+					/>
+				{:else if type == 'color'}
+					<input
+						data-testid={testId}
+						on:change={onChange}
+						type="color"
 						bind:value
 						{disabled}
 						{readonly}

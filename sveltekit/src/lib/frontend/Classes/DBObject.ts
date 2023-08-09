@@ -8,7 +8,7 @@ export class DBObject {
 	unescapedData: any;
 	constructor(data: any) {
 		// nothing
-		this.id = data.id || '';
+		this.id = data.id || crypto.randomUUID();
 		this.table = data.table || '';
 		//unescape values
 		for (const key in data) {

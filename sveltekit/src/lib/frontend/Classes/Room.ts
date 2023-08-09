@@ -9,8 +9,6 @@ import type { Mentor } from './Mentor';
 export class Room extends DBObject {
 	slug: string;
 	title: string;
-	allowAudio: boolean;
-	allowVideo: boolean;
 	organization: string;
 	allowedUsersData: string;
 	isPublic: boolean;
@@ -32,8 +30,6 @@ export class Room extends DBObject {
 		this.id = this.unescapedData.id;
 		this.slug = this.unescapedData.slug;
 		this.title = this.unescapedData.title;
-		this.allowAudio = this.unescapedData.allowAudio;
-		this.allowVideo = this.unescapedData.allowVideo;
 		this.organization = this.unescapedData.organization;
 		this.allowedUsersData = this.unescapedData.allowedUsers;
 		this.isPublic = this.unescapedData.isPublic;
