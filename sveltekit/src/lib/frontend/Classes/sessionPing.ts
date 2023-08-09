@@ -29,12 +29,13 @@ export class sessionPing {
 			})
 			.then((res) => res.data);
 		this.interval = setInterval(() => {
+			const data = {
+				position: this.el?.getAttribute('position'),
+				rotation: this.el?.getAttribute('rotation'),
+				scale: this.el?.getAttribute('scale')
+			};
 			axios.put('/api/sessions/' + this.session.id, {
-				components: JSON.stringify({
-					position: this.el?.getAttribute('position'),
-					rotation: this.el?.getAttribute('rotation'),
-					scale: this.el?.getAttribute('scale')
-				})
+				components: JSON.stringify(data)
 			});
 		}, 5000);
 	}

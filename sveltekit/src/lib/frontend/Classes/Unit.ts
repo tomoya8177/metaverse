@@ -151,6 +151,18 @@ export class Unit {
 				'position',
 				`${this.position.x + vector.x} ${this.position.y + 1.65} ${this.position.z + vector.z}`
 			);
+			setTimeout(() => {
+				videoChat.sendMessage({
+					key: 'objectPosition',
+					object: {
+						id: video.id
+					},
+					position: video.getAttribute('position'),
+					rotation: video.getAttribute('rotation'),
+					scale: video.getAttribute('scale'),
+					radius: video.getAttribute('geometry')?.radius
+				});
+			}, 1000);
 
 			videoChat.screenPingInterval = new sessionPing(
 				{
@@ -164,13 +176,19 @@ export class Unit {
 			videoChat.screenPingInterval.start();
 		} else {
 			// this is someone elses screen, thus get the position from db
-			const session = await axios.get('/api/sessions?instanceId=' + sid).then((res) => res.data[0]);
-			const parsedComponents = JSON.parse(session.components);
-			if (parsedComponents) {
-				video.setAttribute('position', parsedComponents.position);
-				video.setAttribute('rotation', parsedComponents.rotation);
-				video.setAttribute('scale', parsedComponents.scale);
-			}
+			//maybe wait for a second
+			setTimeout(async () => {
+				const session = await axios
+					.get('/api/sessions?instanceId=' + sid)
+					.then((res) => res.data[0]);
+				console.log({ session });
+				const parsedComponents = JSON.parse(session.components);
+				if (parsedComponents) {
+					video.setAttribute('position', parsedComponents.position);
+					video.setAttribute('rotation', parsedComponents.rotation);
+					video.setAttribute('scale', parsedComponents.scale);
+				}
+			}, 1000);
 		}
 		const scene: Entity = document.querySelector('a-scene');
 		scene?.appendChild(video);

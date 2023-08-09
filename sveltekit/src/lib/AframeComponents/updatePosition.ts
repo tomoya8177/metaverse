@@ -80,9 +80,10 @@ AFRAME.registerComponent('update-position', {
 				//check if there's any objects near by
 				let closestObject: SharedObject | null = null;
 				sharedObjects.items
-					.filter((object) => !object.explained)
+					.filter((object) => !object.explained && object.type != 'screen')
 					.forEach((object) => {
 						//if this is already explained, skip
+						console.log({ object });
 						const distance = this.el.object3D.position.distanceTo(object.position);
 						let minimumDistance = 3;
 						if (distance < 3 && distance <= minimumDistance) {
