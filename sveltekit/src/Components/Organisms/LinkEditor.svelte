@@ -167,7 +167,7 @@
 		{/if}
 		<div class="previewLinkObject">
 			{#if tempImageURL}
-				<img src={tempImageURL} style="width:20rem;" alt="" />
+				<img src={tempImageURL} style="width:20rem;" alt="" crossorigin="anonymous" />
 			{/if}
 			<div
 				style:background-color={backgroundColor || '#600060'}
