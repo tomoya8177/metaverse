@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import type { Organization } from '$lib/types/Organization';
-
+	import { page } from '$app/stores';
 	import ModalCloseButton from '../../../../../Components/Atom/ModalCloseButton.svelte';
 	import LinkEditor from '../../../../../Components/Organisms/LinkEditor.svelte';
 	import type { PageData } from '../[objectId]/$types';
@@ -12,11 +12,16 @@
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
+	import { goto } from '$app/navigation';
 	export let data: PageData;
 	export let organization: Organization = data.organization;
-	export let editObject = sharedObjects.get(data.object.id);
+	export let editObject = sharedObjects.get($page.params.objectId);
 
 	export let editEvent = data.event ? new Event(data.event) : undefined;
+	if (typeof editObject == 'undefined') {
+		//not in the room
+		goto(`/${organization.slug}/${$RoomStore.slug}`);
+	}
 	export let me: Me;
 	console.log({ editObject, editEvent });
 </script>

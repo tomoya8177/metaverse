@@ -12,11 +12,21 @@
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
 	import FulllNameInput from '../Atom/FulllNameInput.svelte';
+	import { PresetAvatars } from '$lib/preset/PresetAvatars';
+	import { onMount } from 'svelte';
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;
 	});
 	let documents: DocumentForAI[] = [];
+	let voices: SpeechSynthesisVoice[] = [];
+	onMount(async () => {
+		const synth = window.speechSynthesis;
+		synth.addEventListener('voiceschanged', () => {
+			voices = synth.getVoices();
+			console.log(voices);
+		});
+	});
 
 	export let editMentor: Mentor = EmptyMentor;
 	let introBusy = false;
@@ -31,7 +41,11 @@
 		label={_('Nickname')}
 		bind:value={editMentor.userData.nickname}
 	/>
-	<AvatarSelectPane bind:url={editMentor.userData.avatarURL} />
+	<AvatarSelectPane
+		bind:url={editMentor.userData.avatarURL}
+		thumbnailURL={PresetAvatars.find((preset) => preset.url == editMentor.userData.avatarURL)
+			?.thumbnailURL || ''}
+	/>
 
 	<InputWithLabel
 		meta={_(
@@ -110,8 +124,7 @@
 		label={_('AI Voice')}
 		bind:value={editMentor.voiceURI}
 		type="select"
-		selects={speechSynthesis
-			.getVoices()
+		selects={voices
 			.sort((a, b) => (a.lang > b.lang ? 1 : -1)) //sort by language
 			.map((voice) => ({
 				value: voice.voiceURI,

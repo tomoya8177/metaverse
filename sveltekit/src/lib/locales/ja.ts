@@ -239,5 +239,6 @@ export default {
 	'Sample Title': 'サンプルタイトル',
 	'"Click to open" message will be displayed after one click on the object.':
 		'「Click To Open」メッセージは、オブジェクトを1回クリックすると表示されます。',
-	'Add Text Card': 'テキストカードを追加'
+	'Add Text Card': 'テキストカードを追加',
+	'Graphic Colors': 'グラフィックの色'
 };

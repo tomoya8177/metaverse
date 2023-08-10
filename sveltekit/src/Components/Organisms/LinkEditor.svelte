@@ -254,7 +254,7 @@
 									backgroundColor = cardColor.backgroundColor;
 								}}
 							>
-								{cardColor.name}
+								{_(cardColor.name)}
 							</a>
 						{/each}
 					</div>
