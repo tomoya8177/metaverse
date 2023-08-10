@@ -1,5 +1,9 @@
 export const BrandIcons = [
 	{
+		name: 'VirtuaCampus',
+		iconURL: '/brandIcons/virtuaCampus.jpg'
+	},
+	{
 		name: 'Meta',
 		iconURL: '/brandIcons/meta.jpg'
 	},

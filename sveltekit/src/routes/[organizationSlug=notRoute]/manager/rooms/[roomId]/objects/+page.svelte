@@ -10,6 +10,8 @@
 	import SquareThumbnail from '../../../../../../Components/Organisms/SquareThumbnail.svelte';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	export let data: PageData;
+	let organization = data.organization;
+	let room = data.room;
 	let objects = data.objects.map((object: any) => {
 		const obj = new SharedObject(object);
 		return obj;
@@ -22,6 +24,7 @@
 			<th>{_('Title')}</th>
 			<th>{_('Link')}</th>
 			<th>{_('Lock Position')}</th>
+			<th />
 		</tr>
 	</thead>
 	{#each objects as object}
@@ -44,6 +47,15 @@
 			</td>
 			<td>
 				<ObjectLockSelect bind:object />
+			</td>
+			<td>
+				<a
+					role="button"
+					class="circle-button"
+					href={`/${organization.slug}/manager/rooms/${room.id}/objects/${object.id}`}
+				>
+					<Icon icon="edit" />
+				</a>
 			</td>
 		</tr>
 	{/each}

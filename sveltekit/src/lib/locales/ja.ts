@@ -225,5 +225,19 @@ export default {
 	"You've just joined the organization: ": 'あなたはチームに参加しました: ',
 	'Notification from VirtuaCampus': 'VirtuaCampusからの通知',
 	'AI is generating the content...': 'AIがコンテンツを生成しています...',
-	'AI completed to generate the image for you. @': 'AIがあなたのために画像を生成しました。@'
+	'AI completed to generate the image for you. @': 'AIがあなたのために画像を生成しました。@',
+	Object: 'オブジェクト',
+	'Locked Position': 'ロックされた位置',
+	'Link to Room/Mentor': 'ルーム/メンターへのリンク',
+	'Attach Event': 'イベントを添付',
+	'Attach Caption': 'キャプションを添付',
+	Event: 'イベント',
+	'Graphics Preview': 'グラフィックスプレビュー',
+	'Clear Graphic': 'グラフィックをクリア',
+	'Upload Graphic': 'グラフィックをアップロード',
+	'Generate Graphic with AI': 'AIでグラフィックを生成',
+	'Sample Title': 'サンプルタイトル',
+	'"Click to open" message will be displayed after one click on the object.':
+		'「Click To Open」メッセージは、オブジェクトを1回クリックすると表示されます。',
+	'Add Text Card': 'テキストカードを追加'
 };

@@ -125,7 +125,7 @@
 					<a
 						href={'#'}
 						on:click={() => {
-							FocusObjectStore.set(EmptyObject);
+							FocusObjectStore.set(null);
 							inviteDialogOpen = !inviteDialogOpen;
 						}}
 					>

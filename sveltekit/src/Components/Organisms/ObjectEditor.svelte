@@ -18,7 +18,7 @@
 	export let modalOpen = false;
 </script>
 
-{#if $FocusObjectStore.id}
+{#if $FocusObjectStore}
 	<div>
 		<a
 			href={'#'}

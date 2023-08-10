@@ -21,7 +21,6 @@
 	export let editMode: 'create' | 'update' = 'update';
 	export let modalOpen: boolean = true;
 	export let organization: Organization;
-	export let rooms: Room[];
 	export let users: User[];
 	export let onUpdateDone: (event: Event) => void;
 	export let onDeleteDone: (event: Event) => void;
@@ -32,7 +31,7 @@
 	<div>
 		<InputWithLabel label={_('Title')} bind:value={editEvent.summary} />
 		<ScheduleEditor bind:editEvent />
-		<LinkUrlDescriptionEditor bind:editItem={editEvent} {organization} />
+		<LinkUrlDescriptionEditor bind:editItem={editEvent} {organization} canAttachBrandIcon={false} />
 	</div>
 	<div>
 		<AttendanceEditor bind:editEvent bind:users />
@@ -67,7 +66,6 @@
 			onUpdateDone(editEvent);
 		}}>{_('Update')}</button
 	>
-	<button class="secondary" on:click={() => (modalOpen = false)}>{_('Cancel')}</button>
 	<button
 		class="secondary"
 		on:click={async () => {

@@ -25,7 +25,7 @@
 	onMount(async () => {
 		actionHistory.send('dashboard', { organization });
 		console.log('dashboard mount');
-		FocusObjectStore.set(EmptyObject);
+		FocusObjectStore.set(null);
 		RoomStore.set(EmptyRoom);
 		Users.clear();
 		mentors = await axios

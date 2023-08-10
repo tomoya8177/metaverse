@@ -136,15 +136,13 @@
 				</td>
 				<td>{room.slug}</td>
 				<td>
-					<button
-						on:click={() => {
-							editRoom = room;
-							editMode = 'update';
-							modalOpen = true;
-						}}
+					<a
+						role="button"
+						class="circle-button"
+						href={`/${organization.slug}/manager/rooms/${room.id}`}
 					>
-						{_('Edit')}
-					</button>
+						<Icon icon="edit" />
+					</a>
 				</td>
 			</tr>
 		{/each}

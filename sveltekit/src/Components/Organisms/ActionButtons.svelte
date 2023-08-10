@@ -26,6 +26,7 @@
 	import LinkEditor from './LinkEditor.svelte';
 	import type { Organization } from '$lib/types/Organization';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
@@ -182,7 +183,7 @@
 				data-tooltip={_('Preview Panel')}
 				on:click={() => {
 					$PreviewPanelOpen = !$PreviewPanelOpen;
-					FocusObjectStore.set(EmptyObject);
+					FocusObjectStore.set(null);
 				}}
 			>
 				<Icon icon="preview" />
@@ -211,10 +212,10 @@
 		<a
 			role="button"
 			href={`/${organization.slug}/${$RoomStore.slug}/createCard`}
-			data-tooltip={_('Create Link')}
+			data-tooltip={_('Add Text Card')}
 		>
 			<Icon icon="post_add" />
-			{_('Add Text')}
+			{_('Add Text Card')}
 		</a>
 	</div>
 {/if}
@@ -242,7 +243,7 @@
 
 <style>
 	.dim {
-		opacity: 0.5;
+		opacity: 0.7;
 	}
 	.action-buttons {
 		max-width: calc(100vw - 1rem);
@@ -256,7 +257,7 @@
 		position: absolute;
 		bottom: 4rem;
 		right: 0.5rem;
-
+		padding-bottom: 0.4rem;
 		gap: 0.4rem;
 	}
 	button {

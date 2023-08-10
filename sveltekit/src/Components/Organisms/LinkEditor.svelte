@@ -23,14 +23,18 @@
 	import { ClockPositions } from '$lib/preset/ClockPositions';
 	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
 	import { CardColors } from '$lib/preset/CardColors';
+	import { page } from '$app/stores';
+	import type { Room } from '$lib/frontend/Classes/Room';
 	export let editObject: SharedObject = new SharedObject({ type: 'image', withCaption: true });
 	export let editMode: 'update' | 'create' = 'create';
 	export let onCreate: (object: SharedObject) => void = (object) => {};
 	export let onUpdate: (object: SharedObject) => void = (object) => {};
 	export let onDelete: (object: SharedObject) => void = (object) => {};
-	export let editEvent: Event = new Event();
+	export let editEvent: Event | undefined = new Event();
 	export let organization: Organization;
 	export let attendances: Attendance[] = [];
+	export let canAttachCaption: boolean = true;
+	export let room: Room | undefined = undefined;
 	let users: User[] = [];
 	onMount(async () => {
 		const userRoles = await axios
@@ -39,7 +43,7 @@
 		users = await axios
 			.get(`/api/users?id=in:'${userRoles.map((role) => role.user).join("','")}'`)
 			.then((res) => res.data);
-		console.log({ editObject, editEvent });
+		console.log({ editObject, editEvent, canAttachCaption });
 	});
 
 	const putTogetherFile = async () => {
@@ -60,7 +64,7 @@
 			editObject.handle = file.url.split('/').pop();
 		}
 		editObject.user = $UserStore.id;
-		editObject.room = $RoomStore.id;
+		editObject.room = $RoomStore.id || room.id;
 	};
 
 	const onCreateClicked = async () => {
@@ -111,12 +115,15 @@
 
 		onDelete(editObject);
 	};
-	let textColor = '#ffffff';
-	let backgroundColor = '#600060';
+	let textColor =
+		CardColors.find((color) => color.name == editObject.captionStyle)?.textColor || '#ffffff';
+	let backgroundColor =
+		CardColors.find((color) => color.name == editObject.captionStyle)?.backgroundColor || '#600060';
 	export let attachEvent = false;
 	let busy = false;
 	let deleteBusy = false;
 	let generateImageBusy = false;
+	$: console.log(canAttachCaption);
 </script>
 
 <div class="flexOnWideScreen">
@@ -125,7 +132,11 @@
 			{_('Object')}
 		</h4>
 		<InputWithLabel label={_('Title')} bind:value={editObject.title} />
-		<LinkUrlDescriptionEditor bind:editItem={editObject} {organization} />
+		<LinkUrlDescriptionEditor
+			bind:editItem={editObject}
+			{organization}
+			canAttachBrandIcon={editObject.withCaption}
+		/>
 		<InputWithLabel
 			label={_('Locked Position')}
 			type="select"
@@ -133,7 +144,7 @@
 			bind:value={editObject.lockedPosition}
 		/>
 		<InputWithLabel label={_('Attach Event')} bind:value={attachEvent} type="switch" />
-		{#if editObject.type.includes('image')}
+		{#if editObject.type.includes('image') && canAttachCaption}
 			<InputWithLabel
 				label={_('Attach Caption')}
 				bind:value={editObject.withCaption}
@@ -225,9 +236,6 @@
 					</div>
 				</div>
 				<small>
-					{#if attachEvent}
-						{_('Time will be displayed in local time of the user.')}<br />
-					{/if}
 					{_('"Click to open" message will be displayed after one click on the object.')}
 				</small>
 				<div>
@@ -241,6 +249,7 @@
 								style:color={cardColor.textColor}
 								style:background-color={cardColor.backgroundColor}
 								on:click={() => {
+									editObject.captionStyle = cardColor.name;
 									textColor = cardColor.textColor;
 									backgroundColor = cardColor.backgroundColor;
 								}}

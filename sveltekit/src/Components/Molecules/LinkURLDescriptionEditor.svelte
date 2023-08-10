@@ -24,6 +24,7 @@
 		mentors = mentorsResults;
 	});
 	export let organization: Organization;
+	export let canAttachBrandIcon = true;
 </script>
 
 <InputWithLabel
@@ -50,7 +51,7 @@
 	]}
 />
 <InputWithLabel label={_('URL')} bind:value={editItem.linkTo} type="url" />
-{#if editItem.linkTo}
+{#if editItem.linkTo && canAttachBrandIcon}
 	<strong>
 		{_('Link Icons')}
 	</strong>

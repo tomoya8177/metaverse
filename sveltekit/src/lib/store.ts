@@ -32,7 +32,7 @@ export type xyz = {
 	y: number;
 	z: number;
 };
-export const FocusObjectStore = writable(EmptyObject);
+export const FocusObjectStore = writable(null as SharedObject | null);
 export const PreviewPanelOpen = writable(false);
 export const ItemsInPreview = writable([] as SharedObject[]);
 export const ConfirmDialog = writable({

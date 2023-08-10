@@ -26,7 +26,6 @@ export class SharedObject extends DBObject {
 	inPreviewPane: boolean = false;
 	scene: Entity | null = null;
 	asset: Entity | null = null;
-	shortType: shortType = 'image';
 	lockedPosition: number;
 	description: string = '';
 	explained: boolean = false;
@@ -35,6 +34,10 @@ export class SharedObject extends DBObject {
 	captionUrl: string = '';
 	captionAsset: Entity | null = null;
 	captionEl: Entity | null = null;
+	playing: boolean = false;
+	muted: boolean = false;
+	editorOpen: boolean = false;
+	captionStyle: string = '';
 	constructor(data: any = {}) {
 		data.table = 'objects';
 		super(data);
@@ -45,6 +48,7 @@ export class SharedObject extends DBObject {
 		this.createdAt = data.createdAt || '';
 		this.withCaption = data.withCaption || false;
 		this.captionUrl = data.captionUrl || '';
+		this.captionStyle = data.captionStyle || '';
 		this.components =
 			data.components ||
 			JSON.stringify({
@@ -84,24 +88,16 @@ export class SharedObject extends DBObject {
 		this.el = document.createElement('a-entity') as Entity;
 		this.scene = document.querySelector('a-scene');
 		this.el.setAttribute('id', this.id);
-		let shortType: shortType = 'image';
-		if (this.type.includes('image')) {
-			shortType = 'image';
-		} else if (this.type.includes('video')) {
-			shortType = 'video';
-		} else if (this.type.includes('glb') || this.type.includes('gltf')) {
-			shortType = 'model';
-		}
-		this.shortType = shortType;
-		if (shortType != 'model') {
-			this.asset = this.createAsset(shortType);
+
+		if (this.shortType != 'model') {
+			this.asset = this.createAsset(this.shortType);
 			if (this.type.includes('image') && this.withCaption && !!this.captionUrl) {
 				this.captionAsset = this.createCaptionAsset();
 			}
 			if (!this.asset) return;
 		}
-		if (this.url) this.setEntityGeometry(this.el, shortType);
-		if (shortType == 'image' && this.asset) {
+		if (this.url) this.setEntityGeometry(this.el, this.shortType);
+		if (this.shortType == 'image' && this.asset) {
 			if (this.url) this.setEntityMaterial(this.el, this.asset);
 			if (!this.isSphere) {
 				if (this.withCaption && !!this.captionUrl && this.captionAsset) {
@@ -116,21 +112,21 @@ export class SharedObject extends DBObject {
 					this.setImageAspectRatio();
 				};
 			}
-		} else if (shortType == 'video' && this.asset) {
+		} else if (this.shortType == 'video' && this.asset) {
 			this.setEntityMaterial(this.el, this.asset);
 			if (!this.isSphere) {
 				this.asset.addEventListener('loadedmetadata', () => {
 					this.setVideoAspectRatio();
 				});
 			}
-		} else if (shortType == 'model') {
+		} else if (this.shortType == 'model') {
 			this.el.setAttribute('gltf-model', `url(${this.url})`);
 		}
 
-		if (shortType != 'model' && this.asset) {
+		if (this.shortType != 'model' && this.asset) {
 			document.querySelector('a-assets')?.appendChild(this.asset);
 		}
-		if (shortType != 'model' && this.captionAsset) {
+		if (this.shortType != 'model' && this.captionAsset) {
 			document.querySelector('a-assets')?.appendChild(this.captionAsset);
 		}
 		if (this.lockedPosition) {
@@ -181,7 +177,7 @@ export class SharedObject extends DBObject {
 		this.el.setAttribute('geometry', { height: aspectRatio, width: 1 });
 	}
 
-	createAsset(type: 'image' | 'video'): Entity {
+	createAsset(type: shortType): Entity {
 		const asset = document.createElement(type == 'image' ? 'img' : 'video') as Entity;
 		asset.id = this.id + 'asset';
 		asset.setAttribute('src', this.url);
@@ -232,6 +228,16 @@ export class SharedObject extends DBObject {
 		} else if (this.shortType == 'video') {
 			this.setVideoAspectRatio();
 		}
+	}
+	get shortType(): shortType {
+		if (this.type.includes('image')) {
+			return 'image';
+		} else if (this.type.includes('video')) {
+			return 'video';
+		} else if (this.type.includes('glb') || this.type.includes('gltf')) {
+			return 'model';
+		}
+		return 'image';
 	}
 
 	get position() {

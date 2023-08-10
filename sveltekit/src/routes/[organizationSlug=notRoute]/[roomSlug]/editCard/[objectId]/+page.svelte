@@ -30,6 +30,7 @@
 			class="close"
 		/>
 		<LinkEditor
+			canAttachCaption={true}
 			editMode="update"
 			bind:editObject
 			{editEvent}

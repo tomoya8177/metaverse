@@ -157,7 +157,7 @@ AFRAME.registerComponent('editable-object', {
 		this.rig?.setAttribute('touch-controls', 'enabled:true');
 		this.state = 'idle';
 		this.initialPos = null;
-		FocusObjectStore.set(EmptyObject);
+		FocusObjectStore.set(null);
 	},
 	tick: function (e) {
 		if (this.state === 'moving') {

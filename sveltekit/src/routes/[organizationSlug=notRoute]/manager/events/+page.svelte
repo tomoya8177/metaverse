@@ -17,6 +17,7 @@
 	import timeGridPlugin from '@fullcalendar/timegrid';
 	import listPlugin from '@fullcalendar/list';
 	import { cookies } from '$lib/frontend/cookies';
+	import { goto } from '$app/navigation';
 
 	export let data: PageData;
 	let events = data.events;
@@ -59,6 +60,8 @@
 		}, 1000);
 	});
 	const onEventClicked = (eventId: string) => {
+		goto(`/${organization.slug}/manager/events/${eventId}`);
+		return;
 		editEvent = events.find((event) => event.id == eventId) || new Event({});
 		if (!editEvent.id) return;
 		//convert to local

@@ -61,7 +61,6 @@
 	</ul>
 </nav>
 <slot />
-<hr />
 
 <style>
 </style>

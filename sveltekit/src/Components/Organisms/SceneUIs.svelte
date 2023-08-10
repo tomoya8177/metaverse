@@ -188,6 +188,7 @@
 		return createdMessage;
 	};
 	const onDeleteClicked = async () => {
+		if (!$FocusObjectStore) return;
 		if ($FocusObjectStore.title == 'Shared Screen') {
 			//check if the screen belong to myself. otherwise you can't relete it.
 			if (!$UserStore.onScreenShare) return alert('You are not sharing your screen.');
@@ -211,7 +212,7 @@
 			key: 'objectDelete',
 			id: $FocusObjectStore.id
 		});
-		FocusObjectStore.set(EmptyObject);
+		FocusObjectStore.set(null);
 		toast(_('Deleted'));
 	};
 </script>
@@ -220,7 +221,7 @@
 	<NippleControl />
 </div>
 
-{#if $FocusObjectStore.id && $FocusObjectStore.title != ''}
+{#if $FocusObjectStore && $FocusObjectStore.title != ''}
 	{@const iCanEdit = $FocusObjectStore.user == $UserStore.id || $UserStore.isManager}
 	<div class="objectEditorNav">
 		<Icon icon="deployed_code" />
@@ -260,8 +261,9 @@
 						class="circle-button"
 						small
 						on:click={() => {
+							if (!$FocusObjectStore) return;
 							$FocusObjectStore.locked = !$FocusObjectStore.locked;
-							if ($FocusObjectStore.locked) FocusObjectStore.set(EmptyObject);
+							if ($FocusObjectStore.locked) FocusObjectStore.set(undefined);
 						}}
 					>
 						<Icon icon={$FocusObjectStore.locked ? 'lock' : 'lock_open'} />
@@ -274,6 +276,8 @@
 					class="circle-button"
 					small
 					on:click={() => {
+						if (!$FocusObjectStore) return;
+
 						if ($FocusObjectStore.type == 'screen') {
 							PreviewPanelOpen.set(true);
 							return;
@@ -284,20 +288,22 @@
 						});
 						//
 						PreviewPanelOpen.set(true);
-						FocusObjectStore.set(EmptyObject);
+						FocusObjectStore.set(null);
 					}}
 				>
 					<Icon icon="magnify_fullscreen" />
 				</button>
 			</div>
 			{#if $FocusObjectStore.type.includes('video')}
-				{#if !$FocusObjectStore.playing}
+				{#if $FocusObjectStore && !$FocusObjectStore.playing}
 					<div>
 						<button
 							small
 							class="circle-button"
 							on:click={() => {
-								const video = document.getElementById(`${$FocusObjectStore.id}asset`);
+								if (!$FocusObjectStore) return;
+
+								let video = document.getElementById(`${$FocusObjectStore.id}asset`);
 								video?.play();
 								$FocusObjectStore.playing = true;
 							}}
@@ -311,6 +317,7 @@
 							small
 							class="circle-button"
 							on:click={() => {
+								if (!$FocusObjectStore) return;
 								const video = document.getElementById(`${$FocusObjectStore.id}asset`);
 								video?.pause();
 								$FocusObjectStore.playing = false;
@@ -325,6 +332,8 @@
 						small
 						class="circle-button"
 						on:click={() => {
+							if (!$FocusObjectStore) return;
+
 							const video = document.getElementById(`${$FocusObjectStore.id}asset`);
 							if (!video) return console.error('video is null');
 							video.currentTime = 0;
@@ -339,6 +348,8 @@
 						small
 						class="circle-button"
 						on:click={() => {
+							if (!$FocusObjectStore) return;
+
 							const video = document.getElementById(`${$FocusObjectStore.id}asset`);
 							if (!video) return console.error('video is null');
 							video.muted = !video.muted;
@@ -360,6 +371,8 @@
 			<article>
 				<ModalCloseButton
 					onClick={() => {
+						if (!$FocusObjectStore) return;
+
 						$FocusObjectStore.editorOpen = false;
 					}}
 				/>
@@ -374,6 +387,8 @@
 						bind:object={$FocusObjectStore}
 						readonly={$FocusObjectStore.locked}
 						onUpdate={(value) => {
+							if (!$FocusObjectStore) return;
+
 							$FocusObjectStore.lockedPosition = value;
 							const position = getPositionFromLockedPosition(value);
 							console.log({ position });
@@ -423,6 +438,8 @@
 								{#if !$FocusObjectStore.isSphere}
 									<button
 										on:click={async () => {
+											if (!$FocusObjectStore) return;
+
 											const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
 												isSphere: true
 											});
@@ -438,6 +455,8 @@
 								{:else}
 									<button
 										on:click={async () => {
+											if (!$FocusObjectStore) return;
+
 											const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
 												isSphere: false
 											});
@@ -456,6 +475,8 @@
 						<div>
 							<button
 								on:click={async () => {
+									if (!$FocusObjectStore) return;
+
 									await axios.put('/api/objects/' + $FocusObjectStore.id, {
 										title: $FocusObjectStore.title,
 										linkTo: $FocusObjectStore.linkTo,
