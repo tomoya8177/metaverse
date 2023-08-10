@@ -240,13 +240,24 @@
 	
 	"
 		>
+			<div>
+				<a
+					role="button"
+					small
+					class="circle-button"
+					data-tooltip={_('Info')}
+					href={`/${organization.slug}/${$RoomStore.slug}/${$FocusObjectStore.id}`}
+				>
+					<Icon icon="info" />
+				</a>
+			</div>
 			{#if iCanEdit && $FocusObjectStore.type != 'screen'}
 				<div>
 					<a
 						role="button"
 						small
 						class="circle-button"
-						data-tooltip={iCanEdit ? _('Edit') : _('Info')}
+						data-tooltip={_('Edit')}
 						href={`/${organization.slug}/${$RoomStore.slug}/editCard/${$FocusObjectStore.id}`}
 					>
 						<Icon icon="edit" />
