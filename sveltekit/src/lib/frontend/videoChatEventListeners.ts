@@ -92,7 +92,7 @@ const setupDataTrackListener = (track: RemoteDataTrack) => {
 			const parsed = JSON.parse(message);
 			videoChat.listeners[parsed.key]?.(parsed);
 		} catch (e) {
-			console.log('error parsing message', message);
+			console.log('error parsing message', e, message);
 		}
 	});
 };

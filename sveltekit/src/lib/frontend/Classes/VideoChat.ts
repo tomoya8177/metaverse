@@ -70,7 +70,6 @@ export class VideoChat {
 			return alert('not initialized correctly');
 		dataTrackPublished.promise.then(() => {
 			if (!this.dataTrack) return alert('not connected to room');
-			console.log('really sending');
 			this.dataTrack.send(JSON.stringify(message));
 		});
 	}

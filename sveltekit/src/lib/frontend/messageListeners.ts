@@ -45,12 +45,14 @@ export const messageListeners = () => {
 		sharedObjects.add(object);
 	});
 	videoChat.listenTo('objectPosition', (data) => {
-		const object = document.getElementById(data.object.id) as Entity;
+		const object = sharedObjects.get(data.object.id);
 		if (!object) return;
-		object.setAttribute('position', data.position);
-		object.setAttribute('rotation', data.rotation);
-		object.setAttribute('scale', data.scale);
-		object.setAttribute('geometry', { radius: data.radius });
+		object.el?.setAttribute('position', data.position);
+		object.el?.setAttribute('rotation', data.rotation);
+		object.el?.setAttribute('scale', data.scale);
+		if (object.isSphere) {
+			object.el?.setAttribute('geometry', { radius: data.radius });
+		}
 	});
 	videoChat.listenTo('objectUpdate', (data) => {
 		console.log('received upject update', data);
