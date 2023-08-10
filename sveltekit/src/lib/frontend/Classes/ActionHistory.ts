@@ -66,16 +66,20 @@ export class ActionHistory extends DBObject {
 	}
 	async send(action: Actions, data: any = {}): Promise<any> {
 		if (PUBLIC_IS_DEV == 'true') return;
-		const response = await axios.post('/api/actions', {
-			session: this.session,
-			user: this.user,
-			room: this.room,
-			organization: this.organization,
-			action: action,
-			data: JSON.stringify(data),
-			path: location.href
-		});
-		return response.data;
+		try {
+			const response = await axios.post('/api/actions', {
+				session: this.session,
+				user: this.user,
+				room: this.room,
+				organization: this.organization,
+				action: action,
+				data: JSON.stringify(data),
+				path: location.href
+			});
+			return response.data;
+		} catch (error) {
+			return false;
+		}
 	}
 	get paramData() {
 		return JSON.parse(this.param);

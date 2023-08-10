@@ -23,6 +23,7 @@
 	import { nl2br } from '$lib/math/nl2br';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
+	import { escapeHTML } from '$lib/math/escapeHTML';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
@@ -257,7 +258,7 @@
 				bind:user={$UserStore}
 				onUpdateDone={() => {
 					actionHistory.send('profileUpdate', {
-						user: $UserStore
+						user: { ...$UserStore, description: escapeHTML($UserStore.description) }
 					});
 					profileDialogOpen = false;
 				}}

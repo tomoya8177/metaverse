@@ -82,7 +82,9 @@
 		await reinstallAIBrain(createdMentor);
 		busy = false;
 		newMentorModalOpen = false;
-		actionHistory.send('createMentor', { mentor: createdMentor });
+		actionHistory.send('createMentor', {
+			mentor: { ...createdMentor, description: escapeHTML(createdMentor.description) }
+		});
 	};
 	const onUpdateClicked = async () => {
 		if (!validateMentorData(editMentor)) return;

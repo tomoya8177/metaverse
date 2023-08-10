@@ -6,11 +6,15 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import ActionHistoryTable from '../../admin/ActionHistoryTable.svelte';
 	import { onMount } from 'svelte';
+	import { escapeHTML } from '$lib/math/escapeHTML';
 	export let data: PageData;
 	let organization = data.organization;
 	let actionHistories = data.actionHistories;
 	onMount(() => {
-		actionHistory.send('managerConsole', { organization });
+		actionHistory.send('managerConsole', {
+			...organization,
+			title: escapeHTML(organization.title)
+		});
 	});
 </script>
 
@@ -30,7 +34,10 @@
 <button
 	on:click={async () => {
 		if (!confirm(_('Are you sure that you want to delete this organization?'))) return;
-		actionHistory.send('deleteOrganization', { organization });
+		actionHistory.send('deleteOrganization', {
+			...organization,
+			title: escapeHTML(organization.title)
+		});
 		await deleteOrganization(organization);
 		location.href = '/';
 	}}

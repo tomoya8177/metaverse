@@ -10,7 +10,7 @@ export const sendQuestionToAI = async (
 	newMessage: Message
 ) => {
 	console.log({ roomId });
-	actionHistory.send('sendQuestionToAI', newMessage);
+	actionHistory.send('sendQuestionToAI', { ...newMessage, body: escapeHTML(newMessage.body) });
 	const response = await axios
 		.post('/mentor/' + mentor.id, {
 			roomId,

@@ -178,7 +178,7 @@
 	let newMessageBody = '';
 
 	const sendChatMessage = async (message: Message): Promise<Message> => {
-		actionHistory.send('sendChatMessage', message);
+		actionHistory.send('sendChatMessage', { ...message, body: escapeHTML(message.body) });
 		const createdMessage = new Message(await message.create());
 		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
 		ChatMessagesStore.update((arr) => {

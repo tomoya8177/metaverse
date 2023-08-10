@@ -112,7 +112,7 @@
 						message = await axios
 							.put('/api/messages/' + message.id, { pinned: !message.pinned })
 							.then((res) => res.data);
-						actionHistory.send('pinOrUnpinMessage', { message });
+						actionHistory.send('pinOrUnpinMessage', { ...message, body: escapeHTML(message.body) });
 					}}
 				>
 					<Icon icon="push_pin" />
@@ -123,7 +123,7 @@
 					href={'#'}
 					on:click={async () => {
 						await axios.delete('/api/messages/' + message.id);
-						actionHistory.send('deleteMessage', { message });
+						actionHistory.send('deleteMessage', { ...message, body: escapeHTML(message.body) });
 						onDelete(message.id);
 					}}
 				>
