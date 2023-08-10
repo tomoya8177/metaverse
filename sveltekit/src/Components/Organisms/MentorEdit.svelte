@@ -132,9 +132,10 @@
 			}))}
 		onChange={() => {
 			const utterance = new SpeechSynthesisUtterance(editMentor.userData.description);
-			utterance.voice = speechSynthesis
-				.getVoices()
-				.find((voice) => voice.voiceURI == editMentor.voiceURI);
+			utterance.voice =
+				voices.find((voice) => voice.voiceURI == editMentor.voiceURI) ||
+				voices.find((voice) => voice.default) ||
+				voices[0];
 			speechSynthesis.speak(utterance);
 		}}
 	/>
