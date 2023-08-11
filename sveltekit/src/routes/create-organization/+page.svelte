@@ -40,20 +40,6 @@
 		await mentor.init();
 	});
 	let busy = false;
-	const loggedInUpdated = async (loggedIn: boolean) => {
-		if (!loggedIn) return;
-		const slug = crypto.randomUUID();
-		const id = crypto.randomUUID();
-		organization = await axios
-			.post('http://localhost:5173/api/organizations', {
-				title: '',
-				slug: slug,
-				id: id
-			})
-			.then((res) => res.data);
-		console.log({ organization });
-	};
-	$: loggedInUpdated(loggedIn);
 </script>
 
 <Navigation />
