@@ -22,20 +22,26 @@
 		<h4>
 			{_('Object')}
 		</h4>
-		<div>
-			<label>{_('Title')}</label>
-			{object.title}
-		</div>
-		{#if object.linkTo}
-			<div>
-				<label>{_('URL')}</label>
-				<a href={object.linkTo} target="_blank">{object.linkTo}</a>
-			</div>
-		{/if}
-		<div>
-			<label>{_('Description')}</label>
-			{@html nl2br(object.description)}
-		</div>
+		<dl>
+			<dt>
+				{_('Title')}
+			</dt>
+			<dd>
+				{object.title}
+			</dd>
+			{#if object.linkTo}
+				<dt>{_('URL')}</dt>
+				<dd>
+					<a href={object.linkTo} target="_blank">{object.linkTo}</a>
+				</dd>
+			{/if}
+			{#if object.description}
+				<dt>{_('Description')}</dt>
+				<dd>
+					{@html nl2br(object.description)}
+				</dd>
+			{/if}
+		</dl>
 	</div>
 	{#if event && organization}
 		{@const attendance = attendances.find((attendance) => attendance.user == $UserStore.id)}

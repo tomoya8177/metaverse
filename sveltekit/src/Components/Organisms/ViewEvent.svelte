@@ -17,12 +17,16 @@
 		{event.summary}
 	</h3>
 	<EventDateTimeDisplay {event} />
-	<p>
-		{@html nl2br(event.description)}
-	</p>
-	<p>
-		{@html event.location}
-	</p>
+	<dl>
+		<dt>{_('Description')}</dt>
+		<dd>
+			{@html nl2br(event.description)}
+		</dd>
+		<dt>{_('URL')}</dt>
+		<dd>
+			{@html event.location}
+		</dd>
+	</dl>
 </section>
 {#if attendance}
 	<section>

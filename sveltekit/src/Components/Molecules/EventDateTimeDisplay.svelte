@@ -6,16 +6,26 @@
 	export let event: Event;
 </script>
 
-<InputWithLabel label={_('All Day')} bind:value={event.allDay} type="switch" disabled />
-<label>{_('Start')}</label>
-{DateTime.fromISO(event.start).toLocaleString(
-	event.allDay ? DateTime.DATE : DateTime.DATETIME_SHORT
-)}
-{#if DateTime.fromISO(event.end).toISO() != DateTime.fromISO(event.start).plus({ days: 1 }).toISO()}
-	<div>
-		<label>{_('End')}</label>
-		{DateTime.fromISO(event.end).toLocaleString(
+<dl>
+	<dt>
+		<InputWithLabel label={_('All Day')} bind:value={event.allDay} type="switch" disabled />
+	</dt>
+	<dt>{_('Start')}</dt>
+	<dd>
+		{DateTime.fromISO(event.start).toLocaleString(
 			event.allDay ? DateTime.DATE : DateTime.DATETIME_SHORT
 		)}
-	</div>
-{/if}
+	</dd>
+	{#if DateTime.fromISO(event.end).toISO() != DateTime.fromISO(event.start)
+			.plus({ days: 1 })
+			.toISO()}
+		<dt>
+			{_('End')}
+		</dt>
+		<dd>
+			{DateTime.fromISO(event.end).toLocaleString(
+				event.allDay ? DateTime.DATE : DateTime.DATETIME_SHORT
+			)}
+		</dd>
+	{/if}
+</dl>
