@@ -51,6 +51,8 @@
 				document.getElementById('createCardModalCloseButton')?.click();
 			}}
 			onUpdate={(sharedObject) => {
+				if (!editObject) return;
+
 				//sharedObject.moveToMyFront(me.position, me.rotation);
 				document.getElementById('createCardModalCloseButton')?.click();
 				console.log(editObject);
@@ -75,12 +77,13 @@
 				});
 			}}
 			onDelete={(sharedObject) => {
+				if (!editObject) return;
 				editObject.remove();
 				sharedObjects.remove(editObject.id);
 				document.getElementById('createCardModalCloseButton')?.click();
 				videoChat.sendMessage({
 					key: 'objectDelete',
-					id: $FocusObjectStore.id
+					id: editObject.id
 				});
 				FocusObjectStore.set(new SharedObject());
 				toast(_('Deleted'));

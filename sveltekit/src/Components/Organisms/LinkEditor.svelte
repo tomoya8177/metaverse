@@ -25,6 +25,7 @@
 	import { CardColors } from '$lib/preset/CardColors';
 	import { page } from '$app/stores';
 	import type { Room } from '$lib/frontend/Classes/Room';
+	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	export let editObject: SharedObject = new SharedObject({ type: 'image', withCaption: true });
 	export let editMode: 'update' | 'create' = 'create';
 	export let onCreate: (object: SharedObject) => void = (object) => {};
@@ -263,6 +264,49 @@
 		</div>
 	{/if}
 </div>
+{#if editObject.type.includes('image') || editObject.type.includes('video')}
+	<div>
+		{#if !editObject.isSphere}
+			<button
+				on:click={async () => {
+					if (!editObject) return;
+
+					const updatedImage = await axios.put('/api/objects/' + editObject.id, {
+						isSphere: true
+					});
+					editObject.isSphere = true;
+					editObject.updateEntityGeometryAndMaterial();
+					if (videoChat.connected) {
+						videoChat.sendMessage({
+							key: 'objectUpdate',
+							id: editObject.id,
+							isSphere: true
+						});
+					}
+				}}>{_('Convert To 360 Sphere')}</button
+			>
+		{:else}
+			<button
+				on:click={async () => {
+					if (!editObject) return;
+
+					const updatedImage = await axios.put('/api/objects/' + editObject.id, {
+						isSphere: false
+					});
+					editObject.isSphere = false;
+					editObject.updateEntityGeometryAndMaterial();
+					if (videoChat.connected) {
+						videoChat.sendMessage({
+							key: 'objectUpdate',
+							id: editObject.id,
+							isSphere: false
+						});
+					}
+				}}>{_('Convert To Flat Image')}</button
+			>
+		{/if}
+	</div>
+{/if}
 <CreateUpdateDeleteButtons
 	{editMode}
 	{onCreateClicked}

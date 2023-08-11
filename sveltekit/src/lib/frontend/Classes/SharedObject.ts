@@ -156,9 +156,11 @@ export class SharedObject extends DBObject {
 		const width = this.asset.width;
 		const height = this.asset.height;
 		const aspectRatio = height / width;
-		this.el.setAttribute('geometry', { height: aspectRatio, width: 1 });
-		if (this.withCaption && !!this.captionUrl && this.captionEl) {
-			this.captionEl.object3D.position.y -= aspectRatio / 2;
+		if (!this.isSphere) {
+			this.el.setAttribute('geometry', { height: aspectRatio, width: 1 });
+			if (this.withCaption && !!this.captionUrl && this.captionEl) {
+				this.captionEl.object3D.position.y -= aspectRatio / 2;
+			}
 		}
 	}
 	setCaptionImageAspectRatio() {

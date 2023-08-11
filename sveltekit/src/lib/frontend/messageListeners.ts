@@ -58,12 +58,12 @@ export const messageListeners = () => {
 		console.log('received upject update', data);
 		const object = sharedObjects.get(data.id);
 		if (!object) return;
-		object.title = data.title;
-		object.linkTo = data.linkTo;
-		object.description = data.description;
-		object.withCaption = data.withCaption;
-		object.captionUrl = data.captionUrl;
-		object.url = data.url;
+		if (typeof data.title != 'undefined') object.title = data.title;
+		if (typeof data.linkTo != 'undefined') object.linkTo = data.linkTo;
+		if (typeof data.description != 'undefined') object.description = data.description;
+		if (typeof data.withCaption != 'undefined') object.withCaption = data.withCaption;
+		if (typeof data.captionUrl != 'undefined') object.captionUrl = data.captionUrl;
+		if (typeof data.url != 'undefined') object.url = data.url;
 		if (data.isSphere != undefined) {
 			object.isSphere = data.isSphere;
 			object.updateEntityGeometryAndMaterial();
