@@ -6,10 +6,12 @@
 	import LinkEditor from '../../../../Components/Organisms/LinkEditor.svelte';
 	import type { PageData } from './$types';
 	import { UserStore, RoomStore } from '$lib/store';
-	import type { Me } from '$lib/frontend/Classes/Me';
+	import { Me } from '$lib/frontend/Classes/Me';
+	import { onMount } from 'svelte';
+	import { Users } from '$lib/frontend/Classes/Users';
+	import type { User } from '$lib/frontend/Classes/User';
 	export let data: PageData;
 	export let organization: Organization = data.organization;
-	export let me: Me;
 </script>
 
 <dialog open>
@@ -26,6 +28,7 @@
 				sharedObject.attachElement();
 				sharedObject.locked = false;
 				sharedObjects.add(sharedObject);
+				const me = Users.find($UserStore.id);
 				if (me) {
 					sharedObject.moveToMyFront(me.position, me.rotation);
 				}

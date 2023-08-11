@@ -10,20 +10,27 @@
 	import { Event } from '$lib/frontend/Classes/Event';
 	import axios from 'axios';
 	import { calendar } from '$lib/frontend/Classes/Calendar';
+	import ViewObject from '../../../../../Components/Templates/ViewObject.svelte';
+	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	export let data: PageData;
 	let event = new Event(data.event);
 	let attendances: Attendance[] = data.attendances.map(
 		(attendance: any) => new Attendance(attendance)
 	);
+	let object = new SharedObject(data.object);
 </script>
 
 <dialog open>
 	<article style="max-width:calc(100vw - 2rem)">
 		<ModalCloseButton href={`/${data.organization.slug}/${data.room.slug}/events`} />
-		<ViewEvent
-			{event}
-			attendance={attendances.find((attendance) => attendance.user == $UserStore.id)}
-		/>
+		{#if event.object}
+			<ViewObject {object} {event} organization={data.organization} {attendances} />
+		{:else}
+			<ViewEvent
+				{event}
+				attendance={attendances.find((attendance) => attendance.user == $UserStore.id)}
+			/>
+		{/if}
 		{#if $UserStore.isManager}
 			<button
 				on:click={async () => {
