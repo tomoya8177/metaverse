@@ -269,6 +269,10 @@ export class SharedObject extends DBObject {
 		}
 	}
 	updateComponents() {
+		this.setComponents();
+		this.update();
+	}
+	setComponents() {
 		if (!this.el) return console.error('el is null');
 		this.components = JSON.stringify({
 			position: this.el.getAttribute('position'),
@@ -276,7 +280,6 @@ export class SharedObject extends DBObject {
 			scale: this.el.getAttribute('scale'),
 			radius: this.el.getAttribute('geometry')?.radius
 		});
-		this.update();
 	}
 	remove() {
 		this.el?.parentNode?.removeChild(this.el);

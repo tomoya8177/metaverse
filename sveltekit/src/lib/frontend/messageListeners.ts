@@ -50,9 +50,11 @@ export const messageListeners = () => {
 		object.el?.setAttribute('position', data.position);
 		object.el?.setAttribute('rotation', data.rotation);
 		object.el?.setAttribute('scale', data.scale);
+
 		if (object.isSphere) {
 			object.el?.setAttribute('geometry', { radius: data.radius });
 		}
+		object.setComponents();
 	});
 	videoChat.listenTo('objectUpdate', (data) => {
 		console.log('received upject update', data);
