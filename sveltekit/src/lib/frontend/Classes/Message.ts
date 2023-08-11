@@ -5,6 +5,7 @@ import type { Room } from './Room';
 import { ChatMessagesStore, RoomStore } from '$lib/store';
 import { actionHistory } from './ActionHistory';
 import { videoChat } from './VideoChat';
+import { escapeHTML } from '$lib/math/escapeHTML';
 
 const usersMemory: User[] = [];
 let room: Room;
@@ -48,7 +49,11 @@ export class Message extends DBObject {
 		return this.user == room.mentor;
 	}
 	async createSendOutAndPush(): Promise<void> {
-		actionHistory.send('sendChatMessage', { ...this });
+		actionHistory.send('sendChatMessage', {
+			id: this.id,
+			body: escapeHTML(this.body),
+			type: this.type
+		});
 		await this.create();
 		videoChat.sendMessage({ ...this, key: 'textMessage' });
 		ChatMessagesStore.update((arr) => {
