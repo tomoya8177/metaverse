@@ -12,6 +12,7 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import type { ConversationalRetrievalQAChain } from 'langchain/chains.js';
 import { BufferMemory, ChatMessageHistory } from 'langchain/memory';
 import type { System } from 'aframe';
+import { port } from '$env/static/private';
 
 type StoredChat = {
 	mentorId: string;
@@ -61,10 +62,29 @@ export const PUT = async ({ request, params }) => {
 	);
 	//load user data as json to docs
 	const usersJson = JSON.stringify(users);
+	const manualData = await fetch('http://localhost:' + port + '/virtuacampusManual.json').then(
+		(res) => res.json()
+	);
+	const filteredManual = {
+		title: manualData.name,
+		cards: manualData.cards.map((card) => {
+			return {
+				name: card.name,
+				content: card.desc
+			};
+		})
+	};
+
+	const manualJson = JSON.stringify(filteredManual);
 	const messages =
-		`You are a helpful AI mentor named ${mentor.userData.nickname} at an organization called ${organization.title}. ${mentor.prompt}. You'll answer questions based on the given context, but don't give away any extra information from the context when the question is not related to the context. You can answer questions using your knowledge. You can also ask questions to the user to get more information.` +
-		`Below is the list of users in the class with some details about each users.` +
+		`You are a helpful AI mentor named ${mentor.userData.nickname} at an organization called ${organization.title}. ${mentor.prompt}. You'll answer questions based on the given context, but don't give away any extra information from the context when the question is not related to the context. You can answer questions using your knowledge. You can also ask questions to the user to get more information.
+		
+		Following is a manual for using this platform called VirtuaCampus. Reference these data when answering questions about the system itself.` +
+		manualJson +
+		`
+		Below is the list of users in the class with some details about each users.` +
 		usersJson;
+	console.log(messages);
 	const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
 	const promptDocs = await textSplitter.createDocuments([messages]);
 	//store mentor's memory first
@@ -169,7 +189,7 @@ export const POST = async ({ request, params }) => {
 
 	const res = await storedChat.chain.call({
 		question: '',
-		chat_history: storedChat.chatHistory.slice(-10)
+		chat_history: storedChat.chatHistory.slice(-20)
 	});
 	console.log(res.text);
 	if (body.action != 'greet') {
