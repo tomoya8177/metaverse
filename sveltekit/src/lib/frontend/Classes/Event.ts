@@ -25,8 +25,8 @@ export class Event extends DBObject {
 		this.summary = this.unescapedData.summary || '';
 		this.location = this.unescapedData.location || '';
 		this.url = this.unescapedData.url || '';
-		this.start = this.unescapedData.start || '';
-		this.end = this.unescapedData.end || '';
+		this.start = this.unescapedData.start || DateTime.now().toISO();
+		this.end = this.unescapedData.end || DateTime.now().plus({ hours: 1 }).toISO();
 		this.organization = this.unescapedData.organization || '';
 	}
 	get allDay(): boolean {

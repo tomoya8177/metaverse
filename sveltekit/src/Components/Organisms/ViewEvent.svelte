@@ -13,16 +13,14 @@
 </script>
 
 <section>
-	<h3>
+	<h4>
 		{event.summary}
-	</h3>
+	</h4>
 	<EventDateTimeDisplay {event} />
 	<dl>
-		<dt>{_('Description')}</dt>
 		<dd>
 			{@html nl2br(event.description)}
 		</dd>
-		<dt>{_('URL')}</dt>
 		<dd>
 			{@html event.location}
 		</dd>

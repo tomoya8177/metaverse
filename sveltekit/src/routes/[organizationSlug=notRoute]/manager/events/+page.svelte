@@ -18,7 +18,7 @@
 	import listPlugin from '@fullcalendar/list';
 	import { cookies } from '$lib/frontend/cookies';
 	import { goto } from '$app/navigation';
-	import { CalendarDisplay } from '$lib/frontend/Classes/Calendar';
+	import { calendar } from '$lib/frontend/Classes/Calendar';
 
 	export let data: PageData;
 	let events = data.events;
@@ -27,14 +27,11 @@
 	let rooms = data.rooms;
 	let editEvent: Event;
 	let editMode: 'create' | 'update' = 'update';
-	let calendar: CalendarDisplay;
 	let users = data.users;
 	onMount(() => {
-		setTimeout(() => {
-			const el = document.getElementById('calendar') as HTMLElement;
-			calendar = new CalendarDisplay(el, events, onEventClicked);
-			calendar.render();
-		}, 1000);
+		const el = document.getElementById('calendar') as HTMLElement;
+		calendar.init(el, events, onEventClicked);
+		calendar.render();
 	});
 	const onEventClicked = (eventId: string) => {
 		goto(`/${organization.slug}/manager/events/${eventId}`);
@@ -58,10 +55,7 @@
 		href={'#'}
 		on:click={() => {
 			editEvent = new Event({
-				id: crypto.randomUUID(),
-				organization: organization.id,
-				start: DateTime.now().toISO(),
-				end: DateTime.now().plus({ hours: 1 }).toISO()
+				organization: organization.id
 			});
 			modalOpen = true;
 			editMode = 'create';
@@ -79,7 +73,6 @@
 			<EventEdit
 				{users}
 				{organization}
-				{rooms}
 				{editMode}
 				{editEvent}
 				bind:modalOpen
@@ -87,18 +80,17 @@
 					modalOpen = false;
 					events.push(createdEvent);
 					events = events.sort((a, b) => a.start.localeCompare(b.start));
-					calendar.addEvent(createdEvent.toFullCalendarEvent());
+					calendar.addEvent(createdEvent);
 				}}
 				onUpdateDone={(editEvent) => {
 					modalOpen = false;
 
-					calendar.getEventById(editEvent.id)?.remove();
-					calendar.addEvent(editEvent.toFullCalendarEvent());
+					calendar.updateEvent(editEvent);
 				}}
 				onDeleteDone={(editEvent) => {
 					modalOpen = false;
 
-					calendar.getEventById(editEvent.id)?.remove();
+					calendar.removeEvent(editEvent.id);
 					events = events.filter((event) => event.id != editEvent.id);
 				}}
 			/>
