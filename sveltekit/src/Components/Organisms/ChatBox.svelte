@@ -76,7 +76,7 @@
 				const message = new Message({
 					room: $RoomStore.id,
 					type: 'attachment',
-					user: $RoomStore.mentorData.user,
+					user: $RoomStore.mentorData?.user || forceMentor?.user,
 					body: _(`AI completed to generate the image for you. @`) + $UserStore.nickname,
 					handle: file.handle,
 					url: file.url
