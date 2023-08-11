@@ -22,10 +22,15 @@
 	let voices: SpeechSynthesisVoice[] = [];
 	onMount(async () => {
 		const synth = window.speechSynthesis;
-		synth.addEventListener('voiceschanged', () => {
+		if (synth.onvoiceschanged === null) {
 			voices = synth.getVoices();
-			console.log(voices);
-		});
+		} else {
+			synth.onvoiceschanged = () => {
+				voices = synth.getVoices();
+				console.log(voices);
+			};
+		}
+		console.log({ synth });
 	});
 
 	export let editMentor: Mentor = EmptyMentor;

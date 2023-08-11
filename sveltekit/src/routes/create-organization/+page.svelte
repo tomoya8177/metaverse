@@ -8,13 +8,13 @@
 	import { onMount } from 'svelte';
 	import { checkSlugForOrganization } from '$lib/frontend/checkSlugForOrganization';
 	import axios from 'axios';
+	import { page } from '$app/stores';
 	import { myAlert, toast } from '$lib/frontend/toast';
 	import type { User } from '$lib/frontend/Classes/User';
 	import RoomEdit from '../../Components/Organisms/RoomEdit.svelte';
 	import { Room } from '$lib/frontend/Classes/Room';
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import MentorEdit from '../../Components/Organisms/MentorEdit.svelte';
-	import type { Mentor } from '$lib/types/Mentor';
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
 	import Navigation from '../../Components/Organisms/Navigation.svelte';
@@ -23,22 +23,21 @@
 	import Icon from '../../Components/Atom/Icon.svelte';
 	import TeamIconEditor from '../[organizationSlug=notRoute]/manager/TeamIconEditor.svelte';
 	import { UserStore } from '$lib/store';
+	import { sendJoinedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
+	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	export let data: PageData;
 	console.log(data);
 	let loggedIn = data.loggedIn;
 	let user = data.user;
 	let process: 'organization' | 'room' | 'mentor' = 'organization';
-	let organization: Organization = EmptyOrganization;
+	let organization: Organization = data.organization;
 	let room: Room = new Room({
 		...EmptyRoom,
 		slug: crypto.randomUUID()
 	});
-	let mentor: Mentor = EmptyMentor;
-	onMount(() => {
-		organization = {
-			...EmptyOrganization,
-			slug: crypto.randomUUID()
-		};
+	let mentor: Mentor = new Mentor({});
+	onMount(async () => {
+		await mentor.init();
 	});
 	let busy = false;
 	const loggedInUpdated = async (loggedIn: boolean) => {
@@ -90,6 +89,8 @@
 						organization: newOrg.id,
 						role: 'manager'
 					});
+					const url = `${$page.url.protocol}//${$page.url.host}/${newOrg.slug}`;
+					await sendJoinedToOrganizationEmail($UserStore.email, newOrg, url);
 					room.organization = newOrg.id;
 					mentor.organization = newOrg.id;
 					if (!mentor.userData) mentor.userData = emptyUser;

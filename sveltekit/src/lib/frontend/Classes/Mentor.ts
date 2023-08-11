@@ -18,7 +18,7 @@ export class Mentor extends DBObject {
 	constructor(data: any) {
 		data.table = 'mentors';
 		super(data);
-		this.user = data.user;
+		this.user = data.user || '';
 		this.voiceURI = data.voiceURI;
 		this.utterance = new SpeechSynthesisUtterance();
 		const synth = window.speechSynthesis;
@@ -33,7 +33,7 @@ export class Mentor extends DBObject {
 	}
 	async init() {
 		this.userData = await axios.get('/api/users/' + this.user).then((res) => {
-			return new User(res.data);
+			return new User(res.data || {});
 		});
 	}
 	speak(message: string) {
