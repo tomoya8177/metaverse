@@ -24,6 +24,7 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { goto } from '$app/navigation';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
@@ -74,13 +75,14 @@
 		if (!(await myConfirm(_('Are you sure that you want to leave this room?')))) return;
 		actionHistory.send('leaveRoom');
 		videoChat.leave();
-		const organization: Organization = await axios
-			.get('/api/organizations/' + $RoomStore.organization)
-			.then((res) => res.data);
-		RoomStore.set(EmptyRoom);
-		location.href = '/' + organization.slug;
+
+		RoomStore.set(null);
+		if (!organization) {
+			location.href = '/';
+			return;
+		}
+		goto('/' + organization.slug);
 	};
-	let chosenLanguage: string = cookies.get('locale') || 'en';
 	let loginOpen: boolean = false;
 	export let logoLinkTo: string = '#';
 	onMount(() => {

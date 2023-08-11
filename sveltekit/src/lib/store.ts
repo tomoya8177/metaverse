@@ -26,7 +26,7 @@ export const RigStore = writable({
 		z: 0
 	}
 });
-export const RoomStore = writable({} as Room);
+export const RoomStore = writable({} as Room | null);
 export type xyz = {
 	x: number;
 	y: number;

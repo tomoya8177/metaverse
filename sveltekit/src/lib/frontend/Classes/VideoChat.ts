@@ -24,8 +24,13 @@ import {
 	onDisconnected,
 	onNewParticipantConnected,
 	onParticipantAlreadyInRoom,
-	onParticipantDisconnected
+	onParticipantDisconnected,
+	onReconnected,
+	onReconnecting,
+	onTabClosed
 } from '$lib/frontend/videoChatEventListeners';
+import { toast } from '../toast';
+import { _ } from '$lib/i18n';
 
 type trackType = 'audio' | 'camera' | 'screen' | 'data';
 
@@ -133,15 +138,13 @@ export class VideoChat {
 				dataTrackPublished.reject(error);
 			}
 		});
-		//new participant joined
 		onNewParticipantConnected(this.room);
-
-		// Log any Participants already connected to the Room
 		onParticipantAlreadyInRoom(this.room.participants);
-
 		onParticipantDisconnected(this.room);
-
 		onDisconnected(this.room, this.localParticipant);
+		onReconnecting(this.room);
+		onReconnected(this.room);
+		onTabClosed(this.room);
 	}
 	listenTo(key: string, callback: (data: any) => void) {
 		//if (!this.dataTrack) return;
@@ -224,8 +227,8 @@ export class VideoChat {
 		}
 	}
 	leave() {
-		if (this.connected) {
-			this.room?.disconnect();
+		if (this.connected && this.room) {
+			this.room.disconnect();
 		}
 	}
 }

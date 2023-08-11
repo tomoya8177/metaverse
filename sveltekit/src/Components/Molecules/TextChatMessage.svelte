@@ -33,14 +33,14 @@
 			clearInterval(interval);
 		}, 1000);
 	});
-	const sendToRoomClicked = async (message) => {
+	const sendToRoomClicked = async (message: Message) => {
 		const response = await axios.get(
 			'https://www.filestackapi.com/api/file/' + message.handle + '/metadata'
 		);
 		console.log(response);
 		actionHistory.send('sendFileFromChatToRoom', { file: { ...response.data, url: message.url } });
 		appendObjectInTheRoom({
-			roomId: $RoomStore.id,
+			roomId: $RoomStore?.id || '',
 			userId: $UserStore.id,
 			me: Users.find($UserStore.id),
 			file: { ...response.data, url: message.url }

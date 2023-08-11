@@ -13,6 +13,8 @@ import { messageListeners } from './messageListeners';
 import { attachRemoteTrack, detatchTrack } from './videoChatTrackAttacher';
 import { Users } from './Classes/Users';
 import { videoChat } from './Classes/VideoChat';
+import { toast } from './toast';
+import { _ } from '$lib/i18n';
 
 export const onNewParticipantConnected = (room: Room) => {
 	room.on('participantConnected', (participant: RemoteParticipant) => {
@@ -104,5 +106,28 @@ const sendHandshake = () => {
 		user: videoChat.user,
 		position: me.position,
 		rotation: me.rotation
+	});
+};
+export const onTabClosed = (room: Room) => {
+	window.addEventListener('beforeunload', () => {
+		room.disconnect();
+	});
+};
+export const onReconnecting = (room: Room) => {
+	room.on('reconnecting', (error) => {
+		if (error.code === 53001) {
+			console.log('Reconnecting your signaling connection!', error.message);
+		} else if (error.code === 53405) {
+			console.log('Reconnecting your media connection!', error.message);
+		}
+		/* Update the application UI here */
+		toast(_('Reconnecting your media connection...'));
+	});
+};
+export const onReconnected = (room: Room) => {
+	room.on('reconnected', () => {
+		console.log('Reconnected your signaling and media connections!');
+		/* Update the application UI here */
+		toast(_('Reconnected your signaling and media connections!'));
 	});
 };

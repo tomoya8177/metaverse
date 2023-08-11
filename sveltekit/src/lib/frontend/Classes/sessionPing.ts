@@ -14,10 +14,10 @@ type Session = {
 export class sessionPing {
 	session: Session;
 	interval: any;
-	el: Entity;
-	constructor(data: Session, el: Entity) {
+	el: Entity | null;
+	constructor(data: Session, el: Entity | null) {
 		this.session = data;
-		this.el = el;
+		this.el = el || null;
 	}
 	async start() {
 		this.session = await axios
@@ -25,7 +25,7 @@ export class sessionPing {
 				instanceId: this.session.instanceId,
 				type: this.session.type,
 				user: this.session.user,
-				room: this.session.event
+				room: this.session.room
 			})
 			.then((res) => res.data);
 		this.interval = setInterval(() => {
