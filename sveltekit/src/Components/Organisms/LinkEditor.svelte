@@ -5,11 +5,11 @@
 	import { RoomStore, UserStore } from '$lib/store';
 	import type { Organization } from '$lib/types/Organization';
 	import { onMount } from 'svelte';
-	import EventEdit from '../../routes/[organizationSlug=notRoute]/manager/events/EventEdit.svelte';
+	import EventEdit from './EventEdit.svelte';
 	import CreateUpdateDeleteButtons from '../Molecules/CreateUpdateDeleteButtons.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import ScheduleEditor from '../Molecules/ScheduleEditor.svelte';
-	import AttendanceEditor from '../../routes/[organizationSlug=notRoute]/manager/events/AttendanceEditor.svelte';
+	import AttendanceEditor from '../Molecules/AttendanceEditor.svelte';
 	import axios from 'axios';
 	import type { User } from '$lib/frontend/Classes/User';
 	import type { Attendance } from '$lib/frontend/Classes/Attendance';
@@ -26,18 +26,26 @@
 	import { page } from '$app/stores';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	import { convertLocalToUTC, convertUTCToLocal } from '$lib/frontend/convertLocalToUTC';
 	export let editObject: SharedObject = new SharedObject({ type: 'image', withCaption: true });
 	export let editMode: 'update' | 'create' = 'create';
 	export let onCreate: (object: SharedObject) => void = (object) => {};
 	export let onUpdate: (object: SharedObject) => void = (object) => {};
 	export let onDelete: (object: SharedObject) => void = (object) => {};
 	export let editEvent: Event | undefined = new Event();
+
 	export let organization: Organization;
 	export let attendances: Attendance[] = [];
 	export let canAttachCaption: boolean = true;
 	export let room: Room | undefined = undefined;
 	let users: User[] = [];
 	onMount(async () => {
+		console.log({ editEvent });
+		if (editEvent) {
+			editEvent.start = convertUTCToLocal(editEvent.start);
+			editEvent.end = convertUTCToLocal(editEvent.end);
+		}
+		console.log({ editEvent });
 		const userRoles = await axios
 			.get('/api/userRoles?organization=' + organization.id)
 			.then((res) => res.data);
@@ -77,6 +85,8 @@
 		if (attachEvent) {
 			editEvent.attachObject(editObject);
 			editEvent.organization = organization.id;
+			editEvent.start = convertLocalToUTC(editEvent.start);
+			editEvent.end = convertLocalToUTC(editEvent.end);
 			await editEvent.create();
 		}
 		busy = false;
@@ -96,6 +106,9 @@
 
 			editEvent.attachObject(editObject);
 			editEvent.organization = organization.id;
+			editEvent.start = convertLocalToUTC(editEvent.start);
+			editEvent.end = convertLocalToUTC(editEvent.end);
+
 			if (existing) {
 				const updated = await editEvent.update();
 				console.log({ updated });

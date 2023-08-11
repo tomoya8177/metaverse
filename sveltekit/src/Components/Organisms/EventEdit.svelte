@@ -1,22 +1,22 @@
 <script lang="ts">
-	import AttendanceEditor from './AttendanceEditor.svelte';
+	import AttendanceEditor from '../Molecules/AttendanceEditor.svelte';
 
 	import { Event } from '$lib/frontend/Classes/Event';
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
 	import { page } from '$app/stores';
-	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
-	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
+	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
+	import { convertLocalToUTC, convertUTCToLocal } from '$lib/frontend/convertLocalToUTC';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import type { Organization } from '$lib/types/Organization';
 	import type { User } from '$lib/frontend/Classes/User';
-	import Icon from '../../../../Components/Atom/Icon.svelte';
+	import Icon from '../Atom/Icon.svelte';
 	import { onMount } from 'svelte';
 	import axios from 'axios';
 	import { Attendance } from '$lib/frontend/Classes/Attendance';
 	import { DateTime } from 'luxon';
-	import ScheduleEditor from '../../../../Components/Molecules/ScheduleEditor.svelte';
-	import LinkUrlDescriptionEditor from '../../../../Components/Molecules/LinkURLDescriptionEditor.svelte';
+	import ScheduleEditor from '../Molecules/ScheduleEditor.svelte';
+	import LinkUrlDescriptionEditor from '../Molecules/LinkURLDescriptionEditor.svelte';
 	export let editEvent: Event;
 	export let editMode: 'create' | 'update' = 'update';
 	export let modalOpen: boolean = true;
@@ -25,6 +25,12 @@
 	export let onUpdateDone: (event: Event) => void;
 	export let onDeleteDone: (event: Event) => void;
 	export let onCreateDone: (event: Event) => void;
+	console.log({ editEvent });
+	if (editEvent) {
+		editEvent.start = convertUTCToLocal(editEvent.start);
+		editEvent.end = convertUTCToLocal(editEvent.end);
+	}
+	console.log({ editEvent });
 </script>
 
 <div class="flexOnWideScreen">
@@ -43,10 +49,12 @@
 		on:click={async () => {
 			if (!editEvent.validate()) return;
 			modalOpen = false;
-			editEvent.start = convertLocalToUTC(editEvent.start);
-			editEvent.end = convertLocalToUTC(editEvent.end);
-			console.log(editEvent.start, editEvent.end);
-			const createdEvent = new Event(await editEvent.create());
+			const newEvent = new Event({
+				...editEvent,
+				start: convertLocalToUTC(editEvent.start),
+				end: convertLocalToUTC(editEvent.end)
+			});
+			const createdEvent = new Event(await newEvent.create());
 			toast(_('Created'));
 			onCreateDone(createdEvent);
 		}}>{_('Create')}</button
@@ -58,12 +66,14 @@
 			if (!editEvent.validate()) return;
 			//close modal first
 			modalOpen = false;
-
-			editEvent.start = convertLocalToUTC(editEvent.start);
-			editEvent.end = convertLocalToUTC(editEvent.end);
-			await editEvent.update();
+			const newEvent = new Event({
+				...editEvent,
+				start: convertLocalToUTC(editEvent.start),
+				end: convertLocalToUTC(editEvent.end)
+			});
+			await newEvent.update();
 			toast(_('Updated'));
-			onUpdateDone(editEvent);
+			onUpdateDone(newEvent);
 		}}>{_('Update')}</button
 	>
 	<button

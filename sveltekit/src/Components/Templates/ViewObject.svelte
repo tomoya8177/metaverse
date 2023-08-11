@@ -9,6 +9,7 @@
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { DateTime } from 'luxon';
 	import Attendance from '../Molecules/Attendance.svelte';
+	import EventDateTimeDisplay from '../Molecules/EventDateTimeDisplay.svelte';
 	export let object: SharedObject;
 	export let event: Event | null = null;
 	export let organization: Organization | null = null;
@@ -39,24 +40,16 @@
 	{#if event && organization}
 		{@const attendance = attendances.find((attendance) => attendance.user == $UserStore.id)}
 		<div>
-			<h4>
-				{_('Event')}
-			</h4>
-			<InputWithLabel label={_('All Day')} bind:value={event.allDay} type="switch" disabled />
-			<div>
-				<label>{_('Start')}</label>
-				{DateTime.fromISO(event.start).toLocaleString(
-					event.allDay ? DateTime.DATE : DateTime.DATETIME_SHORT
-				)}
-			</div>
-			<div>
-				<label>{_('End')}</label>
-				{DateTime.fromISO(event.end).toLocaleString(
-					event.allDay ? DateTime.DATE : DateTime.DATETIME_SHORT
-				)}
-			</div>
+			<section>
+				<h4>
+					{_('Event')}
+				</h4>
+				<EventDateTimeDisplay {event} />
+			</section>
 			{#if attendance}
-				You are attending
+				<h4>
+					{_('RSVP')}
+				</h4>
 				<Attendance
 					user={$UserStore}
 					{event}

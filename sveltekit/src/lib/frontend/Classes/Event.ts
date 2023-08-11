@@ -16,6 +16,7 @@ export class Event extends DBObject {
 	start: string;
 	end: string;
 	organization: string;
+	myAttendance?: Attendance;
 	constructor(data: any = {}) {
 		data.table = 'events';
 		super(data);
@@ -112,7 +113,7 @@ export class Event extends DBObject {
 		return true;
 	}
 	toFullCalendarEvent() {
-		return {
+		const obj = {
 			...this,
 			url: '',
 			title: this.summary,
@@ -128,6 +129,21 @@ export class Event extends DBObject {
 				.toLocal()
 				.toJSDate()
 		};
+		if (this.myAttendance) {
+			obj.textColor =
+				this.myAttendance.status == 'notAttending'
+					? 'pink'
+					: this.myAttendance.status == 'unknown'
+					? ''
+					: 'lightgreen';
+			obj.borderColor =
+				this.myAttendance.status == 'notAttending'
+					? 'pink'
+					: this.myAttendance.status == 'unknown'
+					? ''
+					: 'lightgreen';
+		}
+		return obj;
 	}
 	async ical(users: User[], attendances: Attendance[], organizer: User | null = null) {
 		console.log({ users, attendances });

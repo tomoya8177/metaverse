@@ -8,6 +8,7 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
+	import { UserStore } from '$lib/store';
 	export let user: User;
 
 	export let event: Event;
@@ -22,18 +23,19 @@
 
 			{user.nickname}
 		</div>
-
-		<div style="width:1rem;text-align:right">
-			<a
-				href={'#'}
-				on:click={() => {
-					attendance.delete();
-					onDelete();
-				}}
-			>
-				<Icon icon="delete" />
-			</a>
-		</div>
+		{#if $UserStore.isManager}
+			<div style="width:1rem;text-align:right">
+				<a
+					href={'#'}
+					on:click={() => {
+						attendance.delete();
+						onDelete();
+					}}
+				>
+					<Icon icon="delete" />
+				</a>
+			</div>
+		{/if}
 	</div>
 	{#if event.end > DateTime.now().toISO()}
 		<div style="display:flex;gap:0.2rem">

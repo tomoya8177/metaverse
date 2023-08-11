@@ -27,6 +27,7 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
+	import { goto } from '$app/navigation';
 
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
@@ -138,6 +139,16 @@
 </div>
 {#if more}
 	<div class="more" transition:slide={{ delay: 0, duration: 500, easing: quintOut, axis: 'y' }}>
+		{#if $UserStore.isMember}
+			<button
+				on:click={() => {
+					goto(`/${organization.slug}/${$RoomStore.slug}/events`);
+				}}
+			>
+				<Icon icon="calendar_month" />
+				{_('Calendar')}
+			</button>
+		{/if}
 		{#if $UserStore.onScreenShare}
 			<button
 				data-tooltip={_('Hide My Screen')}

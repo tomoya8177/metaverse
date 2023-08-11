@@ -22,7 +22,7 @@ AFRAME.registerComponent('editable-object', {
 	camera: null as Entity | null,
 	rig: null as Entity | null,
 	distance: 0,
-	timeout: '' as string,
+	timeout: null as any,
 	init: function () {
 		this.cursorEl = document.querySelector('[raycaster]');
 		this.rayCatcher = document.getElementById('rayCatcher') as Entity;
@@ -102,6 +102,7 @@ AFRAME.registerComponent('editable-object', {
 					//deselect object
 					let ifEditorOpen;
 					FocusObjectStore.update((obj) => {
+						if (!obj) return;
 						ifEditorOpen = obj.editorOpen;
 						return obj;
 					});

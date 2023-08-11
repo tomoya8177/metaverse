@@ -1,5 +1,5 @@
 <script lang="ts">
-	import EventEdit from './EventEdit.svelte';
+	import EventEdit from '../../../../Components/Organisms/EventEdit.svelte';
 
 	import { Event } from '$lib/frontend/Classes/Event';
 	import { myConfirm, toast } from '$lib/frontend/toast';
@@ -18,6 +18,7 @@
 	import listPlugin from '@fullcalendar/list';
 	import { cookies } from '$lib/frontend/cookies';
 	import { goto } from '$app/navigation';
+	import { CalendarDisplay } from '$lib/frontend/Classes/Calendar';
 
 	export let data: PageData;
 	let events = data.events;
@@ -26,36 +27,12 @@
 	let rooms = data.rooms;
 	let editEvent: Event;
 	let editMode: 'create' | 'update' = 'update';
-	let calendar: Calendar;
+	let calendar: CalendarDisplay;
 	let users = data.users;
 	onMount(() => {
 		setTimeout(() => {
 			const el = document.getElementById('calendar') as HTMLElement;
-			calendar = new Calendar(el, {
-				events: events.map((event) => event.toFullCalendarEvent()),
-				plugins: [dayGridPlugin, timeGridPlugin, listPlugin],
-				themeSystem: 'Flatly',
-				buttonText: {
-					today: _('today'),
-					month: _('month'),
-					week: _('week'),
-					day: _('day'),
-					list: _('list')
-				},
-				headerToolbar: {
-					left: 'title',
-					right: 'dayGridMonth,timeGridWeek,listWeek'
-				},
-				footerToolbar: {
-					center: 'prev,today,next'
-				},
-				locale: cookies.get('locale') || 'en',
-				initialView: 'dayGridMonth',
-				titleFormat: { year: 'numeric', month: 'short' },
-				eventClick: function (info) {
-					onEventClicked(info.event.id);
-				}
-			});
+			calendar = new CalendarDisplay(el, events, onEventClicked);
 			calendar.render();
 		}, 1000);
 	});

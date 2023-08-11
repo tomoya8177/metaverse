@@ -377,7 +377,7 @@
 			{/if}
 		</div>
 	</div>
-	{#if $FocusObjectStore.editorOpen}
+	{#if $FocusObjectStore?.editorOpen}
 		<dialog open style="position:absolute">
 			<article>
 				<ModalCloseButton

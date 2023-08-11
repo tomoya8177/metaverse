@@ -3,15 +3,17 @@
 	import { Event } from '$lib/frontend/Classes/Event';
 	import { Room } from '$lib/frontend/Classes/Room';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
+	import { convertUTCToLocal } from '$lib/frontend/convertLocalToUTC';
 	import { toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
 	import LinkEditor from '../../../../../Components/Organisms/LinkEditor.svelte';
-	import EventEdit from '../EventEdit.svelte';
+	import EventEdit from '../../../../../Components/Organisms/EventEdit.svelte';
 
 	import type { PageData } from './$types';
 	export let data: PageData;
 	console.log({ data });
 	let editEvent = new Event(data.event);
+
 	let editObject = editEvent.object ? new SharedObject(data.object) : undefined;
 	let room = editObject?.room ? new Room(data.room) : undefined;
 	let organization = data.organization;
