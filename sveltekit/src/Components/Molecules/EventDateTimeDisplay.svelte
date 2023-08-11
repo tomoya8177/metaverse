@@ -15,17 +15,17 @@
 		{DateTime.fromISO(event.start).toLocaleString(
 			event.allDay ? DateTime.DATE : DateTime.DATETIME_SHORT
 		)}
-	</dd>
-	{#if DateTime.fromISO(event.end).toISO() != DateTime.fromISO(event.start)
-			.plus({ days: 1 })
-			.toISO()}
-		<dt>
-			{_('End')}
-		</dt>
-		<dd>
+		{#if DateTime.fromISO(event.end).toISO() != DateTime.fromISO(event.start)
+				.plus({ days: 1 })
+				.toISO()}
+			-
 			{DateTime.fromISO(event.end).toLocaleString(
-				event.allDay ? DateTime.DATE : DateTime.DATETIME_SHORT
+				event.allDay
+					? DateTime.DATE
+					: DateTime.fromISO(event.end).toISODate() == DateTime.fromISO(event.start).toISODate()
+					? DateTime.TIME_SIMPLE
+					: DateTime.DATETIME_SHORT
 			)}
-		</dd>
-	{/if}
+		{/if}
+	</dd>
 </dl>

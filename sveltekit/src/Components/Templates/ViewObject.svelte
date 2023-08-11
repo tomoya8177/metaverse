@@ -24,21 +24,17 @@
 		</h4>
 		<dl>
 			<dt>
-				{_('Title')}
+				<strong>
+					{object.title}
+				</strong>
 			</dt>
 			<dd>
-				{object.title}
+				{@html nl2br(object.description)}
 			</dd>
 			{#if object.linkTo}
 				<dt>{_('URL')}</dt>
 				<dd>
 					<a href={object.linkTo} target="_blank">{object.linkTo}</a>
-				</dd>
-			{/if}
-			{#if object.description}
-				<dt>{_('Description')}</dt>
-				<dd>
-					{@html nl2br(object.description)}
 				</dd>
 			{/if}
 		</dl>
