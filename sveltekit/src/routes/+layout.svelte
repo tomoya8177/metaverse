@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from '$app/stores';
+	import { page, page } from '$app/stores';
 	import { PUBLIC_IS_DEV } from '$env/static/public';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { _ } from '$lib/i18n';
@@ -9,6 +9,21 @@
 		path: $page.url.pathname
 	});
 </script>
+{#if !$page.url.host.includes('localhost')}
+<svelte:head>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-VGNJBD1Q84"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag() {
+			dataLayer.push(arguments);
+		}
+		gtag('js', new Date());
+
+		gtag('config', 'G-VGNJBD1Q84');
+	</script>
+</svelte:head>
+{/if}
 
 <slot />
 {#if $Toast.open}

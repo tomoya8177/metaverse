@@ -127,6 +127,15 @@
 				}}>{_('Back')}</a
 			>
 		{/if}
+		<div>
+			{_('Please read our Terms of Service and Privacy Policy before using this service.')}
+		</div>
+		<div style="display:flex;gap:1rem">
+			<a href="https://virtuacampus.com/terms-of-service/" target="_blank"
+				>{_('Terms of Service')}</a
+			>
+			<a href="https://virtuacampus.com/privacy-policy/" target="_blank">{_('Privacy Policy')}</a>
+		</div>
 	</article>
 </dialog>
 
