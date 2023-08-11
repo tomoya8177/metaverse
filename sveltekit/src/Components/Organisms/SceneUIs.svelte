@@ -305,7 +305,7 @@
 					<Icon icon="magnify_fullscreen" />
 				</button>
 			</div>
-			{#if $FocusObjectStore.type.includes('video')}
+			{#if $FocusObjectStore.type?.includes('video')}
 				{#if $FocusObjectStore && !$FocusObjectStore.playing}
 					<div>
 						<button

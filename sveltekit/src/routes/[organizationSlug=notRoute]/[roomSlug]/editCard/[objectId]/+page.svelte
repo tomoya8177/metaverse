@@ -55,7 +55,7 @@
 
 				//sharedObject.moveToMyFront(me.position, me.rotation);
 				document.getElementById('createCardModalCloseButton')?.click();
-				console.log(editObject);
+				console.log({ editObject });
 				if (editObject.type.includes('image')) {
 					// const existing = sharedObjects.get(sharedObject.id);
 					// if (existing) {
@@ -63,6 +63,7 @@
 					// 	editObject.asset = existing.asset;
 					// 	editObject.captionAsset = existing.captionAsset;
 					// }
+
 					editObject.refreshPreview();
 				}
 				videoChat.sendMessage({

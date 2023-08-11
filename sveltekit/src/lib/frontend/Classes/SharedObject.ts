@@ -5,6 +5,7 @@ import { getPositionFromLockedPosition } from '../getPositionFromLockedPosition'
 import { myAlert } from '../toast';
 import { _ } from '$lib/i18n';
 import { DBObject } from './DBObject';
+import axios from 'axios';
 type shortType = 'image' | 'video' | 'model' | 'screen';
 
 //export class SharedObject extends DBObject {
@@ -80,9 +81,7 @@ export class SharedObject extends DBObject {
 	}
 	refreshPreview() {
 		this.remove();
-		setTimeout(() => {
-			this.attachElement();
-		}, 1000);
+		this.attachElement();
 	}
 	attachElement() {
 		this.el = document.createElement('a-entity') as Entity;
@@ -215,7 +214,7 @@ export class SharedObject extends DBObject {
 				break;
 		}
 	}
-	setEntityMaterial(entity: Entity, asset: Entity): Entity {
+	setEntityMaterial(entity: Entity, asset: Entity) {
 		this.el?.setAttribute(
 			'material',
 			`src: #${asset.id}; shader:flat;side: double;transparent: true`
@@ -269,6 +268,16 @@ export class SharedObject extends DBObject {
 		} else {
 			return 0.5;
 		}
+	}
+	updateComponents() {
+		if (!this.el) return console.error('el is null');
+		this.components = JSON.stringify({
+			position: this.el.getAttribute('position'),
+			rotation: this.el.getAttribute('rotation'),
+			scale: this.el.getAttribute('scale'),
+			radius: this.el.getAttribute('geometry')?.radius
+		});
+		this.update();
 	}
 	remove() {
 		this.el?.parentNode?.removeChild(this.el);

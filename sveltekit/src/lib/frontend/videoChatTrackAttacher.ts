@@ -32,7 +32,6 @@ export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTra
 				const newItem = EmptyObject;
 				newItem.id = track.sid;
 				newItem.type = 'screen';
-				newItem.shortType = 'screen';
 				newItem.inPreviewPane = true;
 
 				return [...items, newItem];

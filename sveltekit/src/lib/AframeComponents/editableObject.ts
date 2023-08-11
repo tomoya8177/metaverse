@@ -26,9 +26,9 @@ AFRAME.registerComponent('editable-object', {
 	init: function () {
 		this.cursorEl = document.querySelector('[raycaster]');
 		this.rayCatcher = document.getElementById('rayCatcher') as Entity;
+		this.object = sharedObjects.get(this.el.id) || null;
 
 		this.el.addEventListener('mousedown', (e: Room) => {
-			this.object = sharedObjects.get(this.el.id) || null;
 			if (!this.object || !this.rayCatcher) return console.error('object is null');
 			FocusObjectStore.set(this.object);
 			this.transportMode = 'position';
@@ -66,67 +66,62 @@ AFRAME.registerComponent('editable-object', {
 			}
 		});
 		this.el.addEventListener('mouseup', () => {
-			if (this.object && this.object.locked) {
-				if (this.object.linkTo) {
-					if (this.readyToLink) {
-						//link to object
-						window.open(this.object.linkTo, '_blank');
-						return;
+			if (this.object) {
+				if (this.object.locked) {
+					if (this.object.linkTo) {
+						if (this.readyToLink) {
+							//link to object
+							window.open(this.object.linkTo, '_blank');
+							return;
+						}
+						const text = document.createElement('a-text');
+						text.setAttribute('value', _('Click to open'));
+						text.setAttribute('position', '0 0 0.02');
+						text.setAttribute('color', 'white');
+						text.setAttribute('align', 'center');
+						text.setAttribute('width', '1');
+						//set geometry as background
+						const geometry = document.createElement('a-plane');
+						geometry.setAttribute('color', 'green');
+						geometry.setAttribute('width', '0.4');
+						geometry.setAttribute('height', '0.1');
+						geometry.setAttribute('position', '0 0 0.01');
+						//append to the object
+						geometry.classList.add('clickable');
+						this.el.appendChild(text);
+						this.el.appendChild(geometry);
+						setTimeout(() => {
+							if (!this.el.lastChild) return;
+							this.el.removeChild(this.el.lastChild);
+							this.el.removeChild(this.el.lastChild);
+							this.readyToLink = false;
+						}, 3000);
+						this.readyToLink = true;
 					}
-					const text = document.createElement('a-text');
-					text.setAttribute('value', _('Click to open'));
-					text.setAttribute('position', '0 0 0.02');
-					text.setAttribute('color', 'white');
-					text.setAttribute('align', 'center');
-					text.setAttribute('width', '1');
-					//set geometry as background
-					const geometry = document.createElement('a-plane');
-					geometry.setAttribute('color', 'green');
-					geometry.setAttribute('width', '0.4');
-					geometry.setAttribute('height', '0.1');
-					geometry.setAttribute('position', '0 0 0.01');
-					//append to the object
-					geometry.classList.add('clickable');
-					this.el.appendChild(text);
-					this.el.appendChild(geometry);
-					setTimeout(() => {
-						if (!this.el.lastChild) return;
-						this.el.removeChild(this.el.lastChild);
-						this.el.removeChild(this.el.lastChild);
-						this.readyToLink = false;
-					}, 3000);
-					this.readyToLink = true;
-				}
-				clearTimeout(this.timeout);
-				this.timeout = setTimeout(() => {
-					//deselect object
-					let ifEditorOpen;
-					FocusObjectStore.update((obj) => {
-						if (!obj) return;
-						ifEditorOpen = obj.editorOpen;
-						return obj;
-					});
-					if (ifEditorOpen) return;
-					this.deselect();
-				}, 4000);
+					clearTimeout(this.timeout);
+					this.timeout = setTimeout(() => {
+						//deselect object
+						let ifEditorOpen;
+						FocusObjectStore.update((obj) => {
+							if (!obj) return;
+							ifEditorOpen = obj.editorOpen;
+							return obj;
+						});
+						if (ifEditorOpen) return;
+						this.deselect();
+					}, 4000);
 
-				return;
+					return;
+				}
+				if (!this.rayCatcher) return console.error('raycatcher is null');
+				this.rayCatcher.setAttribute('position', '0 -100 0');
+				this.rig?.setAttribute('look-controls', 'enabled:true');
+				this.rig?.setAttribute('touch-controls', 'enabled:true');
+				this.state = 'idle';
+				this.initialPos = null;
+				//lets' save position
+				this.object.updateComponents();
 			}
-			if (!this.rayCatcher) return console.error('raycatcher is null');
-			this.rayCatcher.setAttribute('position', '0 -100 0');
-			this.rig?.setAttribute('look-controls', 'enabled:true');
-			this.rig?.setAttribute('touch-controls', 'enabled:true');
-			this.state = 'idle';
-			this.initialPos = null;
-			//lets' save position
-			axios.put('/api/objects/' + this.el.id, {
-				components: JSON.stringify({
-					position: this.el.getAttribute('position'),
-					rotation: this.el.getAttribute('rotation'),
-					scale: this.el.getAttribute('scale'),
-					radius: this.el.getAttribute('geometry')?.radius
-				})
-			});
 		});
 		window.addEventListener('keydown', (evt) => {
 			if (evt.key == 'Shift') {

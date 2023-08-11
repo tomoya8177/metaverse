@@ -139,9 +139,40 @@
 </div>
 {#if more}
 	<div class="more" transition:slide={{ delay: 0, duration: 500, easing: quintOut, axis: 'y' }}>
+		<button
+			data-tooltip={_('Upload')}
+			on:click={() => {
+				uploader.launchPicker(['image/*', 'video/*', '.glb', 'gltf'], 1, (res) => {
+					//when done
+					actionHistory.send('uploadToScene', { files: res.filesUploaded });
+					res.filesUploaded.forEach(async (file) => {
+						if (!$RoomStore?.id) return;
+						appendObjectInTheRoom({
+							roomId: $RoomStore.id,
+							file,
+							userId: $UserStore.id,
+							me
+						});
+					});
+				});
+			}}
+		>
+			<Icon icon="add" />
+			{_('Upload')}
+		</button>
+		<button
+			on:click={() => {
+				goto(`/${organization.slug}/${$RoomStore?.slug}/createCard`);
+			}}
+			data-tooltip={_('Add Text Card')}
+		>
+			<Icon icon="post_add" />
+			{_('Add Text Card')}
+		</button>
 		{#if $UserStore.isMember}
 			<button
 				on:click={() => {
+					if (!$RoomStore?.id) return;
 					goto(`/${organization.slug}/${$RoomStore.slug}/events`);
 				}}
 			>
@@ -201,33 +232,6 @@
 				{_('Preview Panel')}
 			</button>
 		{/if}
-		<button
-			data-tooltip={_('Upload')}
-			on:click={() =>
-				uploader.launchPicker(['image/*', 'video/*', '.glb', 'gltf'], 1, (res) => {
-					//when done
-					actionHistory.send('uploadToScene', { files: res.filesUploaded });
-					res.filesUploaded.forEach(async (file) => {
-						appendObjectInTheRoom({
-							roomId: $RoomStore.id,
-							file,
-							userId: $UserStore.id,
-							me
-						});
-					});
-				})}
-		>
-			<Icon icon="add" />
-			{_('Upload')}
-		</button>
-		<a
-			role="button"
-			href={`/${organization.slug}/${$RoomStore.slug}/createCard`}
-			data-tooltip={_('Add Text Card')}
-		>
-			<Icon icon="post_add" />
-			{_('Add Text Card')}
-		</a>
 	</div>
 {/if}
 {#if linkEditorOpen}
