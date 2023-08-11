@@ -30,7 +30,6 @@
 		location.href = '/' + organization.slug;
 	}
 	onMount(async () => {
-		console.log('manager dashboard mount');
 		FocusObjectStore.set(null);
 		RoomStore.set(null);
 		Users.clear();

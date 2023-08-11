@@ -7,12 +7,9 @@ import type { User } from './Classes/User';
 //if the user is logged in, it sets the user in the UserStore
 
 export const checkLogin = async (): Promise<{ loggedIn: boolean; user?: User | undefined }> => {
-	console.log('checking login');
 	const result = await axios.get('/api/login');
-	console.log({ result });
 	if (result.data.result) {
 		//logged in
-		console.log(emptyUser, result.data.user);
 		const user = { ...emptyUser, ...result.data.user };
 		UserStore.set(user);
 		return { loggedIn: true, user: user };

@@ -148,7 +148,6 @@ export class SharedObject extends DBObject {
 			this.el.classList.add('clickable');
 		}
 		this.scene?.appendChild(this.el);
-		console.log({ entity: this.el });
 	}
 	setImageAspectRatio() {
 		if (!this.asset || !this.el) return console.error('asset is null');

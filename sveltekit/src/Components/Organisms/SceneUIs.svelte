@@ -374,34 +374,6 @@
 		border-radius: 0.6rem;
 	}
 
-	#filePreview {
-		overflow: auto;
-		display: flex;
-		flex-wrap: nowrap;
-		list-style-type: none;
-		gap: 0.2rem;
-		height: 100%;
-		margin-bottom: 0px;
-	}
-	.previewPaneItem {
-		/* min-width: calc(100vw - 6rem); */
-		height: calc(100svh - 11rem);
-		border-radius: 0.2rem;
-		flex: none;
-		position: relative;
-		list-style: none;
-		margin-bottom: 0px;
-	}
-	.filePreviewContainer {
-		position: absolute;
-		top: 3rem;
-		left: 1rem;
-		right: 1rem;
-		background-color: black;
-		padding: 0.4rem;
-		border-radius: 0.4rem;
-	}
-
 	.object-editor {
 		position: absolute;
 		top: 2em;

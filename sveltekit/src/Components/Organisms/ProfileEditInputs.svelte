@@ -8,7 +8,7 @@
 	import { _ } from '$lib/i18n';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	export let onUpdateDone: () => void;
-	export let me: Me;
+	export let me: Me | null = null;
 	export let label: string = _('Update');
 	export let withName = false;
 	export let withDescription = false;

@@ -13,7 +13,7 @@
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
-	import { UsersStore } from '$lib/frontend/Classes/Users';
+	import { Users, UsersStore } from '$lib/frontend/Classes/Users';
 	import { _, lang } from '$lib/i18n';
 	import Login from './Login.svelte';
 	import type { Organization } from '$lib/types/Organization';
@@ -25,6 +25,7 @@
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import { goto } from '$app/navigation';
+	import type { Me } from '$lib/frontend/Classes/Me';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
@@ -102,7 +103,7 @@
 </script>
 
 <nav>
-	<ul class:hiddenInSmallScreen={$RoomStore.id}>
+	<ul class:hiddenInSmallScreen={$RoomStore?.id}>
 		<li style="max-width:18rem">
 			<a href={logoLinkTo || '#'}>
 				{#if thumbnailURL}
@@ -122,7 +123,7 @@
 	<ul>
 		<li style="flex:1" />
 		{#if $UserStore.id}
-			{#if $UsersStore.length && $RoomStore.id}
+			{#if $UsersStore.length && $RoomStore?.id}
 				<li>
 					<a
 						href={'#'}
@@ -257,7 +258,6 @@
 			<ProfileEditInputs
 				withName
 				withDescription
-				bind:user={$UserStore}
 				onUpdateDone={() => {
 					actionHistory.send('profileUpdate', {
 						user: { ...$UserStore, description: escapeHTML($UserStore.description) }
@@ -274,10 +274,5 @@
 		padding-left: 1rem;
 		padding-right: 1rem;
 		flex-wrap: wrap;
-	}
-	.permissionRow {
-		display: flex;
-		gap: 1rem;
-		border-bottom: solid 1px #ccc;
 	}
 </style>

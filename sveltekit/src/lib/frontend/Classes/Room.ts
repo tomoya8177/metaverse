@@ -48,7 +48,6 @@ export class Room extends DBObject {
 		if (this.allowedUsers == '') {
 			this.allowedUsersArray = [];
 		} else {
-			console.log(this.allowedUsers);
 			this.allowedUsersArray = JSON.parse(this.allowedUsers);
 		}
 	}

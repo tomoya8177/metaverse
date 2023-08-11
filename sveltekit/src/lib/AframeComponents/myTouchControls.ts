@@ -1,5 +1,4 @@
 import { nippleControl } from '$lib/frontend/Classes/NippleControl';
-import { tick } from 'svelte';
 
 /**
  * Touch-to-move-forward controls for mobile.
@@ -20,6 +19,5 @@ AFRAME.registerComponent('my-touch-controls', {
 			this.el.object3D.position.x += (this.data.speed * vector.x) / 1000;
 			this.el.object3D.position.z += (this.data.speed * vector.z) / 1000;
 		}, 30);
-	},
-	tick: function () {}
+	}
 });

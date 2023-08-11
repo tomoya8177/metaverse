@@ -6,17 +6,17 @@
 	import type { PageData } from './$types';
 	import { RoomStore, FocusObjectStore, UserStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
-	import type { Mentor } from '$lib/types/Mentor';
 	import axios from 'axios';
 	import { nl2br } from '$lib/math/nl2br';
 	import { unescapeHTML } from '$lib/math/escapeHTML';
-	import { Room } from '$lib/frontend/Classes/Room';
+	import type { Room } from '$lib/frontend/Classes/Room';
 	import RoomTitleForManagers from '../../Components/Molecules/RoomTitleForManagers.svelte';
 	import AvatarThumbnail from '../../Components/Atom/AvatarThumbnail.svelte';
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 
 	export let data: PageData;
 	const organization: Organization = data.organization;
@@ -24,7 +24,6 @@
 	let rooms: Room[] = [];
 	onMount(async () => {
 		actionHistory.send('dashboard', { organization });
-		console.log('dashboard mount');
 		FocusObjectStore.set(null);
 		RoomStore.set(null);
 		Users.clear();
