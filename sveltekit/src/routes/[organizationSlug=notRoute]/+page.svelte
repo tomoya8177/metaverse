@@ -26,7 +26,7 @@
 		actionHistory.send('dashboard', { organization });
 		console.log('dashboard mount');
 		FocusObjectStore.set(null);
-		RoomStore.set(EmptyRoom);
+		RoomStore.set(null);
 		Users.clear();
 		mentors = await axios
 			.get('/api/mentors?organization=' + organization.id)

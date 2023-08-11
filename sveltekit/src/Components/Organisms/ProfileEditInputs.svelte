@@ -1,20 +1,17 @@
 <script lang="ts">
 	import AvatarSelectPane from './AvatarSelectPane.svelte';
-
-	import { RoomStore, UserStore } from '$lib/store';
+	import { UserStore } from '$lib/store';
 	import axios from 'axios';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
-	import type { User } from '$lib/frontend/Classes/User';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
-	import AvatarPreview from '../Atom/AvatarPreview.svelte';
-	import type { Unit } from '$lib/frontend/Classes/Unit';
-	import { fade } from 'svelte/transition';
-	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { _ } from '$lib/i18n';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	export let onUpdateDone: () => void;
 	export let me: Me;
+	export let label: string = _('Update');
+	export let withName = false;
+	export let withDescription = false;
 	let busy = false;
 
 	const onUpdateProfileDoClicked = async () => {
@@ -43,10 +40,6 @@
 		busy = false;
 		onUpdateDone();
 	};
-	export let label: string = _('Update');
-	let avatarSelectOpen = false;
-	export let withName = false;
-	export let withDescription = false;
 </script>
 
 {#if withName}

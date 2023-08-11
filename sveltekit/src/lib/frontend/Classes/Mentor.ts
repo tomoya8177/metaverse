@@ -11,7 +11,7 @@ AISpeaks.subscribe((value) => {
 
 export class Mentor extends DBObject {
 	user: string;
-	userData: User | null = null;
+	userData: User = new User({});
 	voiceURI: string = '';
 	utterance: SpeechSynthesisUtterance | null = null;
 	speechInterval: any;
@@ -23,7 +23,7 @@ export class Mentor extends DBObject {
 		this.utterance = new SpeechSynthesisUtterance();
 		const synth = window.speechSynthesis;
 		synth.addEventListener('voiceschanged', () => {
-			if (this.voiceURI) {
+			if (this.voiceURI && this.utterance) {
 				this.utterance.voice =
 					synth.getVoices().find((voice) => {
 						return voice.voiceURI == this.voiceURI;

@@ -31,7 +31,9 @@
 	import { cookies } from '$lib/frontend/cookies';
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
+	import type { Room } from '$lib/frontend/Classes/Room';
 	export let data: PageData;
+	export let room: Room;
 	let organization: Organization = data.organization;
 	AFRAME.registerComponent('on-scene-loaded', {
 		init: function () {
@@ -45,18 +47,18 @@
 	};
 	let sceneLoaded = false;
 	let readyToConnect = false;
-	let me: Me | null = null;
+	let me: Me;
 	const onSceneLoaded = async () => {
 		actionHistory.send('enteringRoom');
 		me = new Me($UserStore.id);
 		me.nickname = $UserStore.nickname;
 		Users.add(me);
 		// $UserStore.unit = me;
-		await me.setLastPosition($RoomStore);
+		await me.setLastPosition(room);
 		me.avatarURL =
 			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		sceneLoaded = true;
-		//me.twilioConnect($RoomStore.id)
+		//me.twilioConnect(room.id)
 		document.addEventListener('touchstart', () => {
 			//activate the nipple control
 			me.enableTouch();
@@ -71,8 +73,8 @@
 			}
 		};
 		//load mentor user
-		if ($RoomStore.mentor) {
-			const mentor = await axios.get('/api/mentors/' + $RoomStore.mentor).then((res) => res.data);
+		if (room.mentor) {
+			const mentor = await axios.get('/api/mentors/' + room.mentor).then((res) => res.data);
 			mentor.userData = await axios.get('/api/users/' + mentor.user).then((res) => res.data);
 			const mentorUnit = new Unit(mentor.userData.id);
 			mentorUnit.position = { x: 0, y: 0, z: 3 };
@@ -95,7 +97,7 @@
 {#if !readyToConnect}
 	<EnterRoomDialog
 		whenChatConnected={async () => {
-			loadSharedObjects($RoomStore.id);
+			loadSharedObjects(room.id);
 			const existingFeedback = await axios
 				.get('/api/feedbacks?campaign=1&user=' + $UserStore.id)
 				.then((res) => res.data);
@@ -110,7 +112,7 @@
 					{
 						role: 'system',
 						content: `The user, whose nickname is ${$UserStore.nickname}, joined the room "${
-							$RoomStore.title
+							room.title
 						}" of the organization "${
 							organization.title
 						}". Just greet the user nicely. Make sure you answer in the language user prefers. User's locale setting is ${cookies.get(
@@ -121,21 +123,21 @@
 			});
 			console.log({ response });
 			const message = new Message({
-				room: $RoomStore.id,
-				user: $RoomStore.mentorData.userData.id,
+				room: room.id,
+				user: room.mentorData.userData.id,
 				body: response.data.response.content,
 				createdAt: DateTime.now().toISO(),
 				isTalking: true
 			});
 			message.createSendOutAndPush();
-			callAIMentor($RoomStore.mentorData);
+			callAIMentor(room.mentorData);
 
 			TextChatOpen.set(true);
 			if (!$AISpeaks) {
 				return;
 			}
-			$RoomStore.mentorData.speak(message.body);
-			//			aiSpeaksOut(message.body, Users.find($RoomStore.mentorData.user) || null);
+			room.mentorData.speak(message.body);
+			//			aiSpeaksOut(message.body, Users.find(room.mentorData.user) || null);
 		}}
 		{me}
 		bind:readyToConnect
@@ -171,9 +173,10 @@
 			<InputWithLabel label={_('Give us your feedback')} type="textarea" bind:value={feedback} />
 			<button
 				on:click={async () => {
+					if (!room) return;
 					const feedbackObj = {
-						organization: $RoomStore.organization,
-						room: $RoomStore.id,
+						organization: room.organization,
+						room: room.id,
 						user: $UserStore.id,
 						star: starValue,
 						data: JSON.stringify({
@@ -222,10 +225,10 @@
 		rotation="0 0 0"
 		visible="false"
 	/>
-	{#if $RoomStore.environmentPreset != 'none'}
+	{#if room.environmentPreset != 'none'}
 		<a-entity
 			environment="
-        preset:{$RoomStore.environmentPreset || 'default'};
+        preset:{room.environmentPreset || 'default'};
         groundYScale:20
         "
 		/>
@@ -237,11 +240,11 @@
 				"
 		/>
 	{/if}
-	{#if $RoomStore.environmentModelURL}
-		<a-gltf-model src={$RoomStore.environmentModelURL} position="0 0.01 0" />
+	{#if room.environmentModelURL}
+		<a-gltf-model src={room.environmentModelURL} position="0 0.01 0" />
 	{/if}
-	{#if $RoomStore.navMeshModelURL}
-		<a-gltf-model src={$RoomStore.navMeshModelURL} position="0 0.01 0" visible="false" nav-mesh />
+	{#if room.navMeshModelURL}
+		<a-gltf-model src={room.navMeshModelURL} position="0 0.01 0" visible="false" nav-mesh />
 	{:else}
 		<a-plane
 			id="ground"
@@ -256,7 +259,7 @@
 	{/if}
 </a-scene>
 {#if sceneLoaded}
-	<SceneUIs {me} {organization} />
+	<SceneUIs {me} {organization} {room} />
 {/if}
 
 <style>

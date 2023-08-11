@@ -32,7 +32,7 @@
 	onMount(async () => {
 		console.log('manager dashboard mount');
 		FocusObjectStore.set(null);
-		RoomStore.set(EmptyRoom);
+		RoomStore.set(null);
 		Users.clear();
 	});
 </script>

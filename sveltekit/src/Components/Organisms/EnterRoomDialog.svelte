@@ -19,6 +19,7 @@
 	export let readyToConnect;
 	let organization: Organization | null = null;
 	onMount(async () => {
+		if (!$RoomStore) return;
 		organization = await axios
 			.get('/api/organizations/' + $RoomStore.organization)
 			.then((res) => res.data);
@@ -27,7 +28,7 @@
 	const onLeaveClicked = () => {
 		actionHistory.send('leaveRoom');
 		videoChat.leave();
-		RoomStore.set(EmptyRoom);
+		RoomStore.set(null);
 		if ($UserStore?.isMember) {
 			location.href = '/' + organization?.slug;
 		} else {
@@ -38,44 +39,47 @@
 
 <dialog open>
 	<article>
-		<div>{_('Room Title')}</div>
-		<h4>{$RoomStore.title}</h4>
-		{#if organization}
-			<div>{_('Organization')}</div>
-			<h5>{organization?.title}</h5>
-		{/if}
-		{#if me}
-			<ProfileEditInputs
-				{me}
-				label={_('Enter')}
-				onUpdateDone={async () => {
-					actionHistory.send('enterRoom');
-					readyToConnect = true;
-					if (!videoChat.connected) {
-						videoChat.init({ ...$UserStore }, $RoomStore);
-						await videoChat.connect();
-						whenChatConnected();
-					}
-				}}
-				user={$UserStore}
-			>
-				<hr />
-				<div>{_('Audio')}</div>
-				<div style="display:flex;gap:1rem;">
-					<div style="flex:1;align-self:center">
-						{_('Your Audio')}:
-						{#if $UserStore.onMute}{_('Muted')}{:else}{_('On')}{/if}
-					</div>
-					<div
-						style="align-self: center;
+		{#if $RoomStore}
+			<div>{_('Room Title')}</div>
+			<h4>{$RoomStore.title}</h4>
+			{#if organization}
+				<div>{_('Organization')}</div>
+				<h5>{organization?.title}</h5>
+			{/if}
+			{#if me}
+				<ProfileEditInputs
+					{me}
+					label={_('Enter')}
+					onUpdateDone={async () => {
+						if (!$RoomStore) return;
+
+						actionHistory.send('enterRoom');
+						readyToConnect = true;
+						if (!videoChat.connected) {
+							videoChat.init($UserStore, $RoomStore);
+							await videoChat.connect();
+							whenChatConnected();
+						}
+					}}
+				>
+					<hr />
+					<div>{_('Audio')}</div>
+					<div style="display:flex;gap:1rem;">
+						<div style="flex:1;align-self:center">
+							{_('Your Audio')}:
+							{#if $UserStore.onMute}{_('Muted')}{:else}{_('On')}{/if}
+						</div>
+						<div
+							style="align-self: center;
       height: 3rem;"
-					>
-						<AudioButton />
+						>
+							<AudioButton />
+						</div>
 					</div>
-				</div>
-				<hr />
-			</ProfileEditInputs>
+					<hr />
+				</ProfileEditInputs>
+			{/if}
+			<button class="secondary" on:click={onLeaveClicked}>{_('Leave')}</button>
 		{/if}
-		<button class="secondary" on:click={onLeaveClicked}>{_('Leave')}</button>
 	</article>
 </dialog>

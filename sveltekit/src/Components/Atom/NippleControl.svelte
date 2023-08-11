@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
-	import { radian2degree } from '$lib/math/degree2radians';
 	import { onMount } from 'svelte';
 	export let size = 2;
-	let dragging = false;
 	let initialPos = { x: 0, y: 0 };
 	let currentPos = { x: 0, y: 0 };
 	onMount(() => {

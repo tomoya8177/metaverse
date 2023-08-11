@@ -1,7 +1,7 @@
 export class VoiceRecognition {
 	recognition: SpeechRecognition;
 	body: string;
-	constructor(onError: () => void) {
+	constructor(onError: (event: ErrorEvent) => void) {
 		this.body = '';
 		//activate speech detech api
 		const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;

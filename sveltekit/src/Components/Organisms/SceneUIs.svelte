@@ -1,4 +1,6 @@
 <script lang="ts">
+	import FilePreviewPanel from './FilePreviewPanel.svelte';
+
 	import ActionButtons from './ActionButtons.svelte';
 	import ChatBox from './ChatBox.svelte';
 
@@ -43,25 +45,25 @@
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { error } from '@sveltejs/kit';
 	import type { Organization } from '$lib/types/Organization';
-	import { cookies } from '$lib/frontend/cookies';
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
+	import type { Room } from '$lib/frontend/Classes/Room';
 	export let organization: Organization;
+	export let room: Room;
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};
-	let virtuaMentorReady = false;
 	let authors: User[];
 	const onTextChatClicked = () => {
 		TextChatOpen.update((value) => {
-			value = !value;
-			if (value) {
+			const val = !value;
+			if (val) {
 				setTimeout(() => {
 					const element = document.querySelector('.chat-box > div');
 					if (!element) return;
 					scrolToBottom(element);
 				}, 100);
 			}
-			return value;
+			return val;
 		});
 	};
 
@@ -83,17 +85,13 @@
 	};
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
-		if ($RoomStore.mentor) {
-			if (!$RoomStore.mentorData.userData) return console.error('MentorUser not found');
-			authors = [...authors, $RoomStore.mentorData.userData];
-			const res = await axios.put('/mentor/' + $RoomStore.mentor, {
-				roomId: $RoomStore.id,
+		if (room.mentor) {
+			if (!room.mentorData.userData) return console.error('MentorUser not found');
+			authors = [...authors, room.mentorData.userData];
+			const res = await axios.put('/mentor/' + room.mentor, {
+				roomId: room.id,
 				refresh: false
 			});
-
-			console.log({ res });
-			//this is okay to be delaied
-			virtuaMentorReady = true;
 		}
 		videoChat.listenTo('textMessage', async (data) => {
 			const message = new Message(data);
@@ -112,11 +110,9 @@
 			if (message.isAIs) {
 				if (!$AISpeaks) {
 					TextChatOpen.set(true);
-
 					return;
 				}
-				$RoomStore.mentorData.speak(message.body);
-				//				aiSpeaksOut(message.body);
+				room.mentorData.speak(message.body);
 			}
 		});
 	});
@@ -126,16 +122,14 @@
 	});
 
 	let recognition: VoiceRecognition;
-	export let me: Me | null = null;
+	export let me: Me;
 	let micActive = false;
 	const onMicClicked = async () => {
 		micActive = !micActive;
 		if (micActive) {
-			//activate my mic and start audio to text
 			recognition = new VoiceRecognition((event) => {
 				if (event.error === 'not-allowed') {
 					myAlert(_('Microphone access denied by the user.'));
-					// Perform any necessary actions when access is denied
 				} else {
 					myAlert(event.error);
 					return;
@@ -143,34 +137,26 @@
 				onMicClicked();
 			});
 		} else {
-			//deactivate my mic and stop audio to text
 			recognition.stop();
 			if (!recognition.body) return;
 			const newMessage = new Message({
 				body: recognition.body + ' @Mentor',
 				user: $UserStore.id,
-				room: $RoomStore.id,
+				room: room.id,
 				pinned: newMessagePinned
 			});
 
 			await sendChatMessage(newMessage);
 			waitingForAIAnswer = true;
-			const aiMessage = await sendQuestionToAI(
-				$RoomStore.mentorData,
-				$RoomStore.id || 'none',
-				newMessage
-			);
+			const aiMessage = await sendQuestionToAI(room.mentorData, room.id || 'none', newMessage);
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)) };
 			callAIMentor();
-
 			if (!$AISpeaks) {
-				//open chat box
 				TextChatOpen.set(true);
-
 				return;
 			}
-			aiSpeaksOut(createdMessage.body, Users.find($RoomStore.mentorData.user) || null);
+			aiSpeaksOut(createdMessage.body, Users.find(room.mentorData.user) || null);
 		}
 	};
 	let waitingForAIAnswer = false;
@@ -186,34 +172,6 @@
 			return arr;
 		});
 		return createdMessage;
-	};
-	const onDeleteClicked = async () => {
-		if (!$FocusObjectStore) return;
-		if ($FocusObjectStore.title == 'Shared Screen') {
-			//check if the screen belong to myself. otherwise you can't relete it.
-			if (!$UserStore.onScreenShare) return alert('You are not sharing your screen.');
-			videoChat.unpublishMyTrack('screen');
-			const me = Users.find($UserStore.id);
-			if (!me) return console.error('me is null');
-			me?.hideScreen();
-			$UserStore.onScreenShare = false;
-			return;
-		}
-
-		const file = sharedObjects.get($FocusObjectStore.id);
-		console.log({ file });
-		await axios.delete('/api/objects/' + file.id);
-		// uploader.client.remove(file.handle, {
-		// 	policy: PUBLIC_FileStackPolicy,
-		// 	signature: PUBLIC_FileStackSignature
-		// });
-		file.remove();
-		videoChat.sendMessage({
-			key: 'objectDelete',
-			id: $FocusObjectStore.id
-		});
-		FocusObjectStore.set(null);
-		toast(_('Deleted'));
 	};
 </script>
 
@@ -235,9 +193,7 @@
 			display:flex;
 			gap:0.4rem;
 			justify-content: center; 
-		align-items: center;
-			
-	
+			align-items: center;
 	"
 		>
 			<div>
@@ -246,7 +202,7 @@
 					small
 					class="circle-button"
 					data-tooltip={_('Info')}
-					href={`/${organization.slug}/${$RoomStore.slug}/${$FocusObjectStore.id}`}
+					href={`/${organization.slug}/${room.slug}/${$FocusObjectStore.id}`}
 				>
 					<Icon icon="info" />
 				</a>
@@ -258,7 +214,7 @@
 						small
 						class="circle-button"
 						data-tooltip={_('Edit')}
-						href={`/${organization.slug}/${$RoomStore.slug}/editCard/${$FocusObjectStore.id}`}
+						href={`/${organization.slug}/${room.slug}/editCard/${$FocusObjectStore.id}`}
 					>
 						<Icon icon="edit" />
 					</a>
@@ -274,7 +230,7 @@
 						on:click={() => {
 							if (!$FocusObjectStore) return;
 							$FocusObjectStore.locked = !$FocusObjectStore.locked;
-							if ($FocusObjectStore.locked) FocusObjectStore.set(undefined);
+							if ($FocusObjectStore.locked) FocusObjectStore.set(null);
 						}}
 					>
 						<Icon icon={$FocusObjectStore.locked ? 'lock' : 'lock_open'} />
@@ -295,6 +251,7 @@
 						}
 						$FocusObjectStore.inPreviewPane = true;
 						ItemsInPreview.update((itemsInPreview) => {
+							if (!$FocusObjectStore) return itemsInPreview;
 							return [...itemsInPreview, $FocusObjectStore];
 						});
 						//
@@ -312,10 +269,8 @@
 							small
 							class="circle-button"
 							on:click={() => {
-								if (!$FocusObjectStore) return;
-
-								let video = document.getElementById(`${$FocusObjectStore.id}asset`);
-								video?.play();
+								if (!$FocusObjectStore || !$FocusObjectStore.asset) return;
+								$FocusObjectStore.asset.play();
 								$FocusObjectStore.playing = true;
 							}}
 						>
@@ -328,9 +283,8 @@
 							small
 							class="circle-button"
 							on:click={() => {
-								if (!$FocusObjectStore) return;
-								const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-								video?.pause();
+								if (!$FocusObjectStore || !$FocusObjectStore.asset) return;
+								$FocusObjectStore.asset.pause();
 								$FocusObjectStore.playing = false;
 							}}
 						>
@@ -343,11 +297,9 @@
 						small
 						class="circle-button"
 						on:click={() => {
-							if (!$FocusObjectStore) return;
-
-							const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-							if (!video) return console.error('video is null');
-							video.currentTime = 0;
+							if (!$FocusObjectStore || !$FocusObjectStore.asset) return;
+							if ($FocusObjectStore.asset instanceof HTMLVideoElement)
+								$FocusObjectStore.asset.currentTime = 0;
 						}}
 					>
 						<Icon icon="replay" />
@@ -362,9 +314,11 @@
 							if (!$FocusObjectStore) return;
 
 							const video = document.getElementById(`${$FocusObjectStore.id}asset`);
-							if (!video) return console.error('video is null');
-							video.muted = !video.muted;
-							$FocusObjectStore.muted = video.muted;
+							if (!video || !$FocusObjectStore.asset) return console.error('video is null');
+							if ($FocusObjectStore.asset instanceof HTMLVideoElement) {
+								$FocusObjectStore.asset.muted = !$FocusObjectStore.asset.muted;
+								$FocusObjectStore.muted = $FocusObjectStore.asset.muted;
+							}
 						}}
 					>
 						{#if $FocusObjectStore.muted}
@@ -377,206 +331,12 @@
 			{/if}
 		</div>
 	</div>
-	{#if $FocusObjectStore?.editorOpen}
-		<dialog open style="position:absolute">
-			<article>
-				<ModalCloseButton
-					onClick={() => {
-						if (!$FocusObjectStore) return;
-
-						$FocusObjectStore.editorOpen = false;
-					}}
-				/>
-
-				<div>
-					{#if $FocusObjectStore.lockedPosition}
-						{_('Object is in locked position.')}
-					{:else}
-						{_('Lock object to a fixed position.')}
-					{/if}
-					<ObjectLockSelect
-						bind:object={$FocusObjectStore}
-						readonly={$FocusObjectStore.locked}
-						onUpdate={(value) => {
-							if (!$FocusObjectStore) return;
-
-							$FocusObjectStore.lockedPosition = value;
-							const position = getPositionFromLockedPosition(value);
-							console.log({ position });
-							//animate to the position
-							$FocusObjectStore.el?.setAttribute('animation', {
-								property: 'position',
-								to: `${position.x} ${position.y} ${position.z}`,
-								dur: 1000
-							});
-						}}
-					/>
-				</div>
-
-				{#if $FocusObjectStore.title != 'Shared Screen'}
-					<div>
-						<InputWithLabel
-							label={_('Title')}
-							bind:value={$FocusObjectStore.title}
-							readonly={$FocusObjectStore.locked}
-						/>
-						<InputWithLabel
-							type="textarea"
-							label={_('Description')}
-							bind:value={$FocusObjectStore.description}
-							readonly={$FocusObjectStore.locked}
-						/>
-					</div>
-					<div style="position:relative">
-						<InputWithLabel
-							label={_('Link To')}
-							bind:value={$FocusObjectStore.linkTo}
-							readonly={$FocusObjectStore.locked}
-							copiable={!!$FocusObjectStore.linkTo}
-						/>
-					</div>
-					{#if $FocusObjectStore.linkTo}
-						<div>
-							<a href={$FocusObjectStore.linkTo} target="_blank">
-								<Icon icon="link" />
-								{_('Go To Link')}
-							</a>
-						</div>
-					{/if}
-					{#if !$FocusObjectStore.locked}
-						{#if $FocusObjectStore.type.includes('image') || $FocusObjectStore.type.includes('video')}
-							<div>
-								{#if !$FocusObjectStore.isSphere}
-									<button
-										on:click={async () => {
-											if (!$FocusObjectStore) return;
-
-											const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
-												isSphere: true
-											});
-											$FocusObjectStore.isSphere = true;
-											$FocusObjectStore.updateEntityGeometryAndMaterial();
-											videoChat.sendMessage({
-												key: 'objectUpdate',
-												id: $FocusObjectStore.id,
-												isSphere: true
-											});
-										}}>{_('Convert To 360 Sphere')}</button
-									>
-								{:else}
-									<button
-										on:click={async () => {
-											if (!$FocusObjectStore) return;
-
-											const updatedImage = await axios.put('/api/objects/' + $FocusObjectStore.id, {
-												isSphere: false
-											});
-											$FocusObjectStore.isSphere = false;
-											$FocusObjectStore.updateEntityGeometryAndMaterial();
-											videoChat.sendMessage({
-												key: 'objectUpdate',
-												id: $FocusObjectStore.id,
-												isSphere: false
-											});
-										}}>{_('Convert To Flat Image')}</button
-									>
-								{/if}
-							</div>
-						{/if}
-						<div>
-							<button
-								on:click={async () => {
-									if (!$FocusObjectStore) return;
-
-									await axios.put('/api/objects/' + $FocusObjectStore.id, {
-										title: $FocusObjectStore.title,
-										linkTo: $FocusObjectStore.linkTo,
-										description: $FocusObjectStore.description
-									});
-									toast(_(`Updated`));
-									videoChat.sendMessage({
-										key: 'objectUpdate',
-										id: $FocusObjectStore.id,
-										title: $FocusObjectStore.title,
-										linkTo: $FocusObjectStore.linkTo,
-										description: $FocusObjectStore.description
-									});
-								}}>{_('Update')}</button
-							>
-						</div>
-					{/if}
-				{/if}
-
-				{#if !$FocusObjectStore.locked}
-					<div>
-						<button on:click={onDeleteClicked} class="secondary">{_('Delete')}</button>
-					</div>
-				{/if}
-			</article>
-		</dialog>
-	{/if}
 {/if}
-<div class="filePreviewContainer" class:hidden={!$PreviewPanelOpen}>
-	<div style="display:flex">
-		<div style="flex:1">
-			{_('Preview Panel')}
-		</div>
-		<div>
-			<a
-				href={'#'}
-				on:click={() => {
-					PreviewPanelOpen.set(false);
-				}}
-			>
-				<Icon icon="close" />
-			</a>
-		</div>
-	</div>
-	<ul id="filePreview">
-		{#each $ItemsInPreview.filter((item) => item.shortType == 'screen') as object}
-			<li class="previewPaneItem" id={object.id + '_preview'}>
-				<div class="content" />
-			</li>
-		{/each}
-		{#each $ItemsInPreview.filter((item) => item.shortType != 'screen') as object}
-			<li class="previewPaneItem" id={object.id + '_preview'}>
-				{#if object.title}
-					<div style="position:absolute; top:0px;right:0px;z-index:2;">
-						<a href={object.url} target="_blank">
-							{object.title}
-							<Icon icon="open_in_new" />
-						</a>
-						<a
-							href={'#'}
-							on:click={() => {
-								object.inPreviewPane = false;
-								ItemsInPreview.update((items) => {
-									console.log({ items });
-									return items.filter((item) => item.inPreviewPane);
-								});
-							}}
-						>
-							<Icon icon="close" />
-						</a>
-					</div>
-				{/if}
-				<div class="content">
-					{#if object.shortType == 'image'}
-						<img src={object.url} alt={object.title} />
-					{:else if object.shortType == 'video'}
-						<video src={object.url} controls muted />
-					{:else if object.shortType == 'screen'}
-						<!--none-->
-					{/if}
-				</div>
-			</li>
-		{/each}
-	</ul>
-</div>
+<FilePreviewPanel />
 
 <div class="object-editor" />
 
-<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:micActive {me} />
+<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:micActive {me} {room} />
 <div style:display={$TextChatOpen ? 'block' : 'none'}>
 	<div class="chat-box">
 		<ChatBox
@@ -598,9 +358,7 @@
 	button {
 		margin-bottom: 0rem;
 	}
-	.hidden {
-		display: none;
-	}
+
 	.objectEditorNav {
 		position: absolute;
 		/* center */

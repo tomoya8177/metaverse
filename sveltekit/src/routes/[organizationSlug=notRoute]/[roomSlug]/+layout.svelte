@@ -5,35 +5,29 @@
 	import { ChatMessagesStore, RoomStore, UserStore } from '$lib/store';
 	import Login from '../../../Components/Organisms/Login.svelte';
 	import { fade } from 'svelte/transition';
-	import { checkLogin } from '$lib/frontend/checkLogin';
 	import Navigation from '../../../Components/Organisms/Navigation.svelte';
 	import { Room } from '$lib/frontend/Classes/Room';
 	import type { UserRole } from '$lib/types/UserRole';
 	import { _ } from '$lib/i18n';
 	import type { Organization } from '$lib/types/Organization';
 	import type { PageData } from './$types';
-	import {
-		sendInvitedToOrganizationEmail,
-		sendJoinedToOrganizationEmail
-	} from '$lib/frontend/sendInvitedToOrganizationEmail';
+	import { sendJoinedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { User } from '$lib/frontend/Classes/User';
 	import Scene from '../../../Components/Templates/Scene.svelte';
 	export let data: PageData;
 	let loggedIn: boolean | null = data.loggedIn;
-	console.log({ data });
 	let room: Room = new Room(data.room);
+	let roomReady = false;
 	if (room.mentor) {
 		room.mentorData = new Mentor(data.mentor);
 		room.mentorData.userData = new User(data.mentorUser);
-		console.log({ mentor: room.mentorData });
 	}
+	roomReady = true;
 	let noRoom: boolean | null = null;
 	let organization: Organization | null = data.organization;
 	ChatMessagesStore.set(data.messages);
-	$: console.log(loggedIn);
 	onMount(async () => {
-		console.log({ organization });
 		if (!organization) {
 			noRoom = true;
 			return;
@@ -51,13 +45,10 @@
 		}
 		if (!room.isPublic) {
 			if (!userRole) {
-				//room exists, but you are not a mamber of this organization
-				//check if the ogranization accepts registration
 				if (!organization.allowRegistration) {
 					noRoom = true;
 					return;
 				}
-				//you may get registered
 				const newUserRole = {
 					user: $UserStore.id,
 					organization: room.organization
@@ -69,7 +60,7 @@
 				location.reload();
 				return;
 			}
-			if (!room.isOpen && !$RoomStore.allowedUsersArray?.includes($UserStore.id)) {
+			if (!room.isOpen && !room.allowedUsersArray?.includes($UserStore.id)) {
 				noRoom = true;
 				return;
 			}
@@ -79,7 +70,7 @@
 </script>
 
 {#if loggedIn === false}
-	<Login organization={$RoomStore.organization} {room} />
+	<Login organization={room.organization} {room} />
 {:else}
 	{#if loggedIn === null || noRoom === null}
 		<dialog open transition:fade>
@@ -88,8 +79,8 @@
 				<progress />
 			</article>
 		</dialog>
-	{:else if $RoomStore.id && !noRoom}
-		<Scene {data} />
+	{:else if roomReady && !noRoom}
+		<Scene {data} {room} />
 		<slot />
 	{/if}
 	{#if noRoom}
@@ -104,9 +95,9 @@
 			</div>
 		</div>
 	{/if}
-	{#if $RoomStore.id}
+	{#if roomReady}
 		<div class="top">
-			<Navigation title={$RoomStore.title} {organization} />
+			<Navigation title={room.title} {organization} />
 		</div>
 	{/if}
 {/if}

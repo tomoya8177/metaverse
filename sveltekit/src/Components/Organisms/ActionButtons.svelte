@@ -28,10 +28,9 @@
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { goto } from '$app/navigation';
+	import type { Room } from '$lib/frontend/Classes/Room';
 
-	const scrolToBottom = (element: Element) => {
-		element.scrollTop = element.scrollHeight;
-	};
+export let room:Room
 	const onTextChatClicked = () => {
 		TextChatOpen.update((v) => !v);
 	};
@@ -51,7 +50,7 @@
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
 		organization = await axios
-			.get('/api/organizations/' + $RoomStore.organization)
+			.get('/api/organizations/' + room.organization)
 			.then((res) => res.data);
 	});
 	onDestroy(() => {
@@ -66,7 +65,7 @@
 </script>
 
 <div class="action-buttons">
-	{#if $RoomStore.mentor}
+	{#if room.mentor}
 		<button
 			data-tooltip={_('Ask AI Mentor')}
 			style:background-color={micActive ? 'red' : ''}
@@ -146,9 +145,9 @@
 					//when done
 					actionHistory.send('uploadToScene', { files: res.filesUploaded });
 					res.filesUploaded.forEach(async (file) => {
-						if (!$RoomStore?.id) return;
+						if (!room?.id) return;
 						appendObjectInTheRoom({
-							roomId: $RoomStore.id,
+							roomId: room.id,
 							file,
 							userId: $UserStore.id,
 							me
@@ -162,7 +161,7 @@
 		</button>
 		<button
 			on:click={() => {
-				goto(`/${organization.slug}/${$RoomStore?.slug}/createCard`);
+				goto(`/${organization.slug}/${room?.slug}/createCard`);
 			}}
 			data-tooltip={_('Add Text Card')}
 		>
@@ -172,8 +171,8 @@
 		{#if $UserStore.isMember}
 			<button
 				on:click={() => {
-					if (!$RoomStore?.id) return;
-					goto(`/${organization.slug}/${$RoomStore.slug}/events`);
+					if (!room?.id) return;
+					goto(`/${organization.slug}/${room.slug}/events`);
 				}}
 			>
 				<Icon icon="calendar_month" />

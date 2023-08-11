@@ -31,7 +31,7 @@
 	const onLogoutClicked = () => {
 		actionHistory.send('logout');
 		videoChat.leave();
-		RoomStore.set(EmptyRoom);
+		RoomStore.set(null);
 		cookies.remove('login');
 		location.reload();
 	};
@@ -179,7 +179,7 @@
 									href={'#'}
 									on:click={() => {
 										videoChat.leave();
-										RoomStore.set(EmptyRoom);
+										RoomStore.set(null);
 										location.href = '/admin';
 									}}
 								>
