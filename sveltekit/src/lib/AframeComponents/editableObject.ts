@@ -68,7 +68,7 @@ AFRAME.registerComponent('editable-object', {
 		this.el.addEventListener('mouseup', () => {
 			if (this.object) {
 				if (this.object.locked) {
-					if (this.object.linkTo) {
+					if (this.object.linkTo && this.object.shortType == 'image') {
 						if (this.readyToLink) {
 							//link to object
 							window.open(this.object.linkTo, '_blank');
