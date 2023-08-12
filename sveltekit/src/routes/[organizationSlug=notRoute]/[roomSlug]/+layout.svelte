@@ -69,6 +69,12 @@
 	});
 </script>
 
+<svelte:head>
+	<title>
+		{room.title} | {organization?.title} | VirtuaCampus
+	</title>
+</svelte:head>
+
 {#if loggedIn === false}
 	<Login organization={room.organization} {room} />
 {:else}
