@@ -236,4 +236,11 @@ export class Event extends DBObject {
 		this.description = sharedObject.description;
 		this.location = sharedObject.linkTo;
 	}
+	get startString() {
+		return `The event is ${this.allDay ? 'all day' : 'not all day'} event, and is scheduled ${
+			this.allDay
+				? 'on ' + DateTime.fromISO(this.start).toISODate()
+				: 'at ' + DateTime.fromISO(this.start).toLocaleString(DateTime.DATETIME_FULL)
+		}, which is ${DateTime.fromISO(this.start).setZone().toRelative()}.`;
+	}
 }

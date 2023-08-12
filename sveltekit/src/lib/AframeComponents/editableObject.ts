@@ -2,7 +2,6 @@ import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { _ } from '$lib/i18n';
-import { EmptyObject } from '$lib/preset/EmptyObject';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
 import type { Entity, Room } from 'aframe';
 import axios from 'axios';

@@ -13,7 +13,6 @@
 	import type { PageData } from './$types';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
-	import { EmptyObject } from '$lib/preset/EmptyObject';
 	export let data: PageData;
 	const organization: Organization = data.organization;
 	const loggedIn: boolean = data.loggedIn;

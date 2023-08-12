@@ -58,11 +58,8 @@ AFRAME.registerComponent('update-position', {
 				position: this.me.position,
 				rotation: { ...this.me.rotation }
 			});
-			// io.emit('position', {
-			// 	position: this.me.position,
-			// 	rotation: { ...this.me.rotation }
-			// });
 		}
+		if (!room.mentor) return;
 		if (
 			positionNotChanged(
 				{
@@ -73,60 +70,67 @@ AFRAME.registerComponent('update-position', {
 					position: this.lastPosition,
 					rotation: this.lastRotation
 				}
-			)
+			) &&
+			timeSinceLastPositionChange > 1000
 		) {
-			if (timeSinceLastPositionChange >= 1000) {
-				//check if there's any objects near by
-				let closestObject: SharedObject | null = null;
-				sharedObjects.items
-					.filter((object) => !object.explained && object.type != 'screen')
-					.forEach((object) => {
-						//if this is already explained, skip
-						const distance = this.el.object3D.position.distanceTo(object.position);
-						let minimumDistance = 3;
-						if (distance < 3 && distance <= minimumDistance) {
-							minimumDistance = distance;
-							closestObject = object;
-						}
-					});
-				if (!closestObject) return;
-				closestObject = closestObject as SharedObject;
-				closestObject.explained = true;
-				if (!closestObject.description) return;
-				callAIMentor(room.mentorData);
-
-				axios
-					.post('/mentor', {
-						messages: [
-							{
-								role: 'system',
-								content: `${user.nickname} is looking at the ${closestObject.shortType}, ${
-									closestObject.title
-								}, whose description is: ${closestObject.description}.
-									Tell the context of the description to the user. Try not to make it boring just by reading out the description. Encourage the user to seek more detail about the context. Answer in less than 100 words.
-								Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
-									'locale'
-								)}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`
-							}
-						]
-					})
-					.then((res) => {
-						const message = new Message({
-							user: room.mentorData?.user,
-							body: res.data.response.content,
-							room: room.id,
-							createdAt: DateTime.now().toISO(),
-							isTalking: true
-						});
-						message.createSendOutAndPush();
-						if (!aiSpeaks) {
-							TextChatOpen.set(true);
-							return;
-						}
-						room.mentorData.speak(res.data.response.content);
-						//aiSpeaksOut(res.data.response.content, Users.find(room.mentorData.user) || null);
-					});
+			//check if there's any objects near by
+			let closestObject: SharedObject | null = null;
+			sharedObjects.items
+				.filter((object) => !object.explained && object.type != 'screen')
+				.forEach((object) => {
+					//if this is already explained, skip
+					const distance = this.el.object3D.position.distanceTo(object.position);
+					let minimumDistance = 3;
+					if (distance < 3 && distance <= minimumDistance) {
+						minimumDistance = distance;
+						closestObject = object;
+					}
+				});
+			if (!closestObject) return;
+			closestObject = closestObject as SharedObject;
+			closestObject.explained = true;
+			if (!closestObject.description) return;
+			callAIMentor(room.mentorData);
+			console.log('sending AI request about object', closestObject);
+			let content = `${user.nickname} is looking at the ${closestObject.shortType}, ${closestObject.title}, whose description is: ${closestObject.description}.`;
+			//if there's an event attached, include it's data as well.
+			if (closestObject.attachedEvent) {
+				content += `There is an event attached. ${closestObject.attachedEvent.startString}`;
+				if (closestObject.attachedEvent.myAttendance) {
+					content += `User's attendance status for this event is ${closestObject.attachedEvent.myAttendance.status}.`;
+				}
 			}
+			content += `
+					Tell the context of the description to the user. Try not to make it boring just by reading out the description. Encourage the user to seek more detail about the context. Answer in less than 100 words.
+				Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
+					'locale'
+				)}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`;
+			console.log(content);
+			axios
+				.post('/mentor', {
+					messages: [
+						{
+							role: 'system',
+							content
+						}
+					]
+				})
+				.then((res) => {
+					const message = new Message({
+						user: room.mentorData?.user,
+						body: res.data.response.content,
+						room: room.id,
+						createdAt: DateTime.now().toISO(),
+						isTalking: true
+					});
+					message.createSendOutAndPush();
+					if (!aiSpeaks) {
+						TextChatOpen.set(true);
+						return;
+					}
+					room.mentorData.speak(res.data.response.content);
+					//aiSpeaksOut(res.data.response.content, Users.find(room.mentorData.user) || null);
+				});
 		}
 	}
 });

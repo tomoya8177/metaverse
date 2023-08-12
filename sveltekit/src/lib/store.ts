@@ -2,7 +2,6 @@ import { writable } from 'svelte/store';
 import type { Room } from './frontend/Classes/Room';
 import { emptyUser } from './preset/EmptyUser';
 import type { SharedObject } from './frontend/Classes/SharedObject';
-import { EmptyObject } from './preset/EmptyObject';
 import type { Message } from './frontend/Classes/Message';
 import type { User } from './frontend/Classes/User';
 

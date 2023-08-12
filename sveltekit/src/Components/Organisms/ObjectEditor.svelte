@@ -8,7 +8,6 @@
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { PUBLIC_FileStackPolicy, PUBLIC_FileStackSignature } from '$env/static/public';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
-	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { _ } from '$lib/i18n';
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { toast } from '$lib/frontend/toast';

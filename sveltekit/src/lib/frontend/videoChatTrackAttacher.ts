@@ -4,7 +4,6 @@ import type { RemoteAudioTrack, RemoteTrack, RemoteVideoTrack } from 'twilio-vid
 import { Users } from './Classes/Users';
 import { ItemsInPreview } from '$lib/store';
 import { SharedObject } from './Classes/SharedObject';
-import { EmptyObject } from '$lib/preset/EmptyObject';
 
 export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
 	const remoteUserId = track.name
@@ -29,7 +28,7 @@ export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTra
 			console.log('loaded screen of', el);
 			const clonedEl = track.attach();
 			ItemsInPreview.update((items) => {
-				const newItem = EmptyObject;
+				const newItem = new SharedObject({});
 				newItem.id = track.sid;
 				newItem.type = 'screen';
 				newItem.inPreviewPane = true;

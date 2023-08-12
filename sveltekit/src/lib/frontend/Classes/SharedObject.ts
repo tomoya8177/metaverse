@@ -1,13 +1,18 @@
 import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
-import type { xyz } from '$lib/store';
+import { UserStore, type xyz } from '$lib/store';
 import { getPositionFromLockedPosition } from '../getPositionFromLockedPosition';
 import { myAlert } from '../toast';
 import { _ } from '$lib/i18n';
 import { DBObject } from './DBObject';
 import axios from 'axios';
+import { Event } from './Event';
+import type { User } from './User';
 type shortType = 'image' | 'video' | 'model' | 'screen';
-
+let user: User;
+UserStore.subscribe((u) => {
+	user = u;
+});
 //export class SharedObject extends DBObject {
 export class SharedObject extends DBObject {
 	url: string = '';
@@ -39,6 +44,7 @@ export class SharedObject extends DBObject {
 	muted: boolean = false;
 	editorOpen: boolean = false;
 	captionStyle: string = '';
+	attachedEvent: Event | null = null;
 	constructor(data: any = {}) {
 		data.table = 'objects';
 		super(data);
@@ -78,6 +84,18 @@ export class SharedObject extends DBObject {
 		this.isSphere = data.isSphere || false;
 		this.description = data.description || '';
 		this.lockedPosition = data.lockedPosition || 0;
+		this.loadAttachedEvent();
+	}
+	async loadAttachedEvent(): Promise<void> {
+		const res = await axios.get('/api/events?object=' + this.id);
+		if (res.data.length == 0) return;
+		this.attachedEvent = new Event(res.data[0]);
+		console.log({ attachedEvent: this.attachedEvent, user });
+		const res2 = await axios.get(
+			'/api/attendances?event=' + this.attachedEvent.id + '&user=' + user.id
+		);
+		if (res2.data.length == 0 || !this.attachedEvent) return;
+		this.attachedEvent.myAttendance = res2.data[0];
 	}
 	refreshPreview() {
 		this.remove();

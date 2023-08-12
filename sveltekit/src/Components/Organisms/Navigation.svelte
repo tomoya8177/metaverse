@@ -22,7 +22,6 @@
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { nl2br } from '$lib/math/nl2br';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
-	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import { goto } from '$app/navigation';
 	import type { Me } from '$lib/frontend/Classes/Me';

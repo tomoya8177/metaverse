@@ -32,6 +32,7 @@
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
 	import type { Room } from '$lib/frontend/Classes/Room';
+	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	export let data: PageData;
 	export let room: Room;
 	let organization: Organization = data.organization;
@@ -97,7 +98,7 @@
 {#if !readyToConnect}
 	<EnterRoomDialog
 		whenChatConnected={async () => {
-			loadSharedObjects(room.id);
+			await loadSharedObjects(room.id);
 			const existingFeedback = await axios
 				.get('/api/feedbacks?campaign=1&user=' + $UserStore.id)
 				.then((res) => res.data);
@@ -106,18 +107,32 @@
 					QADialogOpen = true;
 				}, 120000); //in 2 minutes, the QA dialog will show up
 			}
+			if (!room.mentor) return;
 			console.log('now initialize the chat');
+
+			let content = `The user, whose nickname is ${$UserStore.nickname}, joined the room "${
+				room.title
+			}" of the organization "${
+				organization.title
+			}". Just greet the user nicely. Make sure you answer in the language user prefers. User's locale setting is ${cookies.get(
+				'locale'
+			)}.`;
+			if (sharedObjects.items.length) {
+				sharedObjects.items.forEach((object) => {
+					if (
+						object.attachedEvent &&
+						object.attachedEvent.myAttendance &&
+						DateTime.fromISO(object.attachedEvent.start) > DateTime.now()
+					) {
+						content += `The user is also attending the event ${object.attachedEvent.summary}. The description of the event is: ${object.attachedEvent.description}. ${object.attachedEvent.startString}  And user's attendance status is set to ${object.attachedEvent.myAttendance.status}.`;
+					}
+				});
+			}
 			const response = await axios.post('/mentor', {
 				messages: [
 					{
 						role: 'system',
-						content: `The user, whose nickname is ${$UserStore.nickname}, joined the room "${
-							room.title
-						}" of the organization "${
-							organization.title
-						}". Just greet the user nicely. Make sure you answer in the language user prefers. User's locale setting is ${cookies.get(
-							'locale'
-						)}.`
+						content
 					}
 				]
 			});

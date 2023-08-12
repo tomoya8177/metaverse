@@ -14,7 +14,6 @@
 	import AvatarThumbnail from '../../Components/Atom/AvatarThumbnail.svelte';
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import { Users } from '$lib/frontend/Classes/Users';
-	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 

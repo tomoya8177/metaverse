@@ -33,7 +33,6 @@
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import NippleControl from '../Atom/NippleControl.svelte';
-	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { myAlert, toast } from '$lib/frontend/toast';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -340,6 +339,7 @@
 <div style:display={$TextChatOpen ? 'block' : 'none'}>
 	<div class="chat-box">
 		<ChatBox
+			{room}
 			bind:waitingForAIAnswer
 			bind:newMessagePinned
 			{sendChatMessage}

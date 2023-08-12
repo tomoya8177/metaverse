@@ -2,7 +2,7 @@
 	import TextChatMessage from '../Molecules/TextChatMessage.svelte';
 
 	import { onDestroy, onMount } from 'svelte';
-	import { ChatMessagesStore, RoomStore, UserStore, TextChatOpen, AISpeaks } from '$lib/store';
+	import { ChatMessagesStore, UserStore, TextChatOpen, AISpeaks } from '$lib/store';
 	import axios from 'axios';
 
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -26,6 +26,7 @@
 	import SendMessageButton from '../Atom/SendMessageButton.svelte';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
+	import type { Room } from '$lib/frontend/Classes/Room';
 	export let newMessagePinned = false;
 	let newMessageBody = '';
 	export let authors: User[] = [];
@@ -38,6 +39,7 @@
 			return;
 		}
 	};
+	export let room: Room;
 	let mentor: Mentor | null = null;
 	onMount(async () => {
 		if (forceMentor) {
@@ -60,7 +62,7 @@
 		let newMessage = new Message({
 			body: escapeHTML(newMessageBody),
 			user: $UserStore.id,
-			room: $RoomStore.id,
+			room: room.id,
 			pinned: newMessagePinned
 		});
 		if (!newMessageGenerateImage) {
@@ -74,9 +76,9 @@
 			promise.onDone(async (file) => {
 				console.log({ file });
 				const message = new Message({
-					room: $RoomStore.id,
+					room: room.id,
 					type: 'attachment',
-					user: $RoomStore.mentorData?.user || forceMentor?.user,
+					user: room.mentorData?.user || forceMentor?.user,
 					body: _(`AI completed to generate the image for you. @`) + $UserStore.nickname,
 					handle: file.handle,
 					url: file.url
@@ -87,19 +89,19 @@
 					TextChatOpen.set(true);
 					return;
 				}
-				$RoomStore.mentorData.speak(message.body);
-				//aiSpeaksOut(message.body, Users.find($RoomStore.mentorData.user) || null);
+				room.mentorData.speak(message.body);
+				//aiSpeaksOut(message.body, Users.find(room.mentorData.user) || null);
 			});
 			newMessageBody = '';
 			waitingForAIAnswer = false;
 			return;
 		}
-		if (newMessageBody.includes('@Mentor') || forceMentor) {
+		if ((newMessageBody.includes('@Mentor') && room.mentor) || forceMentor) {
 			newMessageBody = '';
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(
-				$RoomStore.mentorData || forceMentor,
-				$RoomStore.id || 'none',
+				room.mentorData || forceMentor,
+				room.id || 'none',
 				newMessage
 			);
 			await aiMessage.createSendOutAndPush();
@@ -116,11 +118,11 @@
 			if (forceMentor) {
 				forceMentor.speak(aiMessage.body);
 			} else {
-				$RoomStore.mentorData.speak(aiMessage.body);
+				room.mentorData.speak(aiMessage.body);
 			}
 			// aiSpeaksOut(
 			// 	aiMessage.body,
-			// 	forceMentor ? null : Users.find($RoomStore.mentorData.user) || null
+			// 	forceMentor ? null : Users.find(room.mentorData.user) || null
 			// );
 		} else {
 			//io.emit('statement', newMessageBody);
@@ -159,7 +161,7 @@
 </div>
 <hr />
 <div style="display:flex; gap:0.4rem;">
-	{#if forceMentor || $RoomStore.mentor}
+	{#if forceMentor || room.mentor}
 		<div>
 			<button
 				small
@@ -185,7 +187,7 @@
 							console.log(file);
 
 							const message = new Message({
-								room: $RoomStore.id,
+								room: room.id,
 								type: 'attachment',
 								user: $UserStore.id,
 								body: file.filename,
@@ -202,7 +204,7 @@
 			</button>
 		</div>
 	{/if}
-	{#if !forceMentor}
+	{#if !forceMentor && room.mentor}
 		<div>
 			<button
 				data-tooltip={_('@Mentor')}
@@ -217,37 +219,39 @@
 			</button>
 		</div>
 	{/if}
-	<div>
-		<button
-			style:opacity={$AISpeaks ? 1 : 0.5}
-			data-tooltip={_('AI Speaks')}
-			class="circle-button"
-			small
-			on:click={() => {
-				AISpeaks.update((v) => {
-					if (v) {
-						speechSynthesis.cancel();
-					}
-					return !v;
-				});
-			}}
-		>
-			<Icon icon="campaign" />
-		</button>
-	</div>
-	<div style="text-align:right;flex:1">
-		<button
-			data-tooltip={_('Generate Image')}
-			class="circle-button"
-			small
-			on:click={() => {
-				newMessageGenerateImage = !newMessageGenerateImage;
-			}}
-			style:opacity={newMessageGenerateImage ? 1 : 0.5}
-		>
-			<Icon icon="palette" />
-		</button>
-	</div>
+	{#if forceMentor || room.mentor}
+		<div>
+			<button
+				style:opacity={$AISpeaks ? 1 : 0.5}
+				data-tooltip={_('AI Speaks')}
+				class="circle-button"
+				small
+				on:click={() => {
+					AISpeaks.update((v) => {
+						if (v) {
+							speechSynthesis.cancel();
+						}
+						return !v;
+					});
+				}}
+			>
+				<Icon icon="campaign" />
+			</button>
+		</div>
+		<div style="text-align:right;flex:1">
+			<button
+				data-tooltip={_('Generate Image')}
+				class="circle-button"
+				small
+				on:click={() => {
+					newMessageGenerateImage = !newMessageGenerateImage;
+				}}
+				style:opacity={newMessageGenerateImage ? 1 : 0.5}
+			>
+				<Icon icon="palette" />
+			</button>
+		</div>
+	{/if}
 	{#if !forceNoPin}
 		<button
 			data-tooltip={newMessagePinned ? _('Unpin') : _('Pin')}

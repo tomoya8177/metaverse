@@ -16,7 +16,6 @@
 	import axios from 'axios';
 	import { _ } from '$lib/i18n';
 	import { myAlert } from '$lib/frontend/toast';
-	import { EmptyObject } from '$lib/preset/EmptyObject';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { slide } from 'svelte/transition';
@@ -30,7 +29,7 @@
 	import { goto } from '$app/navigation';
 	import type { Room } from '$lib/frontend/Classes/Room';
 
-export let room:Room
+	export let room: Room;
 	const onTextChatClicked = () => {
 		TextChatOpen.update((v) => !v);
 	};
