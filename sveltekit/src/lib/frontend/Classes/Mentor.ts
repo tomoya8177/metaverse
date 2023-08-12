@@ -3,6 +3,7 @@ import { DBObject } from './DBObject';
 import { User } from './User';
 import { AISpeaks } from '$lib/store';
 import { Users } from './Users';
+import { DocumentForAI } from '$lib/types/DocumentForAI';
 
 let aiSpeaks = false;
 AISpeaks.subscribe((value) => {
@@ -15,6 +16,7 @@ export class Mentor extends DBObject {
 	voiceURI: string = '';
 	utterance: SpeechSynthesisUtterance | null = null;
 	speechInterval: any;
+	documents: DocumentForAI[] = [];
 	constructor(data: any) {
 		data.table = 'mentors';
 		super(data);
@@ -35,6 +37,9 @@ export class Mentor extends DBObject {
 		this.userData = await axios.get('/api/users/' + this.user).then((res) => {
 			return new User(res.data || {});
 		});
+		this.documents = await axios
+			.get('/api/documentsForAI?mentor=' + this.id)
+			.then((res) => res.data.map((doc) => new DocumentForAI(doc)));
 	}
 	speak(message: string) {
 		const unit = Users.find(this.user);

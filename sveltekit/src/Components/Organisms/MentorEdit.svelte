@@ -18,7 +18,6 @@
 	uploader.progress.subscribe((value) => {
 		progress = value;
 	});
-	let documents: DocumentForAI[] = [];
 	let voices: SpeechSynthesisVoice[] = [];
 	onMount(async () => {
 		const synth = window.speechSynthesis;
@@ -93,7 +92,6 @@
 				return res.data;
 			});
 			const fileDatas = await Promise.all(promises);
-			documents = [...documents, ...fileDatas];
 			editMentor.documents = [...editMentor.documents, ...fileDatas];
 			e.target.value = '';
 		}}

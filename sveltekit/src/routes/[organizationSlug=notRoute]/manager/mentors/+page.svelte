@@ -14,7 +14,6 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { _ } from '$lib/i18n';
 	import { page, updated } from '$app/stores';
-	import type { Mentor } from '$lib/types/Mentor';
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
 	import AvatarSelectPane from '../../../../Components/Organisms/AvatarSelectPane.svelte';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
@@ -29,43 +28,31 @@
 	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	export let data: PageData;
 	let paginated: Mentor[] = [];
 	export let organization: Organization = data.organization;
-	let mentors: Mentor[] = [];
+	let mentors: Mentor[] = data.mentors.map((mentor) => new Mentor(mentor));
+
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;
 	});
+	let mentorsReady = false;
 	export let users: User[] = data.users;
 	let documents: DocumentForAI[] = [];
-	const setUpMentorbject = (mentor: Mentor) => {
-		const user = users.find((user) => user.id == mentor.user);
-		const docs = documents.filter((document) => document.mentor == mentor.id);
-		if (user) mentor.userData = user;
-		if (document) mentor.documents = docs;
-		return mentor;
-	};
+
 	onMount(async () => {
-		mentors = await axios
-			.get('/api/mentors?organization=' + organization.id)
-			.then((res) => res.data);
-		if (mentors.length) {
-			users = await axios
-				.get(`/api/users?id=in:'${mentors.map((mentor) => mentor.user).join("','")}'`)
-				.then((res) => res.data);
-			documents = await axios
-				.get(`/api/documentsForAI?mentor=in:'${mentors.map((mentor) => mentor.id).join("','")}'`)
-				.then((res) => res.data);
-			mentors = mentors.map((mentor) => {
-				return setUpMentorbject(mentor);
-			});
-			console.log({ mentors });
-		}
+		const promises = mentors.map(async (mentor) => {
+			await mentor.init();
+			console.log({ mentor });
+		});
+		await Promise.all(promises);
+		mentorsReady = true;
 	});
 	let busy: boolean = false;
 	let newMentorModalOpen = false;
-	let editMentor: Mentor = EmptyMentor;
+	let editMentor: Mentor = new Mentor({});
 	let editMode: 'update' | 'create' = 'update';
 
 	const onCreateClicked = async () => {
@@ -73,13 +60,19 @@
 		busy = true;
 		const createdUser = await axios.post('/api/users', editMentor.userData).then((res) => res.data);
 		users = [...users, createdUser];
-		let createdMentor = await axios
-			.post('/api/mentors', { ...editMentor, user: createdUser.id, organization: organization.id })
-			.then((res) => res.data);
-		console.log({ createdMentor, createdUser });
-		createdMentor = setUpMentorbject(createdMentor);
+		let createdMentor = new Mentor(
+			await axios
+				.post('/api/mentors', {
+					...editMentor,
+					user: createdUser.id,
+					organization: organization.id
+				})
+				.then((res) => res.data)
+		);
+		await createdMentor.init();
+		//createdMentor = setUpMentorbject(createdMentor);
 		mentors = [...mentors, createdMentor];
-		await reinstallAIBrain(createdMentor);
+		editMentor.documents = await reinstallAIBrain(createdMentor);
 		busy = false;
 		newMentorModalOpen = false;
 		actionHistory.send('createMentor', {
@@ -103,21 +96,24 @@
 			}
 			return user;
 		});
-		let updatedMentor = await axios
-			.put('/api/mentors/' + editMentor.id, {
-				prompt: escapeHTML(editMentor.prompt),
-				...editMentor
-			})
-			.then((res) => res.data);
+		let updatedMentor = new Mentor(
+			await axios
+				.put('/api/mentors/' + editMentor.id, {
+					prompt: escapeHTML(editMentor.prompt),
+					...editMentor
+				})
+				.then((res) => res.data)
+		);
+		await updatedMentor.init();
 		console.log({ updatedMentor });
 		mentors = mentors.map((mentor) => {
 			if (mentor.id == updatedMentor.id) {
-				updatedMentor = setUpMentorbject(updatedMentor);
+				//updatedMentor = setUpMentorbject(updatedMentor);
 				return updatedMentor;
 			}
 			return mentor;
 		});
-		await reinstallAIBrain(updatedMentor);
+		editMentor.documents = await reinstallAIBrain(updatedMentor);
 		busy = false;
 		newMentorModalOpen = false;
 		actionHistory.send('updateMentor', { mentor: updatedMentor });
@@ -159,7 +155,7 @@
 		}}>{_('New Mentor')}</a
 	>
 </div>
-{#if mentors.length}
+{#if mentorsReady}
 	<FilterPagination inputArray={mentors} bind:paginated />
 	<table>
 		<thead>
