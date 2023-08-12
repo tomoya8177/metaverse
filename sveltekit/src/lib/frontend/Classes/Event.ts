@@ -239,8 +239,8 @@ export class Event extends DBObject {
 	get startString() {
 		return `The event is ${this.allDay ? 'all day' : 'not all day'} event, and is scheduled ${
 			this.allDay
-				? 'on ' + DateTime.fromISO(this.start).toISODate()
+				? 'on ' + DateTime.fromISO(this.start).toLocaleString()
 				: 'at ' + DateTime.fromISO(this.start).toLocaleString(DateTime.DATETIME_FULL)
-		}, which is ${DateTime.fromISO(this.start).setZone().toRelative()}.`;
+		}${!this.allDay ? `, which is ${DateTime.fromISO(this.start).setZone().toRelative()}` : ''}.`;
 	}
 }
