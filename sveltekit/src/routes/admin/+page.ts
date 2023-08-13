@@ -6,10 +6,15 @@ export const load = async ({ params }) => {
 	const organization: Organization = await axios
 		.get(`/api/organizations`)
 		.then((res) => res.data[0]);
-	const actions = await axios
-		.get('/api/actions?orderBy=createdAt&order=desc&limit=100')
-		.then((res) => res.data);
 	const users = await axios.get('/api/users').then((res) => res.data);
+	const actions = await axios
+		.get(
+			`/api/actions?orderBy=createdAt&user=nin:'${users
+				.filter((user) => user.isAdmin)
+				.map((user) => user.id)
+				.join("','")}'&order=desc&limit=100`
+		)
+		.then((res) => res.data);
 	const rooms = await axios.get('/api/rooms').then((res) => res.data);
 	const actionHistories = actions.map((action) => {
 		action.userData = users.find((user: User) => user.id == action.user);
