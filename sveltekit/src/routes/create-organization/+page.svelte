@@ -30,7 +30,7 @@
 	let loggedIn = data.loggedIn;
 	let user = data.user;
 	let process: 'organization' | 'room' | 'mentor' = 'organization';
-	let organization: Organization = data.organization;
+	let organization: Organization;
 	let room: Room = new Room({
 		...EmptyRoom,
 		slug: crypto.randomUUID()
@@ -40,13 +40,24 @@
 		await mentor.init();
 	});
 	let busy = false;
+	const createOrgWhenLoggedIn = async (loggedIn) => {
+		if (loggedIn) {
+			organization = await axios
+				.post('/api/organizations', {
+					slug: crypto.randomUUID()
+				})
+				.then((res) => res.data);
+		}
+	};
+
+	$: createOrgWhenLoggedIn(loggedIn);
 </script>
 
 <Navigation />
 
 {#if !loggedIn}
 	<Login />
-{:else}
+{:else if organization}
 	<div class="container">
 		<h3>
 			{_("Let's Create an Organization!")}
