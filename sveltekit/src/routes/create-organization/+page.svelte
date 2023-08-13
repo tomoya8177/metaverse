@@ -53,6 +53,9 @@
 	$: createOrgWhenLoggedIn(loggedIn);
 </script>
 
+<svelte:head>
+	<title>Create Organization | VirtuaCampus</title>
+</svelte:head>
 <Navigation />
 
 {#if !loggedIn}

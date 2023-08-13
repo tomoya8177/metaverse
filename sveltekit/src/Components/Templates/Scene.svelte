@@ -108,7 +108,6 @@
 				}, 120000); //in 2 minutes, the QA dialog will show up
 			}
 			if (!room.mentor) return;
-			console.log('now initialize the chat');
 
 			let content = `The user, whose nickname is ${$UserStore.nickname}, joined the room "${
 				room.title
@@ -129,6 +128,7 @@
 				});
 			}
 			const response = await axios.post('/mentor', {
+				appendToChannel: room.id,
 				messages: [
 					{
 						role: 'system',
@@ -136,7 +136,6 @@
 					}
 				]
 			});
-			console.log({ response });
 			const message = new Message({
 				room: room.id,
 				user: room.mentorData.userData.id,
