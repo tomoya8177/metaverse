@@ -50,6 +50,7 @@ test.describe('Top Page', () => {
 		await createNewOrganizationButton.click();
 		await page.waitForTimeout(500);
 		const emailInput = page.getByLabel('Email');
+		expect(emailInput).toBeVisible();
 		await emailInput.fill(newEmail);
 		const proceedButton = page.getByRole('button', { name: 'Proceed' });
 		await proceedButton.click();

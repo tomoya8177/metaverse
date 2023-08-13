@@ -24,7 +24,7 @@
 	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import SendMessageButton from '../Atom/SendMessageButton.svelte';
-	import { Mentor } from '$lib/frontend/Classes/Mentor';
+	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	export let newMessagePinned = false;
@@ -40,7 +40,6 @@
 		}
 	};
 	export let room: Room;
-	let mentor: Mentor | null = null;
 	onMount(async () => {
 		if (forceMentor) {
 			newMessageForMentor = true;
@@ -139,9 +138,15 @@
 	let busy = false;
 	let newMessageForMentor = false;
 	export let onMicClicked: () => void = () => {};
-	let recognition;
 	export let micActive: boolean = false;
 	let newMessageGenerateImage = false;
+	ChatMessagesStore.subscribe(() => {
+		setTimeout(() => {
+			const element = document.querySelector('.chat-box > div');
+			if (!element) return;
+			scrollToBottom(element);
+		}, 100);
+	});
 </script>
 
 <div

@@ -77,14 +77,13 @@ export const PUT = async ({ request, params }) => {
 
 	const manualJson = JSON.stringify(filteredManual);
 	const messages =
-		`You are a helpful AI mentor named ${mentor.userData.nickname} at an organization called ${organization.title}. ${mentor.prompt}. You'll answer questions based on the given context, but don't give away any extra information from the context when the question is not related to the context. You can answer questions using your knowledge. You can also ask questions to the user to get more information.
+		`You are a helpful AI mentor named ${mentor.userData.nickname} at an organization called ${organization.title}. ${mentor.prompt}. When a user asks a question, you'll answer it based on the given context, but don't give away any extra information from the context when the question is not related to the context. You can answer questions using your knowledge. You can also ask questions to the user to get more information. When user is only greeting, you should simply greet back.
 		
 		Following is a manual for using this platform called VirtuaCampus. Reference these data when answering questions about the system itself.` +
 		manualJson +
 		`
 		Below is the list of users in the class with some details about each users.` +
 		usersJson;
-	console.log(messages);
 	const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
 	const promptDocs = await textSplitter.createDocuments([messages]);
 	//store mentor's memory first
@@ -149,6 +148,10 @@ export const POST = async ({ request, params }) => {
 	const body: {
 		action: 'greet' | 'system' | undefined;
 		body: string;
+		messages: {
+			role: string;
+			content: string;
+		}[];
 	} = await request.json();
 	const user = (await db.query(`select * from users where id='${body.user}'`))[0];
 	let storedChat = storedChats.find((storedChat) => {
@@ -158,7 +161,6 @@ export const POST = async ({ request, params }) => {
 			return storedChat.mentorId == params.mentorId && storedChat.roomId == 'none';
 		}
 	});
-	console.log({ storedChats });
 	if (!storedChat || !storedChat.chain) {
 		return new Response(JSON.stringify({ error: 'mentor not initialized' }));
 	}
@@ -169,20 +171,19 @@ export const POST = async ({ request, params }) => {
 	let messages: (SystemMessage | AIMessage | HumanMessage)[] = [];
 	switch (body.action) {
 		case 'greet': {
-			const systemMessage = `The user, whose nickname is ${user.nickname}, joined the conversation. Just greet the user nicely.`;
-			messages = [new SystemMessage(systemMessage)];
-			console.log({ systemMessage, question });
+			messages = body.messages.map((message) => {
+				if (message.role == 'system') {
+					console.log({ message });
+					return new SystemMessage(message.content);
+				}
+				return new HumanMessage(message.content);
+			});
 			break;
 		}
 		default: {
 			question = `${body.body.replace('@Mentor', '').trim()}`;
-			const systemMessage = `Following is a message from ${user.nickname}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`;
-			messages = [
-				new SystemMessage(systemMessage),
-				new HumanMessage(question)
-				//new HumanMessage(question)
-			];
-			console.log({ systemMessage, question });
+			const systemMessage = `Following is a message from ${user.nickname}.`;
+			messages = [new SystemMessage(systemMessage), new HumanMessage(question)];
 		}
 	}
 	storedChat.chatHistory.push(...messages);
@@ -191,7 +192,6 @@ export const POST = async ({ request, params }) => {
 		question: '',
 		chat_history: storedChat.chatHistory.slice(-20)
 	});
-	console.log(res.text);
 	if (body.action != 'greet') {
 		storedChat.chatHistory.push(new AIMessage(res.text));
 	}

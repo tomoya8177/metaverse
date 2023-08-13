@@ -15,6 +15,8 @@
 	import { myConfirm } from '$lib/frontend/toast';
 	import { page } from '$app/stores';
 	import { sendJoinedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
+	import { DateTime } from 'luxon';
+	import Icon from '../../../Components/Atom/Icon.svelte';
 	export let data: PageData;
 	let users: User[] = data.users;
 	let paginated: User[] = [];
@@ -115,6 +117,7 @@
 		<thead>
 			<tr>
 				<th>{_('Nickname')}/{_('Email')}</th>
+				<th>{_('Last Login')}</th>
 				<th>{_('Is Admin')}</th>
 				<th>{_('Organizations')}</th>
 				<th>{_('Edit')}</th>
@@ -130,6 +133,11 @@
 						<small>
 							{user.email}
 						</small>
+					</td>
+					<td>
+						{#if user.lastSession}
+							{DateTime.fromISO(user.lastSession.createdAt).toLocaleString()}
+						{/if}
 					</td>
 					<td>
 						<input type="checkbox" disabled role="switch" bind:checked={user.isAdmin} />
@@ -162,7 +170,7 @@
 								newUserModalOpen = true;
 							}}
 						>
-							{_('Edit')}
+							<Icon icon="edit" />
 						</button>
 					</td>
 				</tr>

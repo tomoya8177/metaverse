@@ -91,7 +91,6 @@ AFRAME.registerComponent('update-position', {
 			closestObject.explained = true;
 			if (!closestObject.description) return;
 			callAIMentor(room.mentorData);
-			console.log('sending AI request about object', closestObject);
 			let content = `${user.nickname} is looking at the ${closestObject.shortType}, ${closestObject.title}, whose description is: ${closestObject.description}.`;
 			//if there's an event attached, include it's data as well.
 			if (closestObject.attachedEvent) {
@@ -105,9 +104,10 @@ AFRAME.registerComponent('update-position', {
 				Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
 					'locale'
 				)}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`;
-			console.log(content);
 			axios
 				.post('/mentor', {
+					appendToChannel: room.id,
+
 					messages: [
 						{
 							role: 'system',

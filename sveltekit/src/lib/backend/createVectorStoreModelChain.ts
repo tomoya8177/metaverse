@@ -14,22 +14,7 @@ export const createVectorStoreModelChain = async (documents: Document[]) => {
 		new OpenAIEmbeddings({ openAIApiKey: OPENAI_API_KEY })
 	);
 
-	const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-3.5-turbo' });
-	// const chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), {
-	// 	memory: new BufferMemory({ chatHistory: chatHistory, memoryKey: 'chat_history' })
-	// });
-	const chain = ConversationalRetrievalQAChain.fromLLM(
-		model,
-		vectorStore.asRetriever()
-		// {
-		// returnSourceDocuments: true,
-		// memory: new BufferMemory({
-		// 	memoryKey: 'chat_history',
-		// 	inputKey: 'question', // The key for the input to the chain
-		// 	outputKey: 'text', // The key for the final conversational output of the chain
-		// 	returnMessages: true // If using with a chat model
-		// })
-		// }
-	);
+	const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-4' });
+	const chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever());
 	return { model, chain };
 };
