@@ -23,7 +23,6 @@ export class User extends DBObject {
 	firstName?: string;
 	lastName?: string;
 	description: string = '';
-	unit: Unit | null = null;
 	subtitle: string = '';
 	nicknameURL: string = '';
 	constructor(data: any) {

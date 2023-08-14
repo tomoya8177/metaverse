@@ -24,7 +24,7 @@ export const messageListeners = () => {
 		userUnit.rotation = data.rotation;
 	});
 	videoChat.listenTo('position', async (data) => {
-		let unit = Users.find(data.user.id);
+		let unit = Users.find(data.user.id) as Unit;
 		if (!unit) {
 			unit = welcomeUnit(data.user);
 		}
@@ -33,10 +33,11 @@ export const messageListeners = () => {
 		unit.rotation = data.rotation;
 	});
 	videoChat.listenTo('updateProfile', (data) => {
-		const unit = Users.find(data.user.id);
+		console.log('updateProfile received', { data });
+		const unit = Users.find(data.user.id) as Unit;
 		if (!unit) return;
-		unit.nickname = data.nickname;
-		unit.avatarURL = data.avatarURL;
+		unit.userData = data.user;
+		unit.resetProfile();
 	});
 	videoChat.listenTo('objectCreate', async (data) => {
 		const objectData = await axios.get('/api/objects/' + data.id).then((res) => res.data);

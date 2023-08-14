@@ -31,8 +31,6 @@
 		await $UserStore.update();
 		videoChat.sendMessage({
 			key: 'updateProfile',
-			nickname: $UserStore.nickname,
-			avatarURL: $UserStore.avatarURL,
 			user: { ...$UserStore }
 		});
 		if (me) {

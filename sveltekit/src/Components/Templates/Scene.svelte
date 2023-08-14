@@ -79,8 +79,8 @@
 			mentor.userData = await axios.get('/api/users/' + mentor.user).then((res) => res.data);
 			const mentorUnit = new Unit(mentor.userData);
 			mentorUnit.position = { x: 0, y: 0, z: 3 };
-			mentorUnit.nickname = mentor.userData.nickname;
-			mentorUnit.avatarURL = mentor.userData.avatarURL;
+			//	mentorUnit.nickname = mentor.userData.nickname;
+			//	mentorUnit.avatarURL = mentor.userData.avatarURL;
 			mentorUnit.el.setAttribute('ai-mentor', '');
 			mentorUnit.avatar?.setAttribute('move-mouth', 'userId:' + mentor.userData.id);
 			Users.add(mentorUnit);

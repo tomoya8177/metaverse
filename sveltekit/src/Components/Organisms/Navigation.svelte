@@ -25,6 +25,7 @@
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import { goto } from '$app/navigation';
 	import type { Me } from '$lib/frontend/Classes/Me';
+	import AvatarThumbnail from '../Atom/AvatarThumbnail.svelte';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
@@ -148,7 +149,8 @@
 						<ul role="listbox">
 							{#each $UsersStore || [] as unit}
 								<li>
-									{unit.nickname}
+									<AvatarThumbnail url={unit.userData.avatarURL} size="2rem" />
+									{unit.userData.nickname}
 								</li>
 							{/each}
 						</ul>

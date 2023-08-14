@@ -5,7 +5,7 @@ import type { LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack } from 'twilio
 import { videoChat } from './VideoChat';
 import { sessionPing } from '$lib/frontend/Classes/sessionPing';
 import type { Room } from './Room';
-import type { User } from '$lib/frontend/Classes/User';
+import { User } from '$lib/frontend/Classes/User';
 import axios from 'axios';
 import { degree2radian } from '$lib/math/degree2radians';
 import { sharedObjects } from './SharedObjects';
@@ -28,7 +28,9 @@ export class Unit {
 	onVideoMute: boolean = false;
 	sharingScreen: boolean = false;
 	audioLevel: number = 0;
+	userData: User;
 	constructor(data: User) {
+		this.userData = data;
 		this.id = data.id;
 		this.userId = data.id;
 		//append element to the scene
@@ -50,29 +52,50 @@ export class Unit {
 		this.avatarContainer.setAttribute('rotate-at-position', '');
 		const scene = document.querySelector('a-scene');
 
-		if (data.nicknameURL) {
-			const asset = document.createElement('img');
-			asset.setAttribute('id', data.id + 'nameTag');
-			asset.setAttribute('src', data.nicknameURL);
-			asset.setAttribute('crossorigin', 'anonymous');
-			document.querySelector('a-assets')?.appendChild(asset);
-			console.log('appending nicknameURL');
-			let image = document.createElement('a-image');
-			image.setAttribute('src', `#${data.id}nameTag`);
-			image.setAttribute('side', 'front');
-			image.setAttribute('position', '0 1.85 0');
-			image.setAttribute('rotation', '0 180 0');
-			this.avatarContainer.appendChild(image);
+		this.setNickname();
+		scene?.appendChild(this.el);
+	}
+	get nickname(): string {
+		return this.nicknameData;
+	}
+	setNickname() {
+		if (this.userData.nicknameURL) {
+			let asset: HTMLImageElement;
+			const existingAsset = document.querySelector(`#${this.userData.id}nameTag`);
+			if (existingAsset && existingAsset instanceof HTMLImageElement) {
+				asset = existingAsset;
+			} else {
+				const el = document.createElement('img');
+				if (el instanceof HTMLImageElement) {
+					asset = el;
+					asset.setAttribute('id', this.userData.id + 'nameTag');
+					asset.setAttribute('crossorigin', 'anonymous');
+					document.querySelector('a-assets')?.appendChild(asset);
+					asset.onload = () => {
+						//get aspect ratio
+						console.log('asset loaded', asset);
+						const width = asset.width;
+						const height = asset.height;
+						const aspectRatio = height / width;
+						image.setAttribute('height', 0.2);
+						image.setAttribute('width', 0.2 / aspectRatio);
+					};
+				}
+			}
+			asset.setAttribute('src', this.userData.nicknameURL);
+			let image: Entity;
+			const existingImage = this.el.querySelector('a-image');
+			if (existingImage) {
+				image = existingImage;
+			} else {
+				image = document.createElement('a-image');
+				image.setAttribute('side', 'front');
+				image.setAttribute('position', '0 1.85 0');
+				image.setAttribute('rotation', '0 180 0');
+				image.setAttribute('src', `#${this.userData.id}nameTag`);
+				this.avatarContainer.appendChild(image);
+			}
 			console.log(asset);
-			asset.onload = () => {
-				//get aspect ratio
-				console.log('asset loaded', asset);
-				const width = asset.width;
-				const height = asset.height;
-				const aspectRatio = height / width;
-				image.setAttribute('height', 0.2);
-				image.setAttribute('width', 0.2 / aspectRatio);
-			};
 		} else {
 			//text nickname
 			let text = this.el.querySelector('a-text');
@@ -83,34 +106,13 @@ export class Unit {
 				text.setAttribute('align', 'center');
 				this.avatarContainer.appendChild(text);
 			}
-			text.setAttribute('value', data.nickname);
+			text.setAttribute('value', this.userData.nickname);
 		}
-		scene?.appendChild(this.el);
 	}
-	get nickname(): string {
-		return this.nicknameData;
-	}
-	set nickname(nickname: string) {
-		return;
-		if (!this.avatarContainer) return;
-		this.nicknameData = nickname;
+	resetProfile(): void {
+		this.setNickname();
 	}
 
-	set avatarURL(avatarURL: string) {
-		return;
-		if (!this.avatarContainer) return;
-
-		if (!this.avatar) {
-			this.avatar = document.createElement('a-gltf-model');
-			this.avatarContainer.appendChild(this.avatar);
-			this.avatar.setAttribute('position', '0 0.9 0');
-			this.avatar.setAttribute('rotation', '0 180 0');
-			this.avatar.setAttribute('hand-position', '');
-			this.avatar.setAttribute('smile', '');
-		}
-		this.avatar.setAttribute('src', avatarURL);
-		this.avatarContainer.setAttribute('rotate-at-position', '');
-	}
 	set position(position: xyz) {
 		this.el.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
 	}
