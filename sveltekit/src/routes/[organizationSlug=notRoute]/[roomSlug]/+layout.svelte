@@ -17,6 +17,7 @@
 	import Scene from '../../../Components/Templates/Scene.svelte';
 	export let data: PageData;
 	let loggedIn: boolean | null = data.loggedIn;
+	console.log(101);
 	let room: Room = new Room(data.room);
 	let roomReady = false;
 	if (room.mentor) {
@@ -26,6 +27,7 @@
 	roomReady = true;
 	let noRoom: boolean | null = null;
 	let organization: Organization | null = data.organization;
+	console.log(2);
 	ChatMessagesStore.set(data.messages);
 	onMount(async () => {
 		if (!organization) {
@@ -38,6 +40,7 @@
 			return;
 		}
 		RoomStore.set(room);
+		console.log(3);
 		if (!loggedIn) return;
 		const userRole: UserRole | undefined = $UserStore.userRole;
 		if (userRole?.role == 'manager') {
@@ -60,12 +63,14 @@
 				location.reload();
 				return;
 			}
+			console.log(4);
 			if (!room.isOpen && !room.allowedUsersArray?.includes($UserStore.id)) {
 				noRoom = true;
 				return;
 			}
 		}
 		noRoom = false;
+		console.log(5);
 	});
 </script>
 

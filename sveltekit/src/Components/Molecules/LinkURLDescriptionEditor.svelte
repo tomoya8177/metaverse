@@ -61,10 +61,14 @@
 				<a
 					href={'#'}
 					on:click={() => {
-						editItem.iconURL = icon.iconURL;
+						editItem.brandIcon = icon.iconURL;
 					}}
 				>
-					<img src={icon.iconURL} alt={icon.name} />
+					<img
+						class:active={editItem.brandIcon === icon.iconURL}
+						src={icon.iconURL}
+						alt={icon.name}
+					/>
 				</a>
 			</div>
 		{/each}
@@ -72,7 +76,7 @@
 			<a
 				href={'#'}
 				on:click={() => {
-					editItem.iconURL = '';
+					editItem.brandIcon = '';
 				}}
 			>
 				{_('No Icon')}</a
@@ -87,5 +91,8 @@
 		width: 4rem;
 		height: 4rem;
 		border-radius: 0.2rem;
+	}
+	.active {
+		border: 0.4rem solid yellow;
 	}
 </style>

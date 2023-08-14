@@ -12,7 +12,7 @@
 	let renderer: THREE.WebGLRenderer;
 
 	let isLoading = true; // Add a new state variable to track loading state
-
+	let id = 'preview' + Math.ceil(Math.random() * 1000).toString();
 	onMount(() => {
 		// Load the placeholder image
 
@@ -46,7 +46,7 @@
 		camera.position.x = 0.33;
 		camera.rotation.y = Math.PI / 7;
 		renderer.setSize(180, 180);
-		const container = document.querySelector('#avatarPreview');
+		const container = document.querySelector('#' + id);
 		container?.appendChild(renderer.domElement);
 
 		const controls = new OrbitControls(camera, renderer.domElement);
@@ -62,7 +62,7 @@
 	});
 </script>
 
-<div id="avatarPreview">
+<div {id}>
 	{#if isLoading}
 		<!-- Display the placeholder image while loading -->
 		<img src={thumbnailURL} alt="Loading..." />

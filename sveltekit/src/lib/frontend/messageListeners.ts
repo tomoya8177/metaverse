@@ -94,7 +94,7 @@ export const welcomeUnit = (user: User): Unit => {
 	if (ifExisting) {
 		return ifExisting;
 	}
-	const userUnit = new Unit(user.id);
+	const userUnit = new Unit(user);
 	userUnit.nickname = user.nickname;
 	userUnit.avatarURL =
 		user.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';

@@ -50,15 +50,15 @@
 	let readyToConnect = false;
 	let me: Me;
 	const onSceneLoaded = async () => {
+		sceneLoaded = true;
 		actionHistory.send('enteringRoom');
-		me = new Me($UserStore.id);
-		me.nickname = $UserStore.nickname;
+		me = new Me($UserStore);
+		// me.nickname = $UserStore.nickname;
 		Users.add(me);
 		// $UserStore.unit = me;
 		await me.setLastPosition(room);
-		me.avatarURL =
-			$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
-		sceneLoaded = true;
+		// me.avatarURL =
+		// 	$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 		//me.twilioConnect(room.id)
 		document.addEventListener('touchstart', () => {
 			//activate the nipple control
@@ -77,7 +77,7 @@
 		if (room.mentor) {
 			const mentor = await axios.get('/api/mentors/' + room.mentor).then((res) => res.data);
 			mentor.userData = await axios.get('/api/users/' + mentor.user).then((res) => res.data);
-			const mentorUnit = new Unit(mentor.userData.id);
+			const mentorUnit = new Unit(mentor.userData);
 			mentorUnit.position = { x: 0, y: 0, z: 3 };
 			mentorUnit.nickname = mentor.userData.nickname;
 			mentorUnit.avatarURL = mentor.userData.avatarURL;

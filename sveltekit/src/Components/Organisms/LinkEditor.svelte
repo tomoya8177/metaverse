@@ -16,7 +16,6 @@
 	import { DateTime } from 'luxon';
 	import { PUBLIC_FileStackAPIKey } from '$env/static/public';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
-	import { HTML2Canvas } from '$lib/frontend/Classes/HTML2Canvas';
 	import { myAlert, myConfirm } from '$lib/frontend/toast';
 	import LinkUrlDescriptionEditor from '../Molecules/LinkURLDescriptionEditor.svelte';
 	import ObjectLockSelect from '../Molecules/ObjectLockSelect.svelte';
@@ -57,16 +56,8 @@
 
 	const putTogetherFile = async () => {
 		if (editObject.withCaption) {
-			const html2canvas = new HTML2Canvas();
-			const blob = await html2canvas.getJpegBlob(
-				document.querySelector('.previewLinkObject'),
-				'image.jpg'
-			);
-			if (!blob) {
-				myAlert('Error');
-				return;
-			}
-			const file = await uploader.uploadBlob(blob, 'image.jpg');
+			const file = await uploader.uploadCanvas('.previewLinkObject', 'image.jpg');
+			if (!file) return;
 			editObject.captionUrl = file.url;
 			editObject.type = file.type;
 			editObject.size = file.size;
@@ -82,7 +73,7 @@
 		await putTogetherFile();
 
 		await editObject.create();
-		if (attachEvent) {
+		if (attachEvent && editEvent) {
 			editEvent.attachObject(editObject);
 			editEvent.organization = organization.id;
 			editEvent.start = convertLocalToUTC(editEvent.start);
@@ -100,7 +91,7 @@
 		await putTogetherFile();
 
 		await editObject.update();
-		if (attachEvent) {
+		if (attachEvent && editEvent) {
 			const existing = await axios.get('/api/events/' + editEvent.id).then((res) => res.data);
 			console.log({ existing });
 
@@ -137,7 +128,6 @@
 	let busy = false;
 	let deleteBusy = false;
 	let generateImageBusy = false;
-	$: console.log(canAttachCaption);
 </script>
 
 <div class="flexOnWideScreen">
@@ -166,7 +156,7 @@
 			/>
 		{/if}
 	</div>
-	{#if attachEvent && organization}
+	{#if attachEvent && organization && editEvent}
 		<div>
 			<h4>
 				{_('Event')}
@@ -225,9 +215,9 @@
 						style:background-color={backgroundColor || '#600060'}
 						style="width:20rem;max-height:20rem;text-align:center;padding:0.4rem;overflow:hidden"
 					>
-						{#if editObject.iconURL}
+						{#if editObject.brandIcon}
 							<img
-								src={editObject.iconURL}
+								src={editObject.brandIcon}
 								style="width:3rem;margin-bottom:0.4rem;border-radius:0.4rem"
 								alt=""
 							/>

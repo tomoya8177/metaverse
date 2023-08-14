@@ -1,14 +1,9 @@
-import { redirect } from '@sveltejs/kit';
 import axios from 'axios';
 
 export const load = async ({ params }) => {
 	const room = await axios.get(`/api/rooms?slug=${params.roomSlug}`).then((res) => res.data[0]);
 	let mentor;
 	let mentorUser;
-	if (!room) {
-		//not found
-		throw redirect(302, '/notFound');
-	}
 	if (room.mentor) {
 		mentor = await axios.get(`/api/mentors/${room.mentor}`).then((res) => res.data);
 		mentorUser = await axios.get(`/api/users/${mentor.user}`).then((res) => res.data);

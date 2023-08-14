@@ -3,10 +3,13 @@ import axios, { type AxiosResponse } from 'axios';
 import * as filestack from 'filestack-js';
 import type { File } from 'filestack-js/build/main/lib/api/upload';
 import { writable, type Writable } from 'svelte/store';
+import { HTML2Canvas } from './HTML2Canvas';
+import { myAlert } from '../toast';
 class Uploader {
 	client: filestack.Client;
 	progress: Writable<number>;
 	constructor() {
+		console.log('constructing uploader');
 		this.client = filestack.init(PUBLIC_FileStackAPIKey);
 		this.progress = writable(0);
 	}
@@ -55,6 +58,26 @@ class Uploader {
 			}
 		);
 		return res.data;
+	}
+	async uploadCanvas(selector: string, filename: string): Promise<File | false> {
+		const html2canvas = new HTML2Canvas();
+		const blob = await html2canvas.getJpegBlob(document.querySelector(selector), filename);
+		if (!blob) {
+			myAlert('Error');
+			return false;
+		}
+		const file = await this.uploadBlob(blob, filename);
+		return file;
+	}
+	async uploadCanvasPNG(selector: string, filename: string): Promise<File | false> {
+		const html2canvas = new HTML2Canvas();
+		const blob = await html2canvas.getPNGBlob(document.querySelector(selector), filename);
+		if (!blob) {
+			myAlert('Error');
+			return false;
+		}
+		const file = await this.uploadBlob(blob, filename);
+		return file;
 	}
 }
 export const uploader = new Uploader();

@@ -53,7 +53,7 @@
     "aframe-extras": "^7.0.0",
     "axios": "^1.4.0",
     "dom-to-image": "^2.6.0",
-    "filestack-js": "^3.26.1",
+    "filestack-js": "^3.27.0",
     "fullcalendar": "^6.1.8",
     "html-to-image": "^1.11.11",
     "html2canvas": "^1.4.1",

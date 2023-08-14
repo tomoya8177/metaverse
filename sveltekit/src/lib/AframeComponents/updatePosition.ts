@@ -1,3 +1,4 @@
+import { Me } from '$lib/frontend/Classes/Me';
 import type { Mentor } from '$lib/frontend/Classes/Mentor';
 import { Message } from '$lib/frontend/Classes/Message';
 import type { Room } from '$lib/frontend/Classes/Room';
@@ -26,8 +27,12 @@ AISpeaks.subscribe((value) => {
 	aiSpeaks = value;
 });
 AFRAME.registerComponent('update-position', {
+	me: null as Me | null,
+	lastPosition: { x: 0, y: 0, z: 0 } as xyz,
+	lastRotation: { x: 0, y: 0, z: 0 } as xyz,
+	lastPositionChangeTime: 0,
 	init: function () {
-		this.me = Users.find(this.el.id);
+		this.me = (Users.find(this.el.id) as Me) || null;
 		this.lastPosition = { ...this.me.position };
 		this.lastRotation = { ...this.me.rotation };
 	},
@@ -38,6 +43,7 @@ AFRAME.registerComponent('update-position', {
 		const timeSinceLastPositionChange = currentTime - this.lastPositionChangeTime;
 
 		if (
+			this.me &&
 			positionRotationChanged(
 				{
 					position: this.me.position,
@@ -61,6 +67,7 @@ AFRAME.registerComponent('update-position', {
 		}
 		if (!room.mentor) return;
 		if (
+			this.me &&
 			positionNotChanged(
 				{
 					position: this.me.position,

@@ -1,11 +1,13 @@
 import { writable, type Writable } from 'svelte/store';
 import type { Unit } from './Unit';
 import type { User } from '$lib/frontend/Classes/User';
+import type { Mentor } from './Mentor';
+import type { Me } from './Me';
 
 export const UsersStore = writable([] as Unit[]);
 
 class users {
-	users: Unit[] = [];
+	users: (Unit | Me | Mentor)[] = [];
 	constructor() {}
 	subscribe(value: (value: Unit[]) => void) {
 		return UsersStore.subscribe((value) => (this.users = value));
@@ -22,8 +24,8 @@ class users {
 			return this.users;
 		});
 	}
-	find(userId: string): Unit | false {
-		return this.users.find((user) => user.userId === userId) || false;
+	find(userId: string): Unit | Me | Mentor | false {
+		return this.users.find((user) => user.id === userId) || false;
 	}
 	clear = () => {
 		UsersStore.set([]);

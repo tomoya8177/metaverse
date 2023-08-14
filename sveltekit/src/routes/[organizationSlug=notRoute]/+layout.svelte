@@ -11,7 +11,9 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 
 	export let data: PageData;
+	console.log(1);
 	organization = data.organization;
+	console.log(2);
 	actionHistory.organization = organization.id;
 	console.log({ user: $UserStore });
 </script>

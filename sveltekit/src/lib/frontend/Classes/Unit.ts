@@ -13,10 +13,12 @@ import { pollAudioLevel } from '../pollAudioLevel';
 import { SharedObject } from './SharedObject';
 let room: Room;
 RoomStore.subscribe((value) => {
+	if (!value) return;
 	room = value;
 });
 
 export class Unit {
+	id: string;
 	userId: string;
 	el: Entity;
 	avatar: Entity | null = null;
@@ -26,35 +28,76 @@ export class Unit {
 	onVideoMute: boolean = false;
 	sharingScreen: boolean = false;
 	audioLevel: number = 0;
-	constructor(userId: string) {
-		this.userId = userId;
+	constructor(data: User) {
+		this.id = data.id;
+		this.userId = data.id;
 		//append element to the scene
 		this.el = document.createElement('a-entity');
-		this.el.id = userId;
+		this.el.id = data.id;
 		this.avatarContainer = document.createElement('a-entity');
 		this.avatarContainer.setAttribute('rotate-at-position', '');
 		this.el.appendChild(this.avatarContainer);
+
+		if (!this.avatar) {
+			this.avatar = document.createElement('a-gltf-model');
+			this.avatarContainer.appendChild(this.avatar);
+			this.avatar.setAttribute('position', '0 0.9 0');
+			this.avatar.setAttribute('rotation', '0 180 0');
+			this.avatar.setAttribute('hand-position', '');
+			this.avatar.setAttribute('smile', '');
+		}
+		this.avatar.setAttribute('src', data.avatarURL);
+		this.avatarContainer.setAttribute('rotate-at-position', '');
 		const scene = document.querySelector('a-scene');
+
+		if (data.nicknameURL) {
+			const asset = document.createElement('img');
+			asset.setAttribute('id', data.id + 'nameTag');
+			asset.setAttribute('src', data.nicknameURL);
+			asset.setAttribute('crossorigin', 'anonymous');
+			document.querySelector('a-assets')?.appendChild(asset);
+			console.log('appending nicknameURL');
+			let image = document.createElement('a-image');
+			image.setAttribute('src', `#${data.id}nameTag`);
+			image.setAttribute('side', 'front');
+			image.setAttribute('position', '0 1.85 0');
+			image.setAttribute('rotation', '0 180 0');
+			this.avatarContainer.appendChild(image);
+			console.log(asset);
+			asset.onload = () => {
+				//get aspect ratio
+				console.log('asset loaded', asset);
+				const width = asset.width;
+				const height = asset.height;
+				const aspectRatio = height / width;
+				image.setAttribute('height', 0.2);
+				image.setAttribute('width', 0.2 / aspectRatio);
+			};
+		} else {
+			//text nickname
+			let text = this.el.querySelector('a-text');
+			if (!text) {
+				text = document.createElement('a-text');
+				text.setAttribute('position', '0 2 0');
+				text.setAttribute('rotation', '0 180 0');
+				text.setAttribute('align', 'center');
+				this.avatarContainer.appendChild(text);
+			}
+			text.setAttribute('value', data.nickname);
+		}
 		scene?.appendChild(this.el);
 	}
 	get nickname(): string {
 		return this.nicknameData;
 	}
 	set nickname(nickname: string) {
+		return;
 		if (!this.avatarContainer) return;
 		this.nicknameData = nickname;
-		let text = this.el.querySelector('a-text');
-		if (!text) {
-			text = document.createElement('a-text');
-			text.setAttribute('position', '0 2 0');
-			text.setAttribute('rotation', '0 180 0');
-			text.setAttribute('align', 'center');
-			this.avatarContainer.appendChild(text);
-		}
-		text.setAttribute('value', nickname);
 	}
 
 	set avatarURL(avatarURL: string) {
+		return;
 		if (!this.avatarContainer) return;
 
 		if (!this.avatar) {

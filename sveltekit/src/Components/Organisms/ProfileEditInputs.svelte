@@ -7,6 +7,8 @@
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
 	import { _ } from '$lib/i18n';
 	import type { Me } from '$lib/frontend/Classes/Me';
+	import { uploader } from '$lib/frontend/Classes/Uploader';
+	import NameTag from '../Atom/NameTag.svelte';
 	export let onUpdateDone: () => void;
 	export let me: Me | null = null;
 	export let label: string = _('Update');
@@ -20,13 +22,13 @@
 			return;
 		}
 		busy = true;
-		await axios.put('/api/users/' + $UserStore.id, {
-			nickname: $UserStore.nickname,
-			avatarURL: $UserStore.avatarURL,
-			firstName: $UserStore.firstName,
-			lastName: $UserStore.lastName,
-			description: $UserStore.description
-		});
+		//render nametag
+		const file = await uploader.uploadCanvasPNG('.nameTagPreview', 'nameTag.png');
+		console.log({ file });
+		if (file) {
+			$UserStore.nicknameURL = file.url;
+		}
+		await $UserStore.update();
 		videoChat.sendMessage({
 			key: 'updateProfile',
 			nickname: $UserStore.nickname,
@@ -48,17 +50,16 @@
 		<InputWithLabel label={_('Last Name')} bind:value={$UserStore.lastName} />
 	</div>
 {/if}
-
-<InputWithLabel
-	meta={_('Only alphabets and numbers allowed for nickname')}
-	label={_('Nickname')}
-	bind:value={$UserStore.nickname}
-/>
-<AvatarSelectPane
-	bind:url={$UserStore.avatarURL}
-	thumbnailURL={PresetAvatars.find((preset) => preset.url == $UserStore.avatarURL)?.thumbnailURL ||
-		''}
-/>
+<section>
+	<InputWithLabel label={_('Nickname')} bind:value={$UserStore.nickname} />
+	<InputWithLabel label={_('Status')} bind:value={$UserStore.subtitle} />
+	<NameTag user={$UserStore} className="nameTagPreview" border={false} size={24} />
+	<AvatarSelectPane
+		bind:url={$UserStore.avatarURL}
+		thumbnailURL={PresetAvatars.find((preset) => preset.url == $UserStore.avatarURL)
+			?.thumbnailURL || ''}
+	/>
+</section>
 {#if withDescription}
 	<InputWithLabel label={_('Bio')} bind:value={$UserStore.description} type="textarea" />
 {/if}

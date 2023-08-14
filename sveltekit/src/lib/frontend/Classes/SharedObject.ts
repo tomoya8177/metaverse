@@ -35,7 +35,7 @@ export class SharedObject extends DBObject {
 	lockedPosition: number;
 	description: string = '';
 	explained: boolean = false;
-	iconURL?: string = '';
+	//iconURL?: string = '';
 	withCaption: boolean = false;
 	captionUrl: string = '';
 	captionAsset: Entity | null = null;
@@ -45,6 +45,8 @@ export class SharedObject extends DBObject {
 	editorOpen: boolean = false;
 	captionStyle: string = '';
 	attachedEvent: Event | null = null;
+	linkType: string = '';
+	brandIcon: string = '';
 	constructor(data: any = {}) {
 		data.table = 'objects';
 		super(data);
@@ -56,6 +58,8 @@ export class SharedObject extends DBObject {
 		this.withCaption = data.withCaption || false;
 		this.captionUrl = data.captionUrl || '';
 		this.captionStyle = data.captionStyle || '';
+		this.linkType = data.linkType || '';
+		this.brandIcon = data.brandIcon || '';
 		this.components =
 			data.components ||
 			JSON.stringify({

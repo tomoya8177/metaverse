@@ -4,8 +4,8 @@ import axios from 'axios';
 import { DBObject } from './DBObject';
 import { myAlert } from '../toast';
 import { _ } from '$lib/i18n';
-import { PUBLIC_LOCALHOST } from '$env/static/public';
 import type { Unit } from './Unit';
+import { PresetAvatars } from '$lib/preset/PresetAvatars';
 export class User extends DBObject {
 	nickname: string;
 	email: string;
@@ -24,19 +24,26 @@ export class User extends DBObject {
 	lastName?: string;
 	description: string = '';
 	unit: Unit | null = null;
+	subtitle: string = '';
+	nicknameURL: string = '';
 	constructor(data: any) {
 		data.table = 'users';
 		super(data);
-		this.nickname = data.nickname;
-		this.email = data.email;
-		this.avatarURL = data.avatarURL;
-		this.isAdmin = data.isAdmin;
-		this.organizations = data.organizations;
-		this.userRoles = data.userRoles;
-		this.createdAt = data.createdAt;
+		this.nickname = data.nickname || 'Nickname';
+		this.email = data.email || '';
+		this.avatarURL =
+			data.avatarURL ||
+			PresetAvatars[Math.round(Math.random() * PresetAvatars.length) | 0].url ||
+			'';
+		this.isAdmin = data.isAdmin || false;
+		this.organizations = data.organizations || [];
+		this.userRoles = data.userRoles || [];
+		this.createdAt = data.createdAt || '';
 		this.onMute = true;
 		this.onVideoMute = true;
-		this.description = data.description;
+		this.description = data.description || '';
+		this.subtitle = data.subtitle || '';
+		this.nicknameURL = data.nicknameURL || '';
 	}
 	get fullName(): string {
 		if (!this.firstName && !this.lastName) return this.nickname;

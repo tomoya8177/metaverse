@@ -3,11 +3,12 @@ import { Unit } from './Unit';
 import { connect, createLocalTracks } from 'twilio-video';
 import type { Room } from './Room';
 import type { Component, Entity, ObjectMap, System } from 'aframe';
+import type { User } from './User';
 
 export class Me extends Unit {
 	cameraRig: Entity;
-	constructor(userId: string) {
-		super(userId);
+	constructor(user: User) {
+		super(user);
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
 		this.el.setAttribute('my-touch-controls', 'enabled:false');
@@ -27,7 +28,7 @@ export class Me extends Unit {
 			'constrainToNavMesh: true; camera: #camera; controls: keyboard'
 		);
 
-		this.el.setAttribute('ping-session', `user:${userId};type:unit`);
+		this.el.setAttribute('ping-session', `user:${user.id};type:unit`);
 	}
 	async setLastPosition(room: Room): Promise<void> {
 		const sessions = await axios

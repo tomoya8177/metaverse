@@ -1,4 +1,3 @@
-import { PUBLIC_LOCALHOST } from '$env/static/public';
 import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
 import axios from 'axios';
 
