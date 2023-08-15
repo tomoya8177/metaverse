@@ -18,11 +18,14 @@ export const load = async ({ params }) => {
 			.then((res) => res.data[0]);
 		if (userRole) {
 			user.userRole = userRole;
-			user.isMember = true;
-			if (userRole.role == 'manager') {
-				user.isManager = true;
-			}
-			UserStore.set(new User(user));
+			UserStore.update((user) => {
+				user.userRole = userRole;
+				user.isMember = true;
+				if (userRole.role == 'manager') {
+					user.isManager = true;
+				}
+				return user;
+			});
 		}
 	}
 	console.log({ organization });
@@ -30,22 +33,6 @@ export const load = async ({ params }) => {
 		.get('/api/userRoles?organization=' + organization.id)
 		.then((res) => res.data);
 	console.log({ userRoles });
-	// const users = await axios
-	// 	.get(`/api/users?id=in:'${userRoles.map((role: UserRole) => role.user).join("','")}'`)
-	// 	.then((res) => {
-	// 		res.data = res.data.map((user: User) => {
-	// 			user.userRoles = userRoles.filter((userRole: UserRole) => userRole.user == user.id);
-	// 			return user;
-	// 		});
-	// 		return res.data.sort((a: User, b: User) => {
-	// 			if (a.createdAt > b.createdAt) {
-	// 				return -1;
-	// 			}
-	// 			if (a.createdAt < b.createdAt) {
-	// 				return 1;
-	// 			}
-	// 		});
-	// 	});
 
 	return {
 		organization,

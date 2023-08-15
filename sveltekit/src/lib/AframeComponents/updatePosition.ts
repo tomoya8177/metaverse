@@ -20,6 +20,7 @@ UserStore.subscribe((u) => {
 });
 let room: Room;
 RoomStore.subscribe((r) => {
+	if (!r) return;
 	room = r;
 });
 let aiSpeaks = false;
