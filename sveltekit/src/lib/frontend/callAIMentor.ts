@@ -23,7 +23,7 @@ export const callAIMentor = async (mentor: Mentor | null = null): Promise<void> 
 	if (mentor === null) {
 		mentor = room.mentorData;
 	}
-	const mentorEl = document.querySelector('#aiMentor') as Entity;
+	const mentorEl = document.getElementById(mentor.userData.id) as Entity;
 	if (!mentorEl) return;
 	const userUnit = Users.find(user.id);
 	const vector = new THREE.Vector3(0, 0, -1.2);
