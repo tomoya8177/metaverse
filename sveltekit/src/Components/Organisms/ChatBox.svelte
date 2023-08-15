@@ -61,7 +61,7 @@
 		let newMessage = new Message({
 			body: escapeHTML(newMessageBody),
 			user: $UserStore.id,
-			room: room.id,
+			room: room?.id,
 			pinned: newMessagePinned
 		});
 		if (!newMessageGenerateImage) {
@@ -75,9 +75,9 @@
 			promise.onDone(async (file) => {
 				console.log({ file });
 				const message = new Message({
-					room: room.id,
+					room: room?.id,
 					type: 'attachment',
-					user: room.mentorData?.user || forceMentor?.user,
+					user: room?.mentorData?.user || forceMentor?.user,
 					body: _(`AI completed to generate the image for you. @`) + $UserStore.nickname,
 					handle: file.handle,
 					url: file.url
@@ -88,19 +88,19 @@
 					TextChatOpen.set(true);
 					return;
 				}
-				room.mentorData.speak(message.body);
+				room?.mentorData.speak(message.body);
 				//aiSpeaksOut(message.body, Users.find(room.mentorData.user) || null);
 			});
 			newMessageBody = '';
 			waitingForAIAnswer = false;
 			return;
 		}
-		if ((newMessageBody.includes('@Mentor') && room.mentor) || forceMentor) {
+		if ((newMessageBody.includes('@Mentor') && room?.mentor) || forceMentor) {
 			newMessageBody = '';
 			waitingForAIAnswer = true;
 			const aiMessage = await sendQuestionToAI(
-				room.mentorData || forceMentor,
-				room.id || 'none',
+				room?.mentorData || forceMentor,
+				room?.id || 'none',
 				newMessage
 			);
 			await aiMessage.createSendOutAndPush();
@@ -117,7 +117,7 @@
 			if (forceMentor) {
 				forceMentor.speak(aiMessage.body);
 			} else {
-				room.mentorData.speak(aiMessage.body);
+				room?.mentorData.speak(aiMessage.body);
 			}
 			// aiSpeaksOut(
 			// 	aiMessage.body,
@@ -166,7 +166,7 @@
 </div>
 <hr />
 <div style="display:flex; gap:0.4rem;">
-	{#if forceMentor || room.mentor}
+	{#if forceMentor || room?.mentor}
 		<div>
 			<button
 				small
@@ -192,7 +192,7 @@
 							console.log(file);
 
 							const message = new Message({
-								room: room.id,
+								room: room?.id,
 								type: 'attachment',
 								user: $UserStore.id,
 								body: file.filename,
@@ -209,7 +209,7 @@
 			</button>
 		</div>
 	{/if}
-	{#if !forceMentor && room.mentor}
+	{#if !forceMentor && room?.mentor}
 		<div>
 			<button
 				data-tooltip={_('@Mentor')}
@@ -224,7 +224,7 @@
 			</button>
 		</div>
 	{/if}
-	{#if forceMentor || room.mentor}
+	{#if forceMentor || room?.mentor}
 		<div>
 			<button
 				style:opacity={$AISpeaks ? 1 : 0.5}

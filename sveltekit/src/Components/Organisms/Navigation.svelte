@@ -5,7 +5,7 @@
 	import { page } from '$app/stores';
 	import ProfileEditInputs from './ProfileEditInputs.svelte';
 	import { cookies } from '$lib/frontend/cookies';
-	import { FocusObjectStore, RoomStore, UserStore } from '$lib/store';
+	import { ChatMessagesStore, FocusObjectStore, RoomStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
@@ -26,6 +26,7 @@
 	import { goto } from '$app/navigation';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import AvatarThumbnail from '../Atom/AvatarThumbnail.svelte';
+	import { ChatMessage } from 'langchain/schema';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
@@ -76,7 +77,7 @@
 		if (!(await myConfirm(_('Are you sure that you want to leave this room?')))) return;
 		actionHistory.send('leaveRoom');
 		videoChat.leave();
-
+		ChatMessagesStore.set([]);
 		RoomStore.set(null);
 		if (!organization) {
 			location.href = '/';

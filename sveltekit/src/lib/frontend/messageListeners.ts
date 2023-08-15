@@ -19,7 +19,6 @@ RoomStore.subscribe((r) => {
 
 export const messageListeners = () => {
 	videoChat.listenTo('handshake', async (data) => {
-		console.log('handshale received from ', data.user.nickname);
 		const userUnit = welcomeUnit(data.user);
 		if (!userUnit) return;
 		userUnit.position = data.position;
@@ -35,7 +34,6 @@ export const messageListeners = () => {
 		unit.rotation = data.rotation;
 	});
 	videoChat.listenTo('updateProfile', (data) => {
-		console.log('updateProfile received', { data });
 		const unit = Users.find(data.user.id) as Unit;
 		if (!unit) return;
 		unit.userData = data.user;
@@ -43,7 +41,6 @@ export const messageListeners = () => {
 	});
 	videoChat.listenTo('objectCreate', async (data) => {
 		const objectData = await axios.get('/api/objects/' + data.id).then((res) => res.data);
-		console.log({ objectData });
 		const object = new SharedObject(objectData);
 		object.attachElement();
 		sharedObjects.add(object);
@@ -61,7 +58,6 @@ export const messageListeners = () => {
 		object.setComponents();
 	});
 	videoChat.listenTo('objectUpdate', (data) => {
-		console.log('received upject update', data);
 		const object = sharedObjects.get(data.id);
 		if (!object) return;
 		if (typeof data.title != 'undefined') object.title = data.title;
@@ -79,7 +75,6 @@ export const messageListeners = () => {
 		}
 	});
 	videoChat.listenTo('objectDelete', (data) => {
-		console.log('delete revceived', data);
 		const object = document.getElementById(data.id);
 		if (!object) return;
 		object.parentNode?.removeChild(object);

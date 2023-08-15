@@ -46,7 +46,6 @@
 
 <InputWithLabel label={_('Title')} bind:value={editRoom.title} />
 <InputWithLabel label={_('Slug')} bind:value={editRoom.slug} />
-<InputWithLabel label={_('With Metaverse')} type="switch" bind:value={editRoom.withMetaverse} />
 {#if editRoom.withMetaverse}
 	<InputWithLabel
 		label={_('Environment Preset')}

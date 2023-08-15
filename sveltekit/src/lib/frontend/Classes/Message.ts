@@ -46,7 +46,7 @@ export class Message extends DBObject {
 		}
 	}
 	get isAIs() {
-		return this.user == room.mentor;
+		return this.user == room?.mentor;
 	}
 	async createSendOutAndPush(): Promise<void> {
 		actionHistory.send('sendChatMessage', {

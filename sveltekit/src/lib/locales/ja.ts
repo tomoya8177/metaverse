@@ -240,5 +240,14 @@ export default {
 	'"Click to open" message will be displayed after one click on the object.':
 		'「Click To Open」メッセージは、オブジェクトを1回クリックすると表示されます。',
 	'Add Text Card': 'テキストカードを追加',
-	'Graphic Colors': 'グラフィックの色'
+	'Graphic Colors': 'グラフィックの色',
+	'Please read our Terms of Service and Privacy Policy before using this service.':
+		'このサービスを利用する前に、利用規約とプライバシーポリシーをお読みください。',
+	'Terms of Service': '利用規約',
+	'Privacy Policy': 'プライバシーポリシー',
+	'Edit Profile': 'プロフィールを編集',
+	Status: 'ステータス',
+	Bio: '自己紹介',
+	'has joined the room!': 'がルームに参加しました！',
+	'left the room': 'がルームを退出しました'
 };

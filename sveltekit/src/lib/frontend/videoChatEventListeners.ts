@@ -44,7 +44,6 @@ export const onNewParticipantConnected = (room: Room) => {
 };
 export const onParticipantAlreadyInRoom = (participants: Map<string, RemoteParticipant>) => {
 	participants.forEach((participant: RemoteParticipant) => {
-		console.log(`Participant "${participant.identity}" is in the Room`);
 		participant.on('trackSubscribed', (track) => {
 			console.log('track subscribed', track);
 			if (track.kind === 'data') {
@@ -65,7 +64,6 @@ export const onParticipantAlreadyInRoom = (participants: Map<string, RemoteParti
 
 export const onParticipantDisconnected = (room: Room) => {
 	room.on('participantDisconnected', (participant: RemoteParticipant) => {
-		console.log(`Participant disconnected: ${participant.identity}`);
 		// Detach the media elements
 		const unit = Users.find(participant.identity) as Unit;
 		if (!unit) return;
