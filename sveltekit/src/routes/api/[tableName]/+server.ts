@@ -19,7 +19,7 @@ export async function GET({ request, params, cookies }) {
 
 export async function POST({ request, params, cookies }) {
 	const isLocalhost = request.headers.get('host')?.includes('localhost');
-	if (!isLocalhost || !(await Auth.check(cookies.get('login'))).result) {
+	if (!(await Auth.check(cookies.get('login'))).result) {
 		return new Response('not authorized', { status: 401 });
 	}
 	const id = crypto.randomUUID();

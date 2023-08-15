@@ -41,12 +41,17 @@
 	});
 	let busy = false;
 	const createOrgWhenLoggedIn = async (loggedIn) => {
+		console.log(data);
 		if (loggedIn) {
-			organization = await axios
-				.post('/api/organizations', {
-					slug: crypto.randomUUID()
-				})
-				.then((res) => res.data);
+			try {
+				organization = await axios
+					.post('/api/organizations', {
+						slug: crypto.randomUUID()
+					})
+					.then((res) => res.data);
+			} catch (e) {
+				console.log(e);
+			}
 		}
 	};
 
