@@ -302,13 +302,14 @@ export class SharedObject extends DBObject {
 			scale: this.el.getAttribute('scale'),
 			radius: this.el.getAttribute('geometry')?.radius
 		});
+		console.log('set component', this.components);
 	}
 	remove() {
 		this.el?.parentNode?.removeChild(this.el);
 		this.asset?.parentNode?.removeChild(this.asset);
 		this.captionAsset?.parentNode?.removeChild(this.captionAsset);
 	}
-	moveToMyFront(eyePosition: xyz, eyeRotation: xyz) {
+	async moveToMyFront(eyePosition: xyz, eyeRotation: xyz): Promise<void> {
 		this.el?.setAttribute('rotation', `0 ${eyeRotation.y} 0`);
 		const vector = new THREE.Vector3(0, 0, -2);
 		vector.applyAxisAngle(new THREE.Vector3(0, 1, 0), degree2radian(eyeRotation.y));
@@ -316,6 +317,9 @@ export class SharedObject extends DBObject {
 			'position',
 			`${eyePosition.x + vector.x} ${eyePosition.y + 1.65} ${eyePosition.z + vector.z}`
 		);
+		//wait for 100
+		await new Promise((resolve) => setTimeout(resolve, 100));
+		this.setComponents();
 	}
 	validate(): boolean {
 		if (this.title == '') {

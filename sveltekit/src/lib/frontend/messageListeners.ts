@@ -41,6 +41,7 @@ export const messageListeners = () => {
 	});
 	videoChat.listenTo('objectCreate', async (data) => {
 		const objectData = await axios.get('/api/objects/' + data.id).then((res) => res.data);
+		console.log({ objectData });
 		const object = new SharedObject(objectData);
 		object.attachElement();
 		sharedObjects.add(object);
@@ -93,12 +94,12 @@ export const messageListeners = () => {
 export const welcomeUnit = (user: User): Unit => {
 	const ifExisting = Users.find(user.id);
 	if (ifExisting) {
-		return ifExisting;
+		return ifExisting as Unit;
 	}
 	const userUnit = new Unit(user);
-	userUnit.nickname = user.nickname;
-	userUnit.avatarURL =
-		user.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
+	// userUnit.nickname = user.nickname;
+	// userUnit.avatarURL =
+	// 	user.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
 	Users.add(userUnit);
 	return userUnit;
 };

@@ -60,41 +60,43 @@ export class Unit {
 	}
 	setNickname() {
 		if (this.userData.nicknameURL) {
-			let asset: HTMLImageElement;
-			const existingAsset = document.querySelector(`#${this.userData.id}nameTag`);
-			if (existingAsset && existingAsset instanceof HTMLImageElement) {
-				asset = existingAsset;
-			} else {
-				const el = document.createElement('img');
-				if (el instanceof HTMLImageElement) {
-					asset = el;
-					asset.setAttribute('id', this.userData.id + 'nameTag');
-					asset.setAttribute('crossorigin', 'anonymous');
-					document.querySelector('a-assets')?.appendChild(asset);
-					asset.onload = () => {
-						//get aspect ratio
-						console.log('asset loaded', asset);
-						const width = asset.width;
-						const height = asset.height;
-						const aspectRatio = height / width;
-						image.setAttribute('height', 0.2);
-						image.setAttribute('width', 0.2 / aspectRatio);
-					};
-				}
+			let asset: HTMLImageElement | null = null;
+			const existingAsset = document.querySelector(`#nameTagFor${this.userData.id}`);
+			if (existingAsset) {
+				//remove
+				existingAsset.parentElement?.removeChild(existingAsset);
 			}
+			const el = document.createElement('img');
+			if (el instanceof HTMLImageElement) {
+				asset = el;
+				asset.setAttribute('id', 'nameTagFor' + this.userData.id);
+				asset.setAttribute('crossorigin', 'anonymous');
+				document.querySelector('a-assets')?.appendChild(asset);
+				asset.onload = () => {
+					if (!asset) return;
+					//get aspect ratio
+					console.log('asset loaded', asset);
+					const width = asset.width;
+					const height = asset.height;
+					const aspectRatio = height / width;
+					image.setAttribute('height', '0.2');
+					image.setAttribute('width', (0.2 / aspectRatio).toString());
+				};
+			}
+			if (!asset) return;
 			asset.setAttribute('src', this.userData.nicknameURL);
-			let image: Entity;
+			let image: Element;
 			const existingImage = this.el.querySelector('a-image');
 			if (existingImage) {
-				image = existingImage;
-			} else {
-				image = document.createElement('a-image');
-				image.setAttribute('side', 'front');
-				image.setAttribute('position', '0 1.85 0');
-				image.setAttribute('rotation', '0 180 0');
-				image.setAttribute('src', `#${this.userData.id}nameTag`);
-				this.avatarContainer.appendChild(image);
+				//remove
+				existingImage.parentElement?.removeChild(existingImage);
 			}
+			image = document.createElement('a-image');
+			image.setAttribute('side', 'front');
+			image.setAttribute('position', '0 1.85 0');
+			image.setAttribute('rotation', '0 180 0');
+			image.setAttribute('src', `#nameTagFor${this.userData.id}`);
+			this.avatarContainer.appendChild(image);
 			console.log(asset);
 		} else {
 			//text nickname
