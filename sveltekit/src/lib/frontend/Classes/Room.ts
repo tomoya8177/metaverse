@@ -76,7 +76,7 @@ export class Room extends DBObject {
 			return false;
 		}
 		const existingRoomWithSlug = await axios
-			.get('/api/rooms?slug=' + this.slug + '&organiation=' + this.organization)
+			.get('/api/rooms?slug=' + this.slug + '&organization=' + this.organization)
 			.then((res) => res.data);
 		if (existingRoomWithSlug.length && existingRoomWithSlug[0].id != this.id) {
 			myAlert(_('Slug already exists'));
@@ -87,29 +87,7 @@ export class Room extends DBObject {
 	get capacity(): number {
 		return 50;
 	}
-	create = async () => {
-		this.allowedUsers = JSON.stringify(this.allowedUsersArray);
-		const newRoom = await axios.post('/api/rooms', { ...this }).then((res) => res.data);
-		let mentor;
-		if (this.mentor) {
-			mentor = await axios.get('/api/mentors/' + this.mentor).then((res) => res.data);
-			await reinstallAIBrain(mentor);
-		}
-		return { newRoom, mentor };
-	};
-	update = async () => {
-		this.allowedUsers = JSON.stringify(this.allowedUsersArray);
-		const updatedRoom = await axios
-			.put('/api/rooms/' + this.id, { ...this })
-			.then((res) => res.data);
 
-		let mentor;
-		if (this.mentor) {
-			mentor = await axios.get('/api/mentors/' + this.mentor).then((res) => res.data);
-			await reinstallAIBrain(mentor);
-		}
-		return { updatedRoom, mentor };
-	};
 	delete = async () => {
 		await axios.delete('/api/rooms/' + this.id);
 		await axios.delete('/api/sessions?room=' + this.id);

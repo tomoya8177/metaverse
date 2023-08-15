@@ -32,13 +32,13 @@
 		console.log({ synth });
 	});
 
-	export let editMentor: Mentor = EmptyMentor;
+	export let editMentor: Mentor;
 	let introBusy = false;
 </script>
 
 {#if editMentor.userData}
 	<div style="display:flex;gap:0.4rem">
-		<FulllNameInput user={editMentor.userData} />
+		<FulllNameInput bind:user={editMentor.userData} />
 	</div>
 	<InputWithLabel
 		meta={_('Only alphabets and numbers allowed for nickname')}
@@ -108,11 +108,12 @@
 		aria-busy={introBusy}
 		on:click={async () => {
 			introBusy = true;
+			console.log({ editMentor });
 			const response = await axios.post('/mentor', {
 				messages: [
 					{
 						role: 'system',
-						content: `Create your introduction in less than 100 words. Your name is ${editMentor.userData?.firstName} ${editMentor.userData?.lastName}. Include your name, the context that you are given to help students. you are told to follow the instruction below. ${editMentor.prompt}`
+						content: `Create your introduction in less than 100 words. Your name is ${editMentor.userData?.fullName}. Include your name, the context that you are given to help students. you are told to follow the instruction below. ${editMentor.prompt}`
 					}
 				]
 			});

@@ -10,11 +10,11 @@ export class Organization extends DBObject {
 	constructor(data: any = {}) {
 		data.table = 'organizations';
 		super(data);
-		this.title = data.unescapedData.title || '';
-		this.checked = data.unescapedData.checked || false;
-		this.isManager = data.unescapedData.isManager || false;
-		this.slug = data.unescapedData.slug || '';
-		this.allowRegistration = data.unescapedData.allowRegistration || false;
-		this.thumbnailURL = data.unescapedData.thumbnailURL || '';
+		this.title = this.unescapedData.title || '';
+		this.checked = this.unescapedData.checked || false;
+		this.isManager = this.unescapedData.isManager || false;
+		this.slug = this.unescapedData.slug || '';
+		this.allowRegistration = this.unescapedData.allowRegistration || false;
+		this.thumbnailURL = this.unescapedData.thumbnailURL || '';
 	}
 }

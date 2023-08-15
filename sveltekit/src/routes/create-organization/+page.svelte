@@ -3,7 +3,7 @@
 	import type { PageData } from '$lib/types';
 	import { _ } from '$lib/i18n';
 	import OrganizationEdit from '../../Components/Organisms/OrganizationEdit.svelte';
-	import type { Organization } from '$lib/types/Organization';
+	import { Organization } from '$lib/types/Organization';
 	import { EmptyOrganization } from '$lib/preset/EmptyOrganization';
 	import { onMount } from 'svelte';
 	import { checkSlugForOrganization } from '$lib/frontend/checkSlugForOrganization';
@@ -38,17 +38,17 @@
 	let mentor: Mentor = new Mentor({});
 	onMount(async () => {
 		await mentor.init();
+		console.log({ mentor });
 	});
 	let busy = false;
 	const createOrgWhenLoggedIn = async (loggedIn) => {
 		console.log(data);
 		if (loggedIn) {
 			try {
-				organization = await axios
-					.post('/api/organizations', {
-						slug: crypto.randomUUID()
-					})
-					.then((res) => res.data);
+				organization = new Organization({
+					slug: crypto.randomUUID()
+				});
+				await organization.create();
 			} catch (e) {
 				console.log(e);
 			}
@@ -86,28 +86,26 @@
 					if (!(await checkSlugForOrganization(organization.slug, organization))) return;
 					if (!organization.title) return myAlert(_('Please enter a title'));
 					busy = true;
-					const newOrg = await axios
-						.put('/api/organizations/' + organization.id, organization)
-						.then((res) => res.data);
+					organization.update();
 					const newUserRole = await axios.post('/api/userRoles', {
 						user: user.id,
-						organization: newOrg.id,
+						organization: organization.id,
 						role: 'manager'
 					});
-					const url = `${$page.url.protocol}//${$page.url.host}/${newOrg.slug}`;
-					await sendJoinedToOrganizationEmail($UserStore.email, newOrg, url);
-					room.organization = newOrg.id;
-					mentor.organization = newOrg.id;
-					if (!mentor.userData) mentor.userData = emptyUser;
-					mentor.userData.nickname = 'My First AI Mentor';
-					mentor.userData =
-						(await axios.post('/api/users', mentor.userData).then((res) => res.data)) || emptyUser;
-					mentor.user = mentor.userData?.id || '';
-					const mentorRes = await axios.post('/api/mentors', mentor).then((res) => res.data);
-					mentor = {
-						...mentor,
-						...mentorRes
-					};
+					const url = `${$page.url.protocol}//${$page.url.host}/${organization.slug}`;
+					await sendJoinedToOrganizationEmail($UserStore.email, organization, url);
+					room.organization = organization.id;
+					mentor.organization = organization.id;
+					// if (!mentor.userData) mentor.userData = emptyUser;
+					// mentor.userData.nickname = 'My First AI Mentor';
+					// mentor.userData =
+					// 	(await axios.post('/api/users', mentor.userData).then((res) => res.data)) || emptyUser;
+					// mentor.user = mentor.userData?.id || '';
+					// const mentorRes = await axios.post('/api/mentors', mentor).then((res) => res.data);
+					// mentor = {
+					// 	...mentor,
+					// 	...mentorRes
+					// };
 
 					process = 'mentor';
 					busy = false;
@@ -119,30 +117,17 @@
 			<h4>
 				{_('VirtuaMentor')}
 			</h4>
-			<MentorEdit editMentor={mentor} />
+			<MentorEdit bind:editMentor={mentor} />
 			<button
 				aria-busy={busy}
 				on:click={async () => {
 					if (!validateMentorData(mentor)) return;
 					busy = true;
-					if (!mentor.userData) mentor.userData = emptyUser;
+					mentor.userData.create();
+					mentor.user = mentor.userData.id;
+					mentor.create();
 
-					const updatedUser = await axios
-						.put('/api/users/' + mentor.userData.id, {
-							...mentor.userData,
-							description: escapeHTML(mentor.userData.description)
-						})
-						.then((res) => res.data);
-					const updatedMentor = await axios
-						.put('/api/mentors/' + mentor.id, {
-							...mentor,
-							prompt: escapeHTML(mentor.prompt)
-						})
-						.then((res) => res.data);
-					mentor.id = updatedMentor.id;
-					updatedMentor.userData = updatedUser;
-					room.mentor = updatedMentor.id;
-					console.log({ updatedMentor, updatedUser });
+					room.mentor = mentor.id;
 					busy = false;
 					process = 'room';
 				}}
@@ -160,10 +145,10 @@
 					if (!(await room.validate())) return;
 					busy = true;
 					console.log({ room });
-					const { newRoom, mentor } = await room.create();
-					console.log({ newRoom, mentor });
+					await room.create();
+					await mentor.study(room.id);
 					busy = false;
-					location.href = `/${organization.slug}/${newRoom.slug}`;
+					location.href = `/${organization.slug}/${room.slug}`;
 				}}
 			>
 				{_('Next')}

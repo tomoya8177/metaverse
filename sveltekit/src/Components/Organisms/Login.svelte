@@ -36,7 +36,18 @@
 		actionHistory.send('login', { email });
 	};
 	let verificationCode: string = '';
+	const displayWrongCode = () => {
+		wrongCode = true;
+		setTimeout(() => {
+			wrongCode = false;
+		}, 2000);
+	};
 	const onVerifyClicked = async () => {
+		//if anything other than number, warn
+		if (verificationCode.match(/[^0-9]/)) {
+			displayWrongCode();
+			return;
+		}
 		busy = true;
 		const res = await axios.post('/api/login/verifyCode', {
 			email,
@@ -48,10 +59,7 @@
 			location.reload();
 		} else {
 			//wrong code
-			wrongCode = true;
-			setTimeout(() => {
-				wrongCode = false;
-			}, 2000);
+			displayWrongCode();
 		}
 		busy = false;
 		actionHistory.send('verify', { email });

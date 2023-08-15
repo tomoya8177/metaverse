@@ -32,7 +32,7 @@ export class User extends DBObject {
 		this.email = data.email || '';
 		this.avatarURL =
 			data.avatarURL ||
-			PresetAvatars[Math.round(Math.random() * PresetAvatars.length) | 0].url ||
+			PresetAvatars[Math.floor(Math.random() * PresetAvatars.length) | 0]?.url ||
 			'';
 		this.isAdmin = data.isAdmin || false;
 		this.organizations = data.organizations || [];

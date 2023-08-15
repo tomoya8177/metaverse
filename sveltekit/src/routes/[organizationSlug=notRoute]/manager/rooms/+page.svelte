@@ -81,7 +81,8 @@
 	const onUpdateClicked = async () => {
 		if (!(await editRoom.validate())) return;
 		busy = true;
-		const { updatedRoom, mentor } = await editRoom.update();
+		await editRoom.update();
+		mentor.study();
 		mentors = [...mentors.filter((m) => m.id != mentor.id), mentor];
 		rooms = rooms.map((room) => {
 			if (room.id == updatedRoom.id) return new Room(updatedRoom);

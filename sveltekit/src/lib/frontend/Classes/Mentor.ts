@@ -4,6 +4,7 @@ import { User } from './User';
 import { AISpeaks } from '$lib/store';
 import { Users } from './Users';
 import { DocumentForAI } from '$lib/types/DocumentForAI';
+import { _ } from '$lib/i18n';
 
 let aiSpeaks = false;
 AISpeaks.subscribe((value) => {
@@ -17,11 +18,13 @@ export class Mentor extends DBObject {
 	utterance: SpeechSynthesisUtterance | null = null;
 	speechInterval: any;
 	documents: DocumentForAI[] = [];
+	organization: string = '';
 	constructor(data: any) {
 		data.table = 'mentors';
 		super(data);
 		this.user = data.user || '';
 		this.voiceURI = data.voiceURI;
+		this.organization = data.organization || '';
 		this.utterance = new SpeechSynthesisUtterance();
 		const synth = window.speechSynthesis;
 		synth.addEventListener('voiceschanged', () => {
@@ -60,5 +63,19 @@ export class Mentor extends DBObject {
 			clearInterval(this.speechInterval);
 			unit.audioLevel = 0;
 		};
+	}
+	async study(roomId: string) {
+		const res = await axios.put('/mentor/' + this.id, {
+			roomId,
+			refresh: true
+		});
+
+		console.log({ res });
+		if (res.data.failedDocuments.length) {
+			const failedDocuments = res.data.failedDocuments;
+			console.log({ failedDocuments });
+			alert(_('Failed to load documents:') + failedDocuments.map((doc) => doc.title).join(', '));
+		}
+		return res.data.succeededDocuments;
 	}
 }

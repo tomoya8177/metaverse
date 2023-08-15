@@ -80,8 +80,12 @@
 	.placeholder * {
 		position: absolute;
 		top: 0px;
+		left: 0px;
 	}
 	.placeholder img {
+		position: absolute;
+		top: 0px;
+		left: 0px;
 		min-width: 180px;
 		width: 180px;
 		height: 180px;

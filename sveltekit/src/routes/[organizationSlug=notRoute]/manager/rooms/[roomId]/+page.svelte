@@ -12,8 +12,9 @@
 	const onUpdateClicked = async () => {
 		if (!(await room.validate())) return;
 		updateBusy = true;
-		const { updatedRoom } = await room.update();
-		room = new Room({ ...updatedRoom, documents: room.documents });
+		await room.update();
+		room.mentorData.study();
+		room = new Room({ ...room, documents: room.documents });
 		updateBusy = false;
 		toast(_('Updated'));
 	};
