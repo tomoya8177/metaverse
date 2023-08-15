@@ -5,6 +5,7 @@ import { _ } from '$lib/i18n';
 import type { Mentor } from './Classes/Mentor';
 
 export const reinstallAIBrain = async (mentor: Mentor | undefined): Promise<DocumentForAI[]> => {
+	return [];
 	if (!mentor) return [];
 	const res = await axios.put('/mentor/' + mentor.id, {
 		roomId: 'none',

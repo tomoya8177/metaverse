@@ -58,69 +58,36 @@
 	const onCreateClicked = async () => {
 		if (!validateMentorData(editMentor)) return;
 		busy = true;
-		const createdUser = await axios.post('/api/users', editMentor.userData).then((res) => res.data);
-		users = [...users, createdUser];
-		let createdMentor = new Mentor(
-			await axios
-				.post('/api/mentors', {
-					...editMentor,
-					user: createdUser.id,
-					organization: organization.id
-				})
-				.then((res) => res.data)
-		);
-		await createdMentor.init();
+		await editMentor.userData.create();
+		editMentor.user = editMentor.userData.id;
+		await editMentor.create();
+		await editMentor.init();
 		//createdMentor = setUpMentorbject(createdMentor);
-		mentors = [...mentors, createdMentor];
-		editMentor.documents = await reinstallAIBrain(createdMentor);
+		mentors = [...mentors, editMentor];
+		//		editMentor.documents = await reinstallAIBrain(createdMentor);
 		busy = false;
 		newMentorModalOpen = false;
 		actionHistory.send('createMentor', {
-			mentor: { ...createdMentor, description: escapeHTML(createdMentor.description) }
+			mentor: editMentor.purifyData()
 		});
 	};
 	const onUpdateClicked = async () => {
 		if (!validateMentorData(editMentor)) return;
 		if (!editMentor.userData?.id) return;
 		busy = true;
-		const updatedUser = await axios
-			.put('/api/users/' + editMentor.userData.id, {
-				...editMentor.userData,
-				description: escapeHTML(editMentor.userData.description)
-			})
-			.then((res) => res.data);
-		console.log({ editMentor });
-		users = users.map((user) => {
-			if (user.id == updatedUser.id) {
-				return updatedUser;
-			}
-			return user;
-		});
-		let updatedMentor = new Mentor(
-			await axios
-				.put('/api/mentors/' + editMentor.id, {
-					prompt: escapeHTML(editMentor.prompt),
-					...editMentor
-				})
-				.then((res) => res.data)
-		);
-		await updatedMentor.init();
-		console.log({ updatedMentor });
-		mentors = mentors.map((mentor) => {
-			if (mentor.id == updatedMentor.id) {
-				//updatedMentor = setUpMentorbject(updatedMentor);
-				return updatedMentor;
-			}
-			return mentor;
-		});
-		editMentor.documents = await reinstallAIBrain(updatedMentor);
+		await editMentor.userData.update();
+		await editMentor.update();
+		await editMentor.init();
+		editMentor.resetBrain();
 		busy = false;
 		newMentorModalOpen = false;
-		actionHistory.send('updateMentor', { mentor: updatedMentor });
+		actionHistory.send('updateMentor', { mentor: editMentor });
 	};
 	const onDeleteClicked = async () => {
 		if (!confirm('Are you sure that you want to delete this mentor?')) return;
 		await axios.delete('/api/mentors/' + editMentor.id).then((res) => res.data);
+		editMentor.resetBrain();
+
 		if (!editMentor.userData) return;
 		await axios.delete('/api/users/' + editMentor.userData.id).then((res) => res.data);
 		await axios.delete('/api/documentsForAI?mentor=' + editMentor.id).then((res) => res.data);
@@ -182,7 +149,7 @@
 					<td>
 						<button
 							on:click={() => {
-								editMentor = { ...mentor };
+								editMentor = mentor;
 								editMode = 'update';
 								newMentorModalOpen = true;
 							}}

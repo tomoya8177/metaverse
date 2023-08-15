@@ -108,38 +108,27 @@
 				}, 120000); //in 2 minutes, the QA dialog will show up
 			}
 			if (!room.mentor) return;
-
-			let content = `The user, whose nickname is ${$UserStore.nickname}, joined the room "${
-				room.title
-			}" of the organization "${
-				organization.title
-			}". Just greet the user nicely. Make sure you answer in the language user prefers. User's locale setting is ${cookies.get(
-				'locale'
-			)}.`;
-			if (sharedObjects.items.length) {
-				sharedObjects.items.forEach((object) => {
-					if (
-						object.attachedEvent &&
-						object.attachedEvent.myAttendance &&
-						DateTime.fromISO(object.attachedEvent.start) > DateTime.now()
-					) {
-						content += `The user is also attending the event ${object.attachedEvent.summary}. The description of the event is: ${object.attachedEvent.description}. ${object.attachedEvent.startString}  And user's attendance status is set to ${object.attachedEvent.myAttendance.status}.`;
-					}
-				});
-			}
-			const response = await axios.post('/mentor', {
-				appendToChannel: room.id,
-				messages: [
-					{
-						role: 'system',
-						content
-					}
-				]
-			});
+			const response = await axios.post(
+				'/mentor/' + room.mentor + '/' + room.id + DateTime.now().toISODate(),
+				{
+					type: 'room',
+					roomId: room.id,
+					body: _("Hello! I just entered the room. I'm ") + $UserStore.nickname
+					// '(ID:' +
+					// $UserStore.id +
+					// '). ' +
+					// _(
+					// 	'Greet me back first. Then let me know if there is any event where my id is included in the attendances. If any, just give me the title and start date and time, and do not disclose either my ID nor event ID. When talking about the event, use my locale and adjust the time:' +
+					// 		cookies.get('locale') +
+					// 		'.'
+					// )
+				}
+			);
+			console.log({ response });
 			const message = new Message({
 				room: room.id,
 				user: room.mentorData.userData.id,
-				body: response.data.response.content,
+				body: response.data.text,
 				createdAt: DateTime.now().toISO(),
 				isTalking: true
 			});

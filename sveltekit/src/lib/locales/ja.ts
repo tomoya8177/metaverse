@@ -249,5 +249,8 @@ export default {
 	Status: 'ステータス',
 	Bio: '自己紹介',
 	'has joined the room!': 'がルームに参加しました！',
-	'left the room': 'がルームを退出しました'
+	'left the room': 'がルームを退出しました',
+	"Hello! I just entered the room. I'm ": 'こんにちは！私はちょうどルームに入りました。私は',
+	'Let me know if there is any event for me to attend.':
+		'私が出席するイベントがあれば教えてください。'
 };

@@ -15,6 +15,10 @@ export const createVectorStoreModelChain = async (documents: Document[]) => {
 	);
 
 	const model = new ChatOpenAI({ openAIApiKey: OPENAI_API_KEY, modelName: 'gpt-4' });
-	const chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever());
+	const chain = ConversationalRetrievalQAChain.fromLLM(model, vectorStore.asRetriever(), {
+		memory: new BufferMemory({
+			memoryKey: 'chat_history' // Must be set to "chat_history"
+		})
+	});
 	return { model, chain };
 };

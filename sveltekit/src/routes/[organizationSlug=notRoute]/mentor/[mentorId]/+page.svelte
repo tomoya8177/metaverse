@@ -11,6 +11,8 @@
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
+	import { DateTime } from 'luxon';
+	import { _ } from '$lib/i18n';
 	export let data: PageData;
 	const mentor = new Mentor(data.mentor);
 	const sendChatMessage = async (message: Message) => {
@@ -46,25 +48,38 @@
 				pinned: false
 			});
 			await newMessage.createSendOutAndPush();
-			waitingForAIAnswer = true;
-			const aiMessage = await sendQuestionToAI(mentor, 'none', newMessage);
-			waitingForAIAnswer = false;
-			await aiMessage.createSendOutAndPush();
-			if (!$AISpeaks) return;
-			mentor.speak(aiMessage.body);
+			send(newMessage);
+
 			//			aiSpeaksOut(aiMessage.body);
 		}
 	};
 	let mentorReady = false;
 	onMount(async () => {
-		const res = await axios.put('/mentor/' + mentor.id, {
-			roomId: 'none'
-		});
-		console.log({ mentorinitialized: res.data });
 		await mentor.init();
 		console.log({ mentor });
 		mentorReady = true;
+		const newMessage = new Message({
+			body: escapeHTML(_('Hello.')),
+			user: $UserStore.id,
+			pinned: false
+		});
+		send(newMessage);
 	});
+	const send = async (newMessage: Message) => {
+		waitingForAIAnswer = true;
+		const aiMessage = await sendQuestionToAI({
+			type: 'user',
+			mentor: mentor,
+			roomId: undefined,
+			userId: $UserStore.id,
+			newMessage,
+			channelId: $UserStore.id + DateTime.now().toISODate()
+		});
+		waitingForAIAnswer = false;
+		await aiMessage.createSendOutAndPush();
+		if (!$AISpeaks) return;
+		mentor.speak(aiMessage.body);
+	};
 </script>
 
 {#if mentorReady}

@@ -84,14 +84,7 @@
 	};
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
-		if (room.mentor) {
-			if (!room.mentorData.userData) return console.error('MentorUser not found');
-			authors = [...authors, room.mentorData.userData];
-			const res = await axios.put('/mentor/' + room.mentor, {
-				roomId: room.id,
-				refresh: false
-			});
-		}
+
 		videoChat.listenTo('textMessage', async (data) => {
 			const message = new Message(data);
 			ChatMessagesStore.update((arr) => {
@@ -147,7 +140,14 @@
 
 			await sendChatMessage(newMessage);
 			waitingForAIAnswer = true;
-			const aiMessage = await sendQuestionToAI(room.mentorData, room.id || 'none', newMessage);
+			const aiMessage = await sendQuestionToAI({
+				type: 'room',
+				mentor: room.mentorData,
+				roomId: room.id,
+				newMessage,
+				userId: undefined,
+				channelId: room.id + DateTime.now().toISODate()
+			});
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)) };
 			callAIMentor();

@@ -4,24 +4,30 @@ import { escapeHTML } from '$lib/math/escapeHTML';
 import { actionHistory } from './Classes/ActionHistory';
 import type { Mentor } from './Classes/Mentor';
 
-export const sendQuestionToAI = async (
-	mentor: Mentor,
-	roomId: string = 'none',
-	newMessage: Message
-) => {
-	console.log({ roomId });
-	actionHistory.send('sendQuestionToAI', { ...newMessage, body: escapeHTML(newMessage.body) });
+export const sendQuestionToAI = async (data: {
+	mentor: Mentor;
+	roomId: string | undefined;
+	userId: string | undefined;
+	newMessage: Message;
+	type: 'user' | 'room';
+	channelId: string;
+}) => {
+	console.log({ data });
+	actionHistory.send('sendQuestionToAI', {
+		...data.newMessage,
+		body: escapeHTML(data.newMessage.body)
+	});
 	const response = await axios
-		.post('/mentor/' + mentor.id, {
-			roomId,
-			...newMessage
+		.post('/mentor/' + data.mentor.id + '/' + data.channelId, {
+			...data,
+			body: escapeHTML(data.newMessage.body)
 		})
 		.then((res) => res.data);
 	console.log({ response });
 	const aiMessage = new Message({
 		body: response.response || response.text,
-		user: mentor.user,
-		room: roomId,
+		user: data.mentor.user,
+		room: data.roomId,
 		pinned: false
 	});
 	return aiMessage;

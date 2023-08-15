@@ -19,6 +19,7 @@ export class Mentor extends DBObject {
 	speechInterval: any;
 	documents: DocumentForAI[] = [];
 	organization: string = '';
+	prompt: string = '';
 	constructor(data: any) {
 		data.table = 'mentors';
 		super(data);
@@ -26,6 +27,7 @@ export class Mentor extends DBObject {
 		this.voiceURI = data.voiceURI;
 		this.organization = data.organization || '';
 		this.utterance = new SpeechSynthesisUtterance();
+		this.prompt = data.prompt || '';
 		const synth = window.speechSynthesis;
 		synth.addEventListener('voiceschanged', () => {
 			if (this.voiceURI && this.utterance) {
@@ -64,7 +66,11 @@ export class Mentor extends DBObject {
 			unit.audioLevel = 0;
 		};
 	}
+	async resetBrain() {
+		await axios.post('/mentor/' + this.id + '/reset');
+	}
 	async study(roomId: string) {
+		return [];
 		const res = await axios.put('/mentor/' + this.id, {
 			roomId,
 			refresh: true

@@ -27,6 +27,7 @@
 	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	import type { Room } from '$lib/frontend/Classes/Room';
+	import { DateTime } from 'luxon';
 	export let newMessagePinned = false;
 	let newMessageBody = '';
 	export let authors: User[] = [];
@@ -98,11 +99,17 @@
 		if ((newMessageBody.includes('@Mentor') && room?.mentor) || forceMentor) {
 			newMessageBody = '';
 			waitingForAIAnswer = true;
-			const aiMessage = await sendQuestionToAI(
-				room?.mentorData || forceMentor,
-				room?.id || 'none',
-				newMessage
-			);
+
+			const aiMessage = await sendQuestionToAI({
+				type: room ? 'room' : 'user',
+				mentor: room ? room.mentorData : forceMentor,
+				roomId: room ? room.id : undefined,
+				userId: room ? undefined : $UserStore.id,
+				newMessage,
+				channelId: room
+					? room.id + DateTime.now().toISODate()
+					: $UserStore.id + DateTime.now().toISODate()
+			});
 			await aiMessage.createSendOutAndPush();
 			if (!forceMentor) callAIMentor();
 
