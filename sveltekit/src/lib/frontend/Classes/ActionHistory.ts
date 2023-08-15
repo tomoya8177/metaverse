@@ -4,6 +4,7 @@ import axios from 'axios';
 import { DBObject } from './DBObject';
 import { page } from '$app/stores';
 import { escapeHTML } from '$lib/math/escapeHTML';
+import { cookies } from '../cookies';
 type Actions =
 	| 'login'
 	| 'logout'
@@ -74,7 +75,8 @@ export class ActionHistory extends DBObject {
 				organization: this.organization,
 				action: action,
 				data: JSON.stringify(data),
-				path: location.href
+				path: location.href,
+				locale: cookies.get('locale') || ''
 			});
 			return response.data;
 		} catch (error) {
