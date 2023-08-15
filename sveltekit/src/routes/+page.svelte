@@ -184,7 +184,7 @@
 
 				<a
 					role="button"
-					href={cookies.get('locale') == 'ja' ? `/gnv/japan` : `/gnv/firsttest`}
+					href={cookies.get('locale') == 'ja' ? `/gnv/japan` : `/gnv/virtual-classroom-pilot`}
 					class="green-button"
 					style="margin-left:0.3rem"
 				>

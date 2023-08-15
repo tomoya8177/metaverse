@@ -9,6 +9,8 @@ import type { Entity } from 'aframe';
 import { transportMentor } from './callAIMentor';
 import type { Room } from 'twilio-video';
 import { RoomStore } from '$lib/store';
+import { toast } from './toast';
+import { _ } from '$lib/i18n';
 
 let room: Room;
 RoomStore.subscribe((r) => {

@@ -62,7 +62,7 @@
 	});
 </script>
 
-<div {id}>
+<div {id} class="placeholder">
 	{#if isLoading}
 		<!-- Display the placeholder image while loading -->
 		<img src={thumbnailURL} alt="Loading..." />
@@ -70,18 +70,18 @@
 </div>
 
 <style>
-	#avatarPreview {
+	.placeholder {
 		position: relative;
 		width: 180px;
 		height: 180px;
 		border-radius: 1rem;
 		overflow: hidden;
 	}
-	#avatarPreview * {
+	.placeholder * {
 		position: absolute;
 		top: 0px;
 	}
-	#avatarPreview img {
+	.placeholder img {
 		min-width: 180px;
 		width: 180px;
 		height: 180px;

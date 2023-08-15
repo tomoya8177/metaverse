@@ -15,6 +15,8 @@ import { Users } from './Classes/Users';
 import { videoChat } from './Classes/VideoChat';
 import { toast } from './toast';
 import { _ } from '$lib/i18n';
+import type { Unit } from './Classes/Unit';
+import axios from 'axios';
 
 export const onNewParticipantConnected = (room: Room) => {
 	room.on('participantConnected', (participant: RemoteParticipant) => {
@@ -24,6 +26,9 @@ export const onNewParticipantConnected = (room: Room) => {
 
 				setupDataTrackListener(track as RemoteDataTrack);
 				sendHandshake();
+				axios.get(`/api/users/${participant.identity}`).then((res) => {
+					toast(`${res.data.nickname} ${_('has joined the room!')}`);
+				});
 			} else {
 				attachRemoteTrack(track as RemoteVideoTrack);
 			}
@@ -46,6 +51,7 @@ export const onParticipantAlreadyInRoom = (participants: Map<string, RemoteParti
 				messageListeners();
 				setupDataTrackListener(track as RemoteDataTrack);
 				sendHandshake();
+				toast;
 			} else {
 				attachRemoteTrack(track as RemoteVideoTrack);
 			}
@@ -61,8 +67,9 @@ export const onParticipantDisconnected = (room: Room) => {
 	room.on('participantDisconnected', (participant: RemoteParticipant) => {
 		console.log(`Participant disconnected: ${participant.identity}`);
 		// Detach the media elements
-		const unit = Users.find(participant.identity);
+		const unit = Users.find(participant.identity) as Unit;
 		if (!unit) return;
+		toast(`${unit.userData.nickname} ${_('left the room')}`);
 		unit.leave();
 		Users.remove(participant.identity);
 		participant.tracks.forEach((publication: RemoteTrackPublication) => {
