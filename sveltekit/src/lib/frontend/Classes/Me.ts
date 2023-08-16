@@ -3,7 +3,9 @@ import { Unit } from './Unit';
 import { connect, createLocalTracks } from 'twilio-video';
 import type { Room } from './Room';
 import type { Component, Entity, ObjectMap, System } from 'aframe';
-import type { User } from './User';
+import { User } from './User';
+import { CoinHistory } from './CoinHistory';
+import { videoChat } from './VideoChat';
 
 export class Me extends Unit {
 	cameraRig: Entity;
@@ -54,5 +56,22 @@ export class Me extends Unit {
 	jump(): void {
 		let acceleration = 0.1;
 		this.avatarContainer.setAttribute('jump', 'acceleration:' + acceleration + ';');
+		videoChat.sendMessage({
+			key: 'jump',
+			userId: this.id
+		});
+	}
+	async sendLike(userId: string, action: string, coins: number) {
+		const coinHistory = await new CoinHistory({
+			user: userId,
+			action,
+			source: this.id,
+			coins
+		}).create();
+		let user = await axios.get('/api/users/' + userId).then((res) => res.data);
+		if (!user) return;
+		user = new User(user);
+		user.coin += coins;
+		user.update();
 	}
 }

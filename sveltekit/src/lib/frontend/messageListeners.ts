@@ -86,6 +86,11 @@ export const messageListeners = () => {
 			rotation: data.rotation
 		});
 	});
+	videoChat.listenTo('jump', (data) => {
+		const unit = Users.find(data.userId) as Unit;
+		if (!unit) return;
+		unit.avatarContainer.setAttribute('jump', 'acceleration:0.1;');
+	});
 };
 
 export const welcomeUnit = (user: User): Unit => {

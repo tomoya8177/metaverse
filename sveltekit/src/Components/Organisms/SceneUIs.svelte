@@ -50,6 +50,7 @@
 	import { wasdControl } from '$lib/frontend/Classes/WASDControl';
 	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
 	import { PUBLIC_IS_DEV } from '$env/static/public';
+	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
 	export let organization: Organization;
 	export let room: Room;
 	const scrolToBottom = (element: Element) => {
@@ -77,6 +78,7 @@
 			document.activeElement?.tagName === 'SELECT'
 		)
 			return;
+		console.log(e.key);
 		if (e.key === 't') {
 			onTextChatClicked();
 		}
@@ -84,17 +86,21 @@
 		if (e.key === ' ') {
 			me.jump();
 		}
-		if (e.key === 'w') {
-			wasdControl.velocityZ = 60;
-		}
-		if (e.key === 's') {
-			wasdControl.velocityZ = -60;
-		}
-		if (e.key === 'a') {
-			wasdControl.velocityX = 60;
-		}
-		if (e.key === 'd') {
-			wasdControl.velocityX = -60;
+		if (e.key === 'w' || e.key === 'a' || e.key === 's' || e.key === 'd') {
+			me.disableTouch();
+			nippleControl.hide();
+			if (e.key === 'w') {
+				wasdControl.velocityZ = 60;
+			}
+			if (e.key === 's') {
+				wasdControl.velocityZ = -60;
+			}
+			if (e.key === 'a') {
+				wasdControl.velocityX = 60;
+			}
+			if (e.key === 'd') {
+				wasdControl.velocityX = -60;
+			}
 		}
 	};
 	const onKeyUp = (e: KeyboardEvent) => {
@@ -373,6 +379,20 @@
 					</button>
 				</div>
 			{/if}
+			<div>
+				<button
+					data-tooltip={_('Like')}
+					class="circle-button"
+					on:click={async () => {
+						if (!$FocusObjectStore) return;
+						await me.sendLike($FocusObjectStore.user, 'like', 1);
+						toast(_('Sent Like'));
+					}}
+					small
+				>
+					<Icon icon="thumb_up" />
+				</button>
+			</div>
 		</div>
 	</div>
 {/if}

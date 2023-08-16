@@ -122,10 +122,6 @@
 	</ul>
 	<ul />
 	<ul>
-		<li>
-			<Icon icon="local_police" />
-			{$UserStore.coin || 0}
-		</li>
 		<li style="flex:1" />
 		{#if $UserStore.id}
 			{#if $UsersStore.length && $RoomStore?.id}
@@ -171,11 +167,18 @@
 						</div>
 					</summary>
 					<ul role="listbox">
+						{#if $UserStore.coin}
+							<li style="text-align:center">
+								{$UserStore.coin}
+								<Icon icon="local_police" />
+							</li>
+						{/if}
 						{#if $RoomStore?.id}
 							<li>
 								<button on:click={onLeaveClicked} class="secondary">{_('Leave Room')}</button>
 							</li>
 						{/if}
+
 						<li><a href={'#'} on:click={changeEmailClicked}> {_('Change Email')} </a></li>
 						<li>
 							<a href={'#'} on:click={changeProfileClicked}> {_('Change Profile')} </a>

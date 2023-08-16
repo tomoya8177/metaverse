@@ -10,3 +10,4 @@ import './myNippleControl';
 import './myTouchControls';
 import './jump';
 import './myWASDControls';
+import './clickToWave';

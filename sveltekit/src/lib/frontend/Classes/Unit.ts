@@ -39,6 +39,7 @@ export class Unit {
 		this.avatarContainer = document.createElement('a-entity');
 		this.avatarContainer.setAttribute('rotate-at-position', '');
 		this.el.appendChild(this.avatarContainer);
+		this.el.setAttribute('click-to-wave', 'enabled:true;userId:' + this.id);
 
 		if (!this.avatar) {
 			this.avatar = document.createElement('a-gltf-model');

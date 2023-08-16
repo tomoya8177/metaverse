@@ -69,11 +69,6 @@
 		});
 		document.onkeydown = (e) => {
 			//if key is W
-
-			if (e.key === 'w' || e.key === 'a' || e.key === 's' || e.key === 'd') {
-				me.disableTouch();
-				nippleControl.hide();
-			}
 		};
 		//load mentor user
 		if (room.mentor) {
