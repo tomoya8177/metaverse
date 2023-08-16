@@ -134,7 +134,9 @@
 				);
 				console.log({ fourHoursAgo });
 				const lastAction = await axios
-					.get(`/api/actions?user=${$UserStore.id}&createdAt=gt:${fourHoursAgo}&order=desc&limit=1`)
+					.get(
+						`/api/actions?user=${$UserStore.id}&action=enterRoom&createdAt=gt:${fourHoursAgo}&order=desc&limit=1`
+					)
 					.then((res) => res.data);
 				console.log({ lastAction });
 				//if last action is 4 hours ago or more, give 10 coins
@@ -144,6 +146,8 @@
 					toast(_('You got 10 coins for being active.'));
 				}
 			}
+			actionHistory.send('enterRoom');
+
 			const message = new Message({
 				room: room.id,
 				user: room.mentorData.userData.id,

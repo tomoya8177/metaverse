@@ -77,7 +77,6 @@
 				on:click={async () => {
 					if (!$RoomStore) return;
 
-					actionHistory.send('enterRoom');
 					readyToConnect = true;
 					if (!videoChat.connected) {
 						videoChat.init($UserStore, $RoomStore);
