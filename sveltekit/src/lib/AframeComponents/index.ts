@@ -8,3 +8,5 @@ import './aiMentor';
 import './moveMouth';
 import './myNippleControl';
 import './myTouchControls';
+import './jump';
+import './myWASDControls';

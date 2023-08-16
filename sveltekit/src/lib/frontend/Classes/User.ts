@@ -25,6 +25,7 @@ export class User extends DBObject {
 	description: string = '';
 	subtitle: string = '';
 	nicknameURL: string = '';
+	coin: number = 0;
 	constructor(data: any) {
 		data.table = 'users';
 		super(data);
@@ -43,6 +44,7 @@ export class User extends DBObject {
 		this.description = data.description || '';
 		this.subtitle = data.subtitle || '';
 		this.nicknameURL = data.nicknameURL || '';
+		this.coin = data.coin || 0;
 	}
 	get fullName(): string {
 		if (!this.firstName && !this.lastName) return this.nickname;

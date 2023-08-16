@@ -11,6 +11,7 @@ export class Me extends Unit {
 		super(user);
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
+		this.el.setAttribute('my-wasd-controls', 'enabled:true');
 		this.el.setAttribute('my-touch-controls', 'enabled:false');
 		const camera = document.createElement('a-camera');
 		camera.setAttribute('id', 'camera');
@@ -22,11 +23,12 @@ export class Me extends Unit {
 		this.cameraRig.setAttribute('position', '0 1.6 0');
 		this.avatarContainer.appendChild(this.cameraRig);
 		this.cameraRig.appendChild(camera);
+		//get window width
 
-		this.el.setAttribute(
-			'movement-controls',
-			'constrainToNavMesh: true; camera: #camera; controls: keyboard'
-		);
+		// this.el.setAttribute(
+		// 	'movement-controls',
+		// 	'constrainToNavMesh: true; camera: #camera; controls: keyboard'
+		// );
 
 		this.el.setAttribute('ping-session', `user:${user.id};type:unit`);
 	}
@@ -48,5 +50,9 @@ export class Me extends Unit {
 	}
 	disableTouch(): void {
 		this.el.setAttribute('my-touch-controls', 'enabled: false');
+	}
+	jump(): void {
+		let acceleration = 0.1;
+		this.avatarContainer.setAttribute('jump', 'acceleration:' + acceleration + ';');
 	}
 }

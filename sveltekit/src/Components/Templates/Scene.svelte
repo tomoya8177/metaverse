@@ -33,6 +33,8 @@
 	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
+	import { PUBLIC_IS_DEV } from '$env/static/public';
 	export let data: PageData;
 	export let room: Room;
 	let organization: Organization = data.organization;
@@ -125,6 +127,23 @@
 				}
 			);
 			console.log({ response });
+			if (!PUBLIC_IS_DEV) {
+				const fourHoursAgo = convertLocalToUTC(DateTime.now().minus({ hours: 4 }).toISO()).replace(
+					'T',
+					' '
+				);
+				console.log({ fourHoursAgo });
+				const lastAction = await axios
+					.get(`/api/actions?user=${$UserStore.id}&createdAt=gt:${fourHoursAgo}&order=desc&limit=1`)
+					.then((res) => res.data);
+				console.log({ lastAction });
+				//if last action is 4 hours ago or more, give 10 coins
+				if (lastAction.length == 0) {
+					$UserStore.coin += 10;
+					$UserStore.update();
+					toast(_('You got 10 coins for being active.'));
+				}
+			}
 			const message = new Message({
 				room: room.id,
 				user: room.mentorData.userData.id,

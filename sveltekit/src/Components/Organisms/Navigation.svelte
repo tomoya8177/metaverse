@@ -122,6 +122,10 @@
 	</ul>
 	<ul />
 	<ul>
+		<li>
+			<Icon icon="local_police" />
+			{$UserStore.coin || 0}
+		</li>
 		<li style="flex:1" />
 		{#if $UserStore.id}
 			{#if $UsersStore.length && $RoomStore?.id}

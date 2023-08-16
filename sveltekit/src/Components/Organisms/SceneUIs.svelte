@@ -46,6 +46,10 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	import type { Room } from '$lib/frontend/Classes/Room';
+	import RightControls from '../Molecules/RightControls.svelte';
+	import { wasdControl } from '$lib/frontend/Classes/WASDControl';
+	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
+	import { PUBLIC_IS_DEV } from '$env/static/public';
 	export let organization: Organization;
 	export let room: Room;
 	const scrolToBottom = (element: Element) => {
@@ -76,6 +80,36 @@
 		if (e.key === 't') {
 			onTextChatClicked();
 		}
+		//on space key
+		if (e.key === ' ') {
+			me.jump();
+		}
+		if (e.key === 'w') {
+			wasdControl.velocityZ = 60;
+		}
+		if (e.key === 's') {
+			wasdControl.velocityZ = -60;
+		}
+		if (e.key === 'a') {
+			wasdControl.velocityX = 60;
+		}
+		if (e.key === 'd') {
+			wasdControl.velocityX = -60;
+		}
+	};
+	const onKeyUp = (e: KeyboardEvent) => {
+		if (
+			document.activeElement?.tagName === 'INPUT' ||
+			document.activeElement?.tagName === 'TEXTAREA' ||
+			document.activeElement?.tagName === 'SELECT'
+		)
+			return;
+		if (e.key === 'w' || e.key === 's') {
+			wasdControl.velocityZ = 0;
+		}
+		if (e.key === 'a' || e.key === 'd') {
+			wasdControl.velocityX = 0;
+		}
 	};
 	const scrollChatToBottom = () => {
 		const element = document.querySelector('.chat-box > div');
@@ -84,6 +118,7 @@
 	};
 	onMount(async () => {
 		document.addEventListener('keydown', onKeyDown);
+		document.addEventListener('keyup', onKeyUp);
 
 		videoChat.listenTo('textMessage', async (data) => {
 			const message = new Message(data);
@@ -110,6 +145,7 @@
 	});
 	onDestroy(() => {
 		document.removeEventListener('keydown', onKeyDown);
+		document.removeEventListener('keyup', onKeyUp);
 		videoChat.dontListenTo('textMessage');
 	});
 
@@ -176,6 +212,15 @@
 
 <div style="position:absolute;bottom:11rem;left:1rem;" class="nippleControl">
 	<NippleControl />
+</div>
+<div
+	style="
+	position:absolute;
+	bottom:11rem;
+	right:1rem;
+"
+>
+	<RightControls {me} />
 </div>
 
 {#if $FocusObjectStore && $FocusObjectStore.title != ''}
