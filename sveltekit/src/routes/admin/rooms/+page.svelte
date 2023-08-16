@@ -63,13 +63,13 @@
 					<InputWithLabel
 						type="switch"
 						label={_('Open for Anyone')}
-						bind:value={editRoom.isPublic}
+						bind:value={room.isPublic}
 						disabled
 					/>
 					<InputWithLabel
 						type="switch"
 						label={_('Open for Anyone in the organization')}
-						bind:value={editRoom.isOpen}
+						bind:value={room.isOpen}
 						disabled
 					/>
 				</td>
