@@ -32,7 +32,8 @@ export class Me extends Unit {
 		circle.setAttribute('color', 'white');
 		circle.setAttribute('position', `0 -0.1 -0.3`);
 		circle.setAttribute('opacity', '0.5');
-		circle.setAttribute('text', 'value:Jump;color:white;align:center;width:0.5');
+		circle.setAttribute('material', 'shader:flat;src:url(/images/upicon.jpg)');
+		//circle.setAttribute('text', 'value:^;color:white;align:center;');
 		circle.setAttribute('jump-button', 'userId:' + this.id + ';');
 		circle.id = 'jumpButton';
 		camera.appendChild(circle);

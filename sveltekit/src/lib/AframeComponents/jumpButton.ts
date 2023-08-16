@@ -22,14 +22,12 @@ AFRAME.registerComponent('jump-button', {
 		this.el.addEventListener('mousedown', (evt: any) => {
 			this.rig = document.getElementById(this.data.userId) as Entity;
 
-			console.log('mousedown', evt);
 			this.dragging = true;
 			this.rig.setAttribute('look-controls', 'enabled:false');
 
 			this.originalIntersection = evt.detail?.intersection?.point;
 		});
 		this.el.addEventListener('mouseup', (evt: any) => {
-			console.log('mouseup', evt);
 			this.dragging = false;
 			this.rig?.setAttribute('look-controls', 'enabled:true');
 			this.originalIntersection = evt.detail?.intersection?.point;
@@ -37,12 +35,10 @@ AFRAME.registerComponent('jump-button', {
 		this.el.addEventListener('touchstart', (evt) => {
 			this.rig = document.getElementById(this.data.userId) as Entity;
 
-			console.log('touchstart', evt);
 			this.dragging = true;
 			this.rig.setAttribute('look-controls', 'enabled:false');
 		});
 		this.el.addEventListener('touchend', (evt) => {
-			console.log('touchend', evt);
 			this.dragging = false;
 			this.rig?.setAttribute('look-controls', 'enabled:true');
 		});
@@ -62,7 +58,8 @@ AFRAME.registerComponent('jump-button', {
 			y: intersection.y - this.originalIntersection.y
 			//			z: intersection.z - this.originalIntersection.z
 		};
-		console.log({ diff });
+		//if diff is too large, something wrong.
+		if (Math.abs(diff.x) > 0.1 || Math.abs(diff.y) > 0.1) return;
 		this.el.setAttribute(
 			'position',
 			`${this.el.getAttribute('position').x + diff.x}
