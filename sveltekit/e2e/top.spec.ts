@@ -13,6 +13,12 @@ test.describe.serial('Top Page', () => {
 	test.beforeAll(async ({ browser }) => {
 		page = await browser.newPage();
 	});
+	test.afterAll(async () => {
+		const response = await axios
+			.get('http://localhost:5173/deleteLonelyData/' + newOrgSlug)
+			.then((res) => res.data);
+		console.log(response);
+	});
 
 	test('to see all buttons, and to send first chat message to AI', async () => {
 		// Expect a title "to contain" a substring.
@@ -269,19 +275,19 @@ test.describe.serial('Top Page', () => {
 		// you are in the dash board. well done. now let's split the test
 		//initiate chat test
 	});
-	// test('chat test', async ({ page }) => {
-	// 	page.goto(`/${newOrgSlug}`); //dashboard
+	// test('chat test', async () => {
 	// 	await page.waitForTimeout(5000);
+
 	// 	//test room button
 	// 	const testRoomButton = page.getByRole('button').nth(1);
 	// 	await expect(testRoomButton).toBeVisible();
 	// 	//test mentor button
-	// 	const testMentorButton = page.getByRole('link', { name: /Test Mentor/ });
+	// 	const testMentorButton = page.getByRole('link').nth(3);
 	// 	await expect(testMentorButton).toBeVisible();
 	// 	await testMentorButton.click();
-	// 	await page.waitForTimeout(5000);
+	// 	await page.waitForTimeout(10000);
 	// 	//find test mentor
-	// 	const testMentor = page.getByText('Test Mentor');
+	// 	const testMentor = page.getByText(/Hello/).nth(0);
 	// 	await expect(testMentor).toBeVisible();
 	// 	//find textarea
 	// 	const messageInput = page.locator('#chat-textarea textarea');
@@ -294,14 +300,4 @@ test.describe.serial('Top Page', () => {
 	// 	await sendButton.click();
 	// 	await page.waitForTimeout(10000);
 	// });
-	test('Delete User', async () => {
-		const user = await axios
-			.get('http://localhost:5173/api/users?email=' + newEmail)
-			.then((res) => res.data[0]);
-		if (!user) {
-			throw new Error('User not found');
-		} else {
-			await axios.delete('http://localhost:5173/api/users/' + user.id);
-		}
-	});
 });

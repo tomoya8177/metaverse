@@ -78,7 +78,7 @@
 							{#if mentor.userData?.avatarURL}
 								<AvatarThumbnail url={mentor.userData.avatarURL} />
 							{/if}<br />
-							{mentor.userData?.nickname || ''}
+							{@html mentor.userData?.nickname || ''}
 						</a>
 						<p>
 							{@html nl2br(unescapeHTML(mentor.userData?.description) || '')}

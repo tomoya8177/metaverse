@@ -112,7 +112,7 @@
 				{/if}
 				{#if title}
 					<strong class:hiddenInSmallScreen={thumbnailURL}>
-						{title}
+						{@html title}
 					</strong>
 				{:else}
 					<img alt="logo" id="theme-image" src="/images/logo.jpg" style="width:10rem" />

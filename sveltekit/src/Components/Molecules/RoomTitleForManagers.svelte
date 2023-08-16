@@ -22,10 +22,10 @@
 	<div style="align-self:center">
 		{#if forManager}
 			<a href={`/${organization?.slug}/manager/rooms/${room.id}`}>
-				{room.title}
+				{@html room.title}
 			</a>
 		{:else}
-			{room.title}
+			{@html room.title}
 		{/if}
 	</div>
 </div>
