@@ -140,7 +140,7 @@ export class Unit {
 	leave() {
 		this.el.parentNode?.removeChild(this.el);
 	}
-	say(message: string) {
+	say(message: string = '') {
 		if (!this.avatarContainer) return console.error('avatar container is null');
 
 		const text = document.createElement('a-entity');
@@ -155,7 +155,7 @@ export class Unit {
 		this.avatarContainer.appendChild(text);
 		setTimeout(() => {
 			text.parentNode?.removeChild(text);
-		}, Math.max(message.length * 500, 5000));
+		}, Math.max(message?.length * 500, 5000));
 	}
 	showCamera(track: RemoteVideoTrack) {
 		if (!this.avatarContainer) return console.error('avatar container is null');

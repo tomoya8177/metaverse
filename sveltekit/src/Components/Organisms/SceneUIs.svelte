@@ -51,6 +51,7 @@
 	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
 	import { PUBLIC_IS_DEV } from '$env/static/public';
 	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
+	import { Unit } from '$lib/frontend/Classes/Unit';
 	export let organization: Organization;
 	export let room: Room;
 	const scrolToBottom = (element: Element) => {
@@ -135,7 +136,7 @@
 
 			if (message.user !== $UserStore.id) {
 				const unit = Users.find(message.user);
-				if (unit) unit.say(data.body);
+				if (unit && unit instanceof Unit) unit.say(data.body);
 			}
 			setTimeout(() => {
 				scrollChatToBottom();
