@@ -61,6 +61,7 @@ export class VideoChat {
 	cameraPingInterval: any;
 	screenPingInterval: any;
 	connected: boolean = false;
+	channelId: string = '';
 	constructor() {
 		//do nothing,
 	}
@@ -120,6 +121,7 @@ export class VideoChat {
 			name: this.roomId,
 			tracks: [this.dataTrack]
 		});
+		console.log({ room: this.room });
 		this.localParticipant = this.room.localParticipant;
 		this.connected = true;
 		// Log your Client's LocalParticipant in the Room

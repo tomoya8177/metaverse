@@ -35,6 +35,7 @@
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
 	import { PUBLIC_IS_DEV } from '$env/static/public';
+	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	export let data: PageData;
 	export let room: Room;
 	let organization: Organization = data.organization;
@@ -106,19 +107,12 @@
 			}
 			if (!room.mentor) return;
 			const response = await axios.post(
-				'/mentor/' + room.mentor + '/' + room.id + DateTime.now().toISODate(),
+				'/mentor/' + room.mentor + '/' + videoChat.room?.sid || '',
 				{
 					type: 'room',
 					roomId: room.id,
-					body: _("Hello! I just entered the room. I'm ") + $UserStore.nickname
-					// '(ID:' +
-					// $UserStore.id +
-					// '). ' +
-					// _(
-					// 	'Greet me back first. Then let me know if there is any event where my id is included in the attendances. If any, just give me the title and start date and time, and do not disclose either my ID nor event ID. When talking about the event, use my locale and adjust the time:' +
-					// 		cookies.get('locale') +
-					// 		'.'
-					// )
+					body: _("Hello! I just entered the room. I'm ") + $UserStore.nickname,
+					channelId: videoChat.room?.sid || ''
 				}
 			);
 			console.log({ response });

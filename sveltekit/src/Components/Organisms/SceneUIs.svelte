@@ -79,7 +79,6 @@
 			document.activeElement?.tagName === 'SELECT'
 		)
 			return;
-		console.log(e.key);
 		if (e.key === 't') {
 			onTextChatClicked();
 		}
@@ -189,7 +188,7 @@
 				roomId: room.id,
 				newMessage,
 				userId: undefined,
-				channelId: room.id + DateTime.now().toISODate()
+				channelId: videoChat.room?.sid || ''
 			});
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)) };
@@ -207,27 +206,19 @@
 
 	const sendChatMessage = async (message: Message): Promise<Message> => {
 		actionHistory.send('sendChatMessage', { ...message, body: escapeHTML(message.body) });
-		const createdMessage = new Message(await message.create());
-		videoChat.sendMessage({ ...createdMessage, key: 'textMessage' });
+		message.create();
+		//		const createdMessage = new Message(await message.create());
+		videoChat.sendMessage({ ...message, key: 'textMessage' });
 		ChatMessagesStore.update((arr) => {
-			arr = [...arr, createdMessage];
+			arr = [...arr, message];
 			return arr;
 		});
-		return createdMessage;
+		return message;
 	};
 </script>
 
 <div style="position:absolute;bottom:11rem;left:1rem;" class="nippleControl">
 	<NippleControl />
-</div>
-<div
-	style="
-	position:absolute;
-	bottom:11rem;
-	right:1rem;
-"
->
-	<RightControls {me} />
 </div>
 
 {#if $FocusObjectStore && $FocusObjectStore.title != ''}

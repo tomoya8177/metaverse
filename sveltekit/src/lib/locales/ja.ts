@@ -252,5 +252,9 @@ export default {
 	'left the room': 'がルームを退出しました',
 	"Hello! I just entered the room. I'm ": 'こんにちは！私はちょうどルームに入りました。私は',
 	'Let me know if there is any event for me to attend.':
-		'私が出席するイベントがあれば教えてください。'
+		'私が出席するイベントがあれば教えてください。',
+	'Can you tell me anything you know about the object, which ID is ':
+		'このオブジェクトについて何か知っていますか？IDは',
+	'and title is ': 'タイトルは',
+	'Try not to make it boring just by reading out the description. Do not repeat the object ID. Answer in less than 100 words.': `説明を読み上げるだけではつまらなくならないようにしてください。オブジェクトIDを繰り返さないでください。100語以下で回答してください。`
 };

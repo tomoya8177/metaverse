@@ -11,6 +11,7 @@ import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 import { callAIMentor } from '$lib/frontend/callAIMentor';
 import { cookies } from '$lib/frontend/cookies';
+import { _ } from '$lib/i18n';
 import { RoomStore, TextChatOpen, UserStore, AISpeaks, type xyz } from '$lib/store';
 import axios from 'axios';
 import { DateTime } from 'luxon';
@@ -99,34 +100,23 @@ AFRAME.registerComponent('update-position', {
 			closestObject.explained = true;
 			if (!closestObject.description) return;
 			callAIMentor(room.mentorData);
-			let content = `${user.nickname} is looking at the ${closestObject.shortType}, ${closestObject.title}, whose description is: ${closestObject.description}.`;
-			//if there's an event attached, include it's data as well.
-			if (closestObject.attachedEvent) {
-				content += `There is an event attached. ${closestObject.attachedEvent.startString}`;
-				if (closestObject.attachedEvent.myAttendance) {
-					content += `User's attendance status for this event is ${closestObject.attachedEvent.myAttendance.status}.`;
-				}
-			}
-			content += `
-					Tell the context of the description to the user. Try not to make it boring just by reading out the description. Encourage the user to seek more detail about the context. Answer in less than 100 words.
-				Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
-					'locale'
-				)}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`;
+			const question = `${_('Can you tell me anything you know about the object, which ID is ')}${
+				closestObject.id
+			} ${_('and title is ')}${closestObject.title}? ${_(
+				'Try not to make it boring just by reading out the description. Do not repeat the object ID. Answer in less than 100 words.'
+			)}`;
 			axios
-				.post('/mentor', {
-					appendToChannel: room.id,
-
-					messages: [
-						{
-							role: 'system',
-							content
-						}
-					]
+				.post('/mentor/' + room.mentor + '/' + videoChat.room?.sid, {
+					type: 'room',
+					roomId: room.id,
+					body: question,
+					channelId: videoChat.room?.sid
 				})
 				.then((res) => {
+					console.log({ res });
 					const message = new Message({
 						user: room.mentorData?.user,
-						body: res.data.response.content,
+						body: res.data.text,
 						room: room.id,
 						createdAt: DateTime.now().toISO(),
 						isTalking: true
@@ -136,9 +126,52 @@ AFRAME.registerComponent('update-position', {
 						TextChatOpen.set(true);
 						return;
 					}
-					room.mentorData.speak(res.data.response.content);
-					//aiSpeaksOut(res.data.response.content, Users.find(room.mentorData.user) || null);
+					room.mentorData.speak(res.data.text);
 				});
+
+			//calll the mentor with old model
+
+			// let content = `${user.nickname} is looking at the ${closestObject.shortType}, ${closestObject.title}, whose description is: ${closestObject.description}.`;
+			// //if there's an event attached, include it's data as well.
+			// if (closestObject.attachedEvent) {
+			// 	content += `There is an event attached. ${closestObject.attachedEvent.startString}`;
+			// 	if (closestObject.attachedEvent.myAttendance) {
+			// 		content += `User's attendance status for this event is ${closestObject.attachedEvent.myAttendance.status}.`;
+			// 	}
+			// }
+			// content += `
+			// 		Tell the context of the description to the user. Try not to make it boring just by reading out the description. Encourage the user to seek more detail about the context. Answer in less than 100 words.
+			// 	Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
+			// 		'locale'
+			// 	)}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`;
+			// axios
+			// 	.post('/mentor', {
+			// 		appendToChannel: room.id,
+
+			// 		messages: [
+			// 			{
+			// 				role: 'system',
+			// 				content
+			// 			}
+			// 		]
+			// 	})
+			// 	.then((res) => {
+			// 		console.log({ res });
+			// 		const message = new Message({
+			// 			user: room.mentorData?.user,
+			// 			body: res.data.response.content,
+			// 			room: room.id,
+			// 			createdAt: DateTime.now().toISO(),
+			// 			isTalking: true
+			// 		});
+			// 		message.createSendOutAndPush();
+			// 		if (!aiSpeaks) {
+			// 			TextChatOpen.set(true);
+			// 			return;
+			// 		}
+			// 		room.mentorData.speak(res.data.response.content);
+			// 		//aiSpeaksOut(res.data.response.content, Users.find(room.mentorData.user) || null);
+			// 	});
 		}
 	}
 });

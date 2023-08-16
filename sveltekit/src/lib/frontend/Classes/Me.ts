@@ -13,7 +13,7 @@ export class Me extends Unit {
 		super(user);
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
-		this.el.setAttribute('my-wasd-controls', 'enabled:true');
+		//this.el.setAttribute('my-wasd-controls', 'enabled:true');
 		this.el.setAttribute('my-touch-controls', 'enabled:false');
 		const camera = document.createElement('a-camera');
 		camera.setAttribute('id', 'camera');
@@ -27,10 +27,20 @@ export class Me extends Unit {
 		this.cameraRig.appendChild(camera);
 		//get window width
 
-		// this.el.setAttribute(
-		// 	'movement-controls',
-		// 	'constrainToNavMesh: true; camera: #camera; controls: keyboard'
-		// );
+		const circle = document.createElement('a-circle');
+		circle.setAttribute('radius', '0.03');
+		circle.setAttribute('color', 'white');
+		circle.setAttribute('position', `0 -0.1 -0.3`);
+		circle.setAttribute('opacity', '0.5');
+		circle.setAttribute('text', 'value:Jump;color:white;align:center;width:0.5');
+		circle.setAttribute('jump-button', 'userId:' + this.id + ';');
+		circle.id = 'jumpButton';
+		camera.appendChild(circle);
+
+		this.el.setAttribute(
+			'movement-controls',
+			'constrainToNavMesh: true; camera: #camera; controls: keyboard'
+		);
 
 		this.el.setAttribute('ping-session', `user:${user.id};type:unit`);
 	}

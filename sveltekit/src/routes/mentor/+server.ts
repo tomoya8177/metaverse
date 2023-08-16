@@ -16,26 +16,27 @@ export const POST = async ({ request }) => {
 			temperature: 0.6
 		});
 		console.log(body.messages);
-		if (body.appendToChannel) {
-			//append to channel
-			const storedChat = storedChats.find(
-				(storedChat) => storedChat.roomId == body.appendToChannel
-			);
-			if (storedChat) {
-				storedChat.chatHistory.push(
-					...body.messages.map((message) => {
-						if (message.role == 'system') return new SystemMessage(message.content);
-						else return new HumanMessage(message.content);
-					})
-				);
-				storedChat.chatHistory.push(
-					new AIMessage(chat_completion.data.choices[0].message?.content || '')
-				);
-				console.log('pushed', storedChat.chatHistory);
-			}
-		}
+		// if (body.appendToChannel) {
+		//append to channel
+		// const storedChat = storedChats.find(
+		// 	(storedChat) => storedChat.roomId == body.appendToChannel
+		// );
+		// if (storedChat) {
+		// storedChat.chatHistory.push(
+		// 	...body.messages.map((message) => {
+		// 		if (message.role == 'system') return new SystemMessage(message.content);
+		// 		else return new HumanMessage(message.content);
+		// 	})
+		// );
+		// storedChat.chatHistory.push(
+		// 	new AIMessage(chat_completion.data.choices[0].message?.content || '')
+		// );
+		// console.log('pushed', storedChat.chatHistory);
+		// }
+		// }
 		return new Response(JSON.stringify({ response: chat_completion.data.choices[0].message }));
 	} catch (error) {
+		console.log(error);
 		return new Response(JSON.stringify({ response: `AI is busy right now` }));
 	}
 };

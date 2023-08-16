@@ -25,7 +25,7 @@ export const POST = async ({ request, params }) => {
 	});
 	console.log({ storedChat });
 	if (!storedChat || !storedChat.chain) {
-		console.log('no chain yer');
+		console.log('no chain yet');
 		storedChat = await studyChannel({
 			channelId: params.channelId,
 			mentorId: params.mentorId,

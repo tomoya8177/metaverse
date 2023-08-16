@@ -106,9 +106,7 @@
 				roomId: room ? room.id : undefined,
 				userId: room ? undefined : $UserStore.id,
 				newMessage,
-				channelId: room
-					? room.id + DateTime.now().toISODate()
-					: $UserStore.id + DateTime.now().toISODate()
+				channelId: room ? videoChat.room?.sid || '' : $UserStore.id + DateTime.now().toISODate()
 			});
 			await aiMessage.createSendOutAndPush();
 			if (!forceMentor) callAIMentor();

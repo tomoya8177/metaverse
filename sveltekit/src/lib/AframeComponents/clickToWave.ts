@@ -20,6 +20,8 @@ AFRAME.registerComponent('click-to-wave', {
 	},
 	onClick: async function (evt) {
 		this.me = Users.find(user.id) as Me;
+		//if myself, ignore
+		if (this.data.userId == this.me.id) return;
 		console.log('clicked');
 		if (!this.me) return;
 		await this.me.sendLike(this.data.userId, 'wave', 1);

@@ -3,7 +3,7 @@ import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { _ } from '$lib/i18n';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
-import type { Entity, Room } from 'aframe';
+import type { Entity } from 'aframe';
 import axios from 'axios';
 let userId = '';
 UserStore.subscribe((user) => {
@@ -27,7 +27,7 @@ AFRAME.registerComponent('editable-object', {
 		this.rayCatcher = document.getElementById('rayCatcher') as Entity;
 		this.object = sharedObjects.get(this.el.id) || null;
 
-		this.el.addEventListener('mousedown', (e: Room) => {
+		this.el.addEventListener('mousedown', (e: any) => {
 			if (!this.object || !this.rayCatcher) return console.error('object is null');
 			FocusObjectStore.set(this.object);
 			this.transportMode = 'position';
