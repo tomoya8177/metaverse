@@ -127,24 +127,19 @@
 				}
 			);
 			console.log({ response });
-			if (!PUBLIC_IS_DEV) {
-				const fourHoursAgo = convertLocalToUTC(DateTime.now().minus({ hours: 4 }).toISO()).replace(
-					'T',
-					' '
-				);
-				console.log({ fourHoursAgo });
-				const lastAction = await axios
-					.get(
-						`/api/actions?user=${$UserStore.id}&action=enterRoom&createdAt=gt:${fourHoursAgo}&order=desc&limit=1`
-					)
-					.then((res) => res.data);
-				console.log({ lastAction });
-				//if last action is 4 hours ago or more, give 10 coins
-				if (lastAction.length == 0) {
-					$UserStore.coin += 10;
-					$UserStore.update();
-					toast(_('You got 10 coins for being active.'));
-				}
+			const twoHoursAgo = convertLocalToUTC(DateTime.now().minus({ hours: 2 }).toISO()).replace(
+				'T',
+				' '
+			);
+			const lastAction = await axios
+				.get(
+					`/api/coinHistory?user=${$UserStore.id}&action=enterRoom&createdAt=gt:${twoHoursAgo}&order=desc&limit=1`
+				)
+				.then((res) => res.data);
+			//if last action is 4 hours ago or more, give 10 coins
+			if (lastAction.length == 0) {
+				await $UserStore.addCoin('enterRoom', 10);
+				toast(_('You got 10 coins for being active.'));
 			}
 			actionHistory.send('enterRoom');
 

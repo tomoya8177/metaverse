@@ -62,4 +62,14 @@ export class User extends DBObject {
 		}
 		return true;
 	}
+	async addCoin(action: string, coins: number, from: User | undefined = undefined) {
+		this.coin += coins;
+		this.update();
+		await axios.post('/api/coinHistory', {
+			coins,
+			source: from?.id || '',
+			user: this.id,
+			action
+		});
+	}
 }
