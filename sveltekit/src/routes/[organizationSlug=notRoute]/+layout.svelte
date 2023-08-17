@@ -16,12 +16,6 @@
 	console.log({ user: $UserStore });
 </script>
 
-<svelte:head>
-	<title>
-		{organization.title} | VirtuaCampus
-	</title>
-</svelte:head>
-
 <Navigation
 	thumbnailURL={organization.thumbnailURL}
 	logoLinkTo={'/' + organization.slug}

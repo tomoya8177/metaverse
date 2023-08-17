@@ -25,12 +25,10 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import SendMessageButton from '../Atom/SendMessageButton.svelte';
 	import type { Mentor } from '$lib/frontend/Classes/Mentor';
-	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import { DateTime } from 'luxon';
 	export let newMessagePinned = false;
 	let newMessageBody = '';
-	export let authors: User[] = [];
 	export let forceMentor: Mentor | null = null;
 	export let forceNoPin = false;
 	const onKeyDown = (e: KeyboardEvent) => {
@@ -40,12 +38,12 @@
 			return;
 		}
 	};
-	export let room: Room;
+	export let room: Room | null;
+	export let me: Me | null = null;
 	onMount(async () => {
 		if (forceMentor) {
 			newMessageForMentor = true;
 		}
-		console.log({ authors });
 
 		document.addEventListener('keydown', onKeyDown);
 	});
@@ -83,7 +81,7 @@
 					handle: file.handle,
 					url: file.url
 				});
-				if (!forceMentor) callAIMentor();
+				if (!forceMentor && room && me) room.mentorData.come(me);
 				await message.createSendOutAndPush();
 				if (!$AISpeaks) {
 					TextChatOpen.set(true);
@@ -109,7 +107,7 @@
 				channelId: room ? videoChat.room?.sid || '' : $UserStore.id + DateTime.now().toISODate()
 			});
 			await aiMessage.createSendOutAndPush();
-			if (!forceMentor) callAIMentor();
+			if (!forceMentor && room && me) room.mentorData.come(me);
 
 			// console.log({ aiMessage });
 			waitingForAIAnswer = false;
@@ -128,8 +126,6 @@
 			// 	aiMessage.body,
 			// 	forceMentor ? null : Users.find(room.mentorData.user) || null
 			// );
-		} else {
-			//io.emit('statement', newMessageBody);
 		}
 		newMessageBody = '';
 		setTimeout(() => {

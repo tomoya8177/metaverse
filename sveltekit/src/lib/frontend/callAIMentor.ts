@@ -19,46 +19,6 @@ UserStore.subscribe((u) => {
 	user = u;
 });
 
-export const callAIMentor = async (mentor: Mentor | null = null): Promise<void> => {
-	if (mentor === null) {
-		mentor = room.mentorData;
-	}
-	const mentorEl = document.getElementById(mentor.userData.id) as Entity;
-	if (!mentorEl) return;
-	const userUnit = Users.find(user.id);
-	const vector = new THREE.Vector3(0, 0, -1.2);
-	vector.applyAxisAngle(
-		new THREE.Vector3(0, 1, 0),
-		degree2radian(userUnit.el.getAttribute('rotation').y + 30)
-	);
-
-	const targetPosition = {
-		x: userUnit.el.object3D.position.x + vector.x,
-		y: userUnit.el.object3D.position.y,
-		z: userUnit.el.object3D.position.z + vector.z
-	};
-	const targetRotation = {
-		x: 0,
-		y: userUnit.el.getAttribute('rotation').y + 210,
-		z: 0
-	};
-	console.log({ targetPosition });
-	// get distance between the target and aiMentor
-
-	// how long it takes to get to the target if aiMentor walks 2m/s
-
-	//animate the aiMentor to the targetPosition
-	transportMentor({
-		mentorEl,
-		position: targetPosition,
-		rotation: targetRotation
-	});
-	videoChat.sendMessage({
-		key: 'moveMentor',
-		position: targetPosition,
-		rotation: targetRotation
-	});
-};
 export const transportMentor = async ({
 	position,
 	rotation,

@@ -9,7 +9,6 @@ import type { User } from '$lib/frontend/Classes/User';
 import { Users } from '$lib/frontend/Classes/Users';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
-import { callAIMentor } from '$lib/frontend/callAIMentor';
 import { cookies } from '$lib/frontend/cookies';
 import { _ } from '$lib/i18n';
 import { RoomStore, TextChatOpen, UserStore, AISpeaks, type xyz } from '$lib/store';
@@ -99,7 +98,9 @@ AFRAME.registerComponent('update-position', {
 			closestObject = closestObject as SharedObject;
 			closestObject.explained = true;
 			if (!closestObject.description) return;
-			callAIMentor(room.mentorData);
+			const me = Users.find(user.id) as Me;
+			if (me) room.mentorData.come(me);
+
 			const question = `${_('Can you tell me anything you know about the object, which ID is ')}${
 				closestObject.id
 			} ${_('and title is ')}${closestObject.title}? ${_(

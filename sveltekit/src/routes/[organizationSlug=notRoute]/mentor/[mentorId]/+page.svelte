@@ -13,6 +13,8 @@
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { DateTime } from 'luxon';
 	import { _ } from '$lib/i18n';
+	import { Organization } from '$lib/types/Organization';
+	import { organizationFromSlug } from '$lib/frontend/organizationFromSlug';
 	export let data: PageData;
 	const mentor = new Mentor(data.mentor);
 	const sendChatMessage = async (message: Message) => {
@@ -82,6 +84,11 @@
 	};
 </script>
 
+<svelte:head>
+	<title>
+		{mentor.userData.fullName} | {data.organization.title} | VirtuaCampus
+	</title>
+</svelte:head>
 {#if mentorReady}
 	<div class="container" style="position:relative;height:calc(100svh - 3rem)">
 		<div aria-busy={waitingForAIAnswer}>
@@ -90,6 +97,7 @@
 		</div>
 		<div style="position:absolute;bottom:0px;width:calc(100% - 2rem)">
 			<ChatBox
+				room={null}
 				forceMentor={mentor}
 				forceNoPin
 				{micActive}

@@ -147,6 +147,7 @@ export class VideoChat {
 		onReconnecting(this.room);
 		onReconnected(this.room);
 		onTabClosed(this.room);
+		return this.room.sid;
 	}
 	listenTo(key: string, callback: (data: any) => void) {
 		//if (!this.dataTrack) return;

@@ -19,10 +19,11 @@
 	let loggedIn: boolean | null = data.loggedIn;
 	console.log(101);
 	let room: Room = new Room(data.room);
+
 	let roomReady = false;
 	if (room.mentor) {
 		room.mentorData = new Mentor(data.mentor);
-		room.mentorData.userData = new User(data.mentorUser);
+		room.mentorData.init();
 	}
 	roomReady = true;
 	let noRoom: boolean | null = null;
@@ -83,14 +84,7 @@
 {#if loggedIn === false}
 	<Login organization={room.organization} {room} />
 {:else}
-	{#if loggedIn === null || noRoom === null}
-		<dialog open transition:fade>
-			<article>
-				{_('logging in')}...
-				<progress />
-			</article>
-		</dialog>
-	{:else if roomReady && !noRoom}
+	{#if roomReady && !noRoom}
 		<Scene {data} {room} />
 		<slot />
 	{/if}

@@ -16,6 +16,7 @@
 		<div style="width:8rem">
 			{#if !sameSession}
 				{actionHistory.userData?.nickname || 'Anonymous'}
+				({actionHistory.locale})
 			{/if}
 		</div>
 		<div style="flex:1">

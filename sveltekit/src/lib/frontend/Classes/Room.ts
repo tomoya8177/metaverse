@@ -2,9 +2,14 @@ import axios from 'axios';
 import { reinstallAIBrain } from '../reinstallAIBrain';
 import { _ } from '$lib/i18n';
 import type { DocumentForAI } from '$lib/types/DocumentForAI';
-import { myAlert } from '../toast';
+import { myAlert, toast } from '../toast';
 import { DBObject } from './DBObject';
 import type { Mentor } from './Mentor';
+import { writable } from 'svelte/store';
+import type { User } from './User';
+import { videoChat } from './VideoChat';
+import { SharedObject } from './SharedObject';
+import { sharedObjects } from './SharedObjects';
 
 export class Room extends DBObject {
 	slug: string;
@@ -24,6 +29,8 @@ export class Room extends DBObject {
 	navMeshModelURL?: string;
 	withMetaverse?: boolean;
 	mentorData: Mentor;
+	entryStatus = writable('entering' as 'entering' | 'connecting' | 'entered');
+	sid: string = '';
 	constructor(data: any) {
 		data.table = 'rooms';
 		super(data);
@@ -44,6 +51,7 @@ export class Room extends DBObject {
 		this.navMeshModelURL = this.unescapedData.navMeshModelURL;
 		this.withMetaverse = this.unescapedData.withMetaverse;
 		this.mentorData = this.unescapedData.mentorData;
+		this.entryStatus.set('entering');
 
 		if (this.allowedUsers == '') {
 			this.allowedUsersArray = [];
@@ -93,5 +101,39 @@ export class Room extends DBObject {
 		await axios.delete('/api/sessions?room=' + this.id);
 		await axios.delete('/api/messages?room=' + this.id);
 		const results = await axios.delete('/api/objects?room=' + this.id).then((res) => res.data);
+	};
+	async enter(user: User): Promise<void> {
+		videoChat.init(user, this);
+		this.entryStatus.set('connecting');
+	}
+	async connect(): Promise<boolean> {
+		this.sid = (await videoChat.connect()) || '';
+		if (this.sid) {
+			this.entryStatus.set('entered');
+			toast(_('Connected to the room!'));
+			return true;
+		} else {
+			myAlert(_('Connection Failed'));
+			return false;
+		}
+	}
+	loadSharedObjects = async (): Promise<void> => {
+		const models = await axios.get('/api/objects?room=' + this.id).then((res) => res.data);
+		const promises = models.map((model: SharedObject) => {
+			const sharedObject = new SharedObject(model);
+			sharedObject.attachElement();
+			//on first load, don't play videos
+			if (
+				sharedObject.asset &&
+				sharedObject.type.includes('video') &&
+				sharedObject.asset instanceof HTMLVideoElement
+			) {
+				sharedObject.asset.autoplay = false;
+			}
+			sharedObjects.add(sharedObject);
+			return sharedObject.loadAttachedEvent();
+		});
+		await Promise.all(promises);
+		return;
 	};
 }

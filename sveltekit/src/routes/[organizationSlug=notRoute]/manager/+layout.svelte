@@ -35,6 +35,11 @@
 	});
 </script>
 
+<svelte:head>
+	<title>
+		Manager's Console | {organization.title} | VirtuaCampus
+	</title>
+</svelte:head>
 {#if loggedIn && organization}
 	<div style="display:flex;margin-left:1rem;margin-right:1rem">
 		<div class="menu">

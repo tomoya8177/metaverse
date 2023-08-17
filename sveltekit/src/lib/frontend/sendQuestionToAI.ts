@@ -14,12 +14,15 @@ export const sendQuestionToAI = async (data: {
 }) => {
 	console.log({ data });
 	actionHistory.send('sendQuestionToAI', {
-		...data.newMessage,
+		...data.newMessage.purifyData(),
 		body: escapeHTML(data.newMessage.body)
 	});
 	const response = await axios
 		.post('/mentor/' + data.mentor.id + '/' + data.channelId, {
-			...data,
+			roomId: data.roomId,
+			userId: data.userId,
+			type: data.type,
+			channelId: data.channelId,
 			body: escapeHTML(data.newMessage.body)
 		})
 		.then((res) => res.data);

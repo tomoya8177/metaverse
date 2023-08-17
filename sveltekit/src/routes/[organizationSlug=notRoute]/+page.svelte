@@ -48,6 +48,12 @@
 	});
 </script>
 
+<svelte:head>
+	<title>
+		{organization.title} | VirtuaCampus
+	</title>
+</svelte:head>
+
 {#if organization}
 	<div class="container">
 		{#if $UserStore.isMember}

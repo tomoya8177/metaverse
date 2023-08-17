@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { RoomStore, UserStore } from '$lib/store';
-
+	import { DateTime } from 'luxon';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import SceneUIs from './SceneUIs.svelte';
@@ -20,19 +20,19 @@
 	import { fade } from 'svelte/transition';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import { escapeHTML } from '$lib/math/escapeHTML';
+	import type { Room } from '$lib/frontend/Classes/Room';
+	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
+	import { toast } from '$lib/frontend/toast';
+	import { Message } from '$lib/frontend/Classes/Message';
+	export let room: Room;
+	export let me: Me;
 
-	export let readyToConnect;
-	let organization: Organization | null = null;
+	export let organization: Organization;
 	onMount(async () => {
-		if (!$RoomStore) return;
-		organization = await axios
-			.get('/api/organizations/' + $RoomStore.organization)
-			.then((res) => res.data);
 		if (!$UserStore.nicknameURL) {
 			profileDialogOpen = true;
 		}
 	});
-	export let whenChatConnected: () => void;
 	const onLeaveClicked = () => {
 		actionHistory.send('leaveRoom');
 		videoChat.leave();
@@ -44,17 +44,16 @@
 		}
 	};
 	let profileDialogOpen = false;
+	let busy = false;
 </script>
 
 <dialog open>
 	<article>
-		{#if $RoomStore}
+		{#if room}
 			<div>{_('Room Title')}</div>
-			<h4>{$RoomStore.title}</h4>
-			{#if organization}
-				<div>{_('Organization')}</div>
-				<h5>{organization?.title}</h5>
-			{/if}
+			<h4>{room.title}</h4>
+			<div>{_('Organization')}</div>
+			<h5>{organization.title}</h5>
 			<NameTag user={$UserStore} size={24} border={false} />
 			<div style="text-align:center">
 				<div style="display:inline-block">
@@ -74,14 +73,15 @@
 			</button>
 
 			<button
+				aria-busy={busy}
 				on:click={async () => {
-					if (!$RoomStore) return;
+					busy = true;
+					await room.enter($UserStore);
+					const result = await room.connect();
+					busy = false;
 
-					readyToConnect = true;
-					if (!videoChat.connected) {
-						videoChat.init($UserStore, $RoomStore);
-						await videoChat.connect();
-						whenChatConnected();
+					if (result) {
+						actionHistory.send('enterRoom');
 					}
 				}}
 			>

@@ -6,14 +6,14 @@ import axios from 'axios';
 import { SharedObject } from './Classes/SharedObject';
 import { sharedObjects } from './Classes/SharedObjects';
 import type { Entity } from 'aframe';
-import { transportMentor } from './callAIMentor';
-import type { Room } from 'twilio-video';
 import { RoomStore } from '$lib/store';
 import { toast } from './toast';
 import { _ } from '$lib/i18n';
+import type { Room } from './Classes/Room';
 
 let room: Room;
 RoomStore.subscribe((r) => {
+	if (!r) return;
 	room = r;
 });
 
@@ -81,10 +81,9 @@ export const messageListeners = () => {
 		object.parentNode?.removeChild(object);
 	});
 	videoChat.listenTo('moveMentor', (data) => {
-		transportMentor({
-			mentorEl: document.getElementById(room.mentorData.user) as Entity,
-			position: data.position,
-			rotation: data.rotation
+		room.mentorData.go({
+			targetPosition: data.position,
+			targetRotation: data.rotation
 		});
 	});
 	videoChat.listenTo('jump', (data) => {

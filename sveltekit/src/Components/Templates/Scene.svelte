@@ -29,7 +29,6 @@
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import { cookies } from '$lib/frontend/cookies';
-	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
@@ -50,39 +49,28 @@
 		delete AFRAME.components['on-scene-loaded'];
 	};
 	let sceneLoaded = false;
-	let readyToConnect = false;
 	let me: Me;
 	const onSceneLoaded = async () => {
 		sceneLoaded = true;
 		actionHistory.send('enteringRoom');
 		me = new Me($UserStore);
-		// me.nickname = $UserStore.nickname;
 		Users.add(me);
-		// $UserStore.unit = me;
 		await me.setLastPosition(room);
-		// me.avatarURL =
-		// 	$UserStore.avatarURL || '/preset-avatars/b3c158be8e39d28a8cc541052c7497cfa9d7bdbe.glb';
-		//me.twilioConnect(room.id)
 		document.addEventListener('touchstart', () => {
-			//activate the nipple control
 			me.enableTouch();
 			nippleControl.show();
 		});
-		document.onkeydown = (e) => {
-			//if key is W
-		};
+
 		//load mentor user
 		if (room.mentor) {
-			const mentor = await axios.get('/api/mentors/' + room.mentor).then((res) => res.data);
-			mentor.userData = await axios.get('/api/users/' + mentor.user).then((res) => res.data);
-			const mentorUnit = new Unit(mentor.userData);
+			const mentorUnit = new Unit(room.mentorData.userData);
 			mentorUnit.position = { x: 0, y: 0, z: 3 };
-			//	mentorUnit.nickname = mentor.userData.nickname;
-			//	mentorUnit.avatarURL = mentor.userData.avatarURL;
 			mentorUnit.el.setAttribute('ai-mentor', '');
-			mentorUnit.avatar?.setAttribute('move-mouth', 'userId:' + mentor.userData.id);
+			mentorUnit.avatar?.setAttribute('move-mouth', 'userId:' + room.mentorData.userData.id);
 			Users.add(mentorUnit);
+			room.mentorData.setEl();
 		}
+		await room.loadSharedObjects();
 	};
 
 	onDestroy(() => {
@@ -91,12 +79,31 @@
 	let QADialogOpen = false;
 	let starValue = 5;
 	let feedback = '';
-</script>
-
-{#if !readyToConnect}
-	<EnterRoomDialog
-		whenChatConnected={async () => {
-			await loadSharedObjects(room.id);
+	let entryStatus: string = '';
+	room.entryStatus.subscribe(async (status) => {
+		entryStatus = status;
+		if (entryStatus == 'connecting' && room.mentor) {
+			const response = await axios.post(
+				'/mentor/' + room.mentor + '/' + videoChat.room?.sid || '',
+				{
+					type: 'room',
+					roomId: room.id,
+					body: _("Hello! I'm ") + $UserStore.nickname,
+					channelId: videoChat.room?.sid || ''
+				}
+			);
+			const message = new Message({
+				room: room.id,
+				user: room.mentorData.userData.id,
+				body: response.data.text,
+				createdAt: DateTime.now().toISO(),
+				isTalking: true
+			});
+			message.createSendOutAndPush();
+			room.mentorData.come(me);
+			room.mentorData.speak(message.body);
+		}
+		if (entryStatus == 'entered') {
 			const existingFeedback = await axios
 				.get('/api/feedbacks?campaign=1&user=' + $UserStore.id)
 				.then((res) => res.data);
@@ -105,17 +112,6 @@
 					QADialogOpen = true;
 				}, 120000); //in 2 minutes, the QA dialog will show up
 			}
-			if (!room.mentor) return;
-			const response = await axios.post(
-				'/mentor/' + room.mentor + '/' + videoChat.room?.sid || '',
-				{
-					type: 'room',
-					roomId: room.id,
-					body: _("Hello! I just entered the room. I'm ") + $UserStore.nickname,
-					channelId: videoChat.room?.sid || ''
-				}
-			);
-			console.log({ response });
 			const twoHoursAgo = convertLocalToUTC(DateTime.now().minus({ hours: 2 }).toISO()).replace(
 				'T',
 				' '
@@ -130,28 +126,12 @@
 				await $UserStore.addCoin('enterRoom', 10);
 				toast(_('You got 10 coins for being active.'));
 			}
-			actionHistory.send('enterRoom');
+		}
+	});
+</script>
 
-			const message = new Message({
-				room: room.id,
-				user: room.mentorData.userData.id,
-				body: response.data.text,
-				createdAt: DateTime.now().toISO(),
-				isTalking: true
-			});
-			message.createSendOutAndPush();
-			callAIMentor(room.mentorData);
-
-			TextChatOpen.set(true);
-			if (!$AISpeaks) {
-				return;
-			}
-			room.mentorData.speak(message.body);
-			//			aiSpeaksOut(message.body, Users.find(room.mentorData.user) || null);
-		}}
-		{me}
-		bind:readyToConnect
-	/>
+{#if entryStatus != 'entered'}
+	<EnterRoomDialog {room} {organization} {me} />
 {/if}
 {#if QADialogOpen}
 	<dialog open>

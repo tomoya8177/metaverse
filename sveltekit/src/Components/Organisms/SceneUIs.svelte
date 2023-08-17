@@ -44,7 +44,6 @@
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { error } from '@sveltejs/kit';
 	import type { Organization } from '$lib/types/Organization';
-	import { callAIMentor } from '$lib/frontend/callAIMentor';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import RightControls from '../Molecules/RightControls.svelte';
 	import { wasdControl } from '$lib/frontend/Classes/WASDControl';
@@ -192,17 +191,17 @@
 			});
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)) };
-			callAIMentor();
+			room.mentorData.come(me);
 			if (!$AISpeaks) {
 				TextChatOpen.set(true);
 				return;
 			}
-			aiSpeaksOut(createdMessage.body, Users.find(room.mentorData.user) || null);
+			room.mentorData.speak(createdMessage.body);
+			//			aiSpeaksOut(createdMessage.body, Users.find(room.mentorData.user) || null);
 		}
 	};
 	let waitingForAIAnswer = false;
 	let newMessagePinned = false;
-	let newMessageBody = '';
 
 	const sendChatMessage = async (message: Message): Promise<Message> => {
 		actionHistory.send('sendChatMessage', { ...message, body: escapeHTML(message.body) });
