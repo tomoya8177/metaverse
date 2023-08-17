@@ -12,8 +12,7 @@
 		ItemsInPreview,
 		FocusObjectStore,
 		ChatMessagesStore,
-		TextChatOpen,
-		AISpeaks
+		TextChatOpen
 	} from '$lib/store';
 	import axios from 'axios';
 
@@ -24,7 +23,6 @@
 	import { Users } from '$lib/frontend/Classes/Users';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
-	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import ObjectEditor from './ObjectEditor.svelte';
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
@@ -140,7 +138,7 @@
 				scrollChatToBottom();
 			}, 100);
 			if (message.isAIs) {
-				if (!$AISpeaks) {
+				if (!room.mentorData.toSpeak) {
 					TextChatOpen.set(true);
 					return;
 				}
@@ -192,12 +190,11 @@
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)) };
 			room.mentorData.come(me);
-			if (!$AISpeaks) {
+			if (!room.mentorData.toSpeak) {
 				TextChatOpen.set(true);
 				return;
 			}
 			room.mentorData.speak(createdMessage.body);
-			//			aiSpeaksOut(createdMessage.body, Users.find(room.mentorData.user) || null);
 		}
 	};
 	let waitingForAIAnswer = false;
@@ -395,6 +392,7 @@
 <div style:display={$TextChatOpen ? 'block' : 'none'}>
 	<div class="chat-box">
 		<ChatBox
+			mentor={room.mentorData}
 			{room}
 			bind:waitingForAIAnswer
 			bind:newMessagePinned

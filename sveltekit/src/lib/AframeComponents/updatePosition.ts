@@ -8,10 +8,9 @@ import { Unit } from '$lib/frontend/Classes/Unit';
 import type { User } from '$lib/frontend/Classes/User';
 import { Users } from '$lib/frontend/Classes/Users';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
-import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 import { cookies } from '$lib/frontend/cookies';
 import { _ } from '$lib/i18n';
-import { RoomStore, TextChatOpen, UserStore, AISpeaks, type xyz } from '$lib/store';
+import { RoomStore, TextChatOpen, UserStore, type xyz } from '$lib/store';
 import axios from 'axios';
 import { DateTime } from 'luxon';
 let user: User;
@@ -22,10 +21,6 @@ let room: Room;
 RoomStore.subscribe((r) => {
 	if (!r) return;
 	room = r;
-});
-let aiSpeaks = false;
-AISpeaks.subscribe((value) => {
-	aiSpeaks = value;
 });
 AFRAME.registerComponent('update-position', {
 	me: null as Me | null,
@@ -123,56 +118,12 @@ AFRAME.registerComponent('update-position', {
 						isTalking: true
 					});
 					message.createSendOutAndPush();
-					if (!aiSpeaks) {
+					if (!room.mentorData.toSpeak) {
 						TextChatOpen.set(true);
 						return;
 					}
 					room.mentorData.speak(res.data.text);
 				});
-
-			//calll the mentor with old model
-
-			// let content = `${user.nickname} is looking at the ${closestObject.shortType}, ${closestObject.title}, whose description is: ${closestObject.description}.`;
-			// //if there's an event attached, include it's data as well.
-			// if (closestObject.attachedEvent) {
-			// 	content += `There is an event attached. ${closestObject.attachedEvent.startString}`;
-			// 	if (closestObject.attachedEvent.myAttendance) {
-			// 		content += `User's attendance status for this event is ${closestObject.attachedEvent.myAttendance.status}.`;
-			// 	}
-			// }
-			// content += `
-			// 		Tell the context of the description to the user. Try not to make it boring just by reading out the description. Encourage the user to seek more detail about the context. Answer in less than 100 words.
-			// 	Make sure to answer in the user's prefered language based on their locale setting. User's prefered language locale is ${cookies.get(
-			// 		'locale'
-			// 	)}. Answer to user's question starting with calling user's nickname so everyone knows it is the answer for the particular user.`;
-			// axios
-			// 	.post('/mentor', {
-			// 		appendToChannel: room.id,
-
-			// 		messages: [
-			// 			{
-			// 				role: 'system',
-			// 				content
-			// 			}
-			// 		]
-			// 	})
-			// 	.then((res) => {
-			// 		console.log({ res });
-			// 		const message = new Message({
-			// 			user: room.mentorData?.user,
-			// 			body: res.data.response.content,
-			// 			room: room.id,
-			// 			createdAt: DateTime.now().toISO(),
-			// 			isTalking: true
-			// 		});
-			// 		message.createSendOutAndPush();
-			// 		if (!aiSpeaks) {
-			// 			TextChatOpen.set(true);
-			// 			return;
-			// 		}
-			// 		room.mentorData.speak(res.data.response.content);
-			// 		//aiSpeaksOut(res.data.response.content, Users.find(room.mentorData.user) || null);
-			// 	});
 		}
 	}
 });

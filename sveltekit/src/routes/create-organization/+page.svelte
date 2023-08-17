@@ -146,7 +146,6 @@
 					busy = true;
 					console.log({ room });
 					await room.create();
-					await mentor.study(room.id);
 					busy = false;
 					location.href = `/${organization.slug}/${room.slug}`;
 				}}

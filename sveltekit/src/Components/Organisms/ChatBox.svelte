@@ -2,7 +2,7 @@
 	import TextChatMessage from '../Molecules/TextChatMessage.svelte';
 
 	import { onDestroy, onMount } from 'svelte';
-	import { ChatMessagesStore, UserStore, TextChatOpen, AISpeaks } from '$lib/store';
+	import { ChatMessagesStore, UserStore, TextChatOpen } from '$lib/store';
 	import axios from 'axios';
 
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -19,7 +19,6 @@
 	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
-	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { _ } from '$lib/i18n';
 	import { GenerateImage } from '$lib/frontend/Classes/GenerateImage';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
@@ -39,6 +38,7 @@
 		}
 	};
 	export let room: Room | null;
+	export let mentor: Mentor;
 	export let me: Me | null = null;
 	onMount(async () => {
 		if (forceMentor) {
@@ -76,19 +76,18 @@
 				const message = new Message({
 					room: room?.id,
 					type: 'attachment',
-					user: room?.mentorData?.user || forceMentor?.user,
+					user: mentor.user,
 					body: _(`AI completed to generate the image for you. @`) + $UserStore.nickname,
 					handle: file.handle,
 					url: file.url
 				});
-				if (!forceMentor && room && me) room.mentorData.come(me);
+				if (!forceMentor && me) mentor.come(me);
 				await message.createSendOutAndPush();
-				if (!$AISpeaks) {
+				if (mentor.toSpeak) {
 					TextChatOpen.set(true);
 					return;
 				}
-				room?.mentorData.speak(message.body);
-				//aiSpeaksOut(message.body, Users.find(room.mentorData.user) || null);
+				mentor.speak(message.body);
 			});
 			newMessageBody = '';
 			waitingForAIAnswer = false;
@@ -100,19 +99,19 @@
 
 			const aiMessage = await sendQuestionToAI({
 				type: room ? 'room' : 'user',
-				mentor: room ? room.mentorData : forceMentor,
+				mentor: mentor,
 				roomId: room ? room.id : undefined,
 				userId: room ? undefined : $UserStore.id,
 				newMessage,
 				channelId: room ? videoChat.room?.sid || '' : $UserStore.id + DateTime.now().toISODate()
 			});
 			await aiMessage.createSendOutAndPush();
-			if (!forceMentor && room && me) room.mentorData.come(me);
+			if (room && me) mentor.come(me);
 
 			// console.log({ aiMessage });
 			waitingForAIAnswer = false;
 			// const createdMessage = await sendChatMessage(aiMessage);
-			if (!$AISpeaks) {
+			if (!mentor.toSpeak) {
 				TextChatOpen.set(true);
 
 				return;
@@ -120,12 +119,8 @@
 			if (forceMentor) {
 				forceMentor.speak(aiMessage.body);
 			} else {
-				room?.mentorData.speak(aiMessage.body);
+				mentor.speak(aiMessage.body);
 			}
-			// aiSpeaksOut(
-			// 	aiMessage.body,
-			// 	forceMentor ? null : Users.find(room.mentorData.user) || null
-			// );
 		}
 		newMessageBody = '';
 		setTimeout(() => {
@@ -167,7 +162,7 @@
 </div>
 <hr />
 <div style="display:flex; gap:0.4rem;">
-	{#if forceMentor || room?.mentor}
+	{#if mentor}
 		<div>
 			<button
 				small
@@ -210,7 +205,7 @@
 			</button>
 		</div>
 	{/if}
-	{#if !forceMentor && room?.mentor}
+	{#if !forceMentor && mentor}
 		<div>
 			<button
 				data-tooltip={_('@Mentor')}
@@ -225,20 +220,18 @@
 			</button>
 		</div>
 	{/if}
-	{#if forceMentor || room?.mentor}
+	{#if mentor}
 		<div>
 			<button
-				style:opacity={$AISpeaks ? 1 : 0.5}
+				style:opacity={mentor.toSpeak ? 1 : 0.5}
 				data-tooltip={_('AI Speaks')}
 				class="circle-button"
 				small
 				on:click={() => {
-					AISpeaks.update((v) => {
-						if (v) {
-							speechSynthesis.cancel();
-						}
-						return !v;
-					});
+					mentor.toSpeak = !mentor.toSpeak;
+					if (!mentor.toSpeak) {
+						speechSynthesis.cancel();
+					}
 				}}
 			>
 				<Icon icon="campaign" />

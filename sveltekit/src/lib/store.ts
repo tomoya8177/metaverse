@@ -41,4 +41,3 @@ export const ConfirmDialog = writable({
 });
 export const TextChatOpen = writable(true);
 export const ChatMessagesStore = writable([] as Message[]);
-export const AISpeaks = writable(true);

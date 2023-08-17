@@ -16,7 +16,6 @@
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import type { User } from '$lib/frontend/Classes/User';
 	import { _ } from '$lib/i18n';
-	import { speechInterval } from '$lib/frontend/aiSpeaksOut';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import type { Mentor } from '$lib/frontend/Classes/Mentor';
@@ -62,22 +61,6 @@
 					<a href={'#'}>
 						{message.userData.nickname || ''}
 					</a>
-					{#if message.isAIs}
-						<a
-							transition:fade
-							href={'#'}
-							style="margin-left:0.2rem"
-							title="Speaking"
-							on:click={() => {
-								speechSynthesis.cancel();
-								clearInterval(speechInterval);
-
-								//message.isTalking = false;
-							}}
-						>
-							<Icon icon="campaign" />
-						</a>
-					{/if}
 				</div>
 			{/if}
 			{#if message.type == 'attachment'}

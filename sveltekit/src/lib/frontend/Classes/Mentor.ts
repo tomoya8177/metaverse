@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { DBObject } from './DBObject';
 import { User } from './User';
-import { AISpeaks, type xyz } from '$lib/store';
+import type { xyz } from '$lib/store';
 import { Users } from './Users';
 import { DocumentForAI } from '$lib/types/DocumentForAI';
 import { _ } from '$lib/i18n';
@@ -9,11 +9,6 @@ import type { Unit } from './Unit';
 import type { Entity } from 'aframe';
 import { degree2radian } from '$lib/math/degree2radians';
 import { videoChat } from './VideoChat';
-
-let aiSpeaks = false;
-AISpeaks.subscribe((value) => {
-	aiSpeaks = value;
-});
 
 export class Mentor extends DBObject {
 	user: string;
@@ -68,7 +63,7 @@ export class Mentor extends DBObject {
 		this.utterance.text = message;
 		speechSynthesis.speak(this.utterance);
 		this.speechInterval = setInterval(() => {
-			if (!aiSpeaks) {
+			if (!this.toSpeak) {
 				clearInterval(this.speechInterval);
 				if (!unit) return;
 
@@ -132,20 +127,5 @@ export class Mentor extends DBObject {
 
 	async resetBrain() {
 		await axios.post('/mentor/' + this.id + '/reset');
-	}
-	async study(roomId: string) {
-		return [];
-		const res = await axios.put('/mentor/' + this.id, {
-			roomId,
-			refresh: true
-		});
-
-		console.log({ res });
-		if (res.data.failedDocuments.length) {
-			const failedDocuments = res.data.failedDocuments;
-			console.log({ failedDocuments });
-			alert(_('Failed to load documents:') + failedDocuments.map((doc) => doc.title).join(', '));
-		}
-		return res.data.succeededDocuments;
 	}
 }

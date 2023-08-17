@@ -13,8 +13,7 @@
 		if (!(await room.validate())) return;
 		updateBusy = true;
 		await room.update();
-		room.mentorData.study();
-		room = new Room({ ...room, documents: room.documents });
+		//room = new Room({ ...room, documents: room.documents });
 		updateBusy = false;
 		toast(_('Updated'));
 	};

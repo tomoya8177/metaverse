@@ -71,36 +71,13 @@
 	const onCreateClicked = async () => {
 		if (!(await editRoom.validate())) return;
 		busy = true;
-		const { newRoom, mentor } = await editRoom.create();
-		rooms = [...rooms, new Room(newRoom)].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
-		mentors = [...mentors.filter((mentor) => mentor.id != editRoom.mentor), mentor];
+		await editRoom.create();
+		rooms = [...rooms, editRoom].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 		busy = false;
 		modalOpen = false;
-		actionHistory.send('createRoom', { room: newRoom });
+		actionHistory.send('createRoom', { room: editRoom.purifyData() });
 	};
-	const onUpdateClicked = async () => {
-		if (!(await editRoom.validate())) return;
-		busy = true;
-		await editRoom.update();
-		mentor.study();
-		mentors = [...mentors.filter((m) => m.id != mentor.id), mentor];
-		rooms = rooms.map((room) => {
-			if (room.id == updatedRoom.id) return new Room(updatedRoom);
-			return room;
-		});
-		busy = false;
-		modalOpen = false;
-		actionHistory.send('updateRoom', { room: updatedRoom });
-	};
-	const onDeleteClicked = async () => {
-		if (!confirm(_('Are you sure you want to delete this room?'))) return;
-		await editRoom.delete();
 
-		rooms = rooms.filter((room) => room.id != editRoom.id);
-
-		modalOpen = false;
-		actionHistory.send('deleteRoom', { room: editRoom });
-	};
 	let busy = false;
 </script>
 
@@ -162,23 +139,6 @@
 					}}
 				>
 					{_('Create')}
-				</button>
-			{:else}
-				<button
-					aria-busy={busy}
-					on:click={() => {
-						onUpdateClicked();
-					}}
-				>
-					{_('Update')}
-				</button>
-				<button
-					class="secondary"
-					on:click={() => {
-						onDeleteClicked();
-					}}
-				>
-					{_('Delete')}
 				</button>
 			{/if}
 		</article>

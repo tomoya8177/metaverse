@@ -6,10 +6,9 @@
 	import { Message } from '$lib/frontend/Classes/Message';
 	import axios from 'axios';
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
-	import { UserStore, AISpeaks } from '$lib/store';
+	import { UserStore } from '$lib/store';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
-	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { DateTime } from 'luxon';
 	import { _ } from '$lib/i18n';
@@ -51,8 +50,6 @@
 			});
 			await newMessage.createSendOutAndPush();
 			send(newMessage);
-
-			//			aiSpeaksOut(aiMessage.body);
 		}
 	};
 	let mentorReady = false;
@@ -79,7 +76,6 @@
 		});
 		waitingForAIAnswer = false;
 		await aiMessage.createSendOutAndPush();
-		if (!$AISpeaks) return;
 		mentor.speak(aiMessage.body);
 	};
 </script>
@@ -97,6 +93,7 @@
 		</div>
 		<div style="position:absolute;bottom:0px;width:calc(100% - 2rem)">
 			<ChatBox
+				{mentor}
 				room={null}
 				forceMentor={mentor}
 				forceNoPin

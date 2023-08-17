@@ -6,7 +6,7 @@
 	import 'aframe-extras';
 	import 'aframe-audio-analyser';
 	import { onDestroy, onMount } from 'svelte';
-	import { ChatMessagesStore, RoomStore, TextChatOpen, UserStore, AISpeaks } from '$lib/store';
+	import { UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
 	import { Me } from '$lib/frontend/Classes/Me';
@@ -25,7 +25,6 @@
 	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import type { PageData } from '../../routes/[organizationSlug=notRoute]/[roomSlug]/$types';
-	import { aiSpeaksOut } from '$lib/frontend/aiSpeaksOut';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import { cookies } from '$lib/frontend/cookies';
