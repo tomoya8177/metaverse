@@ -48,6 +48,7 @@ export const messageListeners = () => {
 	videoChat.listenTo('objectPosition', (data) => {
 		const object = sharedObjects.get(data.object.id);
 		if (!object) return;
+		console.log({ object });
 		object.el?.setAttribute('position', data.position);
 		object.el?.setAttribute('rotation', data.rotation);
 		object.el?.setAttribute('scale', data.scale);

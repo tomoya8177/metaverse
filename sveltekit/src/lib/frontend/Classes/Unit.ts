@@ -172,16 +172,17 @@ export class Unit {
 	}
 	async showScreen(track: RemoteVideoTrack | LocalVideoTrack, sid: string): Promise<void> {
 		const video = document.createElement('a-plane');
-		const sharedObject = {
-			id: 'screenPlaneOf' + this.userId,
-			locked: this.userId != videoChat.userId,
+		const sharedObject = new SharedObject({
+			id: 'screenPlaneOf' + this.id,
+			locked: this.id != videoChat.userId,
 			title: 'Shared Screen',
-			type: 'screen',
-			el: video
-		};
+			type: 'screen'
+		});
 		console.log({ sharedObject });
 		sharedObjects.add(sharedObject);
+		console.log({ sharedObjects });
 		sharedObject.inPreviewPane = true;
+		sharedObject.el = video;
 
 		video.setAttribute('id', 'screenPlaneOf' + this.userId);
 		video.setAttribute('rotation', `0 ${this.rotation.y} 0`);
@@ -242,8 +243,9 @@ export class Unit {
 		scene?.appendChild(video);
 	}
 	hideScreen() {
-		const video = document.getElementById('screenPlaneOf' + this.userId);
-		video?.parentNode?.removeChild(video);
+		const sharedObject = sharedObjects.get('screenPlaneOf' + this.id);
+		sharedObject?.remove();
+		sharedObjects.remove('screenPlaneOf' + this.id);
 	}
 	hideCamera() {
 		const video = document.getElementById('cameraCircleOf' + this.userId);

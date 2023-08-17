@@ -117,6 +117,7 @@ export class SharedObject extends DBObject {
 			}
 			if (!this.asset) return;
 		}
+
 		if (this.url) this.setEntityGeometry(this.el, this.shortType);
 		if (this.shortType == 'image' && this.asset) {
 			if (this.url) this.setEntityMaterial(this.el, this.asset);
@@ -223,6 +224,7 @@ export class SharedObject extends DBObject {
 		switch (type) {
 			case 'image':
 			case 'video':
+			case 'screen':
 				if (this.isSphere) {
 					this.el?.setAttribute('geometry', `primitive: sphere;radius:${this.radius || 0.5};`);
 				} else {
@@ -258,6 +260,8 @@ export class SharedObject extends DBObject {
 			return 'video';
 		} else if (this.type.includes('glb') || this.type.includes('gltf')) {
 			return 'model';
+		} else if (this.type.includes('screen')) {
+			return 'screen';
 		}
 		return 'image';
 	}

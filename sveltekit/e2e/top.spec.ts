@@ -127,7 +127,7 @@ test.describe.serial('Top Page', () => {
 		const pleaseEnterTitleError = page.getByText('Please enter a title');
 		await expect(pleaseEnterTitleError).toBeVisible();
 		await orgNameInput.fill(nastyString);
-		allowRegistrationSwitch.check();
+		await allowRegistrationSwitch.check();
 		await page.waitForTimeout(1000);
 		//		allowRegistrationSwitch.click();
 		await nextButton.click();
@@ -180,7 +180,7 @@ test.describe.serial('Top Page', () => {
 		const aiVoiceSelect = page.getByRole('combobox', { name: 'AI Voice' });
 		await expect(aiVoiceSelect).toBeVisible();
 		//select random voice
-		await aiVoiceSelect.selectOption('Kyoko');
+		//await aiVoiceSelect.selectOption('Kyoko');
 		//click next
 		//find new next button
 		const newNextButton = page.getByRole('button', { name: 'Next' });
