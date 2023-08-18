@@ -26,17 +26,36 @@ AFRAME.registerComponent('jump-button', {
 			this.rig.setAttribute('look-controls', 'enabled:false');
 
 			this.originalIntersection = evt.detail?.intersection?.point;
+			//conver to world to local position
+			if (this.originalIntersection) {
+				this.originalIntersection = this.rig?.object3D.worldToLocal(
+					new THREE.Vector3(
+						this.originalIntersection.x,
+						this.originalIntersection.y,
+						this.originalIntersection.z
+					)
+				);
+			}
 		});
 		this.el.addEventListener('mouseup', (evt: any) => {
 			this.dragging = false;
 			this.rig?.setAttribute('look-controls', 'enabled:true');
-			this.originalIntersection = evt.detail?.intersection?.point;
 		});
-		this.el.addEventListener('touchstart', (evt) => {
+		this.el.addEventListener('touchstart', (evt: any) => {
 			this.rig = document.getElementById(this.data.userId) as Entity;
 
 			this.dragging = true;
 			this.rig.setAttribute('look-controls', 'enabled:false');
+			this.originalIntersection = evt.detail?.intersection?.point;
+			if (this.originalIntersection) {
+				this.originalIntersection = this.rig?.object3D.worldToLocal(
+					new THREE.Vector3(
+						this.originalIntersection.x,
+						this.originalIntersection.y,
+						this.originalIntersection.z
+					)
+				);
+			}
 		});
 		this.el.addEventListener('touchend', (evt) => {
 			this.dragging = false;
@@ -47,12 +66,17 @@ AFRAME.registerComponent('jump-button', {
 		if (!this.dragging || !this.cursorEl) return;
 		var intersections = this.cursorEl.components.raycaster.intersections;
 		if (intersections.length == 0) return;
-		const intersection = intersections.find(
+		let intersection = intersections.find(
 			(intersection: any) => intersection.object.el.id == 'jumpButton'
 		)?.point;
 		if (!intersection) return;
+
+		intersection = this.rig?.object3D.worldToLocal(
+			new THREE.Vector3(intersection.x, intersection.y, intersection.z)
+		);
 		//convert intersection to local coordinates
 		if (!this.originalIntersection) return;
+
 		const diff = {
 			x: intersection.x - this.originalIntersection.x,
 			y: intersection.y - this.originalIntersection.y
@@ -60,6 +84,7 @@ AFRAME.registerComponent('jump-button', {
 		};
 		//if diff is too large, something wrong.
 		if (Math.abs(diff.x) > 0.1 || Math.abs(diff.y) > 0.1) return;
+		console.log(diff.x, diff.y);
 		this.el.setAttribute(
 			'position',
 			`${this.el.getAttribute('position').x + diff.x}
