@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Event } from '$lib/frontend/Classes/Event';
 	import { _ } from '$lib/i18n';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 
-	import InputWithLabel from './InputWithLabel.svelte';
 	export let editEvent: Event;
 </script>
 

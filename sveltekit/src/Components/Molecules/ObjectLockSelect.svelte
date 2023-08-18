@@ -3,9 +3,9 @@
 	import { ClockPositions } from '$lib/preset/ClockPositions';
 	import axios from 'axios';
 
-	import InputWithLabel from './InputWithLabel.svelte';
 	import { toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let object: SharedObject;
 	export let onUpdate: (value: number) => void = (value) => {};
 	export let readonly: boolean = false;

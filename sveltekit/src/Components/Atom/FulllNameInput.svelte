@@ -2,7 +2,7 @@
 	import type { User } from '$lib/frontend/Classes/User';
 	import { cookies } from '$lib/frontend/cookies';
 	import { _ } from '$lib/i18n';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 
 	export let user: User;
 	const swapLocales = ['ja', 'ko', 'zh'];

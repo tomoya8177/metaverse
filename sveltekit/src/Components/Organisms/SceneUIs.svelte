@@ -33,7 +33,6 @@
 	import NippleControl from '../Atom/NippleControl.svelte';
 	import { myAlert, toast } from '$lib/frontend/toast';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { getPositionFromLockedPosition } from '$lib/frontend/getPositionFromLockedPosition';
 	import ObjectLockSelect from '../Molecules/ObjectLockSelect.svelte';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';

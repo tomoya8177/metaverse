@@ -2,7 +2,7 @@
 	import type { Event } from '$lib/frontend/Classes/Event';
 	import { _ } from '$lib/i18n';
 	import { DateTime } from 'luxon';
-	import InputWithLabel from './InputWithLabel.svelte';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let event: Event;
 	let showEnd = true;
 	let showEndDate = true;

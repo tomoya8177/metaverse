@@ -8,7 +8,6 @@
 	import { ChatMessagesStore, FocusObjectStore, RoomStore, UserStore } from '$lib/store';
 	import axios from 'axios';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { fade } from 'svelte/transition';
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -27,6 +26,7 @@
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import AvatarThumbnail from '../Atom/AvatarThumbnail.svelte';
 	import { ChatMessage } from 'langchain/schema';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;

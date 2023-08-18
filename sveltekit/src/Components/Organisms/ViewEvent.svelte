@@ -2,7 +2,6 @@
 	import type { Event } from '$lib/frontend/Classes/Event';
 	import { DateTime } from 'luxon';
 	import { UserStore } from '$lib/store';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import type { Attendance as AttendanceClass } from '$lib/frontend/Classes/Attendance';
 	import Attendance from '../Molecules/Attendance.svelte';
 	import { nl2br } from '$lib/math/nl2br';

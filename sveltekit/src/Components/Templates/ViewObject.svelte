@@ -6,7 +6,6 @@
 	import { _ } from '$lib/i18n';
 	import { nl2br } from '$lib/math/nl2br';
 	import type { Organization } from '$lib/types/Organization';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { DateTime } from 'luxon';
 	import Attendance from '../Molecules/Attendance.svelte';
 	import EventDateTimeDisplay from '../Molecules/EventDateTimeDisplay.svelte';

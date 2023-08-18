@@ -2,7 +2,6 @@
 	import axios from 'axios';
 	import { getContext, onMount } from 'svelte';
 	import FilterPagination from '../../../../Components/Organisms/FilterPagination.svelte';
-	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
 	import ModalCloseButton from '../../../../Components/Atom/ModalCloseButton.svelte';
 	import { User } from '$lib/frontend/Classes/User';
 	import { emptyUser } from '$lib/preset/EmptyUser';
@@ -15,6 +14,7 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { sendJoinedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
 	import { myConfirm } from '$lib/frontend/toast';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let data: PageData;
 	export let users: User[] = data.users;
 	export let userRoles: UserRole[] = data.userRoles;

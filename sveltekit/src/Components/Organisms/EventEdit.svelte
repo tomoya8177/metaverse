@@ -5,7 +5,6 @@
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
 	import { page } from '$app/stores';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { convertLocalToUTC, convertUTCToLocal } from '$lib/frontend/convertLocalToUTC';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import type { Organization } from '$lib/types/Organization';
@@ -17,6 +16,7 @@
 	import { DateTime } from 'luxon';
 	import ScheduleEditor from '../Molecules/ScheduleEditor.svelte';
 	import LinkUrlDescriptionEditor from '../Molecules/LinkURLDescriptionEditor.svelte';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let editEvent: Event;
 	export let editMode: 'create' | 'update' = 'update';
 	export let modalOpen: boolean = true;

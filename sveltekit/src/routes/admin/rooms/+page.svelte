@@ -3,7 +3,6 @@
 	import { Room } from '$lib/frontend/Classes/Room';
 	import axios from 'axios';
 	import ModalCloseButton from '../../../Components/Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';
 	import FilterPagination from '../../../Components/Organisms/FilterPagination.svelte';
 	import { onMount } from 'svelte';
 	import Icon from '../../../Components/Atom/Icon.svelte';
@@ -13,6 +12,7 @@
 	import type { UserRole } from '$lib/types/UserRole';
 	import { _ } from '$lib/i18n';
 	import RoomTitleForManagers from '../../../Components/Molecules/RoomTitleForManagers.svelte';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 
 	let rooms: Room[] = [];
 	let paginated: Room[] = [];

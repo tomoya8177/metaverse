@@ -8,7 +8,6 @@
 	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import FilterPagination from '../../../../Components/Organisms/FilterPagination.svelte';
-	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
 	import ModalCloseButton from '../../../../Components/Atom/ModalCloseButton.svelte';
 	import type { User } from '$lib/frontend/Classes/User';
 	import type { Organization } from '$lib/types/Organization';

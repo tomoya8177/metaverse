@@ -5,7 +5,6 @@
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
 	import ModalCloseButton from '../../../../Components/Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
 	import type { PageData } from './$types';
 	import { DateTime } from 'luxon';
 	import ActionButtons from '../../../../Components/Organisms/ActionButtons.svelte';

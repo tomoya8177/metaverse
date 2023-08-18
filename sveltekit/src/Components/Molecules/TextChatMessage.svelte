@@ -10,7 +10,6 @@
 	import { nl2br } from '$lib/math/nl2br';
 	import type { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
-	import InputWithLabel from './InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
 	import { fade, slide } from 'svelte/transition';
 	import { escapeHTML } from '$lib/math/escapeHTML';

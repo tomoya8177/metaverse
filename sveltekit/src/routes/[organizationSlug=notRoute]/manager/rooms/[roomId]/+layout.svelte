@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
-	import InputWithLabel from '../../../../../Components/Molecules/InputWithLabel.svelte';
 	import RoomTitleForManagers from '../../../../../Components/Molecules/RoomTitleForManagers.svelte';
 	import type { PageData } from './$types';
 	import { page } from '$app/stores';
@@ -8,6 +7,7 @@
 	import { Room } from '$lib/frontend/Classes/Room';
 	import { toast } from '$lib/frontend/toast';
 	import { fade } from 'svelte/transition';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let data: PageData;
 	let room = new Room(data.room);
 	const organization = data.organization;
@@ -30,6 +30,9 @@
 	value={`${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.slug}`}
 	readonly
 	copiable
+	onCopy={() => {
+		toast(_('Copied'));
+	}}
 />
 <hr />
 <nav>

@@ -3,7 +3,6 @@
 	import { ClockPositions } from '$lib/preset/ClockPositions';
 	import axios from 'axios';
 	import Icon from '../../../../../../Components/Atom/Icon.svelte';
-	import InputWithLabel from '../../../../../../Components/Molecules/InputWithLabel.svelte';
 	import type { PageData } from './$types';
 	import { toast } from '$lib/frontend/toast';
 	import ObjectLockSelect from '../../../../../../Components/Molecules/ObjectLockSelect.svelte';

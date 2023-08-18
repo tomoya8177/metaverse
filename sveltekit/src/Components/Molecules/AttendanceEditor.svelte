@@ -3,7 +3,6 @@
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
 	import { page } from '$app/stores';
-	import InputWithLabel from './InputWithLabel.svelte';
 	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import type { Organization } from '$lib/types/Organization';

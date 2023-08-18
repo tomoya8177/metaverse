@@ -7,7 +7,6 @@
 
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { Message } from '$lib/frontend/Classes/Message';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import Icon from '../Atom/Icon.svelte';
 	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
 	import { Users } from '$lib/frontend/Classes/Users';

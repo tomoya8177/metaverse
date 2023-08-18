@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { filter } from '$lib/frontend/filter';
 	import { _ } from '$lib/i18n';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	let keyword: string = '';
 	let currentPage: number = 1;
 	let maxPage: number = 1;

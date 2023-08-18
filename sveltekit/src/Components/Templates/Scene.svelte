@@ -22,7 +22,6 @@
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import { _ } from '$lib/i18n';
 	import Icon from '../Atom/Icon.svelte';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { escapeHTML } from '$lib/math/escapeHTML';
 	import type { PageData } from '../../routes/[organizationSlug=notRoute]/[roomSlug]/$types';
 	import { Message } from '$lib/frontend/Classes/Message';
@@ -34,6 +33,7 @@
 	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
 	import { PUBLIC_IS_DEV } from '$env/static/public';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let data: PageData;
 	export let room: Room;
 	let organization: Organization = data.organization;

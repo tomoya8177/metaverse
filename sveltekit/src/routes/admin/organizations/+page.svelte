@@ -5,7 +5,6 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { onMount } from 'svelte';
 	import ModalCloseButton from '../../../Components/Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../../../Components/Molecules/InputWithLabel.svelte';
 	import axios from 'axios';
 	import FilterPagination from '../../../Components/Organisms/FilterPagination.svelte';
 	import { _ } from '$lib/i18n';

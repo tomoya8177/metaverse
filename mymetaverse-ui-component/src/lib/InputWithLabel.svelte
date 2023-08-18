@@ -1,8 +1,6 @@
 <script lang="ts">
-	import { toast } from '$lib/frontend/toast';
-	import { _ } from '$lib/i18n';
-	import { Toast } from '$lib/store';
-
+	export let onCopy: () => void = () => {};
+	export let copyText: string = 'Copy';
 	export let label: string = '';
 	export let value: string | number | boolean = '';
 	export let readonly: boolean = false;
@@ -187,10 +185,10 @@
 				class="button is-small"
 				on:click={() => {
 					navigator.clipboard.writeText(value.toString());
-					toast(_('Copied to clipboard'));
+					onCopy();
 				}}
 			>
-				{_('Copy')}
+				{copyText}
 			</button>
 		</div>
 	{/if}

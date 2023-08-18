@@ -2,8 +2,8 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import axios from 'axios';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	import { UserStore } from '$lib/store';
-	import InputWithLabel from '../../Components/Molecules/InputWithLabel.svelte';
 	import { cookies } from '$lib/frontend/cookies';
 	import { fade } from 'svelte/transition';
 	import type { Room } from '$lib/frontend/Classes/Room';

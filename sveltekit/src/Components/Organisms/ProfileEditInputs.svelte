@@ -2,13 +2,13 @@
 	import AvatarSelectPane from './AvatarSelectPane.svelte';
 	import { UserStore } from '$lib/store';
 	import axios from 'axios';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
 	import { _ } from '$lib/i18n';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import NameTag from '../Atom/NameTag.svelte';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let onUpdateDone: () => void;
 	export let me: Me | null = null;
 	export let label: string = _('Update');

@@ -7,7 +7,6 @@
 	import { Room } from '$lib/frontend/Classes/Room';
 	import axios from 'axios';
 	import ModalCloseButton from '../../../../Components/Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../../../../Components/Molecules/InputWithLabel.svelte';
 	import FilterPagination from '../../../../Components/Organisms/FilterPagination.svelte';
 	import { onMount } from 'svelte';
 	import Icon from '../../../../Components/Atom/Icon.svelte';

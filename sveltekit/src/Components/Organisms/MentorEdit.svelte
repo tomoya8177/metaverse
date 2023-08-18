@@ -1,7 +1,6 @@
 <script lang="ts">
 	import DocumentForAIRow from '../Molecules/DocumentForAIRow.svelte';
 	import axios from 'axios';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { _ } from '$lib/i18n';
 	import type { Mentor } from '$lib/types/Mentor';
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
@@ -14,6 +13,7 @@
 	import FulllNameInput from '../Atom/FulllNameInput.svelte';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
 	import { onMount } from 'svelte';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;

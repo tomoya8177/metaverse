@@ -7,7 +7,6 @@
 	import { onMount } from 'svelte';
 	import EventEdit from './EventEdit.svelte';
 	import CreateUpdateDeleteButtons from '../Molecules/CreateUpdateDeleteButtons.svelte';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import ScheduleEditor from '../Molecules/ScheduleEditor.svelte';
 	import AttendanceEditor from '../Molecules/AttendanceEditor.svelte';
 	import axios from 'axios';
@@ -26,6 +25,7 @@
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { convertLocalToUTC, convertUTCToLocal } from '$lib/frontend/convertLocalToUTC';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let editObject: SharedObject = new SharedObject({ type: 'image', withCaption: true });
 	export let editMode: 'update' | 'create' = 'create';
 	export let onCreate: (object: SharedObject) => void = (object) => {};

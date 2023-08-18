@@ -3,7 +3,6 @@
 	import axios from 'axios';
 	import { page } from '$app/stores';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import { fade } from 'svelte/transition';
 	import Icon from '../Atom/Icon.svelte';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
@@ -18,6 +17,7 @@
 	import { nl2br } from '$lib/math/nl2br';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { sendInvitedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let organization: Organization | null = null;
 	export let open = false;
 	let invitingEmail = '';
@@ -35,7 +35,15 @@
 			{_('Invite user')}
 		</h3>
 		<section>
-			<InputWithLabel label="URL" value={location.href} readonly copiable />
+			<InputWithLabel
+				label="URL"
+				value={location.href}
+				readonly
+				copiable
+				onCopy={() => {
+					toast(_('Copied'));
+				}}
+			/>
 			<InputWithLabel
 				meta={_('One email address at a time.')}
 				label={_('Invite by Email')}

@@ -4,25 +4,15 @@
 	import { EmptyRoom } from '$lib/preset/EmptyRoom';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import axios from 'axios';
-	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
-	import FilterPagination from './FilterPagination.svelte';
-	import { onMount } from 'svelte';
-	import Icon from '../Atom/Icon.svelte';
-	import { fade } from 'svelte/transition';
 	import type { User } from '$lib/frontend/Classes/User';
-	import type { Organization } from '$lib/types/Organization';
-	import type { UserRole } from '$lib/types/UserRole';
 	import { _ } from '$lib/i18n';
-	import { page } from '$app/stores';
 	import type { Mentor } from '$lib/types/Mentor';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import DocumentForAiRow from '../Molecules/DocumentForAIRow.svelte';
-	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
-	import type { PageData } from '../../routes/[organizationSlug=notRoute]/manager/rooms/$types';
 	import { environmentPresets } from '$lib/preset/EnvironmentPresets';
 	import { EnvironmentModelPresets } from '$lib/preset/EnvironmentModelPresets';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;

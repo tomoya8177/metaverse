@@ -14,11 +14,11 @@
 	import { User } from '$lib/frontend/Classes/User';
 	import { cookies } from '$lib/frontend/cookies';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
-	import InputWithLabel from '../Components/Molecules/InputWithLabel.svelte';
 	import SendMessageButton from '../Components/Atom/SendMessageButton.svelte';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import TextChatMessage from '../Components/Molecules/TextChatMessage.svelte';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	let mentor: Mentor | null = null;
 	let intro: string = '';
 	let invite: string = '';

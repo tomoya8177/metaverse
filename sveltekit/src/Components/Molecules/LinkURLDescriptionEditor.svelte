@@ -4,13 +4,13 @@
 	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { page } from '$app/stores';
 
-	import InputWithLabel from './InputWithLabel.svelte';
 	import type { Organization } from '$lib/types/Organization';
 	import axios from 'axios';
 	import { onMount } from 'svelte';
 	import { _ } from '$lib/i18n';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { BrandIcons } from '$lib/preset/BrandIcons';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let editItem: SharedObject | Event;
 	let rooms: Room[] = [];
 	let mentors: Mentor[] = [];
