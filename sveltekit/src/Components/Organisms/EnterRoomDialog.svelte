@@ -81,6 +81,7 @@
 					await room.enter($UserStore);
 					const result = await room.connect();
 					busy = false;
+					me.updateAvatar();
 
 					if (result) {
 						actionHistory.send('enterRoom');

@@ -15,6 +15,7 @@
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { User } from '$lib/frontend/Classes/User';
 	import Scene from '../../../Components/Templates/Scene.svelte';
+	import type { Me } from '$lib/frontend/Classes/Me';
 	export let data: PageData;
 	let loggedIn: boolean | null = data.loggedIn;
 	console.log(101);
@@ -73,6 +74,7 @@
 		noRoom = false;
 		console.log(5);
 	});
+	let me: Me;
 </script>
 
 <svelte:head>
@@ -85,7 +87,7 @@
 	<Login organization={room.organization} {room} />
 {:else}
 	{#if roomReady && !noRoom}
-		<Scene {data} {room} />
+		<Scene {data} {room} bind:me />
 		<slot />
 	{/if}
 	{#if noRoom}
@@ -102,7 +104,7 @@
 	{/if}
 	{#if roomReady}
 		<div class="top">
-			<Navigation title={room.title} {organization} />
+			<Navigation title={room.title} {organization} {me} />
 		</div>
 	{/if}
 {/if}

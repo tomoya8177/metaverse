@@ -50,7 +50,7 @@
 		delete AFRAME.components['on-scene-loaded'];
 	};
 	let sceneLoaded = false;
-	let me: Me;
+	export let me: Me;
 	const onSceneLoaded = async () => {
 		sceneLoaded = true;
 		actionHistory.send('enteringRoom');

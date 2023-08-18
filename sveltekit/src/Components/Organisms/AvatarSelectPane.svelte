@@ -7,6 +7,7 @@
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import { onDestroy, onMount } from 'svelte';
+	import { cookies } from '$lib/frontend/cookies';
 	export let url: string;
 	export let thumbnailURL: string;
 
@@ -27,6 +28,7 @@
 <button
 	on:click={() => {
 		avatarSelectOpen = !avatarSelectOpen;
+		if (url.includes('readyplayer.me')) url = url + '#' + Math.floor(Math.random() * 1000);
 	}}>{avatarSelectOpen ? _('OK') : url ? _('Change Avatar') : _('Set Avatar')}</button
 >
 
@@ -77,7 +79,7 @@
 			id="frame"
 			class="frame"
 			allow="camera *; microphone *; clipboard-write"
-			src="https://virtuacampus.readyplayer.me?frameApi"
+			src={'https://virtuacampus.readyplayer.me/avatar?frameApi'}
 		/>
 	</article>
 </dialog>

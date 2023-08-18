@@ -30,6 +30,7 @@
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
+	export let me: Me | null = null;
 	const onLogoutClicked = () => {
 		actionHistory.send('logout');
 		videoChat.leave();
@@ -272,6 +273,8 @@
 						user: { ...$UserStore, description: escapeHTML($UserStore.description) }
 					});
 					profileDialogOpen = false;
+					console.log({me})
+					if (me) me.updateAvatar();
 				}}
 			/>
 		</article>

@@ -45,6 +45,10 @@ export class Me extends Unit {
 
 		this.el.setAttribute('ping-session', `user:${user.id};type:unit`);
 	}
+	updateAvatar() {
+		console.log('updating avatar');
+		this.avatar?.setAttribute('src', this.userData.avatarURL);
+	}
 	async setLastPosition(room: Room): Promise<void> {
 		const sessions = await axios
 			.get(`/api/sessions?user=${this.userId}&room=${room.id}&type=unit`)
