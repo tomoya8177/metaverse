@@ -3,11 +3,11 @@
 	import type { Organization } from '$lib/types/Organization';
 	import { onMount } from 'svelte';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
-	import InputWithLabel from '../Molecules/InputWithLabel.svelte';
 	import axios from 'axios';
 	import FilterPagination from './FilterPagination.svelte';
 	import { _ } from '$lib/i18n';
 	import { page } from '$app/stores';
+	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let editOrganization: Organization;
 </script>
 

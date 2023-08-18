@@ -33,7 +33,8 @@ export const EnvironmentModelPresets = [
 	},
 	{
 		name: _('UFSQ'),
-		modelURL: '/models/usfq/USFQ.gltf',
-		navMeshURL: ''
+		modelURL: '/models/usfq.glb',
+		navMeshURL: '',
+		scale: 0.25
 	}
 ];

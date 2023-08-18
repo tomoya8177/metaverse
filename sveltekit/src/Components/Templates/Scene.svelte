@@ -34,6 +34,8 @@
 	import { PUBLIC_IS_DEV } from '$env/static/public';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
+	import { environmentPresets } from '$lib/preset/EnvironmentPresets';
+	import { EnvironmentModelPresets } from '$lib/preset/EnvironmentModelPresets';
 	export let data: PageData;
 	export let room: Room;
 	let organization: Organization = data.organization;
@@ -230,11 +232,18 @@
 		/>
 	{/if}
 	{#if room.environmentModelURL}
-		<a-gltf-model src={room.environmentModelURL} position="0 0.01 0" />
+		{@const preset = EnvironmentModelPresets.find(
+			(preset) => preset.modelURL == room.environmentModelURL
+		)}
+		<a-gltf-model
+			src={room.environmentModelURL}
+			position="0 0.01 0"
+			scale={`${preset?.scale || 1} ${preset?.scale || 1} ${preset?.scale || 1}`}
+		/>
 	{/if}
 	{#if room.navMeshModelURL}
 		<a-gltf-model src={room.navMeshModelURL} position="0 0.01 0" visible="false" nav-mesh />
-	{:else}
+	{:else if !room.environmentModelURL}
 		<a-plane
 			id="ground"
 			shadow="receive: true"
