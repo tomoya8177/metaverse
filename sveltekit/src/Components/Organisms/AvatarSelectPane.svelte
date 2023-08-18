@@ -8,16 +8,21 @@
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import { onDestroy, onMount } from 'svelte';
 	import { cookies } from '$lib/frontend/cookies';
+	import AvatarBgChip from '../Atom/AvatarBGChip.svelte';
 	export let url: string;
 	export let thumbnailURL: string;
 
 	let avatarSelectOpen = false;
 	let RPMOpen = false;
+	export let backgroundURL = '';
 </script>
 
 <div>
 	<div>{_('Avatar')}</div>
-	<div style="margin-left:auto; margin-right:auto;width:180px;margin-bottom:0.4rem;">
+	<div
+		style="margin-left:auto; margin-right:auto;width:180px;margin-bottom:0.4rem;"
+		class="thumbnailPreview"
+	>
 		{#if url}
 			{#key url}
 				<AvatarPreview {url} {thumbnailURL} />
@@ -33,6 +38,13 @@
 >
 
 {#if avatarSelectOpen}
+	<!-- <div>
+		{_('Background Color')}
+	</div> -->
+	<!-- {#each Array.from(Array(48).keys()) as i}
+		{@const num = i + 1}
+		<AvatarBgChip bind:url={backgroundURL} {num} />
+	{/each} -->
 	<InputWithLabel
 		label={_('Custom Avatar URL')}
 		meta={_(
@@ -93,7 +105,7 @@
 		height: calc(100svh - 2rem);
 	}
 	img {
-		border-radius: 1rem;
+		border-radius: 90px;
 		min-width: 180px;
 		width: 180px;
 		height: 180px;

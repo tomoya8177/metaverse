@@ -28,6 +28,12 @@
 		if (file) {
 			$UserStore.nicknameURL = file.url;
 		}
+		// const file2 = await uploader.uploadCanvas('.thumbnailPreview', 'thumbnail.jpg');
+		// console.log({ file2 });
+		// if (file2) {
+		// 	$UserStore.thumbnailURL = file2.url;
+		// }
+
 		await $UserStore.update();
 		videoChat.sendMessage({
 			key: 'updateProfile',
@@ -53,6 +59,7 @@
 	<InputWithLabel label={_('Status')} bind:value={$UserStore.subtitle} />
 	<NameTag user={$UserStore} className="nameTagPreview" border={false} size={24} />
 	<AvatarSelectPane
+		bind:backgroundURL={$UserStore.backgroundURL}
 		bind:url={$UserStore.avatarURL}
 		thumbnailURL={PresetAvatars.find((preset) => preset.url == $UserStore.avatarURL)
 			?.thumbnailURL || ''}

@@ -59,7 +59,8 @@
 				<div style="display:inline-block">
 					{#key $UserStore.avatarURL}
 						<AvatarPreview
-							url={$UserStore.avatarURL}
+							bind:backgroundURL={$UserStore.backgroundURL}
+							bind:url={$UserStore.avatarURL}
 							thumbnailURL={PresetAvatars.find((preset) => preset.url == $UserStore.avatarURL)
 								?.thumbnailURL || ''}
 						/>

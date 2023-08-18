@@ -151,7 +151,11 @@
 						<ul role="listbox">
 							{#each $UsersStore || [] as unit}
 								<li>
-									<AvatarThumbnail url={unit.userData.avatarURL} size="2rem" />
+									<AvatarThumbnail
+										thumbnailURL={unit.userData.thumbnailURL}
+										url={unit.userData.avatarURL}
+										size="2rem"
+									/>
 									{unit.userData.nickname}
 								</li>
 							{/each}
@@ -273,7 +277,7 @@
 						user: { ...$UserStore, description: escapeHTML($UserStore.description) }
 					});
 					profileDialogOpen = false;
-					console.log({me})
+					console.log({ me });
 					if (me) me.updateAvatar();
 				}}
 			/>

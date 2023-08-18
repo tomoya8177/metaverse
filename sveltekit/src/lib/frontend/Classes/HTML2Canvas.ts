@@ -7,6 +7,7 @@ export class HTML2Canvas {
 	async getJpegBlob(el: HTMLElement, filename: string): Promise<Blob | false> {
 		try {
 			const canvas = await html2canvas(el, {
+				removeContainer: false,
 				allowTaint: true,
 				useCORS: true
 			});

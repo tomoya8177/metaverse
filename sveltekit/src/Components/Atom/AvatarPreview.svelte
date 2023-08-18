@@ -6,11 +6,11 @@
 	export let thumbnailURL: string;
 	import { THREE } from 'aframe';
 	import { fade } from 'svelte/transition';
-
+	export let backgroundURL = '';
 	let scene: THREE.Scene;
 	let camera: THREE.PerspectiveCamera;
 	let renderer: THREE.WebGLRenderer;
-
+	let backgroundColor = '#808080';
 	let isLoading = true; // Add a new state variable to track loading state
 	let id = 'preview' + Math.ceil(Math.random() * 1000).toString();
 	onMount(() => {
@@ -18,9 +18,9 @@
 
 		scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000);
-		renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
-		renderer.setClearColor(0x808080);
+		renderer.setClearColor(backgroundColor);
 		const loader = new THREE.GLTFLoader();
 		loader.load(url, (gltf: GLTF) => {
 			gltf.scene.traverse((child: any) => {
@@ -62,7 +62,12 @@
 	});
 </script>
 
-<div {id} class="placeholder">
+<div
+	{id}
+	class="placeholder"
+	style:background-image={`url(${backgroundURL})`}
+	style="background-size:contain"
+>
 	{#if isLoading}
 		<!-- Display the placeholder image while loading -->
 		{#if thumbnailURL}
@@ -78,7 +83,7 @@
 		position: relative;
 		width: 180px;
 		height: 180px;
-		border-radius: 1rem;
+		border-radius: 50%;
 		overflow: hidden;
 	}
 	.center {
