@@ -18,7 +18,7 @@
 	import Icon from '../../../Components/Atom/Icon.svelte';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	export let data: PageData;
-	let users: User[] = data.users;
+	let users: User[] = data.users.map((user) => new User(user));
 	let paginated: User[] = [];
 	let organizations: Organization[] = data.organizations;
 	let userRoles: UserRole[] = data.userRoles;
