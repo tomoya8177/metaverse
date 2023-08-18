@@ -21,10 +21,9 @@
 	import { cookies } from '$lib/frontend/cookies';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
-	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
 	import type { PageData } from './$types';
 	import { nl2br } from '$lib/math/nl2br';
-	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
+	import { unescapeHTML } from '$lib/math/unescapeHTML';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
@@ -63,7 +62,6 @@
 		await editMentor.init();
 		//createdMentor = setUpMentorbject(createdMentor);
 		mentors = [...mentors, editMentor];
-		//		editMentor.documents = await reinstallAIBrain(createdMentor);
 		busy = false;
 		newMentorModalOpen = false;
 		actionHistory.send('createMentor', {

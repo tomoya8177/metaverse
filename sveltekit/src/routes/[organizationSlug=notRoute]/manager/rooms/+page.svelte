@@ -20,7 +20,6 @@
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import DocumentForAiRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
-	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
 	import type { PageData } from './$types';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let data: PageData;

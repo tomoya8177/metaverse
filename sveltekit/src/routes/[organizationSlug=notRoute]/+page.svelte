@@ -8,7 +8,7 @@
 	import { _ } from '$lib/i18n';
 	import axios from 'axios';
 	import { nl2br } from '$lib/math/nl2br';
-	import { unescapeHTML } from '$lib/math/escapeHTML';
+	import { unescapeHTML } from '$lib/math/unescapeHTML';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import RoomTitleForManagers from '../../Components/Molecules/RoomTitleForManagers.svelte';
 	import AvatarThumbnail from '../../Components/Atom/AvatarThumbnail.svelte';

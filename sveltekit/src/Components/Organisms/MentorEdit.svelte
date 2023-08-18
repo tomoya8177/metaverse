@@ -7,9 +7,8 @@
 	import AvatarSelectPane from './AvatarSelectPane.svelte';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
-	import { reinstallAIBrain } from '$lib/frontend/reinstallAIBrain';
 	import { Message } from '$lib/frontend/Classes/Message';
-	import { unescapeHTML } from '$lib/math/escapeHTML';
+	import { unescapeHTML } from '$lib/math/unescapeHTML';
 	import FulllNameInput from '../Atom/FulllNameInput.svelte';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
 	import { onMount } from 'svelte';

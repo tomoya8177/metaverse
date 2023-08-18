@@ -8,7 +8,7 @@
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import Icon from '../Atom/Icon.svelte';
-	import { escapeHTML, unescapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML } from '$lib/math/escapeHTML';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import type { User } from '$lib/frontend/Classes/User';
 	import { editableObject } from '$lib/frontend/Classes/EditableObject';

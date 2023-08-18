@@ -1,4 +1,4 @@
-import { unescapeHTML } from '$lib/math/escapeHTML';
+import { unescapeHTML } from '$lib/math/unescapeHTML';
 import { RoomStore, ItemsInPreview, UserStore, type xyz } from '$lib/store';
 import type { Entity } from 'aframe';
 import type { LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';

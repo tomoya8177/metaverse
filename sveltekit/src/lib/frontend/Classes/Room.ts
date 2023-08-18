@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { reinstallAIBrain } from '../reinstallAIBrain';
 import { _ } from '$lib/i18n';
 import type { DocumentForAI } from '$lib/types/DocumentForAI';
 import { myAlert, toast } from '../toast';
