@@ -48,6 +48,7 @@ export class Unit {
 			this.avatar.setAttribute('rotation', '0 180 0');
 			this.avatar.setAttribute('hand-position', '');
 			this.avatar.setAttribute('smile', '');
+			this.avatar.setAttribute('animation-mixer', 'clip:idle_eyes');
 		}
 		this.avatar.setAttribute('src', data.avatarURL);
 		this.avatarContainer.setAttribute('rotate-at-position', '');

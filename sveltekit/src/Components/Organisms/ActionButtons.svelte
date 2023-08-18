@@ -28,11 +28,15 @@
 	import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { goto } from '$app/navigation';
 	import type { Room } from '$lib/frontend/Classes/Room';
+	let more = false;
 
 	export let room: Room;
 	const onTextChatClicked = () => {
 		TextChatOpen.update((v) => !v);
 	};
+	TextChatOpen.subscribe((open) => {
+		if (open) more = false;
+	});
 
 	const onKeyDown = (e: KeyboardEvent) => {
 		if (
@@ -59,7 +63,6 @@
 	export let me: Me;
 	export let onMicClicked: () => void;
 	export let micActive: boolean;
-	let more = false;
 	let linkEditorOpen = false;
 </script>
 

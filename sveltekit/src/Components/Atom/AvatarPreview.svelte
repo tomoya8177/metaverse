@@ -65,7 +65,11 @@
 <div {id} class="placeholder">
 	{#if isLoading}
 		<!-- Display the placeholder image while loading -->
-		<img src={thumbnailURL} alt="Loading..." />
+		{#if thumbnailURL}
+			<img src={thumbnailURL} alt="Loading..." />
+		{:else}
+			<div class="center" aria-busy="true" />
+		{/if}
 	{/if}
 </div>
 
@@ -77,7 +81,12 @@
 		border-radius: 1rem;
 		overflow: hidden;
 	}
-	.placeholder * {
+	.center {
+		position: absolute;
+		left: 80px;
+		top: 80px;
+	}
+	.placeholder *:not(.center) {
 		position: absolute;
 		top: 0px;
 		left: 0px;

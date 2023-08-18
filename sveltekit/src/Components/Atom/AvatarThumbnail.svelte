@@ -5,9 +5,11 @@
 	export let size: string = '3rem';
 </script>
 
-<img
-	src={PresetAvatars.find((avatar) => avatar.url == url)?.thumbnailURL}
-	style="width:{size};height:{size};border-radius:{Number(size.replace('rem', '')) /
-		2}rem;margin-right:0.4rem"
-	alt=""
-/>
+{#if PresetAvatars.find((avatar) => avatar.url == url)?.thumbnailURL}
+	<img
+		src={PresetAvatars.find((avatar) => avatar.url == url)?.thumbnailURL}
+		style="width:{size};height:{size};border-radius:{Number(size.replace('rem', '')) /
+			2}rem;margin-right:0.4rem"
+		alt=""
+	/>
+{/if}

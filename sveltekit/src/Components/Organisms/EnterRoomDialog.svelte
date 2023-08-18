@@ -57,11 +57,13 @@
 			<NameTag user={$UserStore} size={24} border={false} />
 			<div style="text-align:center">
 				<div style="display:inline-block">
-					<AvatarPreview
-						url={$UserStore.avatarURL}
-						thumbnailURL={PresetAvatars.find((preset) => preset.url == $UserStore.avatarURL)
-							?.thumbnailURL || ''}
-					/>
+					{#key $UserStore.avatarURL}
+						<AvatarPreview
+							url={$UserStore.avatarURL}
+							thumbnailURL={PresetAvatars.find((preset) => preset.url == $UserStore.avatarURL)
+								?.thumbnailURL || ''}
+						/>
+					{/key}
 				</div>
 			</div>
 			<button
