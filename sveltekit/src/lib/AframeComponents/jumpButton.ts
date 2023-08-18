@@ -39,7 +39,9 @@ AFRAME.registerComponent('jump-button', {
 		});
 		this.el.addEventListener('mouseup', (evt: any) => {
 			this.dragging = false;
-			this.rig?.setAttribute('look-controls', 'enabled:true');
+			if (!this.rig) return;
+
+			this.rig.setAttribute('look-controls', 'enabled:true');
 		});
 		this.el.addEventListener('touchstart', (evt: any) => {
 			this.rig = document.getElementById(this.data.userId) as Entity;
@@ -59,7 +61,8 @@ AFRAME.registerComponent('jump-button', {
 		});
 		this.el.addEventListener('touchend', (evt) => {
 			this.dragging = false;
-			this.rig?.setAttribute('look-controls', 'enabled:true');
+			if (!this.rig) return;
+			this.rig.setAttribute('look-controls', 'enabled:true');
 		});
 	},
 	tick: function () {
@@ -84,7 +87,6 @@ AFRAME.registerComponent('jump-button', {
 		};
 		//if diff is too large, something wrong.
 		if (Math.abs(diff.x) > 0.1 || Math.abs(diff.y) > 0.1) return;
-		console.log(diff.x, diff.y);
 		this.el.setAttribute(
 			'position',
 			`${this.el.getAttribute('position').x + diff.x}

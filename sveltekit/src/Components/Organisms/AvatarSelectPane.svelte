@@ -6,9 +6,6 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
-	import { onDestroy, onMount } from 'svelte';
-	import { cookies } from '$lib/frontend/cookies';
-	import AvatarBgChip from '../Atom/AvatarBGChip.svelte';
 	export let url: string;
 	export let thumbnailURL: string;
 
