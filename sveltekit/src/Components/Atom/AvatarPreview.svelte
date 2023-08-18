@@ -6,7 +6,6 @@
 	export let thumbnailURL: string;
 	import { THREE } from 'aframe';
 	import { fade } from 'svelte/transition';
-	export let backgroundURL = '';
 	let scene: THREE.Scene;
 	let camera: THREE.PerspectiveCamera;
 	let renderer: THREE.WebGLRenderer;
@@ -62,12 +61,7 @@
 	});
 </script>
 
-<div
-	{id}
-	class="placeholder"
-	style:background-image={`url(${backgroundURL})`}
-	style="background-size:contain"
->
+<div {id} class="placeholder">
 	{#if isLoading}
 		<!-- Display the placeholder image while loading -->
 		{#if thumbnailURL}
