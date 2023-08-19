@@ -1,6 +1,14 @@
 import { _ } from '$lib/i18n';
+export type Environment = {
+	name: string;
+	modelURL: string;
+	navMeshURL: string;
+	scale?: number;
+	component?: string;
+	componentDefaultValues?: string;
+};
 
-export const EnvironmentModelPresets = [
+export const EnvironmentModelPresets: Environment[] = [
 	{
 		name: _('None'),
 		modelURL: '',
@@ -30,6 +38,12 @@ export const EnvironmentModelPresets = [
 		name: _('Conference Room'),
 		modelURL: '/models/conference_room.glb',
 		navMeshURL: ''
+	},
+	{
+		name: _('Squid Game'),
+		modelURL: '/models/squidgame.glb',
+		navMeshURL: '/models/squidgame_navmesh.glb',
+		component: 'squid-game'
 	},
 	{
 		name: _('UFSQ'),

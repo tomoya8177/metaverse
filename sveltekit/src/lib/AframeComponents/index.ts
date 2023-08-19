@@ -13,3 +13,4 @@ import './jump';
 import './jumpButton';
 import './myWASDControls';
 import './clickToWave';
+import './squidGame';

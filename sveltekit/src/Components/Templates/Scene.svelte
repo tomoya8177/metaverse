@@ -36,6 +36,7 @@
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	import { environmentPresets } from '$lib/preset/EnvironmentPresets';
 	import { EnvironmentModelPresets } from '$lib/preset/EnvironmentModelPresets';
+	import type { Entity } from 'aframe';
 	export let data: PageData;
 	export let room: Room;
 	let organization: Organization = data.organization;
@@ -45,7 +46,7 @@
 		AFRAME.registerComponent('on-scene-loaded', {
 			init: function () {
 				this.el.addEventListener('loaded', () => {
-					onSceneLoaded();
+					onSceneLoaded(this.el);
 				});
 			}
 		});
@@ -55,7 +56,7 @@
 	};
 	let sceneLoaded = false;
 	export let me: Me;
-	const onSceneLoaded = async () => {
+	const onSceneLoaded = async (sceneEl: Entity) => {
 		sceneLoaded = true;
 		actionHistory.send('enteringRoom');
 		me = new Me($UserStore);
@@ -131,6 +132,12 @@
 			if (lastAction.length == 0) {
 				await $UserStore.addCoin('enterRoom', 10);
 				toast(_('You got 10 coins for being active.'));
+			}
+			if (room.environment?.component) {
+				scene.setAttribute(
+					room.environment.component,
+					(room.environment.componentDefaultValues || '') + ';userId:' + $UserStore.id
+				);
 			}
 		}
 	});
@@ -225,14 +232,14 @@
 		<a-entity
 			environment="
         preset:{room.environmentPreset || 'default'};
-        groundYScale:20
+        groundYScale:20,
         "
 		/>
 	{:else}
 		<a-entity
 			environment="
 				preset: default;
-				ground:none
+				ground:none,
 				"
 		/>
 	{/if}

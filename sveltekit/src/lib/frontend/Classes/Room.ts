@@ -9,6 +9,7 @@ import type { User } from './User';
 import { videoChat } from './VideoChat';
 import { SharedObject } from './SharedObject';
 import { sharedObjects } from './SharedObjects';
+import { EnvironmentModelPresets, type Environment } from '$lib/preset/EnvironmentModelPresets';
 
 export class Room extends DBObject {
 	slug: string;
@@ -30,6 +31,7 @@ export class Room extends DBObject {
 	mentorData: Mentor;
 	entryStatus = writable('entering' as 'entering' | 'connecting' | 'entered');
 	sid: string = '';
+	environment: Environment | null;
 	constructor(data: any) {
 		data.table = 'rooms';
 		super(data);
@@ -51,6 +53,8 @@ export class Room extends DBObject {
 		this.withMetaverse = this.unescapedData.withMetaverse;
 		this.mentorData = this.unescapedData.mentorData;
 		this.entryStatus.set('entering');
+		this.environment =
+			EnvironmentModelPresets.find((env) => env.modelURL == this.environmentModelURL) || null;
 
 		if (this.allowedUsers == '') {
 			this.allowedUsersArray = [];

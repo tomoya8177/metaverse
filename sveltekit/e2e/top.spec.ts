@@ -148,13 +148,13 @@ test.describe.serial('Top Page', () => {
 
 		//set up a mentor
 		const firstNameInput = page.locator('input').nth(0);
-		const lastNameInput = page.locator('input').nth(1);
-		const nicknameInput = page.locator('input').nth(2);
 		expect(firstNameInput).toBeVisible();
-		expect(lastNameInput).toBeVisible();
-		expect(nicknameInput).toBeVisible();
 		await firstNameInput.fill('Test');
+		const lastNameInput = page.locator('input').nth(1);
+		expect(lastNameInput).toBeVisible();
 		await lastNameInput.fill('Mentor');
+		const nicknameInput = page.locator('input').nth(2);
+		expect(nicknameInput).toBeVisible();
 		await nicknameInput.fill(nastyString);
 		const changeAvatarButton = page.getByRole('button', { name: 'Change Avatar' });
 		expect(changeAvatarButton).toBeVisible();

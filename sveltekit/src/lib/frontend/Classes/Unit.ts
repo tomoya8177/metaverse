@@ -265,13 +265,10 @@ export class Unit {
 			/* Update audio level indicator. */
 			this.audioLevel = level;
 		});
-		const audio = document.createElement('a-entity') as Entity;
-		audio.setAttribute(
-			'sound',
-			'src:#' +
-				track.sid +
-				'; autoplay : true; volume : 1; refDistance : 3; rolloffFactor : 1; maxDistance : 20;'
-		);
+		const audio = document.createElement('a-sound') as Entity;
+		audio.setAttribute('src', '#' + track.sid);
+		audio.setAttribute('autoplay', 'true');
+		audio.setAttribute('volume', '1');
 		audio.setAttribute('position', '0 1.5 0');
 		audio.setAttribute('rotation', '0 180 0');
 		audio.setAttribute('move-mouth', 'userId:' + this.userId);
