@@ -6,12 +6,22 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
-	export let url: string;
-	export let thumbnailURL: string;
+	import type { User } from '$lib/frontend/Classes/User';
+	export let user: User;
 
 	let avatarSelectOpen = false;
 	let RPMOpen = false;
-	export let backgroundURL = '';
+	const checkRPMId = (string) => {
+		if (user.avatarURL.includes('readyplayer.me')) {
+			const arr = string.split('/');
+			const id = arr[arr.length - 1].split('.')[0];
+			if (id) {
+				user.RPMId = id;
+			}
+			console.log({ RPMId: user.RPMId });
+		}
+	};
+	$: checkRPMId(user.avatarURL);
 </script>
 
 <div>
@@ -20,18 +30,15 @@
 		style="margin-left:auto; margin-right:auto;width:180px;margin-bottom:0.4rem;"
 		class="thumbnailPreview"
 	>
-		{#if url}
-			{#key url}
-				<AvatarPreview {url} {thumbnailURL} />
-			{/key}
-		{/if}
+		{#key user.avatarURL}
+			<AvatarPreview {user} />
+		{/key}
 	</div>
 </div>
 <button
 	on:click={() => {
 		avatarSelectOpen = !avatarSelectOpen;
-		if (url.includes('readyplayer.me')) url = url + '#' + Math.floor(Math.random() * 1000);
-	}}>{avatarSelectOpen ? _('OK') : url ? _('Change Avatar') : _('Set Avatar')}</button
+	}}>{avatarSelectOpen ? _('OK') : user.avatarURL ? _('Change Avatar') : _('Set Avatar')}</button
 >
 
 {#if avatarSelectOpen}
@@ -48,7 +55,7 @@
 			'If you have ReadyPlayerMe avatar already, paste the URL of your avatar here. If not, click the button, and create one today!'
 		)}
 		type="url"
-		bind:value={url}
+		bind:value={user.avatarURL}
 	/>
 	<button
 		on:click={() => {
@@ -65,7 +72,7 @@
 					<a
 						href={'#'}
 						on:click={() => {
-							url = avatar.url;
+							user.avatarURL = avatar.url;
 							actionHistory.send('selectAvatar', { url: avatar.url });
 						}}
 					>

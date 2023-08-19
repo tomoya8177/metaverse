@@ -90,13 +90,12 @@ AFRAME.registerComponent('jump-button', {
 		//if diff is too large, something wrong.
 		if (Math.abs(diff.x) > 0.1 || Math.abs(diff.y) > 0.1) return;
 
-		if (Math.abs(diff.x) < 0.002 || Math.abs(diff.y) < 0.002) return;
 		this.el.setAttribute(
 			'position',
 			`${this.el.getAttribute('position').x + diff.x}
               ${this.el.getAttribute('position').y + diff.y}
               ${this.el.getAttribute('position').z}`
 		);
-		this.originalIntersection = { ...intersection };
+		this.originalIntersection = new THREE.Vector3(intersection.x, intersection.y, intersection.z);
 	}
 });

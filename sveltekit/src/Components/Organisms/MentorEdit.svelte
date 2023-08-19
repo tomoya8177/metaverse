@@ -44,11 +44,7 @@
 		label={_('Nickname')}
 		bind:value={editMentor.userData.nickname}
 	/>
-	<AvatarSelectPane
-		bind:url={editMentor.userData.avatarURL}
-		thumbnailURL={PresetAvatars.find((preset) => preset.url == editMentor.userData.avatarURL)
-			?.thumbnailURL || ''}
-	/>
+	<AvatarSelectPane bind:user={editMentor.userData} />
 
 	<InputWithLabel
 		meta={_(

@@ -132,7 +132,7 @@
 		{#if mentor}
 			{#if mentor.userData}
 				<div transition:fade>
-					<AvatarThumbnail size="4rem" url={mentor.userData.avatarURL} />
+					<AvatarThumbnail size="4rem" user={mentor.userData} />
 					<p>
 						{mentor.userData.nickname}
 						<br />

@@ -151,11 +151,7 @@
 						<ul role="listbox">
 							{#each $UsersStore || [] as unit}
 								<li>
-									<AvatarThumbnail
-										thumbnailURL={unit.userData.thumbnailURL}
-										url={unit.userData.avatarURL}
-										size="2rem"
-									/>
+									<AvatarThumbnail user={unit.userData} size="2rem" />
 									{unit.userData.nickname}
 								</li>
 							{/each}
@@ -176,6 +172,7 @@
 							<li style="text-align:center">
 								{$UserStore.coin}
 								<Icon icon="local_police" />
+								<AvatarThumbnail user={$UserStore || null} size="3rem" />
 							</li>
 						{/if}
 						{#if $RoomStore?.id}

@@ -135,7 +135,7 @@
 					<td>
 						<a href={`/${organization.slug}/mentor/${mentor.id}`}>
 							{#if mentor.userData?.avatarURL}
-								<AvatarThumbnail url={mentor.userData.avatarURL} />
+								<AvatarThumbnail user={mentor.userData} />
 							{/if}
 							{mentor.userData?.nickname || ''}
 						</a>

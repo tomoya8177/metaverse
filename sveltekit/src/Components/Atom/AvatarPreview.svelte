@@ -2,17 +2,20 @@
 	import { onMount } from 'svelte';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 	import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
-	export let url: string;
-	export let thumbnailURL: string;
 	import { THREE } from 'aframe';
 	import { fade } from 'svelte/transition';
+	import axios from 'axios';
+	import type { User } from '$lib/frontend/Classes/User';
+	import { PresetAvatars } from '$lib/preset/PresetAvatars';
+	export let user: User;
+	let thumbnailURL = '';
 	let scene: THREE.Scene;
 	let camera: THREE.PerspectiveCamera;
 	let renderer: THREE.WebGLRenderer;
 	let backgroundColor = '#808080';
 	let isLoading = true; // Add a new state variable to track loading state
 	let id = 'preview' + Math.ceil(Math.random() * 1000).toString();
-	onMount(() => {
+	onMount(async () => {
 		// Load the placeholder image
 
 		scene = new THREE.Scene();
@@ -21,7 +24,7 @@
 
 		renderer.setClearColor(backgroundColor);
 		const loader = new THREE.GLTFLoader();
-		loader.load(url, (gltf: GLTF) => {
+		loader.load(user.avatarURL + '?quality=medium&useHands=false', (gltf: GLTF) => {
 			gltf.scene.traverse((child: any) => {
 				if (child.isMesh) {
 					child.material.gammaFactor = 1;
@@ -58,12 +61,21 @@
 		}
 
 		animate();
+		if (user.RPMId) {
+			const json = await axios
+				.get(`https://api.readyplayer.me/v1/avatars/${user.RPMId}.json`)
+				.then((res) => res.data);
+			console.log({ json });
+			thumbnailURL = `https://api.readyplayer.me/v1/avatars/${user.RPMId}.png?uat=${json.uat}}`;
+		} else {
+			thumbnailURL =
+				PresetAvatars.find((avatar) => avatar.url === user.avatarURL)?.thumbnailURL || '';
+		}
 	});
 </script>
 
 <div {id} class="placeholder">
 	{#if isLoading}
-		<!-- Display the placeholder image while loading -->
 		{#if thumbnailURL}
 			<img src={thumbnailURL} alt="Loading..." />
 		{:else}

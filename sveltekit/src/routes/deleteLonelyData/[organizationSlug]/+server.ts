@@ -20,5 +20,6 @@ export const GET = async ({ params }) => {
 	await db.query(
 		`delete from actions where organization not in (select id from organizations where 1)`
 	);
+	await db.query(`delete from users where email like '%@test.com'`);
 	return new Response(JSON.stringify({ result: 'success' }));
 };

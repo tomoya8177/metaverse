@@ -88,7 +88,7 @@
 {#if mentorReady}
 	<div class="container" style="position:relative;height:calc(100svh - 3rem)">
 		<div aria-busy={waitingForAIAnswer}>
-			<AvatarThumbnail url={mentor.userData?.avatarURL || ''} />
+			<AvatarThumbnail user={mentor.userData} />
 			{mentor.userData?.nickname}
 		</div>
 		<div style="position:absolute;bottom:0px;width:calc(100% - 2rem)">

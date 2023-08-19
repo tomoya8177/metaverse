@@ -143,7 +143,7 @@
 					<td>
 						<div style="display:flex;gap:0.4rem">
 							{#if user.avatarURL}
-								<AvatarThumbnail url={user.avatarURL} />
+								<AvatarThumbnail {user} />
 							{/if}
 							<div>
 								<div>

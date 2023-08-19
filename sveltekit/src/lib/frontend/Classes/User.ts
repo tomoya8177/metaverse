@@ -28,6 +28,7 @@ export class User extends DBObject {
 	coin: number = 0;
 	backgroundURL: string = '';
 	thumbnailURL: string = '';
+	RPMId: string = '';
 	constructor(data: any) {
 		data.table = 'users';
 		super(data);
@@ -49,6 +50,7 @@ export class User extends DBObject {
 		this.coin = data.coin || 0;
 		this.backgroundURL = data.backgroundURL || '';
 		this.thumbnailURL = data.thumbnailURL || '';
+		this.RPMId = data.RPMId || '';
 	}
 	get fullName(): string {
 		if (!this.firstName && !this.lastName) return this.nickname;

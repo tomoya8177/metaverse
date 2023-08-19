@@ -82,7 +82,7 @@
 					<div style="margin-bottom:0.4rem;">
 						<a data-tooltip={_('Start Chat')} href={`/${organization.slug}/mentor/${mentor.id}`}>
 							{#if mentor.userData?.avatarURL}
-								<AvatarThumbnail url={mentor.userData.avatarURL} />
+								<AvatarThumbnail user={mentor.userData} />
 							{/if}<br />
 							{@html mentor.userData?.nickname || ''}
 						</a>

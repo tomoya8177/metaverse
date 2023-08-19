@@ -47,7 +47,7 @@ export class Me extends Unit {
 	}
 	updateAvatar() {
 		console.log('updating avatar');
-		this.avatar?.setAttribute('src', this.userData.avatarURL);
+		this.avatar?.setAttribute('src', this.avatarURLWithParams);
 	}
 	async setLastPosition(room: Room): Promise<void> {
 		const sessions = await axios

@@ -58,12 +58,7 @@
 	<InputWithLabel label={_('Nickname')} bind:value={$UserStore.nickname} />
 	<InputWithLabel label={_('Status')} bind:value={$UserStore.subtitle} />
 	<NameTag user={$UserStore} className="nameTagPreview" border={false} size={24} />
-	<AvatarSelectPane
-		bind:backgroundURL={$UserStore.backgroundURL}
-		bind:url={$UserStore.avatarURL}
-		thumbnailURL={PresetAvatars.find((preset) => preset.url == $UserStore.avatarURL)
-			?.thumbnailURL || ''}
-	/>
+	<AvatarSelectPane bind:user={$UserStore} />
 </section>
 {#if withDescription}
 	<InputWithLabel label={_('Bio')} bind:value={$UserStore.description} type="textarea" />

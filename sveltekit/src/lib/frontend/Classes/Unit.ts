@@ -50,12 +50,18 @@ export class Unit {
 			this.avatar.setAttribute('smile', '');
 			this.avatar.setAttribute('animation-mixer', 'clip:idle_eyes');
 		}
-		this.avatar.setAttribute('src', data.avatarURL);
+		this.avatar.setAttribute('src', this.avatarURLWithParams);
 		this.avatarContainer.setAttribute('rotate-at-position', '');
 		const scene = document.querySelector('a-scene');
 
 		this.setNickname();
 		scene?.appendChild(this.el);
+	}
+	get avatarURLWithParams(): string {
+		return (
+			this.userData.avatarURL +
+			'?quality=medium&useHands=false&morphTargets=mouthSmile,jawOpen,mouthOpen'
+		);
 	}
 	get nickname(): string {
 		return this.nicknameData;
