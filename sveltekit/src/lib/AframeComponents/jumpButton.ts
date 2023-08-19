@@ -2,10 +2,11 @@ import type { Me } from '$lib/frontend/Classes/Me';
 import { Users } from '$lib/frontend/Classes/Users';
 import type { xyz } from '$lib/store';
 import type { Entity } from 'aframe';
+import type { Vector3 } from 'three';
 
 AFRAME.registerComponent('jump-button', {
 	dragging: false as boolean,
-	originalIntersection: null as xyz | null,
+	originalIntersection: null as Vector3 | null,
 	currentIntersection: null as xyz | null,
 	cursorEl: null as Entity | null,
 	rig: null as Entity | null,
@@ -21,6 +22,7 @@ AFRAME.registerComponent('jump-button', {
 		});
 		this.el.addEventListener('mousedown', (evt: any) => {
 			this.rig = document.getElementById(this.data.userId) as Entity;
+			if (!this.rig) return;
 
 			this.dragging = true;
 			this.rig.setAttribute('look-controls', 'enabled:false');
@@ -28,7 +30,7 @@ AFRAME.registerComponent('jump-button', {
 			this.originalIntersection = evt.detail?.intersection?.point;
 			//conver to world to local position
 			if (this.originalIntersection) {
-				this.originalIntersection = this.rig?.object3D.worldToLocal(
+				this.originalIntersection = this.rig.object3D.worldToLocal(
 					new THREE.Vector3(
 						this.originalIntersection.x,
 						this.originalIntersection.y,
@@ -50,7 +52,7 @@ AFRAME.registerComponent('jump-button', {
 			this.rig.setAttribute('look-controls', 'enabled:false');
 			this.originalIntersection = evt.detail?.intersection?.point;
 			if (this.originalIntersection) {
-				this.originalIntersection = this.rig?.object3D.worldToLocal(
+				this.originalIntersection = this.rig.object3D.worldToLocal(
 					new THREE.Vector3(
 						this.originalIntersection.x,
 						this.originalIntersection.y,
@@ -66,15 +68,15 @@ AFRAME.registerComponent('jump-button', {
 		});
 	},
 	tick: function () {
-		if (!this.dragging || !this.cursorEl) return;
+		if (!this.dragging || !this.cursorEl || !this.rig) return;
 		var intersections = this.cursorEl.components.raycaster.intersections;
 		if (intersections.length == 0) return;
-		let intersection = intersections.find(
+		let intersection: Vector3 = intersections.find(
 			(intersection: any) => intersection.object.el.id == 'jumpButton'
 		)?.point;
 		if (!intersection) return;
 
-		intersection = this.rig?.object3D.worldToLocal(
+		intersection = this.rig.object3D.worldToLocal(
 			new THREE.Vector3(intersection.x, intersection.y, intersection.z)
 		);
 		//convert intersection to local coordinates
@@ -87,6 +89,8 @@ AFRAME.registerComponent('jump-button', {
 		};
 		//if diff is too large, something wrong.
 		if (Math.abs(diff.x) > 0.1 || Math.abs(diff.y) > 0.1) return;
+
+		if (Math.abs(diff.x) < 0.002 || Math.abs(diff.y) < 0.002) return;
 		this.el.setAttribute(
 			'position',
 			`${this.el.getAttribute('position').x + diff.x}

@@ -1,8 +1,9 @@
-import { test, expect, Page } from '@playwright/test';
+import { test, expect, Page, BrowserContext } from '@playwright/test';
 import axios from 'axios';
 import { PresetAvatars } from '../src/lib/preset/PresetAvatars';
 test.describe.serial('Top Page', () => {
 	let page: Page;
+	let context: BrowserContext;
 	const nastyString = `Tomo's nick,name is 0.198@"Japanese" name[0]!?`;
 	const nastyParagraph = `
 	Tomo's nick,name is 0.198@"Japanese" name[0]!?
@@ -11,7 +12,12 @@ test.describe.serial('Top Page', () => {
 	const newEmail = `test${Math.floor(Math.random() * 100000)}@test.com`;
 	const newOrgSlug = 'test-org' + Math.floor(Math.random() * 100000);
 	test.beforeAll(async ({ browser }) => {
-		page = await browser.newPage();
+		context = await browser.newContext({
+			permissions: ['microphone', 'camera']
+		});
+		// Create a new page inside context.
+		page = await context.newPage();
+		//	page = await browser.newPage();
 	});
 	test.afterAll(async () => {
 		const response = await axios
@@ -37,8 +43,9 @@ test.describe.serial('Top Page', () => {
 		const messageInput = page.getByLabel('Message');
 		await messageInput.fill(nastyParagraph);
 		await sendButton.click();
-		await page.waitForTimeout(3000);
 		//get by data-role='message'
+		//wait for 3 seconds
+		await page.waitForTimeout(3000);
 		const chatMessages = page.locator('.chatMessagesWithAI').getByRole('listitem');
 		console.log({ chatMessages });
 		// await expect(chatMessages).toBeVisible();
@@ -48,16 +55,13 @@ test.describe.serial('Top Page', () => {
 		await expect(chatMessages.nth(1)).toContainText(nastyParagraph);
 	});
 	test('change language button working', async () => {
-		await page.waitForTimeout(1000);
 		const changeLanguageSelect = page.locator('select');
 		changeLanguageSelect.selectOption('日本語');
 		//await for the screen reload
-		await page.waitForTimeout(1000);
 		const sendButton = page.getByRole('button', { name: '送信' });
 		await expect(sendButton).toBeVisible();
 		//set the language backt to en
 		changeLanguageSelect.selectOption('English');
-		await page.waitForTimeout(1000);
 		const sendButtonEn = page.getByRole('button', { name: 'Send' });
 		await expect(sendButtonEn).toBeVisible();
 	});
@@ -68,59 +72,59 @@ test.describe.serial('Top Page', () => {
 			name: 'Create New Organization'
 		});
 		await createNewOrganizationButton.click();
-		await page.waitForTimeout(500);
 		const emailInput = page.getByLabel('Email');
-		expect(emailInput).toBeVisible();
+		await expect(emailInput).toBeVisible();
 		await emailInput.fill(newEmail);
 		const proceedButton = page.getByRole('button', { name: 'Proceed' });
+		await expect(proceedButton).toBeVisible();
 		await proceedButton.click();
-		await page.waitForTimeout(1000);
 		const verifyButton = page.getByRole('button', { name: 'Verify' });
+		await expect(verifyButton).toBeVisible();
 		const user = await axios
 			.get('http://localhost:5173/api/users?email=' + newEmail)
 			.then((res) => res.data[0]);
 		console.log({ user });
 		const verificationCode = user.verificationCode;
 		const verificationCodeInput = page.getByLabel('Verification Code');
+		await expect(verificationCodeInput).toBeVisible();
 		//put wrong code
 		await verificationCodeInput.fill(nastyString);
 		await verifyButton.click();
 		//wrong code visible
-		await page.waitForTimeout(500);
 		const wrongCodeError = page.getByText('Wrong Code');
 		await expect(wrongCodeError).toBeVisible();
 		await verificationCodeInput.fill('23445');
 		await verifyButton.click();
 		//wrong code visible
-		await page.waitForTimeout(500);
 		const wrongCodeError2 = page.getByText('Wrong Code');
-		await expect(wrongCodeError).toBeVisible();
+		await expect(wrongCodeError2).toBeVisible();
 
 		//put correct code
 		await verificationCodeInput.fill(verificationCode);
 		await verifyButton.click();
-		await page.waitForTimeout(500);
 		const title = page.getByText(`Let's Create an Organization!`);
 		await expect(title).toBeVisible();
 	});
 	test('Create New Organization', async () => {
 		//delete the test user
 		const orgNameInput = page.getByLabel('Organization Name');
-		expect(orgNameInput).toBeVisible();
+		await expect(orgNameInput).toBeVisible();
 		const slugInput = page.getByLabel('Slug');
-		expect(slugInput).toBeVisible();
+		await expect(slugInput).toBeVisible();
 		await slugInput.fill(newOrgSlug);
 		const allowRegistrationSwitch = page.getByLabel('Allow Registration by Users');
-		expect(allowRegistrationSwitch).toBeVisible();
+		await expect(allowRegistrationSwitch).toBeVisible();
 		const haveAIToGenerateIconButton = page.getByRole('button', {
 			name: 'Have AI to generate Icon'
 		});
+		await expect(haveAIToGenerateIconButton).toBeVisible();
 		haveAIToGenerateIconButton.click();
 		// await page.waitForTimeout(30000);
-		// const teamIcon = page.locator('.teamIcon img');
-		// await expect(teamIcon).toBeVisible();
+		const teamIcon = page.locator('.teamIcon img');
+		await expect(teamIcon).toBeVisible({ timeout: 50000 }); //this can take a long time.
 
 		const nextButton = page.getByRole('button', { name: 'Next' });
+		await expect(nextButton).toBeVisible();
 		await nextButton.click();
 		//shoukld be rejected
 		await page.waitForTimeout(500);
@@ -128,10 +132,8 @@ test.describe.serial('Top Page', () => {
 		await expect(pleaseEnterTitleError).toBeVisible();
 		await orgNameInput.fill(nastyString);
 		await allowRegistrationSwitch.check();
-		await page.waitForTimeout(1000);
 		//		allowRegistrationSwitch.click();
 		await nextButton.click();
-		await page.waitForTimeout(5000);
 		await expect(pleaseEnterTitleError).not.toBeVisible();
 	});
 	test('Create New Mentor', async () => {
@@ -185,11 +187,8 @@ test.describe.serial('Top Page', () => {
 		//find new next button
 		const newNextButton = page.getByRole('button', { name: 'Next' });
 		await newNextButton.click();
-		await page.waitForTimeout(5000);
 		//heading for room to be there
 		const roomHeading = page.getByRole('heading', { name: 'Room' });
-		//verify the first element that has Room
-
 		await expect(roomHeading).toBeVisible();
 	});
 	test('Create New Room', async () => {
@@ -211,12 +210,13 @@ test.describe.serial('Top Page', () => {
 		await expect(virtuMentorSelect).toHaveText(`None${nastyString}`);
 		//find another next button
 		const anotherNextButton = page.getByRole('button', { name: 'Next' });
+		await expect(anotherNextButton).toBeVisible();
 		await anotherNextButton.click();
-		await page.waitForTimeout(15000);
+		//await page.waitForTimeout(15000);
 
 		//now you should see the change profile modal as you haven't initialized the nickname graphic
 		const changeProfileTitle = page.getByRole('heading', { name: 'Change Profile' });
-		await expect(changeProfileTitle).toBeVisible();
+		await expect(changeProfileTitle).toBeVisible({ timeout: 10000 }); //may take longer than expected
 	});
 	test('Update Profile', async () => {
 		//find nickname input
@@ -238,8 +238,9 @@ test.describe.serial('Top Page', () => {
 		await bioInput.fill(nastyParagraph);
 		//find update button
 		const updateButton = page.getByRole('button', { name: 'Update' });
+		await expect(updateButton).toBeVisible();
 		await updateButton.click();
-		await page.waitForTimeout(10000); //wait for image generation
+		await expect(updateButton).not.toBeVisible({ timeout: 10000 }); // may take longer than expected
 		//find enter button
 		const enterButton = page.getByRole('button', { name: 'Enter' });
 		await expect(enterButton).toBeVisible();
@@ -248,10 +249,51 @@ test.describe.serial('Top Page', () => {
 		const enterButton = page.getByRole('button', { name: 'Enter' });
 
 		await enterButton.click();
-		await page.waitForTimeout(5000);
+		const enteredNotice = page.getByText('Connected to the room!');
+		await expect(enteredNotice).toBeVisible();
 		//aframe scene should be in the dom
 		const aframeScene = page.locator('a-scene');
 		await expect(aframeScene).toBeVisible();
+		//textchat box visible
+		const textChatBox = page.locator('.chat-box');
+		await expect(textChatBox).toBeVisible();
+		await page.waitForTimeout(5000);
+		const messages = textChatBox.locator("[data-role='message']");
+		await expect(messages).toHaveCount(1); //you've got one message from mentor
+		const chatButton = page.getByRole('button', { name: 'chat' });
+		await expect(chatButton).toBeVisible();
+		await chatButton.click();
+		await expect(textChatBox).not.toBeVisible();
+	});
+	test('Activate mic', async () => {
+		const micOffButton = page.getByRole('button', { name: 'mic_off' });
+		await expect(micOffButton).toBeVisible();
+		await micOffButton.click();
+		//allow mic access
+		await context.grantPermissions(['microphone'], { origin: 'http://localhost:5173' });
+		await expect(micOffButton).not.toBeVisible();
+		const micButton = page.getByRole('button', { name: 'mic' });
+		await expect(micButton).toBeVisible();
+	});
+	test('Activate camera', async () => {
+		const cameraOffButton = page.getByRole('button', { name: 'videocam_off' });
+		await expect(cameraOffButton).toBeVisible();
+		await cameraOffButton.click();
+		//allow camera access
+		await context.grantPermissions(['camera'], { origin: 'http://localhost:5173' });
+		await expect(cameraOffButton).not.toBeVisible();
+		const cameraButton = page.getByRole('button', { name: 'videocam' });
+		await expect(cameraButton).toBeVisible();
+		const myCameraPreview = page.locator('#myCameraPreview video');
+		await expect(myCameraPreview).toBeVisible();
+	});
+	test('Start Screen Share', async () => {
+		const moreButton = page.getByRole('button', { name: 'more_vert' });
+		await expect(moreButton).toBeVisible();
+		await moreButton.click();
+		const startScreenShareButton = page.getByRole('button', { name: 'Share Screen' });
+		await expect(startScreenShareButton).toBeVisible();
+		await startScreenShareButton.click();
 	});
 	test('Leave Room', async () => {
 		//find account menu
@@ -259,14 +301,12 @@ test.describe.serial('Top Page', () => {
 		await expect(accountMenu).toBeVisible();
 		//find leave room button
 		await accountMenu.click();
-		await page.waitForTimeout(500);
 		const leaveRoomButton = page.getByRole('button', { name: 'Leave Room' });
 		await expect(leaveRoomButton).toBeVisible();
 		await leaveRoomButton.click();
 		const OKButton2 = page.getByRole('button', { name: 'OK' });
 		await expect(OKButton2).toBeVisible();
 		await OKButton2.click();
-		await page.waitForTimeout(5000);
 
 		//manager's console button
 		const managersConsoleButton = page.getByRole('button', { name: "Manager's Console" });
