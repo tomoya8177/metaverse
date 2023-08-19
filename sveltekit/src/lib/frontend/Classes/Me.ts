@@ -14,7 +14,7 @@ export class Me extends Unit {
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
 		//this.el.setAttribute('my-wasd-controls', 'enabled:true');
-		this.el.setAttribute('my-touch-controls', 'enabled:false');
+		// this.el.setAttribute('my-touch-controls2', 'enabled:false');
 		const camera = document.createElement('a-camera');
 		camera.setAttribute('id', 'camera');
 		camera.setAttribute('look-controls-enabled', 'false');
@@ -40,7 +40,7 @@ export class Me extends Unit {
 
 		this.el.setAttribute(
 			'movement-controls',
-			'constrainToNavMesh: true; camera: #camera; controls: keyboard'
+			'constrainToNavMesh: true; camera: #camera; controls: keyboard,my-touch2'
 		);
 
 		this.el.setAttribute('ping-session', `user:${user.id};type:unit`);
@@ -63,10 +63,10 @@ export class Me extends Unit {
 		this.rotation = parsedComponents.rotation;
 	}
 	enableTouch(): void {
-		this.el.setAttribute('my-touch-controls', 'enabled: true');
+		this.el.setAttribute('my-touch2-controls', 'enabled: true');
 	}
 	disableTouch(): void {
-		this.el.setAttribute('my-touch-controls', 'enabled: false');
+		this.el.setAttribute('my-touch2-controls', 'enabled: false');
 	}
 	jump(): void {
 		let acceleration = 0.1;

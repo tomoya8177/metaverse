@@ -12,7 +12,10 @@
 	<div>
 		<a
 			data-tooltip={_('Enter Room')}
-			href={`/${organization?.slug}/${room.slug}`}
+			href={'#'}
+			on:click={() => {
+				location.href = `/${organization?.slug}/${room.slug}`;
+			}}
 			role="button"
 			class=" circle-button"
 		>

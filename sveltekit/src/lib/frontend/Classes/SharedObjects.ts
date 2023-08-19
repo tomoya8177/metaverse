@@ -14,5 +14,8 @@ class SharedObjects {
 	filter(filter: (item: SharedObject) => boolean) {
 		return this.items.filter(filter);
 	}
+	empty() {
+		this.items.forEach((item) => item.remove());
+	}
 }
 export const sharedObjects = new SharedObjects();

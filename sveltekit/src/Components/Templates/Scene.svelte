@@ -39,13 +39,17 @@
 	export let data: PageData;
 	export let room: Room;
 	let organization: Organization = data.organization;
-	AFRAME.registerComponent('on-scene-loaded', {
-		init: function () {
-			this.el.addEventListener('loaded', () => {
-				onSceneLoaded();
-			});
-		}
-	});
+
+	//check if the component is already registered
+	if (!AFRAME.components['on-scene-loaded']) {
+		AFRAME.registerComponent('on-scene-loaded', {
+			init: function () {
+				this.el.addEventListener('loaded', () => {
+					onSceneLoaded();
+				});
+			}
+		});
+	}
 	window.onpopstate = function (event) {
 		delete AFRAME.components['on-scene-loaded'];
 	};
@@ -71,6 +75,7 @@
 			Users.add(mentorUnit);
 			room.mentorData.setEl();
 		}
+		sharedObjects.empty();
 		await room.loadSharedObjects();
 	};
 
