@@ -1,3 +1,4 @@
+import { DynamicDialog } from '$lib/frontend/Classes/DynamicDialog';
 import type { Unit } from '$lib/frontend/Classes/Unit';
 import { Users } from '$lib/frontend/Classes/Users';
 import { myConfirm, toast } from '$lib/frontend/toast';
@@ -17,7 +18,52 @@ AFRAME.registerComponent('squid-game', {
 	gunshot: null as null | Entity,
 	audio: null as null | Entity,
 	timer: null as null | Entity,
+	lightStatus: 'red' as 'red' | 'green',
+	timeToNextGame: 10,
+	gameOverDialog: null as null | DynamicDialog,
+	finishedDialog: null as null | DynamicDialog,
+	timeLimit: 90,
+	timeUp: 5,
+	redAnimStarted: false,
+	greenAnimStarted: false,
+
 	init: async function () {
+		this.gameOverDialog = new DynamicDialog({
+			closeButton: true,
+			cancelButton: {
+				label: _('No')
+			},
+			header: {
+				title: _('Game over')
+			},
+			body: _('Do you want to play again?'),
+			buttons: [
+				{
+					label: _('Yes'),
+					onClick: (evt) => {
+						this.reset();
+					}
+				}
+			]
+		});
+		this.finishedDialog = new DynamicDialog({
+			closeButton: true,
+			cancelButton: {
+				label: _('No')
+			},
+			header: {
+				title: _('You won!')
+			},
+			body: _('Do you want to play again?'),
+			buttons: [
+				{
+					label: _('Yes'),
+					onClick: (evt) => {
+						this.reset();
+					}
+				}
+			]
+		});
 		const scene = document.querySelector('a-scene');
 		this.player = Users.find(this.data.userId) as Unit;
 		this.player.el.setAttribute('movement-controls', 'speed:0.2');
@@ -29,11 +75,6 @@ AFRAME.registerComponent('squid-game', {
 
 		scene.appendChild(girl);
 
-		this.seconds = Math.floor(
-			DateTime.fromISO(await axios.get('/api/serverTime').then((res) => res.data)).toSeconds()
-		);
-		let timeToNextGame = this.seconds % 30;
-		if (timeToNextGame < 10) timeToNextGame += 30;
 		this.timer = document.createElement('a-text');
 		this.timer.setAttribute('align', 'center');
 		this.timer.setAttribute('color', 'white');
@@ -76,43 +117,33 @@ AFRAME.registerComponent('squid-game', {
 		`
 		);
 		scene.appendChild(this.gunshot);
-		let timeLimit = 120;
-		let timeUp = 0;
-		let redAnimStarted = false;
-		let greenAnimStarted = false;
-		let checkAtNextTick = false;
+
+		let ceckAtNextTick = false;
 		setInterval(() => {
 			if (!this.gunshot || !this.audio || !this.timer || !this.player) return;
 
 			switch (this.status) {
 				case 'idle':
-					if (timeToNextGame > 0) {
-						timeToNextGame -= 1;
+					if (this.timeToNextGame > 0) {
+						this.timeToNextGame -= 1;
 						this.timer.setAttribute(
 							'value',
-							'Time to next game: ' + timeToNextGame.toString().padStart(2, '0') + ' seconds'
+							'Time to next game: ' + this.timeToNextGame.toString().padStart(2, '0') + ' seconds'
 						);
 
-						if (timeToNextGame == 0) {
+						if (this.timeToNextGame == 0) {
 							this.status = 'playing';
 						}
 						if (!this.player) return;
-						if (this.player.position.z < -2) {
-							this.player.position = {
-								x: this.player.position.x,
-								y: this.player.position.y,
-								z: 0
-							};
-						}
 					}
 					break;
 				case 'playing':
-					timeLimit -= 1;
-					timeUp += 1;
-					if (timeUp % 9.4 < 5) {
+					this.timeLimit -= 1;
+					this.timeUp += 1;
+					if (this.timeUp % 9.4 < 5) {
+						this.lightStatus = 'red';
 						//red light
-						console.log('emitting to red');
-						if (!redAnimStarted) {
+						if (!this.redAnimStarted) {
 							girl.setAttribute('animation', {
 								property: 'rotation',
 								from: girl.getAttribute('rotation'),
@@ -125,21 +156,16 @@ AFRAME.registerComponent('squid-game', {
 								easing: 'linear',
 								loop: false
 							});
-							redAnimStarted = true;
-							greenAnimStarted = false;
+							this.redAnimStarted = true;
+							this.greenAnimStarted = false;
 						}
 						redLight.setAttribute('visible', 'true');
 						greenLight.setAttribute('visible', 'false');
-						if (this.playerMoving && checkAtNextTick) {
-							this.gameOver();
-							break;
-						}
-						checkAtNextTick = true;
 					} else {
+						this.lightStatus = 'green';
+
 						//green light
-						checkAtNextTick = false;
-						console.log('emitting to green');
-						if (!greenAnimStarted) {
+						if (!this.greenAnimStarted) {
 							girl.setAttribute('animation', {
 								property: 'rotation',
 								from: girl.getAttribute('rotation'),
@@ -152,8 +178,8 @@ AFRAME.registerComponent('squid-game', {
 								easing: 'linear',
 								loop: false
 							});
-							greenAnimStarted = true;
-							redAnimStarted = false;
+							this.greenAnimStarted = true;
+							this.redAnimStarted = false;
 						}
 						if (redLight.getAttribute('visible') == true) {
 							this.audio.components.sound.playSound();
@@ -162,20 +188,16 @@ AFRAME.registerComponent('squid-game', {
 						redLight.setAttribute('visible', 'false');
 						greenLight.setAttribute('visible', 'true');
 					}
-					if (timeLimit < 0) {
+					if (this.timeLimit < 0) {
 						this.gameOver();
 
 						break;
 					}
-					if (this.player.position.z < -59) {
-						this.audio.components.sound.pauseSound();
-						this.timer.setAttribute('value', 'You won!');
 
-						this.status = 'finished';
-						break;
-					}
 					const timeDisplay =
-						Math.floor(timeLimit / 60) + ':' + (timeLimit % 60).toString().padStart(2, '0');
+						Math.floor(this.timeLimit / 60) +
+						':' +
+						(this.timeLimit % 60).toString().padStart(2, '0');
 					this.timer.setAttribute('value', timeDisplay);
 					break;
 				case 'gameover':
@@ -189,34 +211,69 @@ AFRAME.registerComponent('squid-game', {
 	},
 	tick: function () {
 		//get how much player moved
-		if (!this.player) return;
+		if (!this.player || !this.audio || !this.timer || !this.finishedDialog) return;
 		this.playerPosition = this.player.position;
-		if (
-			this.status == 'playing' &&
-			(Math.abs(this.playerPosition.x - this.playerOldPosition.x) > 0.01 ||
-				Math.abs(this.playerPosition.y - this.playerOldPosition.y) > 0.01 ||
-				Math.abs(this.playerPosition.z - this.playerOldPosition.z) > 0.01)
-		) {
-			console.log('player moved');
-			this.playerMoving = true;
-		} else {
-			this.playerMoving = false;
+		switch (this.status) {
+			case 'idle':
+				if (this.player.position.z < -2) {
+					this.player.position = {
+						x: this.player.position.x,
+						y: this.player.position.y,
+						z: 0
+					};
+				}
+				break;
+			case 'playing':
+				if (this.lightStatus == 'red') {
+					if (
+						Math.abs(this.playerPosition.x - this.playerOldPosition.x) > 0.01 ||
+						Math.abs(this.playerPosition.y - this.playerOldPosition.y) > 0.01 ||
+						Math.abs(this.playerPosition.z - this.playerOldPosition.z) > 0.01
+					) {
+						this.gameOver();
+					}
+				}
+				if (this.player.position.z < -59) {
+					this.timer.setAttribute('value', 'You won!');
+					setTimeout(() => {
+						this.finishedDialog.open();
+					}, 1000);
+
+					this.status = 'finished';
+					break;
+				}
+
+				break;
 		}
 		this.playerOldPosition = this.playerPosition;
 	},
 	gameOver: function () {
-		if (!this.gunshot || !this.audio || !this.timer) return;
+		if (!this.gunshot || !this.audio || !this.timer || !this.gameOverDialog) return;
 		const gunshot = this.gunshot.components.sound as any;
 		gunshot.playSound();
 		const audio = this.audio.components.sound as any;
-		audio.pauseSound();
 
 		this.status = 'gameover';
 		this.timer.setAttribute('value', 'Game over');
 		setTimeout(async () => {
-			if (await myConfirm(_('Do you want to play again?'))) {
-				location.reload();
-			}
+			if (!this.gameOverDialog) return;
+
+			this.gameOverDialog.open();
 		}, 1500);
+	},
+	reset() {
+		if (!this.player || !this.gameOverDialog || !this.finishedDialog) return;
+		this.player.position = { x: 0, y: 0, z: 0 };
+		this.playerOldPosition = { x: 0, y: 0, z: 0 };
+		this.playerMoving = false;
+		this.status = 'idle';
+		this.lightStatus = 'red';
+		this.timeToNextGame = 10;
+		this.timeLimit = 90;
+		this.timeUp = 5;
+		this.redAnimStarted = false;
+		this.greenAnimStarted = false;
+		this.gameOverDialog.close();
+		this.finishedDialog.close();
 	}
 });
