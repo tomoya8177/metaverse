@@ -27,29 +27,13 @@ AFRAME.registerComponent('squid-game', {
 		girl.setAttribute('position', '0 0 -60');
 		girl.setAttribute('scale', '0.25 0.25 0.25');
 
-		girl.setAttribute('animation__togreen', {
-			property: 'rotation',
-			from: {
-				x: 0,
-				y: 179,
-				z: 0
-			},
-			to: {
-				x: 0,
-				y: 0,
-				z: 0
-			},
-			dur: 1000,
-			easing: 'linear',
-			loop: false,
-			startEvents: 'starttogreen'
-		});
 		scene.appendChild(girl);
 
 		this.seconds = Math.floor(
 			DateTime.fromISO(await axios.get('/api/serverTime').then((res) => res.data)).toSeconds()
 		);
-		let timeToNextGame = this.seconds % 5;
+		let timeToNextGame = this.seconds % 30;
+		if (timeToNextGame < 10) timeToNextGame += 30;
 		this.timer = document.createElement('a-text');
 		this.timer.setAttribute('align', 'center');
 		this.timer.setAttribute('color', 'white');
