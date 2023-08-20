@@ -10,7 +10,8 @@ AFRAME.registerComponent('my-touch2-controls', {
 	direction: 0,
 	schema: {
 		enabled: { default: true },
-		reverseEnabled: { default: true }
+		reverseEnabled: { default: true },
+		speed: { default: 0.3 }
 	},
 
 	init: function () {

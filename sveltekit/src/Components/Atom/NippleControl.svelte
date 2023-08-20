@@ -48,8 +48,8 @@
 					nippleControl.distance = distance;
 					nippleControl.direction = direction;
 					//get distanceX and distance Y
-					const distanceX = currentPos.x - initialPos.x;
-					const distanceY = currentPos.y - initialPos.y;
+					const distanceX = calculatedPos.x - initialPos.x;
+					const distanceY = calculatedPos.y - initialPos.y;
 					nippleControl.distanceX = distanceX;
 					nippleControl.distanceY = distanceY;
 				}

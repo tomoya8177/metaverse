@@ -50,6 +50,9 @@
 	import { Unit } from '$lib/frontend/Classes/Unit';
 	export let organization: Organization;
 	export let room: Room;
+	if (!room.mentor) {
+		TextChatOpen.set(false);
+	}
 	const scrolToBottom = (element: Element) => {
 		element.scrollTop = element.scrollHeight;
 	};

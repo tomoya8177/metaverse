@@ -164,7 +164,9 @@
 					<summary aria-haspopup="listbox" role="link">
 						<div>
 							<Icon icon="account_circle" />
-							{$UserStore.nickname}
+							<span class="hiddenInSmallScreen">
+								{$UserStore.nickname}
+							</span>
 						</div>
 					</summary>
 					<ul role="listbox">

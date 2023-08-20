@@ -1,0 +1,8 @@
+Model Information:
+* title:	Squid Game Doll
+* source:	https://sketchfab.com/3d-models/squid-game-doll-7da333e5ddaa4cafa1a31915b5dc5e50
+* author:	Heliona (https://sketchfab.com/Heliona)
+
+Model License:
+* license type:	SKETCHFAB Standard (https://sketchfab.com/licenses)
+* requirements:	Under basic restrictions, use worldwide, on all types of media, commercially or not, and in all types of derivative works
