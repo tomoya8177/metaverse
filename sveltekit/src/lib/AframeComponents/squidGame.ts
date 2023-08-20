@@ -40,8 +40,6 @@ AFRAME.registerComponent('squid-game', {
 		const screenWidth = window.innerWidth;
 		const width = Math.min(1, screenWidth / 1200);
 
-		console.log('width', width);
-
 		this.timer.setAttribute('width', width.toString());
 
 		this.player.el.querySelector('a-camera')?.appendChild(this.timer);

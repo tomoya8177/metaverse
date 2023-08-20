@@ -39,7 +39,7 @@
 		...rooms.map((room) => {
 			return {
 				name: `[${_('Room')}] ${room.title}`,
-				value: `${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.id}`
+				value: `${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.slug}`
 			};
 		}),
 		...mentors.map((mentor) => {
