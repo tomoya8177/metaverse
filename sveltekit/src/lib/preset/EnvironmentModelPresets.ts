@@ -48,7 +48,8 @@ export const EnvironmentModelPresets: Environment[] = [
 	{
 		name: _('Maze Game'),
 		modelURL: '/models/maze.glb',
-		navMeshURL: '/models/maze_navmesh.glb'
+		navMeshURL: '/models/maze_navmesh.glb',
+		component: 'maze-game'
 	},
 	{
 		name: _('UFSQ'),

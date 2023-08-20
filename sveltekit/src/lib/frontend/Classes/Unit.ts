@@ -46,7 +46,7 @@ export class Unit {
 			this.avatarContainer.appendChild(this.avatar);
 			this.avatar.setAttribute('position', '0 0.9 0');
 			this.avatar.setAttribute('rotation', '0 180 0');
-			this.avatar.setAttribute('hand-position', '');
+			//this.avatar.setAttribute('hand-position', '');
 			this.avatar.setAttribute('smile', '');
 			this.avatar.setAttribute('animation-mixer', 'clip:idle_eyes');
 		}

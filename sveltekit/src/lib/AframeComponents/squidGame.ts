@@ -67,7 +67,6 @@ AFRAME.registerComponent('squid-game', {
 		const scene = document.querySelector('a-scene');
 		this.player = Users.find(this.data.userId) as Unit;
 		this.player.el.setAttribute('movement-controls', 'speed:0.2');
-		this.player.el.setAttribute('my-touch2-controls', 'speed:0.2');
 		const girl = document.createElement('a-gltf-model');
 		girl.setAttribute('src', 'url(/models/squid_game_doll/scene.gltf)');
 		girl.setAttribute('position', '0 0 -60');
@@ -80,7 +79,6 @@ AFRAME.registerComponent('squid-game', {
 		this.timer.setAttribute('color', 'white');
 		const screenWidth = window.innerWidth;
 		const width = Math.min(1, screenWidth / 1200);
-
 		this.timer.setAttribute('width', width.toString());
 
 		this.player.el.querySelector('a-camera')?.appendChild(this.timer);

@@ -14,3 +14,4 @@ import './jumpButton';
 import './myWASDControls';
 import './clickToWave';
 import './squidGame';
+import './mazeGame';
