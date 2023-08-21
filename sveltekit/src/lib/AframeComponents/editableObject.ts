@@ -70,7 +70,14 @@ AFRAME.registerComponent('editable-object', {
 					if (this.object.linkTo && this.object.shortType == 'image') {
 						if (this.readyToLink) {
 							//link to object
-							window.open(this.object.linkTo, '_blank');
+							switch (this.object.linkType) {
+								case '_blank':
+									window.open(this.object.linkTo, '_blank');
+									break;
+								case '_self':
+									window.open(this.object.linkTo, '_self');
+									break;
+							}
 							return;
 						}
 						const text = document.createElement('a-text');

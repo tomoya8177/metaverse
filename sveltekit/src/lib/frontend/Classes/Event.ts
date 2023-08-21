@@ -12,6 +12,7 @@ export class Event extends DBObject {
 	description: string;
 	summary: string;
 	location: string;
+	linkType: '_blank' | '_self' | 'embed';
 	url: string;
 	start: string;
 	end: string;
@@ -28,6 +29,7 @@ export class Event extends DBObject {
 		this.start = this.unescapedData.start || DateTime.now().toISO();
 		this.end = this.unescapedData.end || DateTime.now().plus({ hours: 1 }).toISO();
 		this.organization = this.unescapedData.organization || '';
+		this.linkType = data.linkType || '_blank';
 	}
 	get allDay(): boolean {
 		if (!this.start) return false;

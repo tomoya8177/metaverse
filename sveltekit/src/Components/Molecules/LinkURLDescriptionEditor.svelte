@@ -51,6 +51,27 @@
 	]}
 />
 <InputWithLabel label={_('URL')} bind:value={editItem.linkTo} type="url" />
+{#if editItem.linkTo}
+	<InputWithLabel
+		label={_('Link Type')}
+		bind:value={editItem.linkType}
+		type="select"
+		selects={[
+			{
+				name: _('Open in New Tab'),
+				value: '_blank'
+			},
+			{
+				name: _('Open in Same Tab'),
+				value: '_self'
+			}
+			// {
+			// 	name: _('Embed in Preview Panel'),
+			// 	value: 'embed'
+			// }
+		]}
+	/>
+{/if}
 {#if editItem.linkTo && canAttachBrandIcon}
 	<strong>
 		{_('Link Icons')}

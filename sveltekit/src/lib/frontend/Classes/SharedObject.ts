@@ -45,7 +45,7 @@ export class SharedObject extends DBObject {
 	editorOpen: boolean = false;
 	captionStyle: string = '';
 	attachedEvent: Event | null = null;
-	linkType: string = '';
+	linkType: '_blank' | '_self' | 'embed' = '_blank';
 	brandIcon: string = '';
 	constructor(data: any = {}) {
 		data.table = 'objects';
@@ -85,6 +85,7 @@ export class SharedObject extends DBObject {
 		this.editable = data.editable || false;
 		this.handle = data.handle || '';
 		this.linkTo = data.linkTo || '';
+		this.linkType = data.linkType || '_blank';
 		this.isSphere = data.isSphere || false;
 		this.description = data.description || '';
 		this.lockedPosition = data.lockedPosition || 0;
