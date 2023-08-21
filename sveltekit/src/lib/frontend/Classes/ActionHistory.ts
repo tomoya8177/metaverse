@@ -55,6 +55,7 @@ export class ActionHistory extends DBObject {
 	param: string;
 	userData?: any;
 	roomData?: any;
+	twilioRoomId?: string;
 	constructor(data: any) {
 		data.table = 'actions';
 		super(data);
@@ -64,6 +65,7 @@ export class ActionHistory extends DBObject {
 		this.organization = data?.organization || '';
 		this.page = null;
 		this.param = data?.param || '';
+		this.twilioRoomId = data?.twilioRoomId || '';
 	}
 	async send(action: Actions, data: any = {}): Promise<any> {
 		if (PUBLIC_IS_DEV == 'true') return;
@@ -76,6 +78,7 @@ export class ActionHistory extends DBObject {
 				action: action,
 				data: JSON.stringify(data),
 				path: location.href,
+				twilioRoomId: this.twilioRoomId,
 				locale: cookies.get('locale') || ''
 			});
 			return response.data;
@@ -94,4 +97,5 @@ UserStore.subscribe((value) => {
 });
 RoomStore.subscribe((value) => {
 	actionHistory.room = value?.id || '';
+	actionHistory.twilioRoomId = value?.sid || '';
 });
