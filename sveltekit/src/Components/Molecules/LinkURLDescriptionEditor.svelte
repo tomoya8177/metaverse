@@ -65,10 +65,6 @@
 				name: _('Open in Same Tab'),
 				value: '_self'
 			}
-			// {
-			// 	name: _('Embed in Preview Panel'),
-			// 	value: 'embed'
-			// }
 		]}
 	/>
 {/if}
