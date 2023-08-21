@@ -15,20 +15,35 @@ import { Users } from './Classes/Users';
 import { videoChat } from './Classes/VideoChat';
 import { toast } from './toast';
 import { _ } from '$lib/i18n';
-import type { Unit } from './Classes/Unit';
+import { Unit } from './Classes/Unit';
 import axios from 'axios';
+import type { Me } from './Classes/Me';
+import { User } from './Classes/User';
+
+const mountDataTrack = async (
+	participant: RemoteParticipant,
+	track: RemoteDataTrack,
+	newUser = true
+): Promise<void> => {
+	setupDataTrackListener(track);
+	//sendHandshake();
+	const user = new User(
+		await axios.get(`/api/users/${participant.identity}`).then((res) => res.data)
+	);
+	toast(`${user.nickname} ${_('has joined the room!')}`);
+	//check after a while if the handshake was successfull
+	const inRoom = !!Users.find(participant.identity);
+	if (inRoom) return;
+
+	const unit = new Unit(user);
+	Users.add(unit);
+};
 
 export const onNewParticipantConnected = (room: Room) => {
 	room.on('participantConnected', (participant: RemoteParticipant) => {
 		participant.on('trackSubscribed', (track) => {
 			if (track.kind === 'data') {
-				messageListeners();
-
-				setupDataTrackListener(track as RemoteDataTrack);
-				sendHandshake();
-				axios.get(`/api/users/${participant.identity}`).then((res) => {
-					toast(`${res.data.nickname} ${_('has joined the room!')}`);
-				});
+				mountDataTrack(participant, track);
 			} else {
 				attachRemoteTrack(track as RemoteVideoTrack);
 			}
@@ -47,10 +62,7 @@ export const onParticipantAlreadyInRoom = (participants: Map<string, RemoteParti
 		participant.on('trackSubscribed', (track) => {
 			console.log('track subscribed', track);
 			if (track.kind === 'data') {
-				messageListeners();
-				setupDataTrackListener(track as RemoteDataTrack);
-				sendHandshake();
-				toast;
+				mountDataTrack(participant, track, false);
 			} else {
 				attachRemoteTrack(track as RemoteVideoTrack);
 			}
@@ -104,7 +116,7 @@ const setupDataTrackListener = (track: RemoteDataTrack) => {
 	});
 };
 const sendHandshake = () => {
-	const me = Users.find(videoChat.userId);
+	const me = Users.find(videoChat.userId) as Me;
 	if (!me) return;
 	videoChat.sendMessage({
 		key: 'handshake',

@@ -59,9 +59,10 @@
 	const onSceneLoaded = async (sceneEl: Entity) => {
 		sceneLoaded = true;
 		actionHistory.send('enteringRoom');
-		me = new Me($UserStore);
+		console.log('ME creating in room', room);
+		me = new Me($UserStore, room.id);
 		Users.add(me);
-		await me.setLastPosition(room);
+		//		await me.setLastPosition(room);
 		document.addEventListener('touchstart', () => {
 			me.enableTouch();
 			nippleControl.show();
@@ -69,6 +70,7 @@
 
 		//load mentor user
 		if (room.mentor) {
+			console.log({ ...room.mentorData, userData: { ...room.mentorData.userData } });
 			const mentorUnit = new Unit(room.mentorData.userData);
 			mentorUnit.position = { x: 0, y: 0, z: 3 };
 			mentorUnit.el.setAttribute('ai-mentor', '');

@@ -29,6 +29,8 @@ export class User extends DBObject {
 	backgroundURL: string = '';
 	thumbnailURL: string = '';
 	RPMId: string = '';
+	lastRoom?: string;
+	lastPosition?: string;
 	constructor(data: any) {
 		data.table = 'users';
 		super(data);
@@ -51,6 +53,8 @@ export class User extends DBObject {
 		this.backgroundURL = data.backgroundURL || '';
 		this.thumbnailURL = data.thumbnailURL || '';
 		this.RPMId = data.RPMId || '';
+		this.lastRoom = data.lastRoom || '';
+		this.lastPosition = data.lastPosition || '';
 	}
 	get fullName(): string {
 		if (!this.firstName && !this.lastName) return this.nickname;

@@ -2,10 +2,7 @@ import {
 	LocalVideoTrack,
 	connect,
 	createLocalVideoTrack,
-	type RemoteTrack,
-	RemoteVideoTrack,
 	Room,
-	RemoteAudioTrack,
 	LocalDataTrack,
 	LocalAudioTrack,
 	createLocalAudioTrack,
@@ -15,10 +12,7 @@ import {
 } from 'twilio-video';
 import type { Room as RoomType } from './Room';
 import axios from 'axios';
-import { Users } from './Users';
 import type { User } from '$lib/frontend/Classes/User';
-import { messageListeners, welcomeUnit } from '$lib/frontend/messageListeners';
-import { UserStore } from '$lib/store';
 import { sessionPing } from '$lib/frontend/Classes/sessionPing';
 import {
 	onDisconnected,
@@ -29,8 +23,8 @@ import {
 	onReconnecting,
 	onTabClosed
 } from '$lib/frontend/videoChatEventListeners';
-import { toast } from '../toast';
 import { _ } from '$lib/i18n';
+import { messageListeners } from '../messageListeners';
 
 type trackType = 'audio' | 'camera' | 'screen' | 'data';
 
@@ -140,6 +134,8 @@ export class VideoChat {
 				dataTrackPublished.reject(error);
 			}
 		});
+		messageListeners();
+
 		onNewParticipantConnected(this.room);
 		onParticipantAlreadyInRoom(this.room.participants);
 		onParticipantDisconnected(this.room);

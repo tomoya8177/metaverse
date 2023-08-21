@@ -102,6 +102,7 @@
 	let inviteDialogOpen = false;
 	let invitingEmail = '';
 	let inviteBusy = false;
+	$: $UsersStore;
 </script>
 
 <nav>

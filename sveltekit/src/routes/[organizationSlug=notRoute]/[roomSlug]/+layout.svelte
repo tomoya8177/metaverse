@@ -22,14 +22,9 @@
 	let room: Room = new Room(data.room);
 
 	let roomReady = false;
-	if (room.mentor) {
-		room.mentorData = new Mentor(data.mentor);
-		room.mentorData.init();
-	}
-	roomReady = true;
+
 	let noRoom: boolean | null = null;
 	let organization: Organization | null = data.organization;
-	console.log(2);
 	ChatMessagesStore.set(data.messages);
 	onMount(async () => {
 		if (!organization) {
@@ -41,8 +36,13 @@
 			noRoom = true;
 			return;
 		}
+		if (room.mentor) {
+			room.mentorData = new Mentor(data.mentor);
+			await room.mentorData.init();
+		}
 		RoomStore.set(room);
-		console.log(3);
+		roomReady = true;
+
 		if (!loggedIn) return;
 		const userRole: UserRole | undefined = $UserStore.userRole;
 		if (userRole?.role == 'manager') {

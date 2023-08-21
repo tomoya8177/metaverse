@@ -6,10 +6,11 @@ import type { Component, Entity, ObjectMap, System } from 'aframe';
 import { User } from './User';
 import { CoinHistory } from './CoinHistory';
 import { videoChat } from './VideoChat';
+import { degree2radian } from '$lib/math/degree2radians';
 
 export class Me extends Unit {
 	cameraRig: Entity;
-	constructor(user: User) {
+	constructor(user: User, roomId?: string) {
 		super(user);
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
@@ -42,25 +43,44 @@ export class Me extends Unit {
 			'movement-controls',
 			'constrainToNavMesh: true; camera: #camera; controls: keyboard,my-touch2'
 		);
-
-		this.el.setAttribute('ping-session', `user:${user.id};type:unit`);
+		//this.el.setAttribute('ping-session', `user:${user.id};type:unit`);
+		console.log(roomId, user, user.lastRoom, user.lastPosition);
+		if (roomId && user.lastRoom == roomId) {
+			this.setLastPosition(user);
+		}
 	}
 	updateAvatar() {
 		console.log('updating avatar');
 		this.avatar?.setAttribute('src', this.avatarURLWithParams);
 	}
-	async setLastPosition(room: Room): Promise<void> {
-		const sessions = await axios
-			.get(`/api/sessions?user=${this.userId}&room=${room.id}&type=unit`)
-			.then((res) => res.data.sort((a, b) => (a.startAt < b.startAt ? 1 : -1)));
-		console.log({ sessions });
-
-		if (!sessions || !sessions.length) return;
-		const parsedComponents = JSON.parse(sessions[0].components);
-		if (!parsedComponents || !parsedComponents.position) return;
-		console.log({ parsedComponents });
-		this.position = parsedComponents.position;
-		this.rotation = parsedComponents.rotation;
+	async savePosition(roomId: string): Promise<void> {
+		await axios.put('/api/users/' + this.id, {
+			lastRoom: roomId,
+			lastPosition: JSON.stringify({
+				position: this.position,
+				rotation: this.rotation
+			})
+		});
+	}
+	setLastPosition(user: User) {
+		let data;
+		if (user.lastPosition) data = JSON.parse(user.lastPosition);
+		else
+			data = {
+				position: {
+					x: 0,
+					y: 0,
+					z: 0
+				},
+				rotation: {
+					x: 0,
+					y: 0,
+					z: 0
+				}
+			};
+		console.log('setting last position', data);
+		this.el.setAttribute('position', data.position);
+		this.el.object3D.rotation.y = degree2radian(data.rotation.y);
 	}
 	enableTouch(): void {
 		this.el.setAttribute('my-touch2-controls', 'enabled: true');

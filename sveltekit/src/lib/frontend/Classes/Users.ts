@@ -9,9 +9,6 @@ export const UsersStore = writable([] as Unit[]);
 class users {
 	users: (Unit | Me | Mentor)[] = [];
 	constructor() {}
-	subscribe(value: (value: Unit[]) => void) {
-		return UsersStore.subscribe((value) => (this.users = value));
-	}
 	add(user: Unit) {
 		UsersStore.update((users) => {
 			this.users = [...users, user];
@@ -20,7 +17,7 @@ class users {
 	}
 	remove(userId: string) {
 		UsersStore.update((users) => {
-			this.users = users.filter((user) => user.userId !== userId);
+			this.users = users.filter((user) => user.id !== userId);
 			return this.users;
 		});
 	}

@@ -27,6 +27,7 @@ AFRAME.registerComponent('update-position', {
 	lastPosition: { x: 0, y: 0, z: 0 } as xyz,
 	lastRotation: { x: 0, y: 0, z: 0 } as xyz,
 	lastPositionChangeTime: 0,
+	positionSaved: true,
 	init: function () {
 		this.me = (Users.find(this.el.id) as Me) || null;
 		this.lastPosition = { ...this.me.position };
@@ -37,29 +38,35 @@ AFRAME.registerComponent('update-position', {
 
 		const currentTime = Date.now();
 		const timeSinceLastPositionChange = currentTime - this.lastPositionChangeTime;
-
-		if (
-			this.me &&
-			positionRotationChanged(
-				{
+		if (this.me) {
+			if (
+				positionRotationChanged(
+					{
+						position: this.me.position,
+						rotation: this.me.rotation
+					},
+					{
+						position: this.lastPosition,
+						rotation: this.lastRotation
+					}
+				)
+			) {
+				this.lastPositionChangeTime = currentTime;
+				this.lastPosition = { ...this.me.position };
+				this.lastRotation = { ...this.me.rotation };
+				videoChat.sendMessage({
+					key: 'position',
+					user,
 					position: this.me.position,
-					rotation: this.me.rotation
-				},
-				{
-					position: this.lastPosition,
-					rotation: this.lastRotation
-				}
-			)
-		) {
-			this.lastPositionChangeTime = currentTime;
-			this.lastPosition = { ...this.me.position };
-			this.lastRotation = { ...this.me.rotation };
-			videoChat.sendMessage({
-				key: 'position',
-				user,
-				position: this.me.position,
-				rotation: { ...this.me.rotation }
-			});
+					rotation: { ...this.me.rotation }
+				});
+				this.positionSaved = false;
+			} else {
+				//position stayed
+				if (this.positionSaved) return;
+				this.me.savePosition(room.id);
+				this.positionSaved = true;
+			}
 		}
 		if (!room.mentor) return;
 		if (

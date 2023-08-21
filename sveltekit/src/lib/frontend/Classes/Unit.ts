@@ -19,7 +19,6 @@ RoomStore.subscribe((value) => {
 
 export class Unit {
 	id: string;
-	userId: string;
 	el: Entity;
 	avatar: Entity | null = null;
 	avatarContainer: Entity;
@@ -32,7 +31,6 @@ export class Unit {
 	constructor(data: User) {
 		this.userData = data;
 		this.id = data.id;
-		this.userId = data.id;
 		//append element to the scene
 		this.el = document.createElement('a-entity');
 		this.el.id = data.id;
@@ -56,6 +54,10 @@ export class Unit {
 
 		this.setNickname();
 		scene?.appendChild(this.el);
+		if (data.lastRoom == room.id && data.lastPosition) {
+			this.position = JSON.parse(data.lastPosition).position;
+			this.rotation = JSON.parse(data.lastPosition).rotation;
+		}
 	}
 	get avatarURLWithParams(): string {
 		return (
@@ -83,7 +85,6 @@ export class Unit {
 				asset.onload = () => {
 					if (!asset) return;
 					//get aspect ratio
-					console.log('asset loaded', asset);
 					const width = asset.width;
 					const height = asset.height;
 					const aspectRatio = height / width;
@@ -105,7 +106,6 @@ export class Unit {
 			image.setAttribute('rotation', '0 180 0');
 			image.setAttribute('src', `#nameTagFor${this.userData.id}`);
 			this.avatarContainer.appendChild(image);
-			console.log(asset);
 		} else {
 			//text nickname
 			let text = this.el.querySelector('a-text');
@@ -169,7 +169,7 @@ export class Unit {
 
 		const video = document.createElement('a-circle');
 		video.setAttribute('material', 'src:#' + track.sid + ';shader:flat;side:double;');
-		video.setAttribute('id', 'cameraCircleOf' + this.userId);
+		video.setAttribute('id', 'cameraCircleOf' + this.id);
 		video.setAttribute('position', '0 1.6 -0.3');
 		video.setAttribute('rotation', '0 180 0');
 		video.setAttribute('radius', '0.2');
@@ -185,13 +185,11 @@ export class Unit {
 			title: 'Shared Screen',
 			type: 'screen'
 		});
-		console.log({ sharedObject });
 		sharedObjects.add(sharedObject);
-		console.log({ sharedObjects });
 		sharedObject.inPreviewPane = true;
 		sharedObject.el = video;
 
-		video.setAttribute('id', 'screenPlaneOf' + this.userId);
+		video.setAttribute('id', 'screenPlaneOf' + this.id);
 		video.setAttribute('rotation', `0 ${this.rotation.y} 0`);
 		video.setAttribute('material', 'src:#' + sid + ';shader: flat; side:double');
 		video.setAttribute('editable-object', '');
@@ -200,7 +198,7 @@ export class Unit {
 			video.setAttribute('height', (track.dimensions?.height / track.dimensions?.width).toString());
 		}
 		//send ping only when the screen is mine
-		if (this.userId == videoChat.userId) {
+		if (this.id == videoChat.userId) {
 			const vector = new THREE.Vector3(0, 0, -2);
 			vector.applyAxisAngle(new THREE.Vector3(0, 1, 0), degree2radian(this.rotation.y));
 			video.setAttribute(
@@ -223,7 +221,7 @@ export class Unit {
 			videoChat.screenPingInterval = new sessionPing(
 				{
 					instanceId: sid,
-					user: this.userId,
+					user: this.id,
 					type: 'screen',
 					room: room.id
 				},
@@ -237,7 +235,6 @@ export class Unit {
 				const session = await axios
 					.get('/api/sessions?instanceId=' + sid)
 					.then((res) => res.data[0]);
-				console.log({ session });
 				const parsedComponents = JSON.parse(session.components);
 				if (parsedComponents) {
 					video.setAttribute('position', parsedComponents.position);
@@ -255,7 +252,7 @@ export class Unit {
 		sharedObjects.remove('screenPlaneOf' + this.id);
 	}
 	hideCamera() {
-		const video = document.getElementById('cameraCircleOf' + this.userId);
+		const video = document.getElementById('cameraCircleOf' + this.id);
 		video?.parentNode?.removeChild(video);
 	}
 	attachAudio(track: RemoteAudioTrack) {
@@ -271,7 +268,7 @@ export class Unit {
 		audio.setAttribute('volume', '1');
 		audio.setAttribute('position', '0 1.5 0');
 		audio.setAttribute('rotation', '0 180 0');
-		audio.setAttribute('move-mouth', 'userId:' + this.userId);
+		audio.setAttribute('move-mouth', 'userId:' + this.id);
 		this.avatarContainer.appendChild(audio);
 	}
 	detachAudio() {
