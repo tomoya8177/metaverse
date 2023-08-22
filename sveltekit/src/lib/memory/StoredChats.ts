@@ -23,9 +23,12 @@ class StoredChats extends Array {
 		//this.initialize();
 	}
 	resetMentor(mentorId: string) {
-		this.filter((storedChat) => {
-			return storedChat.mentorId != mentorId;
-		});
+		this.splice(
+			this.findIndex((storedChat) => {
+				return storedChat.mentorId != mentorId;
+			}),
+			1
+		);
 	}
 }
 

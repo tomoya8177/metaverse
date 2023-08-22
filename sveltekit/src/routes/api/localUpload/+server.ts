@@ -16,7 +16,7 @@ export const POST = async ({ request }) => {
 	const id = crypto.randomUUID();
 	const promises = files.map(async (file, i) => {
 		const filename = `${id}-${i}-${file.name}`;
-		const filePath = `./static/documentsForAI/${filename}`;
+		const filePath = `./userFiles/documentsForAI/${filename}`;
 		const buffer = Buffer.from(await file.arrayBuffer());
 		const result = await writeFile(filePath, buffer);
 		uploadedFiles.push({

@@ -7,6 +7,7 @@ export class DocumentForAI extends DBObject {
 	room: string;
 	mentor: string;
 	title: string;
+	handle: string;
 	constructor(data: any) {
 		data.table = 'documentsForAI';
 		super(data);
@@ -16,5 +17,6 @@ export class DocumentForAI extends DBObject {
 		this.room = data.room || '';
 		this.title = data.title || '';
 		this.mentor = data.mentor || '';
+		this.handle = data.handle || '';
 	}
 }

@@ -5,17 +5,17 @@ import { loadDocument } from './loadDocument';
 export const loadDocuments = async (documents: DocumentForAI[]) => {
 	const promises = documents.map((document: DocumentForAI) => {
 		if (document.type.includes('text')) {
-			return loadDocument(document.filename, 'text');
+			return loadDocument(document, 'text');
 		}
 		// for docx files
 		if (document.type.includes('docx') || document.type.includes('officedocument')) {
-			return loadDocument(document.filename, 'docx');
+			return loadDocument(document, 'docx');
 		}
 		if (document.type.includes('pdf')) {
-			return loadDocument(document.filename, 'pdf');
+			return loadDocument(document, 'pdf');
 		}
 		if (document.type.includes('csv')) {
-			return loadDocument(document.filename, 'csv');
+			return loadDocument(document, 'csv');
 		}
 	});
 	const res = await Promise.all(promises);

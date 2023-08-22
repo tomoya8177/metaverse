@@ -4,30 +4,37 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import type { Document } from 'langchain/document';
 import axios from 'axios';
 import { CSVLoader } from 'langchain/document_loaders/fs/csv';
+import fs from 'fs';
+import type { DocumentForAI } from '$lib/types/DocumentForAI';
 
-export const loadDocument = async (filename: string, type: string): Promise<Document[] | false> => {
-	const url = './static/documentsForAI/' + filename;
-	console.log({ url });
+export const loadDocument = async (
+	document: DocumentForAI,
+	type: string
+): Promise<Document[] | false> => {
+	console.log('fetching filedata');
+
+	const localFilePath = './userFiles/documentsForAI/' + document.filename; // Adjust the path as needed
+
+	//await saveFileLocally(file.handle, localFilePath);
 	try {
 		switch (type) {
 			case 'text':
-				const text = await axios
-					.get(`http://localhost:5173/documentsForAI/${filename}`)
-					.then((res) => res.data);
+				const text = fs.readFileSync(localFilePath, 'utf-8');
 				const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
 				return await textSplitter.createDocuments([text]);
 			case 'docx': {
-				const loader = new DocxLoader(url);
+				const loader = new DocxLoader(localFilePath);
 				return await loader.loadAndSplit();
 			}
 			case 'pdf': {
-				const loader = new PDFLoader(url, {
+				const loader = new PDFLoader(localFilePath, {
 					splitPages: false
 				});
+				console.log('PDF loaded');
 				return await loader.loadAndSplit();
 			}
 			case 'csv': {
-				const loader = new CSVLoader(url);
+				const loader = new CSVLoader(localFilePath);
 
 				return await loader.loadAndSplit();
 			}

@@ -6,13 +6,13 @@
 	import axios from 'axios';
 	import type { User } from '$lib/frontend/Classes/User';
 	import { _ } from '$lib/i18n';
-	import type { Mentor } from '$lib/types/Mentor';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import DocumentForAiRow from '../Molecules/DocumentForAIRow.svelte';
 	import { environmentPresets } from '$lib/preset/EnvironmentPresets';
 	import { EnvironmentModelPresets } from '$lib/preset/EnvironmentModelPresets';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
+	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;
@@ -131,8 +131,11 @@
 		accept=".pdf,.txt,.docx"
 		multiple
 		on:change={async (e) => {
+			if (!e.target) return;
 			//get files from room
+			if (!(e.target instanceof HTMLInputElement)) return;
 			const files = e.target.files;
+			if (!files) return;
 			const res = await uploader.uploadLocally(files);
 			const promises = res.data.map(async (file) => {
 				const res = await axios.post('/api/documentsForAI', {

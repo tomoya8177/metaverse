@@ -84,7 +84,7 @@
 			location.href = '/';
 			return;
 		}
-		goto('/' + organization.slug);
+		location.href = '/' + organization.slug;
 	};
 	let loginOpen: boolean = false;
 	export let logoLinkTo: string = '#';

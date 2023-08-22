@@ -28,7 +28,7 @@ class Uploader {
 			})
 			.open();
 	}
-	async uploadLocally(files: File[]): Promise<AxiosResponse> {
+	async uploadLocally(files: Blob[]): Promise<AxiosResponse> {
 		const formData = new FormData();
 		for (let i = 0; i < files.length; i++) {
 			formData.append('file', files[i]);
@@ -38,7 +38,10 @@ class Uploader {
 				'Content-Type': 'multipart/form-data'
 			},
 			onUploadProgress: (progressEvent) => {
-				var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+				if (!progressEvent) return;
+				var percentCompleted = Math.round(
+					(progressEvent.loaded * 100) / (progressEvent.total || 1)
+				);
 				this.progress.set(percentCompleted);
 			}
 		});

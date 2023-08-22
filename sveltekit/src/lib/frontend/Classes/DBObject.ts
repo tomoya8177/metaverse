@@ -52,7 +52,7 @@ export class DBObject {
 		if (!this.table) return console.error('DBObject.load() called without table name');
 		return await axios.delete(`/api/${this.table}/${this.id}`).then((res) => res.data);
 	}
-	async create(): Promise<any> {
+	async create(): Promise<DBObject | any> {
 		if (!this.table) return console.error('DBObject.load() called without table name');
 		const data = this.purifyData();
 		console.log('create', this.table, data);
@@ -60,7 +60,7 @@ export class DBObject {
 
 		const createdObject = await axios.post(`/api/${this.table}`, data).then((res) => res.data);
 		this.id = createdObject.id;
-		return createdObject;
+		return this;
 	}
 	purifyData(): Object {
 		const data: {

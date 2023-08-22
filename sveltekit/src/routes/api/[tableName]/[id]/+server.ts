@@ -42,17 +42,6 @@ export async function DELETE({ params, cookies, request }) {
 	if (!params.id) {
 		return new Response(JSON.stringify(null));
 	}
-	if (params.tableName == 'documentsForAI') {
-		//delete actual files
-		const rows = await db.query(`select * from ${params.tableName} where id='${params.id}'`);
-		for (let i = 0; i < rows.length; i++) {
-			//elete local file without Deno
-			const filePath = './static/documentsForAI/' + rows[i].filename;
-			console.log({ filePath });
-			const res = await unlink(filePath);
-			console.log({ res });
-		}
-	}
 	const rows = await db.query(`delete from ${params.tableName} where id='${params.id}'`);
 	return new Response(JSON.stringify(rows.affectedRows));
 }
