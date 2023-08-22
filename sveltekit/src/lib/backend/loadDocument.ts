@@ -4,7 +4,6 @@ import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import type { Document } from 'langchain/document';
 import axios from 'axios';
 import { CSVLoader } from 'langchain/document_loaders/fs/csv';
-import fs from 'fs';
 import type { DocumentForAI } from '$lib/types/DocumentForAI';
 
 export const loadDocument = async (
@@ -19,7 +18,7 @@ export const loadDocument = async (
 	try {
 		switch (type) {
 			case 'text':
-				const text = fs.readFileSync(localFilePath, 'utf-8');
+				const text = await axios.get(localFilePath).then((res) => res.data);
 				const textSplitter = new RecursiveCharacterTextSplitter({ chunkSize: 1000 });
 				return await textSplitter.createDocuments([text]);
 			case 'docx': {
