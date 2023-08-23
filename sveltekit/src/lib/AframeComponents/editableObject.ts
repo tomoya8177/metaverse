@@ -1,13 +1,16 @@
+import type { Me } from '$lib/frontend/Classes/Me';
 import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
+import { User } from '$lib/frontend/Classes/User';
+import { Users } from '$lib/frontend/Classes/Users';
 import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { _ } from '$lib/i18n';
 import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
 import type { Entity } from 'aframe';
 import axios from 'axios';
-let userId = '';
-UserStore.subscribe((user) => {
-	userId = user.id;
+let me: Me;
+UserStore.subscribe((val) => {
+	me = Users.find(val?.id) as Me;
 });
 
 AFRAME.registerComponent('editable-object', {
@@ -15,11 +18,9 @@ AFRAME.registerComponent('editable-object', {
 	initialPos: null as xyz | null,
 	cursorEl: null as Entity | null,
 	rayCatcher: null as Entity | null,
-	transportMode: 'position',
 	readyToLink: false,
 	object: null as SharedObject | null,
 	camera: null as Entity | null,
-	rig: null as Entity | null,
 	distance: 0,
 	timeout: null as any,
 	init: function () {
@@ -29,10 +30,8 @@ AFRAME.registerComponent('editable-object', {
 
 		this.el.addEventListener('mousedown', (e: any) => {
 			if (!this.object || !this.rayCatcher) return console.error('object is null');
-			FocusObjectStore.set(this.object);
-			this.transportMode = 'position';
+			this.object.focus();
 			this.camera = document.getElementById('camera') as Entity;
-			this.rig = document.getElementById(userId) as Entity;
 			if (this.object.locked) {
 				return;
 			}
@@ -50,8 +49,8 @@ AFRAME.registerComponent('editable-object', {
 				'scale',
 				`${this.distance / 5} ${this.distance / 5} ${this.distance / 5} `
 			);
-			this.rig.setAttribute('look-controls', 'enabled:false');
-			this.rig.setAttribute('touch-controls', 'enabled:false');
+			me.pauseControls();
+
 			this.state = 'moving';
 		});
 		//attach shift key to move object up and down
@@ -65,89 +64,60 @@ AFRAME.registerComponent('editable-object', {
 			}
 		});
 		this.el.addEventListener('mouseup', () => {
-			if (this.object) {
-				if (this.object.locked) {
-					if (this.object.linkTo && this.object.shortType == 'image') {
-						if (this.readyToLink) {
-							//link to object
-							switch (this.object.linkType) {
-								case '_blank':
-									window.open(this.object.linkTo, '_blank');
-									break;
-								case '_self':
-									window.open(this.object.linkTo, '_self');
-									break;
-							}
-							return;
-						}
-						const text = document.createElement('a-text');
-						text.setAttribute('value', _('Click to open'));
-						text.setAttribute('position', '0 0 0.02');
-						text.setAttribute('color', 'white');
-						text.setAttribute('align', 'center');
-						text.setAttribute('width', '1');
-						//set geometry as background
-						const geometry = document.createElement('a-plane');
-						geometry.setAttribute('color', 'green');
-						geometry.setAttribute('width', '0.4');
-						geometry.setAttribute('height', '0.1');
-						geometry.setAttribute('position', '0 0 0.01');
-						//append to the object
-						geometry.classList.add('clickable');
-						this.el.appendChild(text);
-						this.el.appendChild(geometry);
-						setTimeout(() => {
-							if (!this.el.lastChild) return;
-							this.el.removeChild(this.el.lastChild);
-							this.el.removeChild(this.el.lastChild);
-							this.readyToLink = false;
-						}, 3000);
-						this.readyToLink = true;
+			if (!this.object || !this.object.focused) return;
+			if (this.object.locked) {
+				if (this.object.linkTo && this.object.shortType == 'image') {
+					if (this.object.readyToLink) {
+						this.object.openLink();
+					} else {
+						this.object.getReadyToLink();
 					}
-					clearTimeout(this.timeout);
-					this.timeout = setTimeout(() => {
-						//deselect object
-						let ifEditorOpen;
-						FocusObjectStore.update((obj) => {
-							if (!obj) return;
-							ifEditorOpen = obj.editorOpen;
-							return obj;
-						});
-						if (ifEditorOpen) return;
-						this.deselect();
-					}, 4000);
-
-					return;
 				}
-				if (!this.rayCatcher) return console.error('raycatcher is null');
-				this.rayCatcher.setAttribute('position', '0 -100 0');
-				this.rig?.setAttribute('look-controls', 'enabled:true');
-				this.rig?.setAttribute('touch-controls', 'enabled:true');
-				this.state = 'idle';
-				this.initialPos = null;
-				//lets' save position
-				this.object.updateComponents();
+				clearTimeout(this.timeout);
+				this.timeout = setTimeout(() => {
+					//deselect object
+					let ifEditorOpen;
+					FocusObjectStore.update((obj) => {
+						if (!obj) return;
+						ifEditorOpen = obj.editorOpen;
+						return obj;
+					});
+					if (ifEditorOpen) return;
+					this.deselect();
+				}, 4000);
+
+				return;
 			}
+			if (!this.rayCatcher) return console.error('raycatcher is null');
+			this.rayCatcher.setAttribute('position', '0 -100 0');
+			me.resumeControls();
+			this.state = 'idle';
+			this.initialPos = null;
+			//lets' save position
+			this.object.updateComponents();
 		});
 		window.addEventListener('keydown', (evt) => {
+			if (!this.object) return;
 			if (evt.key == 'Shift') {
 				//rotation
-				this.transportMode = 'rotation';
+				this.object.transportMode = 'rotation';
 			} else if (evt.key == 'Control') {
 				//scale
-				this.transportMode = 'scale';
+				this.object.transportMode = 'scale';
 			} else if (evt.key == 'Escape') {
 				//scale
 				this.deselect();
 			}
 		});
 		window.addEventListener('keyup', (evt) => {
+			if (!this.object) return;
+
 			if (evt.key == 'Shift') {
 				//rotation
-				this.transportMode = 'position';
+				this.object.transportMode = 'position';
 			} else if (evt.key == 'Control') {
 				//scale
-				this.transportMode = 'position';
+				this.object.transportMode = 'position';
 			}
 		});
 	},
@@ -155,8 +125,7 @@ AFRAME.registerComponent('editable-object', {
 		if (!this.rayCatcher) return console.error('raycatcher is null');
 
 		this.rayCatcher.setAttribute('position', '0 -100 0');
-		this.rig?.setAttribute('look-controls', 'enabled:true');
-		this.rig?.setAttribute('touch-controls', 'enabled:true');
+		me.resumeControls();
 		this.state = 'idle';
 		this.initialPos = null;
 		FocusObjectStore.set(null);
@@ -181,7 +150,7 @@ AFRAME.registerComponent('editable-object', {
 					//if diff is too small, don't do anything
 					if (Math.abs(diff.x) == 0 && Math.abs(diff.y) == 0 && Math.abs(diff.z) == 0) return;
 					if (!this.object) return console.error('object is null');
-					if (this.transportMode == 'position') {
+					if (this.object.transportMode == 'position') {
 						if (this.object?.lockedPosition) {
 							this.el.setAttribute(
 								'position',
@@ -197,7 +166,7 @@ AFRAME.registerComponent('editable-object', {
 								${this.el.getAttribute('position').z + diff.z}`
 							);
 						}
-					} else if (this.transportMode == 'rotation') {
+					} else if (this.object.transportMode == 'rotation') {
 						//the diff shoukld be calculated with pointsrelative to the raycatcher
 						const relativeDiff = this.getRelativeDiff(intersection);
 						const factor = relativeDiff.x * 40;
@@ -215,7 +184,7 @@ AFRAME.registerComponent('editable-object', {
 							);
 						}
 						const result = this.el.getAttribute('rotation').y;
-					} else if (this.transportMode == 'scale') {
+					} else if (this.object.transportMode == 'scale') {
 						const relativeDiff = this.getRelativeDiff(intersection);
 						if (this.object.isSphere) {
 							const geometry = this.el.getAttribute('geometry');
