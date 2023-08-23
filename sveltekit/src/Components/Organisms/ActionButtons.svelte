@@ -242,6 +242,8 @@
 					selfieOpen = false;
 				}}
 			>
+				<Icon icon="photo_camera" />
+
 				{_('Selfie')}
 			</button>
 		{:else}
@@ -254,6 +256,7 @@
 					more = false;
 				}}
 			>
+				<Icon icon="photo_camera" />
 				{_('Selfie')}
 			</button>
 		{/if}

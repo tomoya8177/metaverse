@@ -258,7 +258,17 @@
 		/>
 	{/if}
 	{#if room.navMeshModelURL}
-		<a-gltf-model src={room.navMeshModelURL} position="0 0.01 0" visible="false" nav-mesh />
+		{@const preset = EnvironmentModelPresets.find(
+			(preset) => preset.modelURL == room.environmentModelURL
+		)}
+
+		<a-gltf-model
+			src={room.navMeshModelURL}
+			position="0 0.01 0"
+			visible="false"
+			nav-mesh
+			scale={`${preset?.scale || 1} ${preset?.scale || 1} ${preset?.scale || 1}`}
+		/>
 	{:else if !room.environmentModelURL}
 		<a-plane
 			id="ground"

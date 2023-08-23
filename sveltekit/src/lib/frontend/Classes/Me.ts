@@ -68,7 +68,7 @@ export class Me extends Unit {
 		this.selfie = document.createElement('a-entity');
 		this.selfie.setAttribute('position', '0.55 0 -1.2');
 		this.selfie.setAttribute('geometry', 'primitive:plane;width:0.54;height:0.74');
-		this.selfie.setAttribute('material', 'shader:flat;color:grey;');
+		this.selfie.setAttribute('material', 'shader:flat;color:#333;');
 		this.selfie.setAttribute('rotation', '0 -10 0');
 		this.camera.appendChild(this.selfie);
 		const captureButton = document.createElement('a-entity');

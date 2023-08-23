@@ -256,5 +256,9 @@ export default {
 	'Can you tell me anything you know about the object, which ID is ':
 		'このオブジェクトについて何か知っていますか？IDは',
 	'and title is ': 'タイトルは',
-	'Try not to make it boring just by reading out the description. Do not repeat the object ID. Answer in less than 100 words.': `説明を読み上げるだけではつまらなくならないようにしてください。オブジェクトIDを繰り返さないでください。100語以下で回答してください。`
+	'Try not to make it boring just by reading out the description. Do not repeat the object ID. Answer in less than 100 words.': `説明を読み上げるだけではつまらなくならないようにしてください。オブジェクトIDを繰り返さないでください。100語以下で回答してください。`,
+	Selfie: 'セルフィー',
+	Calendar: 'カレンダー',
+	'Connected to the room!': 'ルームに接続しました！',
+	'Connection Failed': '接続に失敗しました'
 };

@@ -38,9 +38,13 @@ AFRAME.registerComponent('selfie-camera', {
 		preview.object3D.rotation.y += Math.PI;
 	},
 	onCapture: async function () {
+		const captureButton = document.querySelector('#captureButton');
+		if (!captureButton) return;
+		captureButton.setAttribute('text', { value: 'Capturing...' });
 		const canvas = document.querySelector('#selfieCanvas');
 		const file = await uploader.uploadCanvas(canvas, 'selfie.jpg');
 		if (!file) return;
+		captureButton.setAttribute('text', { value: 'Uploading...' });
 		const sharedObject = new SharedObject({
 			url: file.url,
 			type: file.mimetype,
@@ -52,6 +56,7 @@ AFRAME.registerComponent('selfie-camera', {
 		sharedObjects.add(sharedObject);
 		const player = Users.find(sharedObject.user) as Me;
 		sharedObject.moveToMyFront(player.position, player.rotation);
+		captureButton.setAttribute('text', { value: 'Capture' });
 		setTimeout(() => {
 			sharedObject.updateComponents();
 		}, 100);
