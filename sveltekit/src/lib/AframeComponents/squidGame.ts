@@ -1,4 +1,6 @@
 import { DynamicDialog } from '$lib/frontend/Classes/DynamicDialog';
+import { SharedObject } from '$lib/frontend/Classes/SharedObject';
+import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import type { Unit } from '$lib/frontend/Classes/Unit';
 import { Users } from '$lib/frontend/Classes/Users';
 import { myConfirm, toast } from '$lib/frontend/toast';
@@ -245,15 +247,38 @@ AFRAME.registerComponent('squid-game', {
 		}
 		this.playerOldPosition = this.playerPosition;
 	},
-	gameOver: function () {
-		if (!this.gunshot || !this.audio || !this.timer || !this.gameOverDialog) return;
+	gameOver: async function () {
+		if (!this.gunshot || !this.audio || !this.timer || !this.gameOverDialog || !this.player) return;
 		const gunshot = this.gunshot.components.sound as any;
 		gunshot.playSound();
 		const audio = this.audio.components.sound as any;
 
 		this.status = 'gameover';
 		this.timer.setAttribute('value', 'Game over');
+		const scull = new SharedObject({
+			url: 'https://cdn.filestackcontent.com/bZEjisHVRke4JHUEEKmf',
+			handle: 'bZEjisHVRke4JHUEEKmf',
+			title: 'Skull',
+			type: 'model/gltf-binary',
+			components: JSON.stringify({
+				position: this.player.position,
+				rotation: {
+					x: 0,
+					y: Math.floor(Math.random() * 360),
+					z: 0
+				},
+				scale: {
+					x: 0.002,
+					y: 0.002,
+					z: 0.002
+				}
+			})
+		});
+		await scull.create();
+		scull.attachElement();
+		sharedObjects.add(scull);
 		setTimeout(async () => {
+			scull.updateComponents();
 			if (!this.gameOverDialog) return;
 
 			this.gameOverDialog.open();

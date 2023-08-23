@@ -11,7 +11,7 @@
 	export let data: PageData;
 	let organization = data.organization;
 	let room = data.room;
-	let objects = data.objects.map((object: any) => {
+	let objects: SharedObject[] = data.objects.map((object: any) => {
 		const obj = new SharedObject(object);
 		return obj;
 	});
@@ -30,10 +30,10 @@
 		<tr>
 			<td>
 				{#if object.shortType == 'image'}
-					<SquareThumbnail url={object.url} />
+					<SquareThumbnail url={object.url || object.captionUrl} />
 				{/if}
 				{object.title}
-				<a href={object.url} target="_blank">
+				<a href={object.url || object.captionUrl} target="_blank">
 					<Icon icon="open_in_new" />
 				</a>
 			</td>
