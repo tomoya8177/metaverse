@@ -162,4 +162,12 @@ export class Me extends Unit {
 		user.coin += coins;
 		user.update();
 	}
+	pauseControls() {
+		this.el.setAttribute('look-controls', 'enabled:false');
+		this.el.setAttribute('touch-controls', 'enabled:false');
+	}
+	resumeControls() {
+		this.el.setAttribute('look-controls', 'enabled:true');
+		this.el.setAttribute('touch-controls', 'enabled:true');
+	}
 }

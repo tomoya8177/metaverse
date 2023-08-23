@@ -1,7 +1,7 @@
 import { degree2radian } from 'mymetaverse-helper';
 
 import type { Entity } from 'aframe';
-import { RoomStore, UserStore, type xyz } from '$lib/store';
+import { FocusObjectStore, RoomStore, UserStore, type xyz } from '$lib/store';
 import { getPositionFromLockedPosition } from '../getPositionFromLockedPosition';
 import { myAlert } from '../toast';
 import { _ } from '$lib/i18n';
@@ -53,6 +53,9 @@ export class SharedObject extends DBObject {
 	attachedEvent: Event | null = null;
 	linkType: '_blank' | '_self' | 'embed' = '_blank';
 	brandIcon: string = '';
+	readyToLink = false;
+	transportMode = 'position';
+	focused = false;
 	constructor(data: any = {}) {
 		data.table = 'objects';
 		super(data);
@@ -338,6 +341,54 @@ export class SharedObject extends DBObject {
 			return false;
 		}
 		return true;
+	}
+	openLink(): void {
+		switch (this.linkType) {
+			case '_blank':
+				window.open(this.linkTo, '_blank');
+				break;
+			case '_self':
+				window.open(this.linkTo, '_self');
+				break;
+		}
+		return;
+	}
+	getReadyToLink(): void {
+		if (!this.el) return console.error('el is null');
+		const text = document.createElement('a-entity');
+		text.setAttribute(
+			'text',
+			`
+			value: ${_('Click to open')};
+			color: white;
+			align: center;
+			
+			`
+		);
+		text.setAttribute(
+			'geometry',
+			`
+			primitive: plane;
+			width: 0.4;
+			height: 0.1;
+			color: green;
+					`
+		);
+		//append to the object
+		text.classList.add('clickable');
+		this.el.appendChild(text);
+		setTimeout(() => {
+			if (!this.el) return console.error('el is null');
+
+			this.el.removeChild(text);
+			this.readyToLink = false;
+		}, 3000);
+		this.readyToLink = true;
+	}
+	focus() {
+		FocusObjectStore.set(this);
+		this.transportMode = 'position';
+		this.focused = true;
 	}
 
 	//this is not working why?? @copilot
