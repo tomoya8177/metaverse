@@ -56,7 +56,7 @@
 
 	const putTogetherFile = async () => {
 		if (editObject.withCaption) {
-			const file = await uploader.uploadCanvas('.previewLinkObject', 'image.jpg');
+			const file = await uploader.uploadHTMLAsCanvas('.previewLinkObject', 'image.jpg');
 			if (!file) return;
 			editObject.captionUrl = file.url;
 			editObject.type = file.type;

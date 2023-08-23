@@ -1,6 +1,6 @@
 import { degree2radian } from '$lib/math/degree2radians';
 import type { Entity } from 'aframe';
-import { UserStore, type xyz } from '$lib/store';
+import { RoomStore, UserStore, type xyz } from '$lib/store';
 import { getPositionFromLockedPosition } from '../getPositionFromLockedPosition';
 import { myAlert } from '../toast';
 import { _ } from '$lib/i18n';
@@ -12,6 +12,11 @@ type shortType = 'image' | 'video' | 'model' | 'screen';
 let user: User;
 UserStore.subscribe((u) => {
 	user = u;
+});
+let room: Room;
+RoomStore.subscribe((value) => {
+	if (!value) return;
+	room = value;
 });
 //export class SharedObject extends DBObject {
 export class SharedObject extends DBObject {
@@ -80,8 +85,8 @@ export class SharedObject extends DBObject {
 				},
 				radius: 0.5
 			});
-		this.room = data.room || '';
-		this.user = data.user || '';
+		this.room = data.room || room.id || '';
+		this.user = data.user || user.id || '';
 		this.editable = data.editable || false;
 		this.handle = data.handle || '';
 		this.linkTo = data.linkTo || '';

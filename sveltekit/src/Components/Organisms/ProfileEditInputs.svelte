@@ -23,16 +23,11 @@
 		}
 		busy = true;
 		//render nametag
-		const file = await uploader.uploadCanvasPNG('.nameTagPreview', 'nameTag.png');
+		const file = await uploader.uploadHTMLAsCanvasPNG('.nameTagPreview', 'nameTag.png');
 		console.log({ file });
 		if (file) {
 			$UserStore.nicknameURL = file.url;
 		}
-		// const file2 = await uploader.uploadCanvas('.thumbnailPreview', 'thumbnail.jpg');
-		// console.log({ file2 });
-		// if (file2) {
-		// 	$UserStore.thumbnailURL = file2.url;
-		// }
 
 		await $UserStore.update();
 		videoChat.sendMessage({

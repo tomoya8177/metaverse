@@ -16,6 +16,11 @@ RoomStore.subscribe((value) => {
 	if (!value) return;
 	room = value;
 });
+let loggedInUser: User;
+UserStore.subscribe((value) => {
+	if (!value) return;
+	loggedInUser = value;
+});
 
 export class Unit {
 	id: string;
@@ -69,6 +74,7 @@ export class Unit {
 		return this.nicknameData;
 	}
 	setNickname() {
+		if (this.id == loggedInUser.id) return;
 		if (this.userData.nicknameURL) {
 			let asset: HTMLImageElement | null = null;
 			const existingAsset = document.querySelector(`#nameTagFor${this.userData.id}`);

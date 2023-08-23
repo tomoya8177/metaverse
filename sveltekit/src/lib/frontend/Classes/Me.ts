@@ -7,37 +7,48 @@ import { User } from './User';
 import { CoinHistory } from './CoinHistory';
 import { videoChat } from './VideoChat';
 import { degree2radian } from '$lib/math/degree2radians';
+import { flip } from 'svelte/animate';
 
 export class Me extends Unit {
 	cameraRig: Entity;
+	selfie: Entity | null = null;
+	camera: Entity;
 	constructor(user: User, roomId?: string) {
 		super(user);
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
 		//this.el.setAttribute('my-wasd-controls', 'enabled:true');
 		// this.el.setAttribute('my-touch-controls2', 'enabled:false');
-		const camera = document.createElement('a-camera');
-		camera.setAttribute('id', 'camera');
-		camera.setAttribute('look-controls-enabled', 'false');
-		camera.setAttribute('wasd-controls-enabled', 'false');
-		camera.setAttribute('position', '0 0.2 0.5');
-		camera.setAttribute('rotation', '-15 0 0');
+		this.camera = document.createElement('a-camera');
+		this.camera.setAttribute('id', 'camera');
+		this.camera.setAttribute('look-controls-enabled', 'false');
+		this.camera.setAttribute('wasd-controls-enabled', 'false');
+		this.camera.setAttribute('position', '0 0.2 0.6');
+		this.camera.setAttribute('rotation', '-15 0 0');
 		this.cameraRig = document.createElement('a-entity');
 		this.cameraRig.setAttribute('position', '0 1.6 0');
 		this.avatarContainer.appendChild(this.cameraRig);
-		this.cameraRig.appendChild(camera);
-		//get window width
+		this.cameraRig.appendChild(this.camera);
+
+		const selfieCamera = document.createElement('a-camera');
+		selfieCamera.setAttribute('id', 'selfieCamera');
+		selfieCamera.setAttribute('active', 'false');
+		selfieCamera.setAttribute('position', '0 -0.1 -1.2');
+		selfieCamera.setAttribute('look-controls-enabled', 'false');
+		selfieCamera.setAttribute('wasd-controls-enabled', 'false');
+		selfieCamera.setAttribute('rotation', '0 180 0');
+		this.camera.appendChild(selfieCamera);
 
 		const circle = document.createElement('a-circle');
 		circle.setAttribute('radius', '0.03');
 		circle.setAttribute('color', 'white');
-		circle.setAttribute('position', `0 -0.1 -0.3`);
+		circle.setAttribute('position', `0.06 -0.1 -0.3`);
 		circle.setAttribute('opacity', '0.5');
 		circle.setAttribute('material', 'shader:flat;src:url(/images/upicon.jpg)');
 		//circle.setAttribute('text', 'value:^;color:white;align:center;');
 		circle.setAttribute('jump-button', 'userId:' + this.id + ';');
 		circle.id = 'jumpButton';
-		camera.appendChild(circle);
+		this.camera.appendChild(circle);
 
 		this.el.setAttribute(
 			'movement-controls',
@@ -52,6 +63,47 @@ export class Me extends Unit {
 	updateAvatar() {
 		console.log('updating avatar');
 		this.avatar?.setAttribute('src', this.avatarURLWithParams);
+	}
+	showSelfie() {
+		this.selfie = document.createElement('a-entity');
+		this.selfie.setAttribute('position', '0.55 0 -1.2');
+		this.selfie.setAttribute('geometry', 'primitive:plane;width:0.54;height:0.74');
+		this.selfie.setAttribute('material', 'shader:flat;color:grey;');
+		this.selfie.setAttribute('rotation', '0 -10 0');
+		this.camera.appendChild(this.selfie);
+		const captureButton = document.createElement('a-entity');
+		captureButton.setAttribute('id', 'captureButton');
+		captureButton.setAttribute('position', '0.15 -0.25 0.01');
+		captureButton.setAttribute('geometry', 'primitive:circle;radius:0.06');
+		captureButton.setAttribute('material', 'shader:flat;color:red;');
+		captureButton.setAttribute('text', 'value:Capture;align:center');
+		this.selfie.appendChild(captureButton);
+		const flipButton = document.createElement('a-entity');
+		flipButton.setAttribute('id', 'flipButton');
+		flipButton.setAttribute('position', '0 -0.25 0.01');
+		flipButton.setAttribute('geometry', 'primitive:circle;radius:0.06');
+		flipButton.setAttribute('material', 'shader:flat;color:blue;');
+		flipButton.setAttribute('text', 'value:Flip;align:center');
+		this.selfie.appendChild(flipButton);
+		const selfieCameraPreview = document.createElement('a-plane');
+		selfieCameraPreview.setAttribute('id', 'selfieCameraPreview');
+		selfieCameraPreview.setAttribute('position', '0 0.1 0.01');
+		selfieCameraPreview.setAttribute('rotation', '0 180 0');
+		selfieCameraPreview.setAttribute('width', '0.5');
+		selfieCameraPreview.setAttribute('height', '0.5');
+		selfieCameraPreview.setAttribute('canvas-updater', '');
+		selfieCameraPreview.setAttribute(
+			'material',
+			`
+			side:double;
+		shader:flat;
+		src:#selfieCanvas
+		`
+		);
+		this.selfie.appendChild(selfieCameraPreview);
+	}
+	hideSelfie() {
+		this.selfie?.parentNode?.removeChild(this.selfie);
 	}
 	async savePosition(roomId: string): Promise<void> {
 		await axios.put('/api/users/' + this.id, {

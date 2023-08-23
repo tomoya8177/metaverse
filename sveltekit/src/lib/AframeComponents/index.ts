@@ -15,3 +15,5 @@ import './myWASDControls';
 import './clickToWave';
 import './squidGame';
 import './mazeGame';
+import './selfieCamera';
+import './canvasUpdater';

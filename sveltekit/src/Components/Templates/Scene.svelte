@@ -220,7 +220,9 @@
 	ar-mode-ui="enabled: false"
 	cursor="rayOrigin: mouse"
 >
-	<a-assets />
+	<a-assets>
+		<canvas width="1024" height="1024" id="selfieCanvas" />
+	</a-assets>
 	<a-cursor raycaster="objects: .clickable" />
 	<a-plane
 		id="rayCatcher"

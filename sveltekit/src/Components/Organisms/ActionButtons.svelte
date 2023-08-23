@@ -64,6 +64,7 @@
 	export let onMicClicked: () => void;
 	export let micActive: boolean;
 	let linkEditorOpen = false;
+	let selfieOpen = false;
 </script>
 
 <div class="action-buttons">
@@ -231,6 +232,29 @@
 			>
 				<Icon icon="preview" />
 				{_('Preview Panel')}
+			</button>
+		{/if}
+		{#if selfieOpen}
+			<button
+				on:click={() => {
+					scene.removeAttribute('selfie-camera');
+					me.hideSelfie();
+					selfieOpen = false;
+				}}
+			>
+				{_('Selfie')}
+			</button>
+		{:else}
+			<button
+				class="dim"
+				on:click={() => {
+					me.showSelfie();
+					scene.setAttribute('selfie-camera', 'enabled:true');
+					selfieOpen = true;
+					more = false;
+				}}
+			>
+				{_('Selfie')}
 			</button>
 		{/if}
 	</div>

@@ -62,7 +62,13 @@ class Uploader {
 		);
 		return res.data;
 	}
-	async uploadCanvas(selector: string, filename: string): Promise<File | false> {
+	async uploadCanvas(canvas, filename) {
+		const dataUrl = canvas.toDataURL(filename, 0.9);
+		const blob = await fetch(dataUrl).then((res) => res.blob());
+		const file = await this.uploadBlob(blob, filename);
+		return file;
+	}
+	async uploadHTMLAsCanvas(selector: string, filename: string): Promise<File | false> {
 		const html2canvas = new HTML2Canvas();
 		const blob = await html2canvas.getJpegBlob(document.querySelector(selector), filename);
 		if (!blob) {
@@ -72,7 +78,7 @@ class Uploader {
 		const file = await this.uploadBlob(blob, filename);
 		return file;
 	}
-	async uploadCanvasPNG(selector: string, filename: string): Promise<File | false> {
+	async uploadHTMLAsCanvasPNG(selector: string, filename: string): Promise<File | false> {
 		const html2canvas = new HTML2Canvas();
 		const blob = await html2canvas.getPNGBlob(document.querySelector(selector), filename);
 		if (!blob) {

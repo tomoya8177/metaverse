@@ -215,6 +215,8 @@
 	};
 </script>
 
+<div style="position:absolute;top:0px" />
+
 <div style="position:absolute;bottom:11rem;left:1rem;" class="nippleControl">
 	<NippleControl />
 </div>
