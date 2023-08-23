@@ -1,4 +1,5 @@
-import { degree2radian } from '$lib/math/degree2radians';
+import { degree2radian } from 'mymetaverse-helper';
+
 import type { xyz } from '$lib/store';
 
 export const getPositionFromLockedPosition = (lockedPosition: number): xyz => {

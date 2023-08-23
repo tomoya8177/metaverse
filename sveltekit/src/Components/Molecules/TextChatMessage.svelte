@@ -7,12 +7,11 @@
 	import { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { VideoChat } from '$lib/frontend/Classes/VideoChat';
-	import { nl2br } from '$lib/math/nl2br';
 	import type { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import Icon from '../Atom/Icon.svelte';
 	import { fade, slide } from 'svelte/transition';
-	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML, nl2br } from 'mymetaverse-helper';
 	import type { User } from '$lib/frontend/Classes/User';
 	import { _ } from '$lib/i18n';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';

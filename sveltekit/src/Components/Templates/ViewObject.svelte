@@ -4,7 +4,7 @@
 	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { UserStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
-	import { nl2br } from '$lib/math/nl2br';
+	import { nl2br } from 'mymetaverse-helper';
 	import type { Organization } from '$lib/types/Organization';
 	import { DateTime } from 'luxon';
 	import Attendance from '../Molecules/Attendance.svelte';

@@ -22,7 +22,7 @@
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
 	import { _ } from '$lib/i18n';
 	import Icon from '../Atom/Icon.svelte';
-	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML } from 'mymetaverse-helper';
 	import type { PageData } from '../../routes/[organizationSlug=notRoute]/[roomSlug]/$types';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';

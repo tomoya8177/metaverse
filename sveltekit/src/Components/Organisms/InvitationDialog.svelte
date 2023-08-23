@@ -14,7 +14,7 @@
 	import { onMount } from 'svelte';
 	import LanguageSelector from '../Molecules/LanguageSelector.svelte';
 	import { myConfirm, toast } from '$lib/frontend/toast';
-	import { nl2br } from '$lib/math/nl2br';
+	import { nl2br } from 'mymetaverse-helper';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { sendInvitedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';

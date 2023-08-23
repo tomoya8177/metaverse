@@ -3,7 +3,6 @@ import { RoomStore, UserStore } from '$lib/store';
 import axios from 'axios';
 import { DBObject } from './DBObject';
 import { page } from '$app/stores';
-import { escapeHTML } from '$lib/math/escapeHTML';
 import { cookies } from '../cookies';
 type Actions =
 	| 'login'

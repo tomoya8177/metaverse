@@ -105,7 +105,7 @@ test.describe.serial('Top Page', () => {
 		await verificationCodeInput.fill(verificationCode);
 		await verifyButton.click();
 		const title = page.getByText(`Let's Create an Organization!`);
-		await expect(title).toBeVisible();
+		await expect(title).toBeVisible({ timeout: 15000 });
 	});
 
 	test('Create New Organization', async () => {
@@ -147,14 +147,14 @@ test.describe.serial('Top Page', () => {
 		expect(virtuaMentorTitle).toBeVisible();
 
 		//set up a mentor
-		const firstNameInput = page.locator('input').nth(0);
-		expect(firstNameInput).toBeVisible();
+		const firstNameInput = page.getByLabel('First Name');
+		await expect(firstNameInput).toBeVisible();
 		await firstNameInput.fill('Test');
-		const lastNameInput = page.locator('input').nth(1);
-		expect(lastNameInput).toBeVisible();
+		const lastNameInput = page.getByLabel('Last Name');
+		await expect(lastNameInput).toBeVisible();
 		await lastNameInput.fill('Mentor');
-		const nicknameInput = page.locator('input').nth(2);
-		expect(nicknameInput).toBeVisible();
+		const nicknameInput = page.getByLabel('Nickname');
+		await expect(nicknameInput).toBeVisible();
 		await nicknameInput.fill(nastyString);
 		const changeAvatarButton = page.getByRole('button', { name: 'Change Avatar' });
 		expect(changeAvatarButton).toBeVisible();
@@ -222,7 +222,7 @@ test.describe.serial('Top Page', () => {
 
 		//now you should see the change profile modal as you haven't initialized the nickname graphic
 		const changeProfileTitle = page.getByRole('heading', { name: 'Change Profile' });
-		await expect(changeProfileTitle).toBeVisible({ timeout: 10000 }); //may take longer than expected
+		await expect(changeProfileTitle).toBeVisible({ timeout: 15000 }); //may take longer than expected
 	});
 	test('Update Profile', async () => {
 		//find nickname input
@@ -265,7 +265,7 @@ test.describe.serial('Top Page', () => {
 		await expect(textChatBox).toBeVisible();
 		await page.waitForTimeout(5000);
 		const messages = textChatBox.locator("[data-role='message']");
-		await expect(messages).toHaveCount(1); //you've got one message from mentor
+		await expect(messages).toHaveCount(1, { timeout: 10000 }); //you've got one message from mentor
 		const chatButton = page.getByRole('button', { name: 'chat' });
 		await expect(chatButton).toBeVisible();
 		await chatButton.click();

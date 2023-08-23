@@ -19,7 +19,7 @@
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
 	import { fade } from 'svelte/transition';
 	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
-	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML } from 'mymetaverse-helper';
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
 	import { toast } from '$lib/frontend/toast';

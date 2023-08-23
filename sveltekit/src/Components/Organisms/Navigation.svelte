@@ -19,9 +19,8 @@
 	import { onMount } from 'svelte';
 	import LanguageSelector from '../Molecules/LanguageSelector.svelte';
 	import { myConfirm, toast } from '$lib/frontend/toast';
-	import { nl2br } from '$lib/math/nl2br';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
-	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML } from 'mymetaverse-helper';
 	import { goto } from '$app/navigation';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import AvatarThumbnail from '../Atom/AvatarThumbnail.svelte';

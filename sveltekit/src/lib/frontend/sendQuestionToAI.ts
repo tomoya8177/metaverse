@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { Message } from './Classes/Message';
-import { escapeHTML } from '$lib/math/escapeHTML';
+import { escapeHTML } from 'mymetaverse-helper';
 import { actionHistory } from './Classes/ActionHistory';
 import type { Mentor } from './Classes/Mentor';
 

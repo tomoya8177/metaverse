@@ -9,8 +9,7 @@
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import { _ } from '$lib/i18n';
 	import { myAlert } from '$lib/frontend/toast';
-	import { nl2br } from '$lib/math/nl2br';
-	import { unescapeHTML } from '$lib/math/unescapeHTML';
+	import { unescapeHTML,  nl2br } from 'mymetaverse-helper';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let organization: string = '';
 	export let room: Room | null = null;

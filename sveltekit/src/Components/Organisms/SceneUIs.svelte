@@ -3,7 +3,7 @@
 
 	import ActionButtons from './ActionButtons.svelte';
 	import ChatBox from './ChatBox.svelte';
-
+	import { escapeHTML, scrollToBottom } from 'mymetaverse-helper';
 	import { onDestroy, onMount } from 'svelte';
 	import {
 		PreviewPanelOpen,
@@ -17,13 +17,11 @@
 	import axios from 'axios';
 
 	import type { User } from '$lib/frontend/Classes/User';
-	import { scrollToBottom } from '$lib/frontend/scrollToBottom';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
-	import { escapeHTML } from '$lib/math/escapeHTML';
 	import ObjectEditor from './ObjectEditor.svelte';
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
 	import { _ } from '$lib/i18n';
@@ -53,9 +51,7 @@
 	if (!room.mentor) {
 		TextChatOpen.set(false);
 	}
-	const scrolToBottom = (element: Element) => {
-		element.scrollTop = element.scrollHeight;
-	};
+
 	let authors: User[];
 	const onTextChatClicked = () => {
 		TextChatOpen.update((value) => {

@@ -1,4 +1,5 @@
-import { degree2radian } from '$lib/math/degree2radians';
+import { degree2radian } from 'mymetaverse-helper';
+
 import type { Entity } from 'aframe';
 import { RoomStore, UserStore, type xyz } from '$lib/store';
 import { getPositionFromLockedPosition } from '../getPositionFromLockedPosition';

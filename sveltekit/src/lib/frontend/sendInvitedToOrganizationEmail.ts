@@ -1,6 +1,6 @@
 import { page } from '$app/stores';
 import { _ } from '$lib/i18n';
-import { nl2br } from '$lib/math/nl2br';
+import { nl2br } from 'mymetaverse-helper';
 import axios from 'axios';
 import type { User } from './Classes/User';
 import type { Organization } from '$lib/types/Organization';

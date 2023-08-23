@@ -6,7 +6,8 @@ import type { Component, Entity, ObjectMap, System } from 'aframe';
 import { User } from './User';
 import { CoinHistory } from './CoinHistory';
 import { videoChat } from './VideoChat';
-import { degree2radian } from '$lib/math/degree2radians';
+import { degree2radian } from 'mymetaverse-helper';
+
 import { flip } from 'svelte/animate';
 
 export class Me extends Unit {

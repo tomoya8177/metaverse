@@ -2,11 +2,10 @@
 	import TeamIconEditor from './TeamIconEditor.svelte';
 	import { deleteOrganization } from '$lib/frontend/deleteOrganization';
 	import { _ } from '$lib/i18n';
-	import type { PageData } from './$types';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import ActionHistoryTable from '../../admin/ActionHistoryTable.svelte';
 	import { onMount } from 'svelte';
-	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML } from 'mymetaverse-helper';
 	export let data: PageData;
 	let organization = data.organization;
 	let actionHistories = data.actionHistories;

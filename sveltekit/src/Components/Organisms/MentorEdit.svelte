@@ -2,17 +2,17 @@
 	import DocumentForAIRow from '../Molecules/DocumentForAIRow.svelte';
 	import axios from 'axios';
 	import { _ } from '$lib/i18n';
-	import type { Mentor } from '$lib/types/Mentor';
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
 	import AvatarSelectPane from './AvatarSelectPane.svelte';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import { Message } from '$lib/frontend/Classes/Message';
-	import { unescapeHTML } from '$lib/math/unescapeHTML';
+	import { unescapeHTML, nl2br } from 'mymetaverse-helper';
 	import FulllNameInput from '../Atom/FulllNameInput.svelte';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
 	import { onMount } from 'svelte';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
+	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
 		progress = value;

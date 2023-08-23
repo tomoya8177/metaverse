@@ -22,8 +22,7 @@
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import type { DocumentForAI } from '$lib/types/DocumentForAI';
 	import type { PageData } from './$types';
-	import { nl2br } from '$lib/math/nl2br';
-	import { unescapeHTML } from '$lib/math/unescapeHTML';
+	import { unescapeHTML, nl2br } from 'mymetaverse-helper';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';

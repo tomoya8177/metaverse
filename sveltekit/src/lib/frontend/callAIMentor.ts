@@ -6,7 +6,7 @@ import type { Mentor } from './Classes/Mentor';
 import { RoomStore, UserStore } from '$lib/store';
 import type { Room } from './Classes/Room';
 import type { User } from './Classes/User';
-import { degree2radian } from '$lib/math/degree2radians';
+
 import type { Entity } from 'aframe';
 import { videoChat } from './Classes/VideoChat';
 import { THREE } from 'aframe';

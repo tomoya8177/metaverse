@@ -6,7 +6,6 @@ import './pingSession';
 import './resizeOnload';
 import './aiMentor';
 import './moveMouth';
-import './myNippleControl';
 import './myTouchControls';
 import './myTouchControls2';
 import './jump';

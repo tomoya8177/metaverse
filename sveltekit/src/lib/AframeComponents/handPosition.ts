@@ -1,4 +1,5 @@
-import { degree2radian } from '$lib/math/degree2radians';
+import { degree2radian } from 'mymetaverse-helper';
+
 AFRAME.registerComponent('hand-position', {
 	init: function () {
 		this.el.addEventListener('model-loaded', () => {

@@ -7,7 +7,8 @@ import { DocumentForAI } from '$lib/types/DocumentForAI';
 import { _ } from '$lib/i18n';
 import type { Unit } from './Unit';
 import type { Entity } from 'aframe';
-import { degree2radian } from '$lib/math/degree2radians';
+import { degree2radian } from 'mymetaverse-helper';
+
 import { videoChat } from './VideoChat';
 
 export class Mentor extends DBObject {

@@ -4,6 +4,7 @@ import { SharedObject } from '$lib/frontend/Classes/SharedObject';
 import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import { uploader } from '$lib/frontend/Classes/Uploader';
 import { Users } from '$lib/frontend/Classes/Users';
+import { videoChat } from '$lib/frontend/Classes/VideoChat';
 import { RoomStore } from '$lib/store';
 import type { Entity, Scene } from 'aframe';
 let room: Room;
@@ -55,10 +56,14 @@ AFRAME.registerComponent('selfie-camera', {
 		sharedObject.attachElement();
 		sharedObjects.add(sharedObject);
 		const player = Users.find(sharedObject.user) as Me;
-		sharedObject.moveToMyFront(player.position, player.rotation);
+		await sharedObject.moveToMyFront(player.position, player.rotation);
 		captureButton.setAttribute('text', { value: 'Capture' });
-		setTimeout(() => {
-			sharedObject.updateComponents();
+		setTimeout(async () => {
+			await sharedObject.update();
+			videoChat.sendMessage({
+				id: sharedObject.id,
+				key: 'objectCreate'
+			});
 		}, 100);
 	},
 	init: function () {

@@ -5,7 +5,7 @@ import type { Room } from './Room';
 import { ChatMessagesStore, RoomStore } from '$lib/store';
 import { actionHistory } from './ActionHistory';
 import { videoChat } from './VideoChat';
-import { escapeHTML } from '$lib/math/escapeHTML';
+import { escapeHTML } from 'mymetaverse-helper';
 
 const usersMemory: User[] = [];
 let room: Room;

@@ -63,6 +63,7 @@
     "langchain": "^0.0.107",
     "luxon": "^3.3.0",
     "mammoth": "^1.6.0",
+    "mymetaverse-helper": "^0.0.3",
     "mymetaverseportal-ui-component": "^0.0.1",
     "mysql2": "^3.4.2",
     "nipplejs": "^0.10.1",

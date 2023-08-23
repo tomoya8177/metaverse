@@ -7,7 +7,7 @@
 	import axios from 'axios';
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
 	import { UserStore } from '$lib/store';
-	import { escapeHTML } from '$lib/math/escapeHTML';
+	import { escapeHTML } from 'mymetaverse-helper';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { DateTime } from 'luxon';

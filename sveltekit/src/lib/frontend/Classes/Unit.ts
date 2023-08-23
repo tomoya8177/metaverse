@@ -1,13 +1,14 @@
-import { unescapeHTML } from '$lib/math/unescapeHTML';
+import { unescapeHTML } from 'mymetaverse-helper';
 import { RoomStore, ItemsInPreview, UserStore, type xyz } from '$lib/store';
 import type { Entity } from 'aframe';
 import type { LocalVideoTrack, RemoteAudioTrack, RemoteVideoTrack } from 'twilio-video';
 import { videoChat } from './VideoChat';
 import { sessionPing } from '$lib/frontend/Classes/sessionPing';
 import type { Room } from './Room';
-import { User } from '$lib/frontend/Classes/User';
+import type { User } from '$lib/frontend/Classes/User';
 import axios from 'axios';
-import { degree2radian } from '$lib/math/degree2radians';
+import { degree2radian } from 'mymetaverse-helper';
+
 import { sharedObjects } from './SharedObjects';
 import { pollAudioLevel } from '../pollAudioLevel';
 import { SharedObject } from './SharedObject';

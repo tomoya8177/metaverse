@@ -18,9 +18,6 @@
 	import { EmptyMentor } from '$lib/preset/EmptyMentor';
 	import { validateMentorData } from '$lib/frontend/validateMentorData';
 	import Navigation from '../../Components/Organisms/Navigation.svelte';
-	import { escapeHTML } from '$lib/math/escapeHTML';
-	import { emptyUser } from '$lib/preset/EmptyUser';
-	import Icon from '../../Components/Atom/Icon.svelte';
 	import TeamIconEditor from '../[organizationSlug=notRoute]/manager/TeamIconEditor.svelte';
 	import { UserStore } from '$lib/store';
 	import { sendJoinedToOrganizationEmail } from '$lib/frontend/sendInvitedToOrganizationEmail';

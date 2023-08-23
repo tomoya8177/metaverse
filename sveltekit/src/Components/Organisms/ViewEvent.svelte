@@ -4,7 +4,7 @@
 	import { UserStore } from '$lib/store';
 	import type { Attendance as AttendanceClass } from '$lib/frontend/Classes/Attendance';
 	import Attendance from '../Molecules/Attendance.svelte';
-	import { nl2br } from '$lib/math/nl2br';
+	import { nl2br } from 'mymetaverse-helper';
 	import { _ } from '$lib/i18n';
 	import EventDateTimeDisplay from '../Molecules/EventDateTimeDisplay.svelte';
 	export let event: Event;

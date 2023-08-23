@@ -1,5 +1,4 @@
-import { escapeHTML } from '$lib/math/escapeHTML';
-import { unescapeHTML } from '$lib/math/unescapeHTML';
+import { escapeHTML, unescapeHTML } from 'mymetaverse-helper';
 import axios from 'axios';
 
 export class DBObject {
