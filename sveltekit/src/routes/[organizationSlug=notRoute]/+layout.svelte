@@ -30,9 +30,9 @@
 	console.log({ user: $UserStore });
 </script>
 
-<slot />
 <Navigation
 	thumbnailURL={organization.thumbnailURL}
 	logoLinkTo={'/' + organization.slug}
 	title={organization?.title}
 />
+<slot />

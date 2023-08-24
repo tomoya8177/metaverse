@@ -20,6 +20,8 @@
 				RPMId = id;
 			}
 			console.log({ RPMId: RPMId });
+		} else {
+			RPMId = '';
 		}
 	};
 	$: checkRPMId(url);
