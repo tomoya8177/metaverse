@@ -9,9 +9,14 @@
 	import { UserStore } from '$lib/store';
 	import type { PageData } from './$types';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import { User } from '$lib/frontend/Classes/User';
 
 	export let data: PageData;
-	let user = data.user;
+	let user;
+	if (data.user) {
+		user = new User(data.user);
+	}
+	console.log({ user });
 	if (user) {
 		user.isMember = true;
 		if (user.userRole?.role == 'manager') {
@@ -25,9 +30,9 @@
 	console.log({ user: $UserStore });
 </script>
 
+<slot />
 <Navigation
 	thumbnailURL={organization.thumbnailURL}
 	logoLinkTo={'/' + organization.slug}
 	title={organization?.title}
 />
-<slot />

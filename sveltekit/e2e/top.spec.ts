@@ -20,12 +20,12 @@ test.describe.serial('Top Page', () => {
 		//	page = await browser.newPage();
 	});
 	test.afterAll(async () => {
-		// const response = await axios
-		// 	.get('http://localhost:5173/deleteLonelyData/' + newOrgSlug)
-		// 	.then((res) => res.data);
-		// console.log(response);
-		// const response2 = await axios.delete('/api/users?email=' + newEmail).then((res) => res.data);
-		// console.log(response2);
+		const response = await axios
+			.get('http://localhost:5173/deleteLonelyData/' + newOrgSlug)
+			.then((res) => res.data);
+		console.log(response);
+		const response2 = await axios.delete('/api/users?email=' + newEmail).then((res) => res.data);
+		console.log(response2);
 	});
 
 	test('to see all buttons, and to send first chat message to AI', async () => {
@@ -246,7 +246,7 @@ test.describe.serial('Top Page', () => {
 		const updateButton = page.getByRole('button', { name: 'Update' });
 		await expect(updateButton).toBeVisible();
 		await updateButton.click();
-		await expect(updateButton).not.toBeVisible({ timeout: 10000 }); // may take longer than expected
+		await expect(updateButton).not.toBeVisible({ timeout: 15000 }); // may take longer than expected
 		//find enter button
 		const enterButton = page.getByRole('button', { name: 'Enter' });
 		await expect(enterButton).toBeVisible();
@@ -281,28 +281,7 @@ test.describe.serial('Top Page', () => {
 		const micButton = page.getByRole('button', { name: 'mic' });
 		await expect(micButton).toBeVisible();
 	});
-	// test('Activate camera', async () => {
-	// 	const cameraOffButton = page.getByRole('button', { name: 'videocam_off' });
-	// 	await expect(cameraOffButton).toBeVisible();
-	// 	//wait for 500 ms
-	// 	await page.waitForTimeout(500);
-	// 	await cameraOffButton.click();
-	// 	//allow camera access
-	// 	//await context.grantPermissions(['camera'], { origin: 'http://localhost:5173' });
-	// 	await expect(cameraOffButton).not.toBeVisible({ timeout: 10000 });
-	// 	const cameraButton = page.getByRole('button', { name: 'videocam' });
-	// 	await expect(cameraButton).toBeVisible();
-	// 	const myCameraPreview = page.locator('#myCameraPreview video');
-	// 	await expect(myCameraPreview).toBeVisible();
-	// });
-	// test('Start Screen Share', async () => {
-	// 	const moreButton = page.getByRole('button', { name: 'more_vert' });
-	// 	await expect(moreButton).toBeVisible();
-	// 	await moreButton.click();
-	// 	const startScreenShareButton = page.getByRole('button', { name: 'Share Screen' });
-	// 	await expect(startScreenShareButton).toBeVisible();
-	// 	await startScreenShareButton.click();
-	// });
+
 	test('Leave Room', async () => {
 		//find account menu
 		const accountMenu = page.getByRole('link', { name: 'Test User' }).nth(1); //because there is another link with the same name
@@ -317,8 +296,8 @@ test.describe.serial('Top Page', () => {
 		await OKButton2.click();
 
 		//manager's console button
-		const managersConsoleButton = page.getByRole('button', { name: "Manager's Console" });
-		await expect(managersConsoleButton).toBeVisible();
+		const availableRoomsTitle = page.getByText('Available Rooms');
+		await expect(availableRoomsTitle).toBeVisible();
 
 		// you are in the dash board. well done. now let's split the test
 		//initiate chat test

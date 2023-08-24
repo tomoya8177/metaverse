@@ -43,6 +43,7 @@ export class User extends DBObject {
 		this.isAdmin = data.isAdmin || false;
 		this.organizations = data.organizations || [];
 		this.userRoles = data.userRoles || [];
+		this.userRole = data.userRole || undefined;
 		this.createdAt = data.createdAt || '';
 		this.onMute = true;
 		this.onVideoMute = true;
@@ -55,6 +56,8 @@ export class User extends DBObject {
 		this.RPMId = data.RPMId || '';
 		this.lastRoom = data.lastRoom || '';
 		this.lastPosition = data.lastPosition || '';
+		this.isManager = data.isManager || false;
+		this.isMember = data.isMember || false;
 	}
 	get fullName(): string {
 		if (!this.firstName && !this.lastName) return this.nickname;

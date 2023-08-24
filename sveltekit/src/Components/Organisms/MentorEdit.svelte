@@ -44,7 +44,10 @@
 		label={_('Nickname')}
 		bind:value={editMentor.userData.nickname}
 	/>
-	<AvatarSelectPane bind:user={editMentor.userData} />
+	<AvatarSelectPane
+		bind:url={editMentor.userData.avatarURL}
+		bind:RPMId={editMentor.userData.RPMId}
+	/>
 
 	<InputWithLabel
 		meta={_(

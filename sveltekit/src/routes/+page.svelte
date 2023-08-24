@@ -140,14 +140,7 @@
 		<ul class="chatMessagesWithAI">
 			{#each messages as message}
 				<li>
-					<TextChatMessage
-						withPinWithTrash={false}
-						{message}
-						onDelete={() => {}}
-						author={message.user == $UserStore.id
-							? new User({ nickname: $UserStore.fullName || 'User' })
-							: mentor.userData}
-					/>
+					<TextChatMessage withPinWithTrash={false} {message} onDelete={() => {}} />
 				</li>
 			{/each}
 		</ul>

@@ -7,7 +7,8 @@
 	import axios from 'axios';
 	import type { User } from '$lib/frontend/Classes/User';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
-	export let user: User;
+	export let RPMId: string;
+	export let url: string;
 	let thumbnailURL = '';
 	let scene: THREE.Scene;
 	let camera: THREE.PerspectiveCamera;
@@ -18,13 +19,14 @@
 	onMount(async () => {
 		// Load the placeholder image
 
+		if (!url) return;
 		scene = new THREE.Scene();
 		camera = new THREE.PerspectiveCamera(30, 1, 0.1, 1000);
 		renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
 
 		renderer.setClearColor(backgroundColor);
 		const loader = new THREE.GLTFLoader();
-		loader.load(user.avatarURL + '?quality=medium&useHands=false', (gltf: GLTF) => {
+		loader.load(url + '?quality=medium&useHands=false', (gltf: GLTF) => {
 			gltf.scene.traverse((child: any) => {
 				if (child.isMesh) {
 					child.material.gammaFactor = 1;
@@ -61,15 +63,14 @@
 		}
 
 		animate();
-		if (user.RPMId) {
+		if (RPMId) {
 			const json = await axios
-				.get(`https://api.readyplayer.me/v1/avatars/${user.RPMId}.json`)
+				.get(`https://api.readyplayer.me/v1/avatars/${RPMId}.json`)
 				.then((res) => res.data);
 			console.log({ json });
-			thumbnailURL = `https://api.readyplayer.me/v1/avatars/${user.RPMId}.png?uat=${json.uat}}`;
+			thumbnailURL = `https://api.readyplayer.me/v1/avatars/${RPMId}.png?uat=${json.uat}}`;
 		} else {
-			thumbnailURL =
-				PresetAvatars.find((avatar) => avatar.url === user.avatarURL)?.thumbnailURL || '';
+			thumbnailURL = PresetAvatars.find((avatar) => avatar.url === url)?.thumbnailURL || '';
 		}
 	});
 </script>

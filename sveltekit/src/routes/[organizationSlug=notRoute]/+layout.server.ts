@@ -5,12 +5,15 @@ import { User } from '$lib/frontend/Classes/User.js';
 import { UserStore } from '$lib/store.js';
 import type { Organization } from '$lib/types/Organization.js';
 import type { UserRole } from '$lib/types/UserRole.js';
+import { redirect } from '@sveltejs/kit';
 
 export const load = async ({ params, cookies }) => {
 	const organization: Organization = await db
 		.query(`SELECT * FROM organizations WHERE slug='${params.organizationSlug}'`)
 		.then((res) => res[0]);
 	console.log({ organization });
+	if (!organization) throw redirect(307, '/');
+
 	const { loggedIn, user } = await checkLoginOnServer(cookies.get('login') || '');
 	console.log({ loggedIn, user });
 	const userRoles = await db

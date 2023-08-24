@@ -58,7 +58,7 @@
 			<div style="text-align:center">
 				<div style="display:inline-block">
 					{#key $UserStore.avatarURL}
-						<AvatarPreview bind:user={$UserStore} />
+						<AvatarPreview bind:RPMId={$UserStore.RPMId} bind:url={$UserStore.avatarURL} />
 					{/key}
 				</div>
 			</div>

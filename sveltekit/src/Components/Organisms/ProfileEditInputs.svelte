@@ -28,7 +28,7 @@
 		if (file) {
 			$UserStore.nicknameURL = file.url;
 		}
-
+		console.log({ $UserStore });
 		await $UserStore.update();
 		videoChat.sendMessage({
 			key: 'updateProfile',
@@ -53,7 +53,7 @@
 	<InputWithLabel label={_('Nickname')} bind:value={$UserStore.nickname} />
 	<InputWithLabel label={_('Status')} bind:value={$UserStore.subtitle} />
 	<NameTag user={$UserStore} className="nameTagPreview" border={false} size={24} />
-	<AvatarSelectPane bind:user={$UserStore} />
+	<AvatarSelectPane bind:RPMId={$UserStore.RPMId} bind:url={$UserStore.avatarURL} />
 </section>
 {#if withDescription}
 	<InputWithLabel label={_('Bio')} bind:value={$UserStore.description} type="textarea" />
