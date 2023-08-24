@@ -1,18 +1,13 @@
+import type { AttendanceStatus } from '$lib/types/AttendanceStatus';
 import { DBObject } from './DBObject';
-export type AttendanceStatus =
-	| 'attending'
-	| 'notAttending'
-	| 'present'
-	| 'absent'
-	| 'late'
-	| 'excused'
-	| 'leftEarly'
-	| 'unknown';
+
 export class Attendance extends DBObject {
 	user: string;
 	event: string;
 	status: AttendanceStatus;
 	description: string;
+	stars: number;
+	review: string;
 	constructor(data: any) {
 		data.table = 'attendances';
 		super(data);
@@ -20,5 +15,7 @@ export class Attendance extends DBObject {
 		this.event = this.unescapedData?.event || '';
 		this.status = this.unescapedData?.status || 'unknown';
 		this.description = this.unescapedData?.description || '';
+		this.stars = data.stars || 5;
+		this.review = this.unescapedData?.review || '';
 	}
 }

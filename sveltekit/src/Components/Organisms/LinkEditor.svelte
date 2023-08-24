@@ -64,7 +64,7 @@
 			editObject.handle = file.url.split('/').pop();
 		}
 		editObject.user = $UserStore.id;
-		editObject.room = $RoomStore.id || room.id;
+		editObject.room = $RoomStore?.id || room?.id || '';
 	};
 
 	const onCreateClicked = async () => {
@@ -162,7 +162,7 @@
 				{_('Event')}
 			</h4>
 			<ScheduleEditor bind:editEvent />
-			<AttendanceEditor bind:editEvent {users} bind:attendances />
+			<AttendanceEditor {organization} bind:editEvent {users} bind:attendances />
 		</div>
 	{/if}
 	{#if editObject.type.includes('image') && editObject.withCaption}
@@ -191,6 +191,49 @@
 				>
 					{_('Upload Graphic')}
 				</button>
+				{#if editObject.type.includes('image') || editObject.type.includes('video')}
+					<div>
+						{#if !editObject.isSphere}
+							<button
+								on:click={async () => {
+									if (!editObject) return;
+
+									const updatedImage = await axios.put('/api/objects/' + editObject.id, {
+										isSphere: true
+									});
+									editObject.isSphere = true;
+									editObject.updateEntityGeometryAndMaterial();
+									if (videoChat.connected) {
+										videoChat.sendMessage({
+											key: 'objectUpdate',
+											id: editObject.id,
+											isSphere: true
+										});
+									}
+								}}>{_('Convert To 360 Sphere')}</button
+							>
+						{:else}
+							<button
+								on:click={async () => {
+									if (!editObject) return;
+
+									const updatedImage = await axios.put('/api/objects/' + editObject.id, {
+										isSphere: false
+									});
+									editObject.isSphere = false;
+									editObject.updateEntityGeometryAndMaterial();
+									if (videoChat.connected) {
+										videoChat.sendMessage({
+											key: 'objectUpdate',
+											id: editObject.id,
+											isSphere: false
+										});
+									}
+								}}>{_('Convert To Flat Image')}</button
+							>
+						{/if}
+					</div>
+				{/if}
 				<button
 					aria-busy={generateImageBusy}
 					on:click={async () => {
@@ -267,49 +310,7 @@
 		</div>
 	{/if}
 </div>
-{#if editObject.type.includes('image') || editObject.type.includes('video')}
-	<div>
-		{#if !editObject.isSphere}
-			<button
-				on:click={async () => {
-					if (!editObject) return;
 
-					const updatedImage = await axios.put('/api/objects/' + editObject.id, {
-						isSphere: true
-					});
-					editObject.isSphere = true;
-					editObject.updateEntityGeometryAndMaterial();
-					if (videoChat.connected) {
-						videoChat.sendMessage({
-							key: 'objectUpdate',
-							id: editObject.id,
-							isSphere: true
-						});
-					}
-				}}>{_('Convert To 360 Sphere')}</button
-			>
-		{:else}
-			<button
-				on:click={async () => {
-					if (!editObject) return;
-
-					const updatedImage = await axios.put('/api/objects/' + editObject.id, {
-						isSphere: false
-					});
-					editObject.isSphere = false;
-					editObject.updateEntityGeometryAndMaterial();
-					if (videoChat.connected) {
-						videoChat.sendMessage({
-							key: 'objectUpdate',
-							id: editObject.id,
-							isSphere: false
-						});
-					}
-				}}>{_('Convert To Flat Image')}</button
-			>
-		{/if}
-	</div>
-{/if}
 <CreateUpdateDeleteButtons
 	{editMode}
 	{onCreateClicked}

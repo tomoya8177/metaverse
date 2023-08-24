@@ -1,6 +1,5 @@
 import type { Organization } from '$lib/types/Organization';
 import axios from 'axios';
-
 export const load = async ({ params }) => {
 	const organization: Organization = await axios
 		.get(`/api/organizations?slug=${params.organizationSlug}`)

@@ -1,6 +1,5 @@
 import type { Room } from '$lib/frontend/Classes/Room.js';
 import type { User } from '$lib/frontend/Classes/User.js';
-import type { Organization } from '$lib/types/Organization.js';
 import axios from 'axios';
 
 export const load = async ({ params, parent }) => {

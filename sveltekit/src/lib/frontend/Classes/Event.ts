@@ -18,6 +18,8 @@ export class Event extends DBObject {
 	end: string;
 	organization: string;
 	myAttendance?: Attendance;
+	review: string;
+	stars: number;
 	constructor(data: any = {}) {
 		data.table = 'events';
 		super(data);
@@ -26,10 +28,19 @@ export class Event extends DBObject {
 		this.summary = this.unescapedData.summary || '';
 		this.location = this.unescapedData.location || '';
 		this.url = this.unescapedData.url || '';
-		this.start = this.unescapedData.start || DateTime.now().toISO();
-		this.end = this.unescapedData.end || DateTime.now().plus({ hours: 1 }).toISO();
+		this.start = this.toUTC(data.start);
+		this.end = this.toUTC(data.end || DateTime.now().plus({ hours: 1 }).toISO());
 		this.organization = this.unescapedData.organization || '';
 		this.linkType = data.linkType || '_blank';
+		this.review = this.unescapedData.review || '';
+		this.stars = data.stars || 5;
+		this.myAttendance = data.myAttendance;
+	}
+	toUTC(datetime: any) {
+		if (!datetime) return DateTime.now().toISO();
+		if (typeof datetime == 'string') return DateTime.fromISO(datetime).toISO();
+		//if date object, convert to iso string
+		if (datetime instanceof Date) return DateTime.fromJSDate(datetime).toISO();
 	}
 	get allDay(): boolean {
 		if (!this.start) return false;

@@ -15,6 +15,8 @@
 	import { Users } from '$lib/frontend/Classes/Users';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import type { Mentor } from '$lib/frontend/Classes/Mentor';
+	import CalendarView from '../../Components/Templates/CalendarView.svelte';
+	import { Event } from '$lib/frontend/Classes/Event';
 
 	export let data: PageData;
 	const organization: Organization = data.organization;
@@ -45,6 +47,11 @@
 			return false;
 		});
 	});
+	let onDeleteClicked = (data) => {
+		console.log(data);
+	};
+	let events = data.events.map((event) => new Event(event));
+	console.log({ events });
 </script>
 
 <svelte:head>
@@ -90,6 +97,10 @@
 						</p>
 					</div>
 				{/each}
+			</section>
+			<section>
+				{_('Your Calendar')}
+				<CalendarView {onDeleteClicked} {events} />
 			</section>
 		{/if}
 	</div>

@@ -1,24 +1,20 @@
 <script lang="ts">
 	import { _ } from '$lib/i18n';
-	import { page } from '$app/stores';
 	import { UserStore } from '$lib/store';
 	import { onMount } from 'svelte';
 	import Icon from '../Components/Atom/Icon.svelte';
-	import NippleControl from '../Components/Atom/NippleControl.svelte';
 	import Navigation from '../Components/Organisms/Navigation.svelte';
-	import UnderConstruction from '../Components/Templates/UnderConstruction.svelte';
 	import axios from 'axios';
-	import type { Mentor } from '$lib/types/Mentor';
 	import AvatarThumbnail from '../Components/Atom/AvatarThumbnail.svelte';
 	import { fade } from 'svelte/transition';
 	import { User } from '$lib/frontend/Classes/User';
 	import { cookies } from '$lib/frontend/cookies';
-	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import SendMessageButton from '../Components/Atom/SendMessageButton.svelte';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import TextChatMessage from '../Components/Molecules/TextChatMessage.svelte';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
+	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 	let mentor: Mentor | null = null;
 	let intro: string = '';
 	let invite: string = '';

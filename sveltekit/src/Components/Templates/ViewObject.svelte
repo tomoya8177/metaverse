@@ -4,7 +4,7 @@
 	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import { UserStore } from '$lib/store';
 	import { _ } from '$lib/i18n';
-	import { nl2br } from 'mymetaverse-helper';
+	import { escapeHTML, nl2br } from 'mymetaverse-helper';
 	import type { Organization } from '$lib/types/Organization';
 	import { DateTime } from 'luxon';
 	import Attendance from '../Molecules/Attendance.svelte';
@@ -46,6 +46,9 @@
 					{_('Event')}
 				</h4>
 				<EventDateTimeDisplay {event} />
+				{#if event.review}
+					{@html nl2br(escapeHTML(event.review))}
+				{/if}
 			</section>
 			{#if attendance}
 				<h4>

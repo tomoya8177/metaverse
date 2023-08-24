@@ -1,5 +1,7 @@
 <script lang="ts">
-	import { Event } from '$lib/frontend/Classes/Event';
+	import AttendingUser from './AttendingUser.svelte';
+
+	import type { Event } from '$lib/frontend/Classes/Event';
 	import { myConfirm, toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
 	import { page } from '$app/stores';
@@ -14,9 +16,11 @@
 	import { DateTime } from 'luxon';
 	import ScheduleEditor from './ScheduleEditor.svelte';
 	import AvatarThumbnail from '../Atom/AvatarThumbnail.svelte';
+	import { goto } from '$app/navigation';
 	export let editEvent: Event;
 	export let users: User[] = [];
 	export let attendances: Attendance[] = [];
+	export let organization: Organization;
 	onMount(async () => {
 		attendances = await axios
 			.get('/api/attendances?event=' + editEvent.id)
@@ -31,7 +35,7 @@
 	{#each users.filter((user) => !attendances.some((attendance) => attendance.user == user.id)) as user}
 		<div style="display:flex;margin-bottom:0.2rem">
 			<div style="flex:1">
-				<AvatarThumbnail url={user.avatarURL} size="2rem" />
+				<AvatarThumbnail {user} size="2rem" />
 				{user.nickname}
 			</div>
 			<div style="width:8rem;text-align:right">
@@ -62,81 +66,18 @@
 	{#each attendances as attendance}
 		{@const user = users.find((user) => user.id == attendance.user)}
 		{#if user}
-			<div>
-				<div style="display:flex;gap:0.6rem">
-					<div style="flex:1">
-						<AvatarThumbnail url={user.avatarURL} size="2rem" />
-
-						{user.nickname}
-					</div>
-					<div>
-						<a
-							href={'#'}
-							on:click={async () => {
-								const data = await editEvent.ical([user], attendances);
-								console.log(data);
-								toast(`${_('Sent an invitation to ')}${user.nickname}`);
-							}}
-						>
-							<Icon icon="email" />
-							{_('Send Invitation')}
-						</a>
-					</div>
-					<div style="width:1rem;text-align:right">
-						<a
-							href={'#'}
-							on:click={() => {
-								attendance.delete();
-								attendances = attendances.filter((a) => a.id != attendance.id);
-							}}
-						>
-							<Icon icon="delete" />
-						</a>
-					</div>
-				</div>
-				{#if editEvent.end > DateTime.now().toISO()}
-					<div style="display:flex;gap:0.2rem">
-						{#each [{ key: 'unknown', label: _('Unknown') }, { key: 'attending', label: _('Attending') }, { key: 'notAttending', label: _('Not Attending') }] as status}
-							<div>
-								<a
-									class:outline={attendance.status != status.key}
-									href={'#'}
-									role="button"
-									on:click={async () => {
-										status.key = status.key;
-										attendance.status = status.key;
-										await attendance.update();
-										toast(_('Updated'));
-									}}
-								>
-									{status.label}
-								</a>
-							</div>
-						{/each}
-					</div>
-				{:else}
-					<div style="display:flex;gap:0.2rem">
-						{#each [{ key: 'present', label: _('Present') }, { key: 'absent', label: _('Absent') }, { key: 'late', label: _('Late') }, { key: 'excused', label: _('Excused') }, { key: 'leftEarly', label: _('Left Early') }] as status}
-							<div>
-								<a
-									class:outline={attendance.status != status.key}
-									href={'#'}
-									role="button"
-									on:click={async () => {
-										attendance.status = status.key;
-										await attendance.update();
-										toast(_('Updated'));
-									}}
-								>
-									{status.label}
-								</a>
-							</div>
-						{/each}
-					</div>
-				{/if}
-			</div>
+			<AttendingUser {editEvent} {attendances} {user} />
 		{/if}
 	{/each}
+</section>
+<section>
+	<button
+		on:click={() => {
+			goto(`/${organization.slug}/manager/events/${editEvent.id}/review`);
+		}}
+	>
+		{_('Write Review')}
+	</button>
 </section>
 <section>
 	<strong>

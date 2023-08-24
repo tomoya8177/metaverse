@@ -9,17 +9,29 @@
 	import { toast } from '$lib/frontend/toast';
 	import { _ } from '$lib/i18n';
 	import { UserStore } from '$lib/store';
+	import { escapeHTML, nl2br } from 'mymetaverse-helper';
+	import RatingStars from './RatingStars.svelte';
+	import {
+		AttendanceStatusOptions,
+		AttendanceStatusOptionsWithUnknown
+	} from '$lib/types/AttendanceStatus';
 	export let user: User;
 
 	export let event: Event;
 	export let attendance: Attendance;
 	export let onDelete: () => void;
+	let attendanceOptions: typeof AttendanceStatusOptions | typeof AttendanceStatusOptionsWithUnknown;
+	if (event.end > DateTime.now().toISO()) {
+		attendanceOptions = AttendanceStatusOptionsWithUnknown;
+	} else {
+		attendanceOptions = AttendanceStatusOptions;
+	}
 </script>
 
 <div>
 	<div style="display:flex;gap:0.6rem">
 		<div style="flex:1">
-			<AvatarThumbnail url={user.avatarURL} size="2rem" />
+			<AvatarThumbnail {user} size="2rem" />
 
 			{user.nickname}
 		</div>
@@ -37,44 +49,31 @@
 			</div>
 		{/if}
 	</div>
-	{#if event.end > DateTime.now().toISO()}
-		<div style="display:flex;gap:0.2rem">
-			{#each [{ key: 'unknown', label: _('Unknown') }, { key: 'attending', label: _('Attending') }, { key: 'notAttending', label: _('Not Attending') }] as status}
-				<div>
-					<a
-						class:outline={attendance.status != status.key}
-						href={'#'}
-						role="button"
-						on:click={async () => {
-							status.key = status.key;
-							attendance.status = status.key;
-							await attendance.update();
-							toast(_('Updated'));
-						}}
-					>
-						{status.label}
-					</a>
-				</div>
-			{/each}
-		</div>
-	{:else}
-		<div style="display:flex;gap:0.2rem">
-			{#each [{ key: 'present', label: _('Present') }, { key: 'absent', label: _('Absent') }, { key: 'late', label: _('Late') }, { key: 'excused', label: _('Excused') }, { key: 'leftEarly', label: _('Left Early') }] as status}
-				<div>
-					<a
-						class:outline={attendance.status != status.key}
-						href={'#'}
-						role="button"
-						on:click={async () => {
-							attendance.status = status.key;
-							await attendance.update();
-							toast(_('Updated'));
-						}}
-					>
-						{status.label}
-					</a>
-				</div>
-			{/each}
-		</div>
+	<div style="display:flex;gap:0.2rem">
+		{#each attendanceOptions as status}
+			<div>
+				<a
+					class:outline={attendance.status != status.key}
+					href={'#'}
+					role="button"
+					on:click={async () => {
+						status.key = status.key;
+						attendance.status = status.key;
+						await attendance.update();
+						toast(_('Updated'));
+					}}
+				>
+					{status.label}
+				</a>
+			</div>
+		{/each}
+	</div>
+	{#if attendance.status == 'present' || attendance.status == 'late' || attendance.status == 'leftEarly'}
+		{#if attendance.stars}
+			<RatingStars value={attendance.stars} readonly />
+		{/if}
+		{#if attendance.review}
+			{@html nl2br(escapeHTML(attendance.review))}
+		{/if}
 	{/if}
 </div>

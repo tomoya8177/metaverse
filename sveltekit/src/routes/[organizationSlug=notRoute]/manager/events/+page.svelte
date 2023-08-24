@@ -18,6 +18,7 @@
 	import { cookies } from '$lib/frontend/cookies';
 	import { goto } from '$app/navigation';
 	import { calendar } from '$lib/frontend/Classes/Calendar';
+	import CalendarView from '../../../../Components/Templates/CalendarView.svelte';
 
 	export let data: PageData;
 	let events = data.events;
@@ -27,21 +28,10 @@
 	let editEvent: Event;
 	let editMode: 'create' | 'update' = 'update';
 	let users = data.users;
-	onMount(() => {
-		const el = document.getElementById('calendar') as HTMLElement;
-		calendar.init(el, events, onEventClicked);
-		calendar.render();
-	});
+
 	const onEventClicked = (eventId: string) => {
 		goto(`/${organization.slug}/manager/events/${eventId}`);
 		return;
-		editEvent = events.find((event) => event.id == eventId) || new Event({});
-		if (!editEvent.id) return;
-		//convert to local
-		editEvent.start = convertUTCToLocal(editEvent.start);
-		editEvent.end = convertUTCToLocal(editEvent.end);
-		modalOpen = true;
-		editMode = 'update';
 	};
 </script>
 
@@ -63,7 +53,7 @@
 		{_('Add Event')}
 	</a>
 </section>
-<div id="calendar" />
+<CalendarView {onEventClicked} bind:events />
 
 {#if modalOpen}
 	<dialog open>

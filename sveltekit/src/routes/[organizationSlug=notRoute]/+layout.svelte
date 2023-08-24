@@ -11,6 +11,15 @@
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 
 	export let data: PageData;
+	let user = data.user;
+	if (user) {
+		user.isMember = true;
+		if (user.userRole?.role == 'manager') {
+			user.isManager = true;
+		}
+		UserStore.set(user);
+	}
+
 	organization = data.organization;
 	actionHistory.organization = organization.id;
 	console.log({ user: $UserStore });

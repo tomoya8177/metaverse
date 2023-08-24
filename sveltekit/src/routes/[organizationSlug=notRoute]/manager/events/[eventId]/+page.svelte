@@ -13,6 +13,7 @@
 	export let data: PageData;
 	console.log({ data });
 	let editEvent = new Event(data.event);
+	console.log({ editEvent });
 
 	let editObject = editEvent.object ? new SharedObject(data.object) : undefined;
 	let room = editObject?.room ? new Room(data.room) : undefined;

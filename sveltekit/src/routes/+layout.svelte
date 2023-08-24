@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { PUBLIC_IS_DEV } from '$env/static/public';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { _ } from '$lib/i18n';
 	import { ConfirmDialog, Toast, UserStore } from '$lib/store';
@@ -12,6 +11,7 @@
 
 <svelte:head>
 	{#if !$page.url.host.includes('localhost')}
+		<!-- Google tag (gtag.js) -->
 		<!-- Google tag (gtag.js) -->
 		<!-- Google tag (gtag.js) -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=G-VGNJBD1Q84"></script>

@@ -260,5 +260,10 @@ export default {
 	Selfie: 'セルフィー',
 	Calendar: 'カレンダー',
 	'Connected to the room!': 'ルームに接続しました！',
-	'Connection Failed': '接続に失敗しました'
+	'Connection Failed': '接続に失敗しました',
+	Schedule: 'スケジュール',
+	'Review for individual attendees': '個々の出席者のレビュー',
+	Review: 'レビュー',
+	'Review for the class': 'クラスのレビュー',
+	'Your Calendar': 'あなたのカレンダー'
 };

@@ -15,14 +15,11 @@
 	}
 	let event = data.event ? new Event(data.event) : undefined;
 	let attendances: Attendance[] = [];
-	console.log({ event });
 	if (event) {
-		attendances = data.attendances.map((atte) => new Attendance(atte));
+		attendances = data.attendances.map((atte: any) => new Attendance(atte));
 	}
 	let organization: Organization = data.organization;
 	let room = data.room;
-
-	onMount(() => {});
 </script>
 
 {#if object}

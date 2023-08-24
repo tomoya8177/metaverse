@@ -40,7 +40,7 @@
 		<LinkUrlDescriptionEditor bind:editItem={editEvent} {organization} canAttachBrandIcon={false} />
 	</div>
 	<div>
-		<AttendanceEditor bind:editEvent bind:users />
+		<AttendanceEditor {organization} bind:editEvent bind:users />
 	</div>
 </div>
 

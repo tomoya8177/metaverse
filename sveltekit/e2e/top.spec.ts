@@ -20,10 +20,10 @@ test.describe.serial('Top Page', () => {
 		//	page = await browser.newPage();
 	});
 	test.afterAll(async () => {
-		const response = await axios
-			.get('http://localhost:5173/deleteLonelyData/' + newOrgSlug)
-			.then((res) => res.data);
-		console.log(response);
+		// const response = await axios
+		// 	.get('http://localhost:5173/deleteLonelyData/' + newOrgSlug)
+		// 	.then((res) => res.data);
+		// console.log(response);
 		// const response2 = await axios.delete('/api/users?email=' + newEmail).then((res) => res.data);
 		// console.log(response2);
 	});
@@ -222,7 +222,7 @@ test.describe.serial('Top Page', () => {
 
 		//now you should see the change profile modal as you haven't initialized the nickname graphic
 		const changeProfileTitle = page.getByRole('heading', { name: 'Change Profile' });
-		await expect(changeProfileTitle).toBeVisible({ timeout: 15000 }); //may take longer than expected
+		await expect(changeProfileTitle).toBeVisible({ timeout: 10000 }); //may take longer than expected
 	});
 	test('Update Profile', async () => {
 		//find nickname input

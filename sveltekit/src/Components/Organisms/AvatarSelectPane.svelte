@@ -12,7 +12,7 @@
 	let avatarSelectOpen = false;
 	let RPMOpen = false;
 	const checkRPMId = (string) => {
-		if (user.avatarURL.includes('readyplayer.me')) {
+		if (user.avatarURL?.includes('readyplayer.me')) {
 			const arr = string.split('/');
 			const id = arr[arr.length - 1].split('.')[0];
 			if (id) {

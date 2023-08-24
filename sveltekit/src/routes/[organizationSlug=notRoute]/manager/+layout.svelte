@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { checkLogin } from '$lib/frontend/checkLogin';
 	import { onMount, setContext } from 'svelte';
 	import { RoomStore, FocusObjectStore, UserStore } from '$lib/store';
 	import Icon from '../../../Components/Atom/Icon.svelte';

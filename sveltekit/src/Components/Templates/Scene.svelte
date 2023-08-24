@@ -37,6 +37,7 @@
 	import { environmentPresets } from '$lib/preset/EnvironmentPresets';
 	import { EnvironmentModelPresets } from '$lib/preset/EnvironmentModelPresets';
 	import type { Entity } from 'aframe';
+	import RatingStars from '../Molecules/RatingStars.svelte';
 	export let data: PageData;
 	export let room: Room;
 	let organization: Organization = data.organization;
@@ -160,20 +161,7 @@
 				{_('Rate This Metaverse!')}
 			</h3>
 			<section>
-				<div style="display:flex">
-					{#each [1, 2, 3, 4, 5] as i}
-						<a
-							href={'#'}
-							on:click={() => {
-								starValue = i;
-							}}
-							class="star"
-							class:selected={starValue >= i}
-						>
-							<Icon size={4} icon="star" />
-						</a>
-					{/each}
-				</div>
+				<RatingStars bind:value={starValue} />
 			</section>
 			<InputWithLabel label={_('Give us your feedback')} type="textarea" bind:value={feedback} />
 			<button
@@ -285,15 +273,3 @@
 {#if sceneLoaded}
 	<SceneUIs {me} {organization} {room} />
 {/if}
-
-<style>
-	.star {
-		flex: 1;
-		text-align: center;
-		display: inline-block;
-		color: gray;
-	}
-	.star.selected {
-		color: orange;
-	}
-</style>
