@@ -75,7 +75,7 @@
 			const mentorUnit = new Unit(room.mentorData.userData);
 			mentorUnit.position = { x: 0, y: 0, z: 3 };
 			mentorUnit.el.setAttribute('ai-mentor', '');
-			mentorUnit.avatar?.setAttribute('move-mouth', 'userId:' + room.mentorData.userData.id);
+			mentorUnit.el.setAttribute('move-mouth', 'userId:' + room.mentorData.userData.id);
 			Users.add(mentorUnit);
 			room.mentorData.setEl();
 		}
@@ -98,7 +98,11 @@
 				{
 					type: 'room',
 					roomId: room.id,
-					body: _("Hello! I'm ") + $UserStore.nickname,
+					body:
+						_("Hello! I'm") +
+						$UserStore.nickname +
+						_('You can just answer me hi. In the language of my setting. My locale is set to ') +
+						cookies.get('locale'),
 					channelId: videoChat.room?.sid || ''
 				}
 			);

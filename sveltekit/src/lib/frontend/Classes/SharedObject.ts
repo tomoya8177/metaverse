@@ -104,7 +104,6 @@ export class SharedObject extends DBObject {
 		const res = await axios.get('/api/events?object=' + this.id);
 		if (res.data.length == 0) return;
 		this.attachedEvent = new Event(res.data[0]);
-		console.log({ attachedEvent: this.attachedEvent, user });
 		const res2 = await axios.get(
 			'/api/attendances?event=' + this.attachedEvent.id + '&user=' + user.id
 		);
@@ -316,7 +315,6 @@ export class SharedObject extends DBObject {
 			scale: this.el.getAttribute('scale'),
 			radius: this.el.getAttribute('geometry')?.radius
 		});
-		console.log('set component', this.components);
 	}
 	remove() {
 		this.el?.parentNode?.removeChild(this.el);

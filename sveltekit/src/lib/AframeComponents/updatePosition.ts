@@ -32,8 +32,20 @@ AFRAME.registerComponent('update-position', {
 		this.me = (Users.find(this.el.id) as Me) || null;
 		this.lastPosition = { ...this.me.position };
 		this.lastRotation = { ...this.me.rotation };
+		setInterval(() => {
+			this.slowTick();
+		}, 100);
 	},
-	tick: function () {
+	slowTick: function () {
+		//spatial sound
+		Users.users
+			.filter((unit) => unit.audioSid)
+			.forEach((unit) => {
+				const distance = this.el.object3D.position.distanceTo(unit.el.object3D.position);
+				const volume = 1 - distance / 10;
+				//set volume of the audio element
+				unit.audioEl.volume = Math.max(0, volume);
+			});
 		if (this.me === undefined) return;
 
 		const currentTime = Date.now();
@@ -159,9 +171,9 @@ const positionRotationChanged = (
 ) => {
 	let threshold = 0.01;
 	return (
-		current.position.x - past.position.x > threshold ||
-		current.position.y - past.position.y > threshold ||
-		current.position.z - past.position.z > threshold ||
+		current.position.x != past.position.x ||
+		current.position.y != past.position.y ||
+		current.position.z != past.position.z ||
 		current.rotation.x !== past.rotation.x ||
 		current.rotation.y !== past.rotation.y ||
 		current.rotation.z !== past.rotation.z

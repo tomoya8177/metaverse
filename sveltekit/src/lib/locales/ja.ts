@@ -251,8 +251,7 @@ export default {
 	'has joined the room!': 'がルームに参加しました！',
 	'left the room': 'がルームを退出しました',
 	"Hello! I just entered the room. I'm ": 'こんにちは！私はちょうどルームに入りました。私は',
-	'Let me know if there is any event for me to attend.':
-		'私が出席するイベントがあれば教えてください。',
+	"Let me know if there is any event for me to attend. If there's no event, don't mentiona anything about event.": `私が出席するイベントがあれば教えてください。イベントがない場合は、イベントについて何も言わないでください。`,
 	'Can you tell me anything you know about the object, which ID is ':
 		'このオブジェクトについて何か知っていますか？IDは',
 	'and title is ': 'タイトルは',
@@ -265,5 +264,7 @@ export default {
 	'Review for individual attendees': '個々の出席者のレビュー',
 	Review: 'レビュー',
 	'Review for the class': 'クラスのレビュー',
-	'Your Calendar': 'あなたのカレンダー'
+	'Your Calendar': 'あなたのカレンダー',
+	'You can just answer me hi. In the language of my setting. My locale is set to ':
+		'私に挨拶してくれるだけでいいです。私の設定の言語で。ロケールは次のように設定されています。'
 };

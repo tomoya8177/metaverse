@@ -10,10 +10,9 @@ AFRAME.registerComponent('move-mouth', {
 	avatar: null as Entity | null,
 	head: null as SkinnedMesh | null,
 	init: function () {
-		if (this.el.parentNode == null) return console.error('parent node is null');
-		this.avatar = this.el.parentNode.querySelector('a-gltf-model');
+		this.avatar = this.el.querySelector('a-gltf-model');
 		//traverse the gltf model to find the head
-		if (!this.avatar) return console.error('avatar is null');
+		if (!this.avatar) return console.error('avatar is null1');
 		this.avatar.addEventListener('model-loaded', () => {
 			this.findMouth();
 		});

@@ -1,4 +1,4 @@
-import type { Me } from '$lib/frontend/Classes/Me';
+import { Me } from '$lib/frontend/Classes/Me';
 import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
 import { User } from '$lib/frontend/Classes/User';
@@ -9,8 +9,9 @@ import { FocusObjectStore, UserStore, type xyz } from '$lib/store';
 import type { Entity } from 'aframe';
 import axios from 'axios';
 let me: Me;
+let user: User;
 UserStore.subscribe((val) => {
-	me = Users.find(val?.id) as Me;
+	user = val;
 });
 
 AFRAME.registerComponent('editable-object', {
@@ -29,6 +30,7 @@ AFRAME.registerComponent('editable-object', {
 		this.object = sharedObjects.get(this.el.id) || null;
 
 		this.el.addEventListener('mousedown', (e: any) => {
+			me = Users.find(user.id) as Me;
 			if (!this.object || !this.rayCatcher) return console.error('object is null');
 			this.object.focus();
 			this.camera = document.getElementById('camera') as Entity;

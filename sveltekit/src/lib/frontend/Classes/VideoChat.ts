@@ -115,7 +115,6 @@ export class VideoChat {
 			name: this.roomId,
 			tracks: [this.dataTrack]
 		});
-		console.log({ room: this.room });
 		this.localParticipant = this.room.localParticipant;
 		this.connected = true;
 		// Log your Client's LocalParticipant in the Room
@@ -129,7 +128,6 @@ export class VideoChat {
 
 		this.localParticipant.on('trackPublicationFailed', (error: Error, track: LocalTrack) => {
 			if (track === this.dataTrack) {
-				console.log('data track publish failed');
 				if (typeof dataTrackPublished.reject === 'undefined') return;
 				dataTrackPublished.reject(error);
 			}
@@ -192,7 +190,6 @@ export class VideoChat {
 		el.style.height = '8rem';
 		localMediaContainer?.appendChild(el);
 		const publication = await this.localParticipant.publishTrack(this.videoTrack);
-		console.log('Successfully published your video:', publication);
 		this.cameraPingInterval = new sessionPing(
 			{
 				user: this.userId,
