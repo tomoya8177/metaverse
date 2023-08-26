@@ -46,9 +46,10 @@ AFRAME.registerComponent('selfie-camera', {
 		const file = await uploader.uploadCanvas(canvas, 'selfie.jpg');
 		if (!file) return;
 		captureButton.setAttribute('text', { value: 'Uploading...' });
+		console.log({ file });
 		const sharedObject = new SharedObject({
 			url: file.url,
-			type: file.mimetype,
+			type: file.type,
 			title: 'Selfie',
 			handle: file.handle
 		});
