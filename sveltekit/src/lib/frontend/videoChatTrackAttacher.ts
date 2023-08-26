@@ -4,22 +4,26 @@ import type { RemoteAudioTrack, RemoteTrack, RemoteVideoTrack } from 'twilio-vid
 import { Users } from './Classes/Users';
 import { ItemsInPreview } from '$lib/store';
 import { SharedObject } from './Classes/SharedObject';
+import type { Unit } from './Classes/Unit';
 
 export const attachRemoteTrack = async (track: RemoteVideoTrack | RemoteAudioTrack) => {
 	const remoteUserId = track.name
 		.replace('screenOf', '')
 		.replace('audioOf', '')
 		.replace('cameraOf', '');
-	let unit = Users.find(remoteUserId);
+	let unit = Users.find(remoteUserId) as Unit;
 	if (!unit) {
 		const user = await axios.get('/api/users/' + remoteUserId).then((res) => res.data);
 		unit = welcomeUnit(user);
 	}
 	console.log({ track });
-	let container = document.querySelector('a-assets');
 
 	const el = track.attach();
+	console.log;
 	el.id = track.sid;
+	let container = track.name.includes('audioOf')
+		? document.querySelector('body')
+		: document.querySelector('a-assets');
 	container?.appendChild(el);
 	if (track.name.includes('cameraOf')) {
 		unit.showCamera(track as RemoteVideoTrack);
@@ -55,7 +59,7 @@ export const detatchTrack = (track: RemoteTrack) => {
 	if (el) el.remove();
 	const unit = Users.find(
 		track.name.replace('cameraOf', '').replace('screenOf', '').replace('audioOf', '')
-	);
+	) as Unit;
 	if (!unit) {
 		console.log('oh no, no unit found');
 		return;

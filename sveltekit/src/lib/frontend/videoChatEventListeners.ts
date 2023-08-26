@@ -26,12 +26,10 @@ const mountDataTrack = async (
 	newUser = true
 ): Promise<void> => {
 	setupDataTrackListener(track);
-	//sendHandshake();
 	const user = new User(
 		await axios.get(`/api/users/${participant.identity}`).then((res) => res.data)
 	);
 	toast(`${user.nickname} ${_('has joined the room!')}`);
-	//check after a while if the handshake was successfull
 	const inRoom = !!Users.find(participant.identity);
 	if (inRoom) return;
 
@@ -115,16 +113,7 @@ const setupDataTrackListener = (track: RemoteDataTrack) => {
 		}
 	});
 };
-const sendHandshake = () => {
-	const me = Users.find(videoChat.userId) as Me;
-	if (!me) return;
-	videoChat.sendMessage({
-		key: 'handshake',
-		user: videoChat.user,
-		position: me.position,
-		rotation: me.rotation
-	});
-};
+
 export const onTabClosed = (room: Room) => {
 	window.addEventListener('beforeunload', () => {
 		room.disconnect();

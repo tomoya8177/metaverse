@@ -18,19 +18,13 @@ RoomStore.subscribe((r) => {
 });
 
 export const messageListeners = () => {
-	videoChat.listenTo('handshake', async (data) => {
-		const userUnit = welcomeUnit(data.user);
-		if (!userUnit) return;
-		userUnit.position = data.position;
-		userUnit.rotation = data.rotation;
-	});
 	videoChat.listenTo('position', async (data) => {
 		let unit = Users.find(data.user.id) as Unit;
 		if (!unit) {
 			unit = welcomeUnit(data.user);
 		}
-		if (!unit) return; // lets return until unit handshake complete
-		unit.position = data.position;
+		if (!unit) return;
+		unit.animatePosition(data.position);
 		unit.rotation = data.rotation;
 	});
 	videoChat.listenTo('updateProfile', (data) => {
@@ -48,7 +42,6 @@ export const messageListeners = () => {
 	videoChat.listenTo('objectPosition', (data) => {
 		const object = sharedObjects.get(data.object.id);
 		if (!object) return;
-		console.log({ object });
 		object.el?.setAttribute('position', data.position);
 		object.el?.setAttribute('rotation', data.rotation);
 		object.el?.setAttribute('scale', data.scale);
@@ -103,7 +96,6 @@ export const welcomeUnit = (user: User): Unit => {
 	return userUnit;
 };
 export const messageUnlisteners = () => {
-	videoChat.dontListenTo('handshake');
 	videoChat.dontListenTo('position');
 	videoChat.dontListenTo('updateProfile');
 };

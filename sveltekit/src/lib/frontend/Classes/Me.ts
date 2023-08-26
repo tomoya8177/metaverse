@@ -97,9 +97,9 @@ export class Me extends Unit {
 			'material',
 			`
 			side:double;
-		shader:flat;
-		src:#selfieCanvas
-		`
+			shader:flat;
+			src:#selfieCanvas
+			`
 		);
 		this.selfie.appendChild(selfieCameraPreview);
 	}

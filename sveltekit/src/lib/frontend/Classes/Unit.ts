@@ -33,6 +33,8 @@ export class Unit {
 	sharingScreen: boolean = false;
 	audioLevel: number = 0;
 	userData: User;
+	audioSid: string = '';
+	audioEl: HTMLAudioElement | null = null;
 	constructor(data: User) {
 		this.userData = data;
 		this.id = data.id;
@@ -131,6 +133,15 @@ export class Unit {
 
 	set position(position: xyz) {
 		this.el.setAttribute('position', `${position.x} ${position.y} ${position.z}`);
+	}
+	animatePosition(position: xyz) {
+		this.el.setAttribute('animation', {
+			property: 'position',
+			from: `${this.position.x} ${this.position.y} ${this.position.z}`,
+			to: `${position.x} ${position.y} ${position.z}`,
+			dur: 100,
+			easing: 'linear'
+		});
 	}
 
 	set rotation(rotation: xyz) {
@@ -270,17 +281,19 @@ export class Unit {
 			/* Update audio level indicator. */
 			this.audioLevel = level;
 		});
-		const audio = document.createElement('a-sound') as Entity;
-		audio.setAttribute('src', '#' + track.sid);
-		audio.setAttribute('autoplay', 'true');
-		audio.setAttribute('volume', '1');
-		audio.setAttribute('position', '0 1.5 0');
-		audio.setAttribute('rotation', '0 180 0');
-		audio.setAttribute('move-mouth', 'userId:' + this.id);
-		this.avatarContainer.appendChild(audio);
+		this.audioSid = track.sid;
+		this.audioEl = document.getElementById(track.sid);
+
+		// this.el.setAttribute('sound', {
+		// 	src: '#' + track.sid,
+		// 	autoplay: false,
+		// 	positional: true
+		// });
+		this.el.setAttribute('move-mouth', 'userId:' + this.id);
 	}
 	detachAudio() {
-		const audio = document.querySelector('a-entity[sound]');
-		audio?.parentNode?.removeChild(audio);
+		this.audioSid = '';
+		this.audioEl = null;
+		this.el.removeAttribute('sound');
 	}
 }
