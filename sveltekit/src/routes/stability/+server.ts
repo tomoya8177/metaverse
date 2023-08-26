@@ -68,7 +68,11 @@ export const POST = async ({ request, params }): Promise<Response> => {
 			}
 		);
 		console.log(res);
-		res.data.handle = res.data.url.split('/').pop();
+		if (typeof res.data == 'string') {
+			//something wrong
+		} else {
+			res.data.handle = res.data.url?.split('/').pop();
+		}
 		await db.query(
 			`update promises set resolved=true, data='${JSON.stringify(res.data)}' where id='${id}'`
 		);

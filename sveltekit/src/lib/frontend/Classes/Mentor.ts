@@ -29,17 +29,7 @@ export class Mentor extends DBObject {
 		this.user = data.user || '';
 		this.voiceURI = data.voiceURI;
 		this.organization = data.organization || '';
-		this.utterance = new SpeechSynthesisUtterance();
 		this.prompt = data.prompt || '';
-		const synth = window.speechSynthesis;
-		synth.addEventListener('voiceschanged', () => {
-			if (this.voiceURI && this.utterance) {
-				this.utterance.voice =
-					synth.getVoices().find((voice) => {
-						return voice.voiceURI == this.voiceURI;
-					}) || null;
-			}
-		});
 	}
 	setEl() {
 		this.el = (document.getElementById(this.userData.id) as Entity) || null;
@@ -52,6 +42,16 @@ export class Mentor extends DBObject {
 		this.documents = await axios
 			.get('/api/documentsForAI?mentor=' + this.id)
 			.then((res) => res.data.map((doc) => new DocumentForAI(doc)));
+		this.utterance = new SpeechSynthesisUtterance();
+		const synth = window.speechSynthesis;
+		synth.addEventListener('voiceschanged', () => {
+			if (this.voiceURI && this.utterance) {
+				this.utterance.voice =
+					synth.getVoices().find((voice) => {
+						return voice.voiceURI == this.voiceURI;
+					}) || null;
+			}
+		});
 	}
 	speak(message: string) {
 		const unit = Users.find(this.user) as Unit | false;

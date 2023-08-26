@@ -8,8 +8,6 @@ import type { Room } from './Classes/Room';
 import type { User } from './Classes/User';
 
 import type { Entity } from 'aframe';
-import { videoChat } from './Classes/VideoChat';
-import { THREE } from 'aframe';
 let room: Room;
 RoomStore.subscribe((r) => {
 	room = r;

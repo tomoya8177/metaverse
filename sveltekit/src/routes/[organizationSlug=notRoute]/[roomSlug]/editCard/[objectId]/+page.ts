@@ -1,8 +1,8 @@
+import { apiCall } from '$lib/frontend/Classes/APICall.js';
 import axios from 'axios';
 
 export const load = async ({ params }) => {
-	const event =
-		(await axios.get('/api/events?object=' + params.objectId).then((res) => res.data[0])) || null;
+	const event = (await apiCall.getOne('/api/events?object=' + params.objectId)) || null;
 	console.log({ event });
 	return {
 		event

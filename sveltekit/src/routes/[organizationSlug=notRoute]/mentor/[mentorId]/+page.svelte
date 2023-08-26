@@ -4,7 +4,6 @@
 	import AvatarThumbnail from '../../../../Components/Atom/AvatarThumbnail.svelte';
 	import type { PageData } from './$types';
 	import { Message } from '$lib/frontend/Classes/Message';
-	import axios from 'axios';
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
 	import { UserStore } from '$lib/store';
 	import { escapeHTML } from 'mymetaverse-helper';
@@ -12,8 +11,6 @@
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { DateTime } from 'luxon';
 	import { _ } from '$lib/i18n';
-	import { Organization } from '$lib/types/Organization';
-	import { organizationFromSlug } from '$lib/frontend/organizationFromSlug';
 	export let data: PageData;
 	const mentor = new Mentor(data.mentor);
 	const sendChatMessage = async (message: Message) => {

@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 	import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
-	import { THREE } from 'aframe';
 	import { fade } from 'svelte/transition';
 	import axios from 'axios';
 	import type { User } from '$lib/frontend/Classes/User';

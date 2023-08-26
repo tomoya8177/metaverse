@@ -13,7 +13,7 @@ class DB {
 	constructor() {
 		this.pool = mysql.createPool(dbConfig);
 	}
-	query = async (sql: string) => {
+	query = async (sql: string): Promise<any[]> => {
 		console.log(sql);
 		const connection = await this.pool.getConnection();
 		const [rows] = await connection.query({ sql });

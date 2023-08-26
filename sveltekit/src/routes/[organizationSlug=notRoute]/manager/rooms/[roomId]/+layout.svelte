@@ -11,10 +11,6 @@
 	export let data: PageData;
 	let room = new Room(data.room);
 	const organization = data.organization;
-	const mentor = data.mentor;
-	const mentors = data.mentors;
-	const users = data.users;
-	let objects = data.objects;
 
 	let tab = 'basic';
 	if ($page.url.href.includes('objects')) tab = 'objects';
