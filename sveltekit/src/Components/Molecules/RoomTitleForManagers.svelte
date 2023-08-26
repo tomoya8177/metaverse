@@ -14,7 +14,11 @@
 			data-tooltip={_('Enter Room')}
 			href={'#'}
 			on:click={() => {
-				location.href = `/${organization?.slug}/${room.slug}`;
+				if (room.isXRCloud) {
+					location.href = room.xrCloudRoomUrl;
+				} else {
+					location.href = `/${organization?.slug}/${room.slug}`;
+				}
 			}}
 			role="button"
 			class=" circle-button"

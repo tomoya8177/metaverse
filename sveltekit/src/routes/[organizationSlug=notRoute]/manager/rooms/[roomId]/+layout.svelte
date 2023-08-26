@@ -23,7 +23,9 @@
 <InputWithLabel
 	label={_('URL')}
 	type="url"
-	value={`${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.slug}`}
+	value={room.isXRCloud
+		? room.xrCloudRoomUrl
+		: `${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.slug}`}
 	readonly
 	copiable
 	onCopy={() => {
@@ -45,18 +47,20 @@
 				{_('Basic Setting')}
 			</a>
 		</li>
-		<li>
-			<a
-				href={`/${organization.slug}/manager/rooms/${room.id}/objects`}
-				on:click={() => {
-					tab = 'objects';
-				}}
-				role="button"
-				class:secondary={tab != 'objects'}
-			>
-				{_('Objects')}
-			</a>
-		</li>
+		{#if !room.isXRCloud}
+			<li>
+				<a
+					href={`/${organization.slug}/manager/rooms/${room.id}/objects`}
+					on:click={() => {
+						tab = 'objects';
+					}}
+					role="button"
+					class:secondary={tab != 'objects'}
+				>
+					{_('Objects')}
+				</a>
+			</li>
+		{/if}
 	</ul>
 </nav>
 <slot />

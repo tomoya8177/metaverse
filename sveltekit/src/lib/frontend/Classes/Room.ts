@@ -32,6 +32,10 @@ export class Room extends DBObject {
 	entryStatus = writable('entering' as 'entering' | 'connecting' | 'entered');
 	sid: string = '';
 	environment: Environment | null;
+	isXRCloud: boolean = false;
+	sceneId: string = '';
+	xrCloudRoomId: string = '';
+	xrCloudRoomUrl: string = '';
 	constructor(data: any) {
 		data.table = 'rooms';
 		super(data);
@@ -61,6 +65,10 @@ export class Room extends DBObject {
 		} else {
 			this.allowedUsersArray = JSON.parse(this.allowedUsers);
 		}
+		this.isXRCloud = data.isXRCloud;
+		this.sceneId = data.sceneId;
+		this.xrCloudRoomId = data.xrCloudRoomId;
+		this.xrCloudRoomUrl = data.xrCloudRoomUrl;
 	}
 	get allowedUsers(): string {
 		return this.allowedUsersData;
