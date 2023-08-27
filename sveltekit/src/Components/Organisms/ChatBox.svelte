@@ -104,6 +104,7 @@
 				channelId: room ? videoChat.room?.sid || '' : $UserStore.id + DateTime.now().toISODate()
 			});
 			await aiMessage.createSendOutAndPush();
+			console.log({ room, me });
 			if (room && me) mentor.come(me);
 
 			// console.log({ aiMessage });

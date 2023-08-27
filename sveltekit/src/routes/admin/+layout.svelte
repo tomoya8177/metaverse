@@ -9,10 +9,7 @@
 	import Login from '../../Components/Organisms/Login.svelte';
 	export let data: PageData;
 	let loggedIn: boolean | null = data.loggedIn;
-	if (!$UserStore.isAdmin) {
-		// not allowed here
-		location.href = '/';
-	}
+	$: console.log({ loggedIn: data.loggedIn });
 </script>
 
 <svelte:head>
@@ -20,50 +17,47 @@
 		{_('Admin Console')} | VirtuaCampus
 	</title>
 </svelte:head>
-
-{#if !loggedIn}
+{#if loggedIn === false}
 	<Login />
 {:else}
 	<Navigation title={`${_('Admin Console')}`} logoLinkTo={`/admin`} />
-	{#if loggedIn}
-		<div style="display:flex;margin-left:1rem;margin-right:1rem">
-			<div class="menu">
-				<aside>
-					<nav>
-						<ul>
-							<li>
-								<a href="/admin/users">
-									<Icon icon="group" />
-									<span>
-										{_('Users')}
-									</span>
-								</a>
-							</li>
-							<li>
-								<a href="/admin/organizations">
-									<Icon icon="apartment" />
-									<span>
-										{_('Organizations')}
-									</span>
-								</a>
-							</li>
-							<li>
-								<a href="/admin/rooms">
-									<Icon icon="vrpano" />
-									<span>
-										{_('Rooms')}
-									</span>
-								</a>
-							</li>
-						</ul>
-					</nav>
-				</aside>
-			</div>
-			<div class="content">
-				<slot />
-			</div>
+	<div style="display:flex;margin-left:1rem;margin-right:1rem">
+		<div class="menu">
+			<aside>
+				<nav>
+					<ul>
+						<li>
+							<a href="/admin/users">
+								<Icon icon="group" />
+								<span>
+									{_('Users')}
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="/admin/organizations">
+								<Icon icon="apartment" />
+								<span>
+									{_('Organizations')}
+								</span>
+							</a>
+						</li>
+						<li>
+							<a href="/admin/rooms">
+								<Icon icon="vrpano" />
+								<span>
+									{_('Rooms')}
+								</span>
+							</a>
+						</li>
+					</ul>
+				</nav>
+			</aside>
 		</div>
-	{/if}
+		<div class="content">
+			<slot />
+		</div>
+	</div>
 {/if}
 
 <style>

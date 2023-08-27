@@ -10,7 +10,6 @@ import axios from 'axios';
 import { degree2radian } from 'mymetaverse-helper';
 
 import { sharedObjects } from './SharedObjects';
-import { pollAudioLevel } from '../pollAudioLevel';
 import { SharedObject } from './SharedObject';
 let room: Room;
 RoomStore.subscribe((value) => {
@@ -273,7 +272,9 @@ export class Unit {
 		const video = document.getElementById('cameraCircleOf' + this.id);
 		video?.parentNode?.removeChild(video);
 	}
-	attachAudio(track: RemoteAudioTrack) {
+	async attachAudio(track: RemoteAudioTrack) {
+		const pollAudioLevel = (await import('../pollAudioLevel')).pollAudioLevel;
+
 		if (!this.avatarContainer) return console.error('avatar container is null');
 
 		pollAudioLevel(track, (level: number) => {

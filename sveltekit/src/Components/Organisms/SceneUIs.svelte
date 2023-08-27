@@ -394,11 +394,11 @@
 		<ChatBox
 			mentor={room.mentorData}
 			{room}
+			{me}
 			bind:waitingForAIAnswer
 			bind:newMessagePinned
 			{sendChatMessage}
 			{onMicClicked}
-			bind:authors
 			bind:micActive
 		/>
 	</div>

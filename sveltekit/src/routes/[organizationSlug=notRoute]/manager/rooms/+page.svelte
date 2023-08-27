@@ -22,6 +22,8 @@
 	import DocumentForAiRow from '../../../../Components/Molecules/DocumentForAIRow.svelte';
 	import type { PageData } from './$types';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
+	import { myAlert } from '$lib/frontend/toast';
+	import { PUBLIC_XRCLOUD_API_KEY, PUBLIC_XRCLOUD_PROJECT_ID } from '$env/static/public';
 	export let data: PageData;
 	let progress: number = 0;
 	uploader.progress.subscribe((value) => {
@@ -67,9 +69,43 @@
 	});
 
 	const onCreateClicked = async () => {
-		if (!(await editRoom.validate())) return;
-		busy = true;
-		await editRoom.create();
+		if (editRoom.isXRCloud) {
+			if (editRoom.title == '' || editRoom.sceneId == '') {
+				myAlert(_('Please fill in the required fields.'));
+				return;
+			}
+			busy = true;
+			const scene = await axios
+				.get(`https://api.xrcloud.app/api/projects/${PUBLIC_XRCLOUD_PROJECT_ID}/scenes`, {
+					headers: {
+						Authorization: `Bearer ${PUBLIC_XRCLOUD_API_KEY}`
+					}
+				})
+				.then((res) => res.data.items[0]);
+			console.log({ scene });
+			const response = await axios
+				.post(
+					`https://api.xrcloud.app/api/projects/${PUBLIC_XRCLOUD_PROJECT_ID}/scenes/${scene.id}/rooms`,
+					{
+						name: editRoom.title,
+						size: 10
+					},
+					{
+						headers: {
+							Authorization: `Bearer ${PUBLIC_XRCLOUD_API_KEY}`
+						}
+					}
+				)
+				.then((res) => res.data);
+			console.log({ response });
+			editRoom.xrCloudRoomId = response.id;
+			editRoom.xrCloudRoomUrl = response.roomUrl;
+			await editRoom.create();
+		} else {
+			if (!(await editRoom.validate())) return;
+			busy = true;
+			await editRoom.create();
+		}
 		rooms = [...rooms, editRoom].sort((a, b) => (a.createdAt > b.createdAt ? -1 : 1));
 		busy = false;
 		modalOpen = false;
@@ -110,7 +146,13 @@
 				<td>
 					<RoomTitleForManagers forManager {room} {organization} />
 				</td>
-				<td>{room.slug}</td>
+				<td>
+					{#if room.isXRCloud}
+						Mozilla Hubs Room
+					{:else}
+						{room.slug}
+					{/if}
+				</td>
 				<td>
 					<a
 						role="button"

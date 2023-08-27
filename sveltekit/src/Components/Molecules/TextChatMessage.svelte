@@ -1,18 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { RoomStore, RigStore, UserStore, type xyz } from '$lib/store';
+	import { RoomStore, UserStore } from '$lib/store';
 	import axios from 'axios';
-	import { Unit } from '$lib/frontend/Classes/Unit';
 
-	import { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
-	import { VideoChat } from '$lib/frontend/Classes/VideoChat';
 	import type { Message } from '$lib/frontend/Classes/Message';
 	import { DateTime } from 'luxon';
 	import Icon from '../Atom/Icon.svelte';
-	import { fade, slide } from 'svelte/transition';
 	import { escapeHTML, nl2br } from 'mymetaverse-helper';
-	import type { User } from '$lib/frontend/Classes/User';
 	import { _ } from '$lib/i18n';
 	import { appendObjectInTheRoom } from '$lib/frontend/appendObjectInTheRoom';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';

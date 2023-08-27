@@ -1,6 +1,6 @@
 import { UserStore } from '$lib/store';
 import type { User } from '$lib/frontend/Classes/User';
-import { type Entity, THREE } from 'aframe';
+import type { Entity } from 'aframe';
 import { degree2radian } from 'mymetaverse-helper';
 let user: User;
 UserStore.subscribe((obj) => {

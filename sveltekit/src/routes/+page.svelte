@@ -7,7 +7,6 @@
 	import axios from 'axios';
 	import AvatarThumbnail from '../Components/Atom/AvatarThumbnail.svelte';
 	import { fade } from 'svelte/transition';
-	import { User } from '$lib/frontend/Classes/User';
 	import { cookies } from '$lib/frontend/cookies';
 	import SendMessageButton from '../Components/Atom/SendMessageButton.svelte';
 	import { Message } from '$lib/frontend/Classes/Message';
@@ -16,8 +15,6 @@
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
 	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 	let mentor: Mentor | null = null;
-	let intro: string = '';
-	let invite: string = '';
 	let firstPrompt: {
 		role: string;
 		content: string;

@@ -1,17 +1,12 @@
+import { apiCall } from '$lib/frontend/Classes/APICall.js';
 import { Event } from '$lib/frontend/Classes/Event';
 import axios from 'axios';
 
-export const load = async ({ params }) => {
-	const organization = await axios
-		.get('/api/organizations?slug=' + params.organizationSlug)
-		.then((res) => res.data[0]);
-	const rooms = await axios
-		.get('/api/rooms?organization=' + organization.id)
-		.then((res) => res.data);
+export const load = async ({ params, parent }) => {
+	const { organization } = await parent();
+	const rooms = await apiCall.get('/api/rooms?organization=' + organization.id);
 
-	const events = (await axios
-		.get('/api/events?organization=' + organization.id)
-		.then((res) => res.data)) as Event[];
+	const events = (await apiCall.get('/api/events?organization=' + organization.id)) as Event[];
 	return {
 		events: events.map((event) => new Event(event)),
 		organization,

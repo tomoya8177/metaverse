@@ -13,7 +13,6 @@ export const load = async ({ params, parent }) => {
 				.map((event) => event.id)
 				.join("','")}') and user='${user.id}'`
 		);
-		console.log({ attendances });
 		events = events
 			.map((event) => {
 				event.myAttendance = attendances.find((attendance) => attendance.event == event.id);

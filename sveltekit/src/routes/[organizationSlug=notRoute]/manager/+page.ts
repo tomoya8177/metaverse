@@ -1,12 +1,13 @@
+import { apiCall } from '$lib/frontend/Classes/APICall.js';
 import type { Room } from '$lib/frontend/Classes/Room.js';
 import type { User } from '$lib/frontend/Classes/User.js';
 import axios from 'axios';
 
 export const load = async ({ params, parent }) => {
 	const { organization, users, rooms } = await parent();
-	const actions = await axios
-		.get('/api/actions?organization=' + organization.id + '&orderBy=createdAt&order=desc&limit=100')
-		.then((res) => res.data);
+	const actions = await apiCall.get(
+		'/api/actions?organization=' + organization.id + '&orderBy=createdAt&order=desc&limit=100'
+	);
 
 	const actionHistories = actions
 		.map((action) => {

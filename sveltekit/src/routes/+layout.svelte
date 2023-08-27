@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { _ } from '$lib/i18n';
-	import { ConfirmDialog, Toast, UserStore } from '$lib/store';
+	import { ConfirmDialog, Toast } from '$lib/store';
 	import { fade } from 'svelte/transition';
 	actionHistory.send('visit', {
 		path: $page.url.pathname
@@ -11,6 +11,7 @@
 
 <svelte:head>
 	{#if !$page.url.host.includes('localhost')}
+		<!-- Google tag (gtag.js) -->
 		<!-- Google tag (gtag.js) -->
 		<!-- Google tag (gtag.js) -->
 		<!-- Google tag (gtag.js) -->
