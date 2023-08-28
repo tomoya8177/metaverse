@@ -9,7 +9,7 @@
 	import { UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
-	import { Me } from '$lib/frontend/Classes/Me';
+	import { Me, me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import SceneUIs from '../Organisms/SceneUIs.svelte';
 	import { messageUnlisteners } from '$lib/frontend/messageListeners';
@@ -56,16 +56,17 @@
 		delete AFRAME.components['on-scene-loaded'];
 	};
 	let sceneLoaded = false;
-	export let me: Me;
 	const onSceneLoaded = async (sceneEl: Entity) => {
 		sceneLoaded = true;
 		actionHistory.send('enteringRoom');
 		console.log('ME creating in room', room);
-		me = new Me($UserStore, room.id);
-		Users.add(me);
+		me.init($UserStore, room.id);
+		$UserStore.unit = me as Me;
+		Users.add($UserStore.unit);
 		//		await me.setLastPosition(room);
 		document.addEventListener('touchstart', () => {
-			me.enableTouch();
+			if (!$UserStore.unit) return;
+			if ($UserStore.unit instanceof Me) $UserStore.unit?.enableTouch();
 			nippleControl.show();
 		});
 
@@ -248,20 +249,16 @@
 			position="0 0.01 0"
 			scale={`${preset?.scale || 1} ${preset?.scale || 1} ${preset?.scale || 1}`}
 		/>
-	{/if}
-	{#if room.navMeshModelURL}
-		{@const preset = EnvironmentModelPresets.find(
-			(preset) => preset.modelURL == room.environmentModelURL
-		)}
-
-		<a-gltf-model
-			src={room.navMeshModelURL}
-			position="0 0.01 0"
-			visible="false"
-			nav-mesh
-			scale={`${preset?.scale || 1} ${preset?.scale || 1} ${preset?.scale || 1}`}
-		/>
-	{:else if !room.environmentModelURL}
+		{#if room.navMeshModelURL}
+			<a-gltf-model
+				src={room.navMeshModelURL}
+				position="0 0.01 0"
+				visible="false"
+				nav-mesh
+				scale={`${preset?.scale || 1} ${preset?.scale || 1} ${preset?.scale || 1}`}
+			/>
+		{/if}
+	{:else}
 		<a-plane
 			id="ground"
 			shadow="receive: true"

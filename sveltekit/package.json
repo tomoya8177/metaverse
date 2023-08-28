@@ -47,6 +47,7 @@
     "@fullcalendar/daygrid": "^6.1.8",
     "@fullcalendar/list": "^6.1.8",
     "@fullcalendar/timegrid": "^6.1.8",
+    "@twilio/conversations": "^2.4.1",
     "@twilio/krisp-audio-plugin": "^1.0.0",
     "aframe": "^1.4.2",
     "aframe-audio-analyser": "^1.0.0",

@@ -6,6 +6,7 @@ import { myAlert } from '../toast';
 import { _ } from '$lib/i18n';
 import type { Unit } from './Unit';
 import { PresetAvatars } from '$lib/preset/PresetAvatars';
+import type { Me } from './Me';
 export class User extends DBObject {
 	nickname: string;
 	email: string;
@@ -31,6 +32,7 @@ export class User extends DBObject {
 	RPMId: string = '';
 	lastRoom?: string;
 	lastPosition?: string;
+	unit: Me | Unit | null = null;
 	constructor(data: any) {
 		data.table = 'users';
 		super(data);

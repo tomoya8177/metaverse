@@ -11,11 +11,13 @@ import { degree2radian } from 'mymetaverse-helper';
 import { flip } from 'svelte/animate';
 
 export class Me extends Unit {
-	cameraRig: Entity;
+	cameraRig: Entity | null = null;
 	selfie: Entity | null = null;
-	camera: Entity;
-	constructor(user: User, roomId?: string) {
-		super(user);
+	camera: Entity | null = null;
+	constructor() {
+		super(new User({}));
+	}
+	init(user: User, roomId?: string) {
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
 		//this.el.setAttribute('my-wasd-controls', 'enabled:true');
