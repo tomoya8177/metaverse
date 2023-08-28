@@ -56,5 +56,10 @@ export const EnvironmentModelPresets: Environment[] = [
 		modelURL: '/models/usfq2.glb',
 		navMeshURL: '/models/usfq_navmesh.glb',
 		scale: 0.3
+	},
+	{
+		name: _('Pyramid'),
+		modelURL: '/models/pyramid.glb',
+		navMeshURL: '/models/pyramid_navmesh.glb'
 	}
 ];
