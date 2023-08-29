@@ -25,7 +25,6 @@
 	import { toast } from '$lib/frontend/toast';
 	import { Message } from '$lib/frontend/Classes/Message';
 	export let room: Room;
-	export let me: Me;
 
 	export let organization: Organization;
 	onMount(async () => {
@@ -77,7 +76,7 @@
 					await room.enter($UserStore);
 					const result = await room.connect();
 					busy = false;
-					me.updateAvatar();
+					$UserStore.unit?.updateAvatar();
 
 					if (result) {
 						actionHistory.send('enterRoom');

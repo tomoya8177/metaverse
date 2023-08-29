@@ -68,7 +68,7 @@ AFRAME.registerComponent('update-position', {
 				this.lastRotation = { ...this.me.rotation };
 				videoChat.sendMessage({
 					key: 'position',
-					user,
+					user: user.purifyData(),
 					position: this.me.position,
 					rotation: { ...this.me.rotation }
 				});

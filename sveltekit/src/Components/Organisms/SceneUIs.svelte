@@ -7,7 +7,6 @@
 	import { onDestroy, onMount } from 'svelte';
 	import {
 		PreviewPanelOpen,
-		RoomStore,
 		UserStore,
 		ItemsInPreview,
 		FocusObjectStore,
@@ -22,28 +21,15 @@
 	import { Users } from '$lib/frontend/Classes/Users';
 	import type { Me } from '$lib/frontend/Classes/Me';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
-	import ObjectEditor from './ObjectEditor.svelte';
 	import { VoiceRecognition } from '$lib/frontend/Classes/VoiceRecognition';
 	import { _ } from '$lib/i18n';
 	import Icon from '../Atom/Icon.svelte';
-	import { sharedObjects } from '$lib/frontend/Classes/SharedObjects';
-	import type { SharedObject } from '$lib/frontend/Classes/SharedObject';
 	import NippleControl from '../Atom/NippleControl.svelte';
 	import { myAlert, toast } from '$lib/frontend/toast';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
-	import { getPositionFromLockedPosition } from '$lib/frontend/getPositionFromLockedPosition';
-	import ObjectLockSelect from '../Molecules/ObjectLockSelect.svelte';
-	import ModalCloseButton from '../Atom/ModalCloseButton.svelte';
-	import MentorEdit from './MentorEdit.svelte';
-	import { DateTime } from 'luxon';
-	import { Mentor } from '$lib/frontend/Classes/Mentor';
-	import { error } from '@sveltejs/kit';
 	import type { Organization } from '$lib/types/Organization';
 	import type { Room } from '$lib/frontend/Classes/Room';
-	import RightControls from '../Molecules/RightControls.svelte';
 	import { wasdControl } from '$lib/frontend/Classes/WASDControl';
-	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
-	import { PUBLIC_IS_DEV } from '$env/static/public';
 	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
 	import { Unit } from '$lib/frontend/Classes/Unit';
 	export let organization: Organization;
@@ -52,7 +38,6 @@
 		TextChatOpen.set(false);
 	}
 
-	let authors: User[];
 	const onTextChatClicked = () => {
 		TextChatOpen.update((value) => {
 			const val = !value;
@@ -79,10 +64,10 @@
 		}
 		//on space key
 		if (e.key === ' ') {
-			me.jump();
+			$UserStore.unit?.jump();
 		}
 		if (e.key === 'w' || e.key === 'a' || e.key === 's' || e.key === 'd') {
-			me.disableTouch();
+			$UserStore.unit?.disableTouch();
 			nippleControl.hide();
 			if (e.key === 'w') {
 				wasdControl.velocityZ = 60;
@@ -151,7 +136,6 @@
 	});
 
 	let recognition: VoiceRecognition;
-	export let me: Me;
 	let micActive = false;
 	const onMicClicked = async () => {
 		micActive = !micActive;
@@ -187,7 +171,7 @@
 			});
 			waitingForAIAnswer = false;
 			const createdMessage = { ...(await sendChatMessage(aiMessage)) };
-			room.mentorData.come(me);
+			room.mentorData.come($UserStore.unit as Me);
 			if (!room.mentorData.toSpeak) {
 				TextChatOpen.set(true);
 				return;
@@ -373,7 +357,7 @@
 					class="circle-button"
 					on:click={async () => {
 						if (!$FocusObjectStore) return;
-						await me.sendLike($FocusObjectStore.user, 'like', 1);
+						await $UserStore.unit?.sendLike($FocusObjectStore.user, 'like', 1);
 						toast(_('Sent Like'));
 					}}
 					small
@@ -388,13 +372,12 @@
 
 <div class="object-editor" />
 
-<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:micActive {me} {room} />
+<ActionButtons {waitingForAIAnswer} {onMicClicked} bind:micActive {room} />
 <div style:display={$TextChatOpen ? 'block' : 'none'}>
 	<div class="chat-box">
 		<ChatBox
 			mentor={room.mentorData}
 			{room}
-			{me}
 			bind:waitingForAIAnswer
 			bind:newMessagePinned
 			{sendChatMessage}

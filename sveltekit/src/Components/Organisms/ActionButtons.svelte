@@ -60,7 +60,6 @@
 		document.removeEventListener('keydown', onKeyDown);
 	});
 
-	export let me: Me;
 	export let onMicClicked: () => void;
 	export let micActive: boolean;
 	let linkEditorOpen = false;
@@ -119,7 +118,7 @@
 			on:click={() => {
 				videoChat.unpublishMyTrack('camera');
 				actionHistory.send('hideMyCamera');
-				me?.hideCamera();
+				$UserStore.unit?.hideCamera();
 				$UserStore.onVideoMute = true;
 			}}
 		>
@@ -153,7 +152,7 @@
 							roomId: room.id,
 							file,
 							userId: $UserStore.id,
-							me
+							me: $UserStore.unit
 						});
 					});
 				});
@@ -188,7 +187,7 @@
 				on:click={() => {
 					videoChat.unpublishMyTrack('screen');
 					actionHistory.send('hideMyScreen');
-					me?.hideScreen();
+					$UserStore.unit?.hideScreen();
 					$UserStore.onScreenShare = false;
 				}}
 			>
@@ -207,8 +206,8 @@
 						const el = document.getElementById(publicationTrackSid);
 						if (!el) return console.error(`Couldn't get access to the Screen`);
 						el.addEventListener('loadedmetadata', () => {
-							if (publicationTrackSid && videoChat.screenTrack && me) {
-								me.showScreen(videoChat.screenTrack, publicationTrackSid);
+							if (publicationTrackSid && videoChat.screenTrack && $UserStore.unit) {
+								$UserStore.unit.showScreen(videoChat.screenTrack, publicationTrackSid);
 								$UserStore.onScreenShare = true;
 							}
 						});
@@ -238,7 +237,7 @@
 			<button
 				on:click={() => {
 					scene.removeAttribute('selfie-camera');
-					me.hideSelfie();
+					$UserStore.unit?.hideSelfie();
 					selfieOpen = false;
 				}}
 			>
@@ -250,7 +249,7 @@
 			<button
 				class="dim"
 				on:click={() => {
-					me.showSelfie();
+					$UserStore.unit?.showSelfie();
 					scene.setAttribute('selfie-camera', 'enabled:true');
 					selfieOpen = true;
 					more = false;
@@ -272,7 +271,8 @@
 					sharedObject.attachElement();
 					sharedObject.locked = false;
 					sharedObjects.add(sharedObject);
-					sharedObject.moveToMyFront(me.position, me.rotation);
+					if ($UserStore.unit)
+						sharedObject.moveToMyFront($UserStore.unit.position, $UserStore.unit.rotation);
 					linkEditorOpen = false;
 				}}
 				onUpdate={(sharedObject) => {

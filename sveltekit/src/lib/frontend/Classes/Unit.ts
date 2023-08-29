@@ -35,7 +35,7 @@ export class Unit {
 	userData: User;
 	audioSid: string = '';
 	audioEl: HTMLAudioElement | null = null;
-	constructor(data: User) {
+	constructor(data: any) {
 		this.userData = data;
 		this.id = data.id;
 		//append element to the scene

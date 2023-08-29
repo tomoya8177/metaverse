@@ -14,10 +14,8 @@ export class Me extends Unit {
 	cameraRig: Entity | null = null;
 	selfie: Entity | null = null;
 	camera: Entity | null = null;
-	constructor() {
-		super(new User({}));
-	}
-	init(user: User, roomId?: string) {
+	constructor(user: any, roomId: string) {
+		super(user);
 		this.el.setAttribute('update-position', '');
 		this.el.setAttribute('look-controls', '');
 		//this.el.setAttribute('my-wasd-controls', 'enabled:true');
@@ -58,9 +56,8 @@ export class Me extends Unit {
 			'constrainToNavMesh: true; camera: #camera; controls: keyboard,my-touch2'
 		);
 		//this.el.setAttribute('ping-session', `user:${user.id};type:unit`);
-		console.log(roomId, user, user.lastRoom, user.lastPosition);
 		if (roomId && user.lastRoom == roomId) {
-			this.setLastPosition(user);
+			//this.setLastPosition(user);
 		}
 	}
 	updateAvatar() {

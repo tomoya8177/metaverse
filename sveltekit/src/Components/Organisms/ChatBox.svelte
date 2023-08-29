@@ -3,18 +3,12 @@
 
 	import { onDestroy, onMount } from 'svelte';
 	import { ChatMessagesStore, UserStore, TextChatOpen } from '$lib/store';
-	import axios from 'axios';
 
 	import { videoChat } from '$lib/frontend/Classes/VideoChat';
 	import { Message } from '$lib/frontend/Classes/Message';
 	import Icon from '../Atom/Icon.svelte';
 	import { escapeHTML, scrollToBottom } from 'mymetaverse-helper';
-	import { Users } from '$lib/frontend/Classes/Users';
-	import type { User } from '$lib/frontend/Classes/User';
-	import { editableObject } from '$lib/frontend/Classes/EditableObject';
 	import type { Me } from '$lib/frontend/Classes/Me';
-	import VoiceResponse from 'twilio/lib/twiml/VoiceResponse';
-	import { LocalAudioTrack, createLocalAudioTrack } from 'twilio-video';
 	import { uploader } from '$lib/frontend/Classes/Uploader';
 	import { sendQuestionToAI } from '$lib/frontend/sendQuestionToAI';
 	import { _ } from '$lib/i18n';
@@ -37,7 +31,6 @@
 	};
 	export let room: Room | null;
 	export let mentor: Mentor;
-	export let me: Me | null = null;
 	onMount(async () => {
 		if (forceMentor) {
 			newMessageForMentor = true;
@@ -79,7 +72,7 @@
 					handle: file.handle,
 					url: file.url
 				});
-				if (!forceMentor && me) mentor.come(me);
+				if (!forceMentor && $UserStore.unit) mentor.come($UserStore.unit);
 				await message.createSendOutAndPush();
 				if (mentor.toSpeak) {
 					TextChatOpen.set(true);
@@ -104,8 +97,7 @@
 				channelId: room ? videoChat.room?.sid || '' : $UserStore.id + DateTime.now().toISODate()
 			});
 			await aiMessage.createSendOutAndPush();
-			console.log({ room, me });
-			if (room && me) mentor.come(me);
+			if (room && $UserStore.unit) mentor.come($UserStore.unit);
 
 			// console.log({ aiMessage });
 			waitingForAIAnswer = false;

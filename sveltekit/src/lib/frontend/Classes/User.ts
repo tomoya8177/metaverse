@@ -6,7 +6,7 @@ import { myAlert } from '../toast';
 import { _ } from '$lib/i18n';
 import type { Unit } from './Unit';
 import { PresetAvatars } from '$lib/preset/PresetAvatars';
-import type { Me } from './Me';
+import { Me } from './Me';
 export class User extends DBObject {
 	nickname: string;
 	email: string;
@@ -60,6 +60,9 @@ export class User extends DBObject {
 		this.lastPosition = data.lastPosition || '';
 		this.isManager = data.isManager || false;
 		this.isMember = data.isMember || false;
+	}
+	initMe(roomId: string) {
+		this.unit = new Me(this, roomId);
 	}
 	get fullName(): string {
 		if (!this.firstName && !this.lastName) return this.nickname;

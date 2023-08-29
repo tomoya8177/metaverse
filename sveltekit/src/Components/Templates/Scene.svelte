@@ -60,9 +60,8 @@
 		sceneLoaded = true;
 		actionHistory.send('enteringRoom');
 		console.log('ME creating in room', room);
-		me.init($UserStore, room.id);
-		$UserStore.unit = me as Me;
-		Users.add($UserStore.unit);
+		$UserStore.initMe(room.id);
+		Users.add($UserStore.unit as Unit);
 		//		await me.setLastPosition(room);
 		document.addEventListener('touchstart', () => {
 			if (!$UserStore.unit) return;
@@ -115,7 +114,7 @@
 				isTalking: true
 			});
 			message.createSendOutAndPush();
-			room.mentorData.come(me);
+			room.mentorData.come($UserStore.unit as Me);
 			room.mentorData.speak(message.body);
 		}
 		if (entryStatus == 'entered') {
@@ -152,7 +151,7 @@
 </script>
 
 {#if entryStatus != 'entered'}
-	<EnterRoomDialog {room} {organization} {me} />
+	<EnterRoomDialog {room} {organization} />
 {/if}
 {#if QADialogOpen}
 	<dialog open>
@@ -272,5 +271,5 @@
 	{/if}
 </a-scene>
 {#if sceneLoaded}
-	<SceneUIs {me} {organization} {room} />
+	<SceneUIs {organization} {room} />
 {/if}
