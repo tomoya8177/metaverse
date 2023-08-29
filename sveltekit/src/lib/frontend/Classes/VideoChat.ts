@@ -1,15 +1,13 @@
-import {
-	LocalVideoTrack,
-	connect,
-	createLocalVideoTrack,
-	Room,
-	LocalDataTrack,
+import pkg, { Room } from 'twilio-video';
+const {
+	LocalParticipant,
 	LocalAudioTrack,
+	LocalVideoTrack,
+	createLocalVideoTrack,
 	createLocalAudioTrack,
-	LocalTrackPublication,
-	type LocalTrack,
-	LocalParticipant
-} from 'twilio-video';
+	LocalDataTrack,
+	connect
+} = pkg;
 import type { Room as RoomType } from './Room';
 import axios from 'axios';
 import type { User } from '$lib/frontend/Classes/User';
@@ -45,11 +43,11 @@ export class VideoChat {
 	roomId: string = '';
 	room: Room | null = null;
 	audioOnly: boolean = false;
-	localParticipant: LocalParticipant | null = null;
-	dataTrack: LocalDataTrack | null = null;
-	audioTrack: LocalAudioTrack | null = null;
-	videoTrack: LocalVideoTrack | null = null;
-	screenTrack: LocalVideoTrack | null = null;
+	localParticipant: pkg.LocalParticipant | null = null;
+	dataTrack: pkg.LocalDataTrack | null = null;
+	audioTrack: pkg.LocalAudioTrack | null = null;
+	videoTrack: pkg.LocalVideoTrack | null = null;
+	screenTrack: pkg.LocalVideoTrack | null = null;
 	listeners: { [key: string]: (data: any) => void } = {};
 	audioPingInterval: any;
 	cameraPingInterval: any;
@@ -104,7 +102,7 @@ export class VideoChat {
 
 	async connect() {
 		//connect to twilio room
-		if (!this.dataTrack) this.dataTrack = (await this.createTrack('data')) as LocalDataTrack;
+		if (!this.dataTrack) this.dataTrack = (await this.createTrack('data')) as pkg.LocalDataTrack;
 		const result = await axios.post('/api/twilio-token', {
 			userId: this.userId,
 			roomId: this.roomId
@@ -118,7 +116,7 @@ export class VideoChat {
 		this.localParticipant = this.room.localParticipant;
 		this.connected = true;
 		// Log your Client's LocalParticipant in the Room
-		this.localParticipant.on('trackPublished', (publication: LocalTrackPublication) => {
+		this.localParticipant.on('trackPublished', (publication: pkg.LocalTrackPublication) => {
 			if (publication.track === this.dataTrack) {
 				//only then,
 				if (typeof dataTrackPublished.resolve === 'undefined') return;
@@ -126,7 +124,7 @@ export class VideoChat {
 			}
 		});
 
-		this.localParticipant.on('trackPublicationFailed', (error: Error, track: LocalTrack) => {
+		this.localParticipant.on('trackPublicationFailed', (error: Error, track: pkg.LocalTrack) => {
 			if (track === this.dataTrack) {
 				if (typeof dataTrackPublished.reject === 'undefined') return;
 				dataTrackPublished.reject(error);
@@ -205,7 +203,7 @@ export class VideoChat {
 	unpublishMyTrack(type: 'camera' | 'screen' | 'audio') {
 		if (!this.localParticipant) return;
 
-		this.localParticipant.tracks.forEach((publication: LocalTrackPublication) => {
+		this.localParticipant.tracks.forEach((publication: pkg.LocalTrackPublication) => {
 			if (!publication.track.name.includes(type + 'Of')) return;
 			if (publication.track.kind == 'data') return;
 			publication.track.stop();
