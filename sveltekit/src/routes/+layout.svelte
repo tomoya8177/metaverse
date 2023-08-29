@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	import { _ } from '$lib/i18n';
-	import { ConfirmDialog, Toast } from '$lib/store';
+	import { ConfirmDialog, Toast, Toasts } from '$lib/store';
 	import { fade } from 'svelte/transition';
 	actionHistory.send('visit', {
 		path: $page.url.pathname
@@ -11,6 +11,8 @@
 
 <svelte:head>
 	{#if !$page.url.host.includes('localhost')}
+		<!-- Google tag (gtag.js) -->
+		<!-- Google tag (gtag.js) -->
 		<!-- Google tag (gtag.js) -->
 		<!-- Google tag (gtag.js) -->
 		<!-- Google tag (gtag.js) -->
@@ -29,15 +31,15 @@
 </svelte:head>
 
 <slot />
-{#if $Toast.open}
+{#each $Toasts as toast}
 	<div
-		class:toast-bottom={$Toast.position == 'bottom'}
-		class:toast-top={$Toast.position == 'top'}
+		class:toast-bottom={toast.position == 'bottom'}
+		class:toast-top={toast.position == 'top'}
 		transition:fade
 	>
-		{$Toast.message}
+		{toast.message}
 	</div>
-{/if}
+{/each}
 <dialog id="myConfirmDialog" data-testid="myConfirmDialog" open={$ConfirmDialog.open}>
 	<article>
 		{$ConfirmDialog.message}

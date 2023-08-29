@@ -9,7 +9,7 @@
 	import { UserStore } from '$lib/store';
 
 	import '$lib/AframeComponents';
-	import { Me, me } from '$lib/frontend/Classes/Me';
+	import { Me } from '$lib/frontend/Classes/Me';
 	import { Users } from '$lib/frontend/Classes/Users';
 	import SceneUIs from '../Organisms/SceneUIs.svelte';
 	import { messageUnlisteners } from '$lib/frontend/messageListeners';

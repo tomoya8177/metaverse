@@ -13,18 +13,9 @@ export const Toast = writable({
 	message: '',
 	position: 'bottom'
 });
-export const RigStore = writable({
-	position: {
-		x: 0,
-		y: 0,
-		z: 0
-	},
-	rotation: {
-		x: 0,
-		y: 0,
-		z: 0
-	}
-});
+export const Toasts = writable(
+	[] as { id: string; open: boolean; message: string; position: string }[]
+);
 export const RoomStore = writable({} as Room | null);
 export type xyz = {
 	x: number;

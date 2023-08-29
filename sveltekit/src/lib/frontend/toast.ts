@@ -1,30 +1,39 @@
-import { ConfirmDialog, Toast } from '$lib/store';
+import { ConfirmDialog, Toasts } from '$lib/store';
 
 export const toast = (message: string, duration: number = 3000) => {
-	Toast.set({
-		open: true,
-		message: message,
-		position: 'bottom'
+	const id = crypto.randomUUID();
+	Toasts.update((toasts) => {
+		toasts.push({
+			id,
+			open: true,
+			message: message,
+			position: 'bottom'
+		});
+		return toasts;
 	});
 	setTimeout(() => {
-		Toast.set({
-			open: false,
-			message: '',
-			position: 'bottom'
+		Toasts.update((toasts) => {
+			toasts = toasts.filter((toast) => toast.id !== id);
+			return toasts;
 		});
 	}, duration);
 };
 export const myAlert = (message: string, duration: number = 3000) => {
-	Toast.set({
-		open: true,
-		message: message,
-		position: 'top'
+	const id = crypto.randomUUID();
+
+	Toasts.update((toasts) => {
+		toasts.push({
+			id: id,
+			open: true,
+			message: message,
+			position: 'top'
+		});
+		return toasts;
 	});
 	setTimeout(() => {
-		Toast.set({
-			open: false,
-			message: '',
-			position: 'bottom'
+		Toasts.update((toasts) => {
+			toasts = toasts.filter((toast) => toast.id !== id);
+			return toasts;
 		});
 	}, duration);
 };
