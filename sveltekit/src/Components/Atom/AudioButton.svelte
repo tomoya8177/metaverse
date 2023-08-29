@@ -15,7 +15,7 @@
 		on:click={async () => {
 			busy = true;
 			try {
-				if (!videoChat.connected) {
+				if (!videoChat.connected && !!$RoomStore) {
 					videoChat.init($UserStore, $RoomStore);
 					await videoChat.connect();
 				}

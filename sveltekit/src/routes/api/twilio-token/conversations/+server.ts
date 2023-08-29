@@ -2,8 +2,10 @@ import {
 	TWILIO_ACCOUNT_SID,
 	TWILIO_API_KEY,
 	TWILIO_API_SECRET,
+	TWILIO_AUTH_TOKE,
 	TWILIO_CHAT_SERVICE_SID
 } from '$env/static/private';
+import { db } from '$lib/backend/db.js';
 import twilio from 'twilio';
 export const POST = async ({ request }) => {
 	const body = await request.json();
@@ -37,5 +39,41 @@ export const POST = async ({ request }) => {
 
 	// Serialize the token to a JWT string
 	console.log(token.toJwt());
-	return new Response(JSON.stringify({ result: true, token: token.toJwt() }));
+	const client = twilio(twilioAccountSid, TWILIO_AUTH_TOKE);
+	const room = (await db.query("select * from rooms where id = '" + body.roomId + "'"))[0];
+	let conversation;
+	if (room.twilioConversationsSid) {
+		conversation = await client.conversations.v1.conversations(room.twilioConversationsSid).fetch();
+	} else {
+		conversation = await client.conversations.v1.conversations.create({
+			friendlyName: room.title,
+			uniqueName: room.id
+		});
+		await db.query(
+			"update rooms set twilioConversationsSid = '" +
+				conversation.sid +
+				"' where id = '" +
+				room.id +
+				"'"
+		);
+		room.twilioConversationsSid = conversation.sid;
+	}
+	let participant;
+	try {
+		participant = await client.conversations.v1
+			.conversations(conversation.sid)
+			.participants(body.userId)
+			.fetch();
+		console.log({ participant });
+	} catch (e) {
+		//not joined
+		participant = await client.conversations.v1
+			.conversations(conversation.sid)
+			.participants.create({ identity: body.userId });
+		console.log(participant);
+	}
+
+	return new Response(
+		JSON.stringify({ result: true, token: token.toJwt(), conversation, participant })
+	);
 };

@@ -26,6 +26,7 @@
 	import AvatarThumbnail from '../Atom/AvatarThumbnail.svelte';
 	import { ChatMessage } from 'langchain/schema';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
+	import { textChat } from '$lib/frontend/Classes/TextChat';
 	export let thumbnailURL: string = '';
 	export let title: String = '';
 	export let organization: Organization | null = null;
@@ -33,6 +34,8 @@
 	const onLogoutClicked = () => {
 		actionHistory.send('logout');
 		videoChat.leave();
+		textChat.leave();
+
 		RoomStore.set(null);
 		cookies.remove('login');
 		location.reload();
@@ -77,6 +80,8 @@
 		if (!(await myConfirm(_('Are you sure that you want to leave this room?')))) return;
 		actionHistory.send('leaveRoom');
 		videoChat.leave();
+		textChat.leave();
+
 		ChatMessagesStore.set([]);
 		RoomStore.set(null);
 		if (!organization) {
@@ -193,6 +198,8 @@
 									href={'#'}
 									on:click={() => {
 										videoChat.leave();
+										textChat.leave();
+
 										RoomStore.set(null);
 										location.href = '/admin';
 									}}

@@ -1,4 +1,4 @@
-import { Me } from '$lib/frontend/Classes/Me';
+import type { Me } from '$lib/frontend/Classes/Me';
 import type { Mentor } from '$lib/frontend/Classes/Mentor';
 import { Message } from '$lib/frontend/Classes/Message';
 import type { Room } from '$lib/frontend/Classes/Room';

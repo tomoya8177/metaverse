@@ -24,6 +24,7 @@
 	import { convertLocalToUTC } from '$lib/frontend/convertLocalToUTC';
 	import { toast } from '$lib/frontend/toast';
 	import { Message } from '$lib/frontend/Classes/Message';
+	import { textChat } from '$lib/frontend/Classes/TextChat';
 	export let room: Room;
 
 	export let organization: Organization;
@@ -35,6 +36,7 @@
 	const onLeaveClicked = () => {
 		actionHistory.send('leaveRoom');
 		videoChat.leave();
+		textChat.leave();
 		RoomStore.set(null);
 		if ($UserStore?.isMember) {
 			location.href = '/' + organization?.slug;

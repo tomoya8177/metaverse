@@ -1,22 +1,26 @@
 import axios from 'axios';
+import type { User } from './User';
+import type { Room } from './Room';
 
-const { Client } = require('@twilio/conversations');
+import { Client, Conversation, Participant } from '@twilio/conversations';
 class TextChat {
-	async init() {
-		const result = await axios.post('/api/twilio-token', {
-			userId: this.userId,
-			roomId: this.roomId
-		});
-		const client = new Client(token);
-		client.on('initialized', () => {
-			// Before you use the client, subscribe to the `'initialized'` event.
-			// Use the client.
-		});
-
-		// To catch client initialization errors, subscribe to the `'initFailed'` event.
-		client.on('initFailed', ({ error }) => {
-			// Handle the error.
-		});
+	conversation: Conversation | null = null;
+	participant: Participant | null = null;
+	messages: any[] = [];
+	async init(user: User, room: Room) {
+		const result = await axios
+			.post('/api/twilio-token/conversations', {
+				userId: user.id,
+				roomId: room.id
+			})
+			.then((res) => res.data);
+		console.log({ result });
+		this.conversation = result.conversation;
+		this.participant = result.participant;
+	}
+	async getMessages() {}
+	async leave() {
+		await this.conversation?.leave();
 	}
 }
 export const textChat = new TextChat();

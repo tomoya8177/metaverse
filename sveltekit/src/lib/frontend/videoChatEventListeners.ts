@@ -19,6 +19,7 @@ import { Unit } from './Classes/Unit';
 import axios from 'axios';
 import type { Me } from './Classes/Me';
 import { User } from './Classes/User';
+import { textChat } from './Classes/TextChat';
 
 const mountDataTrack = async (
 	participant: RemoteParticipant,
@@ -99,6 +100,7 @@ export const onDisconnected = (room: Room, localParticipant: LocalParticipant) =
 			const attachedElements = localVideoTrack.detach();
 			attachedElements.forEach((element: HTMLElement) => element.remove());
 		});
+		textChat.leave();
 	});
 };
 

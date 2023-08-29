@@ -10,6 +10,7 @@ import { videoChat } from './VideoChat';
 import { SharedObject } from './SharedObject';
 import { sharedObjects } from './SharedObjects';
 import { EnvironmentModelPresets, type Environment } from '$lib/preset/EnvironmentModelPresets';
+import { textChat } from './TextChat';
 
 export class Room extends DBObject {
 	slug: string;
@@ -36,6 +37,7 @@ export class Room extends DBObject {
 	sceneId: string = '';
 	xrCloudRoomId: string = '';
 	xrCloudRoomUrl: string = '';
+	twilioConversationsSid: string = '';
 	constructor(data: any) {
 		data.table = 'rooms';
 		super(data);
@@ -69,6 +71,7 @@ export class Room extends DBObject {
 		this.sceneId = data.sceneId;
 		this.xrCloudRoomId = data.xrCloudRoomId;
 		this.xrCloudRoomUrl = data.xrCloudRoomUrl;
+		this.twilioConversationsSid = data.twilioConversationsSid;
 	}
 	get allowedUsers(): string {
 		return this.allowedUsersData;
@@ -116,6 +119,7 @@ export class Room extends DBObject {
 	async enter(user: User): Promise<void> {
 		videoChat.init(user, this);
 		this.entryStatus.set('connecting');
+		textChat.init(user, this);
 	}
 	async connect(): Promise<boolean> {
 		this.sid = (await videoChat.connect()) || '';
@@ -127,6 +131,7 @@ export class Room extends DBObject {
 			myAlert(_('Connection Failed'));
 			return false;
 		}
+		//textChat.connect();
 	}
 	loadSharedObjects = async (): Promise<void> => {
 		const models = await axios.get('/api/objects?room=' + this.id).then((res) => res.data);
