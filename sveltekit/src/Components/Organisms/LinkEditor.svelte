@@ -180,17 +180,6 @@
 				>
 					{_('Clear Graphic')}
 				</button>
-				<img src={editObject.url} style="width:20rem;" alt="" crossorigin="anonymous" />
-			{:else}
-				<button
-					on:click={() => {
-						uploader.launchPicker('image/*', 1, (result) => {
-							editObject.url = result.filesUploaded[0].url;
-						});
-					}}
-				>
-					{_('Upload Graphic')}
-				</button>
 				{#if editObject.type.includes('image') || editObject.type.includes('video')}
 					<div>
 						{#if !editObject.isSphere}
@@ -234,6 +223,24 @@
 						{/if}
 					</div>
 				{/if}
+				<img
+					class="objectImage"
+					src={editObject.url}
+					style="width:20rem;"
+					alt=""
+					crossorigin="anonymous"
+				/>
+			{:else}
+				<button
+					on:click={() => {
+						uploader.launchPicker('image/*', 1, (result) => {
+							editObject.url = result.filesUploaded[0].url;
+						});
+					}}
+				>
+					{_('Upload Graphic')}
+				</button>
+
 				<button
 					aria-busy={generateImageBusy}
 					on:click={async () => {

@@ -38,7 +38,7 @@
 		},
 		...rooms.map((room) => {
 			return {
-				name: `[${_('Room')}] ${room.title}`,
+				name: `[${_('Room')}] ${room.unescapedData.title}`,
 				value: `${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.slug}`
 			};
 		}),
