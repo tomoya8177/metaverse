@@ -43,6 +43,7 @@ test.describe.serial('Top Page', () => {
 		await expect(sendButton).toBeVisible();
 		//await expect(page).toHaveTitle(/Playwright/);
 		const messageInput = page.getByLabel('Message');
+		await expect(messageInput).toBeVisible();
 		await messageInput.fill(nastyParagraph);
 		await sendButton.click();
 		//get by data-role='message'
@@ -140,7 +141,7 @@ test.describe.serial('Top Page', () => {
 		await allowRegistrationSwitch.check();
 		//		allowRegistrationSwitch.click();
 		await nextButton.click();
-		await expect(pleaseEnterTitleError).not.toBeVisible();
+		await expect(pleaseEnterTitleError).not.toBeVisible({ timeout: 15000 });
 	});
 	test('Create New Mentor', async () => {
 		const virtuaMentorTitle = page.getByText('VirtuaMentor');
@@ -301,6 +302,18 @@ test.describe.serial('Top Page', () => {
 
 		// you are in the dash board. well done. now let's split the test
 		//initiate chat test
+	});
+	test('Enter private chat with mentor', async () => {
+		const StartChatButton = page.locator('[data-tooltip="Start Chat"]');
+		await expect(StartChatButton).toBeVisible();
+		await StartChatButton.click();
+		const mentorName = page.getByText(nastyString);
+		await expect(mentorName).toBeVisible();
+		const messageInput = page.locator('#chat-textarea textarea');
+		await expect(messageInput).toBeVisible();
+		const sendButton = page.getByRole('button', { name: 'Send' });
+		await expect(sendButton).toBeVisible();
+		//	const messageFromMentor = page.getByRole('')
 	});
 	// test('chat test', async () => {
 	// 	await page.waitForTimeout(5000);

@@ -1,8 +1,6 @@
 import { STABILITY_AI_API_KEY } from '$env/static/private';
 import axios from 'axios';
-import fs from 'fs';
 import fetch from 'node-fetch';
-import { writeFile } from 'fs/promises';
 import { PUBLIC_FileStackAPIKey } from '$env/static/public';
 import { db } from '$lib/backend/db.js';
 
@@ -45,31 +43,37 @@ export const POST = async ({ request, params }): Promise<Response> => {
 			//style_preset: '3d-model'
 		})
 	}).then(async (response) => {
+		console.log({ response });
 		if (!response.ok) {
 			return new Response(`Non-200 response: ${await response.text()}`);
 		}
 
 		const responseJSON = (await response.json()) as GenerationResponse;
+		console.log(responseJSON);
 
 		const image = responseJSON.artifacts[0];
+		console.log({ image });
 		const buffer = Buffer.from(image.base64, 'base64');
-		const blob = new Blob([buffer], { type: 'image/png' }); // Convert Buffer to Blob
-
-		const formData = new FormData();
-		formData.append('fileUpload', blob, 'image.png');
-
+		console.log({ buffer });
+		//const blob = new Blob([buffer], { type: 'image/png' }); // Convert Buffer to Blob
+		//console.log({ blob });
+		//const formData = new FormData();
+		//console.log({ formData });
+		//formData.append('fileUpload', blob, 'image.png');
+		//console.log({ formData });
 		const res = await axios.post(
 			'https://www.filestackapi.com/api/store/S3?key=' + PUBLIC_FileStackAPIKey,
-			formData,
+			buffer,
 			{
 				headers: {
-					'Content-Type': 'multipart/form-data'
+					'Content-Type': 'image/png'
 				}
 			}
 		);
 		console.log(res);
 		if (typeof res.data == 'string') {
 			//something wrong
+			console.log({ res });
 		} else {
 			res.data.handle = res.data.url?.split('/').pop();
 		}

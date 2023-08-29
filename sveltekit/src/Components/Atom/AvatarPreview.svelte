@@ -2,12 +2,11 @@
 	import { onMount } from 'svelte';
 	import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 	import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader';
-	import { fade } from 'svelte/transition';
 	import axios from 'axios';
-	import type { User } from '$lib/frontend/Classes/User';
 	import { PresetAvatars } from '$lib/preset/PresetAvatars';
 	export let RPMId: string;
 	export let url: string;
+	import { THREE } from 'aframe';
 	let thumbnailURL = '';
 	let scene: THREE.Scene;
 	let camera: THREE.PerspectiveCamera;
