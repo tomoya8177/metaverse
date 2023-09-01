@@ -17,6 +17,7 @@
 	import type { Mentor } from '$lib/frontend/Classes/Mentor';
 	import CalendarView from '../../Components/Templates/CalendarView.svelte';
 	import { Event } from '$lib/frontend/Classes/Event';
+	import Navigation from '../../Components/Organisms/Navigation.svelte';
 
 	export let data: PageData;
 	const organization: Organization = data.organization;
@@ -61,6 +62,7 @@
 </svelte:head>
 
 {#if organization}
+	<Navigation {organization} />
 	<div class="container">
 		{#if $UserStore.isMember}
 			{#if $UserStore.isManager}
