@@ -183,7 +183,11 @@
 	let newMessagePinned = false;
 
 	const sendChatMessage = async (message: Message): Promise<Message> => {
-		actionHistory.send('sendChatMessage', { ...message, body: escapeHTML(message.body) });
+		actionHistory.send('sendChatMessage', {
+			...message,
+			unescapedData: null,
+			body: escapeHTML(message.body)
+		});
 		message.create();
 		//		const createdMessage = new Message(await message.create());
 		videoChat.sendMessage({ ...message, key: 'textMessage' });
