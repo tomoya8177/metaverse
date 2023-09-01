@@ -11,7 +11,9 @@
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { DateTime } from 'luxon';
 	import { _ } from '$lib/i18n';
+	import Navigation from '../../../../Components/Organisms/Navigation.svelte';
 	export let data: PageData;
+	let organization = data.organization;
 	const mentor = new Mentor(data.mentor);
 	const sendChatMessage = async (message: Message) => {
 		console.log('sending message', message);
@@ -82,6 +84,13 @@
 		{mentor.userData.fullName} | {data.organization.title} | VirtuaCampus
 	</title>
 </svelte:head>
+<Navigation
+	{organization}
+	title={organization.title}
+	thumbnailURL={organization.thumbnailURL}
+	logoLinkTo={`/${organization.slug}`}
+/>
+
 {#if mentorReady}
 	<div class="container" style="position:relative;height:calc(100svh - 3rem)">
 		<div aria-busy={waitingForAIAnswer}>

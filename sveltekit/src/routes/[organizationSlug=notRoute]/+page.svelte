@@ -62,7 +62,7 @@
 </svelte:head>
 
 {#if organization}
-	<Navigation {organization} />
+	<Navigation {organization} title={organization.title} thumbnailURL={organization.thumbnailURL} />
 	<div class="container">
 		{#if $UserStore.isMember}
 			{#if $UserStore.isManager}
