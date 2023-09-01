@@ -2,7 +2,8 @@ import { PUBLIC_IS_DEV } from '$env/static/public';
 import { RoomStore, UserStore } from '$lib/store';
 import axios from 'axios';
 import { DBObject } from './DBObject';
-import { page } from '$app/stores';
+import { escapeHTML } from 'mymetaverse-helper';
+
 import { cookies } from '../cookies';
 type Actions =
 	| 'login'
