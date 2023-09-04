@@ -18,7 +18,6 @@
 	import type { Me } from '$lib/frontend/Classes/Me';
 	export let data: PageData;
 	let loggedIn: boolean | null = data.loggedIn;
-	console.log(101);
 	let room: Room = new Room(data.room);
 
 	let roomReady = false;
@@ -72,7 +71,6 @@
 			}
 		}
 		noRoom = false;
-		console.log(5);
 	});
 	let me: Me;
 </script>

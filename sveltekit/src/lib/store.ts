@@ -30,5 +30,5 @@ export const ConfirmDialog = writable({
 	message: '',
 	result: undefined as undefined | boolean
 });
-export const TextChatOpen = writable(true);
+export const TextChatOpen = writable(false);
 export const ChatMessagesStore = writable([] as Message[]);

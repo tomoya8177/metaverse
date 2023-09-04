@@ -71,7 +71,6 @@
 
 		//load mentor user
 		if (room.mentor) {
-			console.log({ ...room.mentorData, userData: { ...room.mentorData.userData } });
 			const mentorUnit = new Unit(room.mentorData.userData);
 			mentorUnit.position = { x: 0, y: 0, z: 3 };
 			mentorUnit.el.setAttribute('ai-mentor', '');
@@ -92,31 +91,32 @@
 	let entryStatus: string = '';
 	room.entryStatus.subscribe(async (status) => {
 		entryStatus = status;
-		if (entryStatus == 'connecting' && room.mentor) {
-			const response = await axios.post(
-				'/mentor/' + room.mentor + '/' + videoChat.room?.sid || '',
-				{
-					type: 'room',
-					roomId: room.id,
-					body:
-						_("Hello! I'm") +
-						$UserStore.nickname +
-						_('You can just answer me hi. In the language of my setting. My locale is set to ') +
-						cookies.get('locale'),
-					channelId: videoChat.room?.sid || ''
-				}
-			);
-			const message = new Message({
-				room: room.id,
-				user: room.mentorData.userData.id,
-				body: response.data.text,
-				createdAt: DateTime.now().toISO(),
-				isTalking: true
-			});
-			message.createSendOutAndPush();
-			room.mentorData.come($UserStore.unit as Me);
-			room.mentorData.speak(message.body);
-		}
+		//asking first question temporarily disabled
+		// if (entryStatus == 'connecting' && room.mentor) {
+		// 	const response = await axios.post(
+		// 		'/mentor/' + room.mentor + '/' + videoChat.room?.sid || '',
+		// 		{
+		// 			type: 'room',
+		// 			roomId: room.id,
+		// 			body:
+		// 				_("Hello! I'm") +
+		// 				$UserStore.nickname +
+		// 				_('You can just answer me hi. In the language of my setting. My locale is set to ') +
+		// 				cookies.get('locale'),
+		// 			channelId: videoChat.room?.sid || ''
+		// 		}
+		// 	);
+		// 	const message = new Message({
+		// 		room: room.id,
+		// 		user: room.mentorData.userData.id,
+		// 		body: response.data.text,
+		// 		createdAt: DateTime.now().toISO(),
+		// 		isTalking: true
+		// 	});
+		// 	message.createSendOutAndPush();
+		// 	room.mentorData.come($UserStore.unit as Me);
+		// 	room.mentorData.speak(message.body);
+		// }
 		if (entryStatus == 'entered') {
 			const existingFeedback = await axios
 				.get('/api/feedbacks?campaign=1&user=' + $UserStore.id)
