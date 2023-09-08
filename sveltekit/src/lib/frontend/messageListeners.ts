@@ -10,6 +10,7 @@ import { RoomStore } from '$lib/store';
 import { toast } from './toast';
 import { _ } from '$lib/i18n';
 import type { Room } from './Classes/Room';
+import { unescapeHTML } from 'mymetaverse-helper';
 
 let room: Room;
 RoomStore.subscribe((r) => {
@@ -21,7 +22,7 @@ export const messageListeners = () => {
 	videoChat.listenTo('position', async (data) => {
 		let unit = Users.find(data.user.id) as Unit;
 		if (!unit) {
-			unit = welcomeUnit(data.user);
+			unit = welcomeUnit({ ...data.user, lastPosition: unescapeHTML(data.user.lastPosition) });
 		}
 		if (!unit) return;
 		unit.animatePosition(data.position);

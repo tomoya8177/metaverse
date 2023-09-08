@@ -106,6 +106,7 @@ export class Me extends Unit {
 		this.selfie?.parentNode?.removeChild(this.selfie);
 	}
 	async savePosition(roomId: string): Promise<void> {
+		console.log('saving position', this.position, this.rotation);
 		await axios.put('/api/users/' + this.id, {
 			lastRoom: roomId,
 			lastPosition: JSON.stringify({
