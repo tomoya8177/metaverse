@@ -84,7 +84,7 @@ AFRAME.registerComponent('squid-game', {
 		this.timer.setAttribute('width', width.toString());
 
 		this.player.el.querySelector('a-camera')?.appendChild(this.timer);
-		this.timer.setAttribute('position', '0 0.3 -0.5');
+		this.timer.setAttribute('position', '0 0.3 -1.5');
 		const redLight = document.createElement('a-circle');
 		redLight.setAttribute('color', 'red');
 		redLight.setAttribute('radius', '1.2');
