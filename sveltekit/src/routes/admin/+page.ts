@@ -9,7 +9,7 @@ export const load = async ({ params }) => {
 		`/api/actions?orderBy=createdAt&user=nin:'${users
 			.filter((user) => user.isAdmin)
 			.map((user) => user.id)
-			.join("','")}'&order=desc&limit=100`
+			.join("','")}'&order=desc&limit=400`
 	);
 
 	const rooms = await apiCall.get('/api/rooms');

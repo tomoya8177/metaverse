@@ -25,7 +25,11 @@ class I18N {
 	load() {
 		this.data = languageData[this.locale];
 		//save cookie
-		cookies.set('locale', this.locale, { expires: 365 });
+		cookies.set('locale', this.locale, {
+			expires: 365,
+			secure: true,
+			sameSite: 'None'
+		});
 	}
 	async setLocale(locale: string) {
 		this.locale = locale;

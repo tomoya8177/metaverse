@@ -13,6 +13,7 @@ export const load = async ({ params, cookies }) => {
 		.then((res) => res[0]);
 	console.log({ organization });
 	if (!organization) throw redirect(307, '/');
+	console.log({ cookie: cookies.get('login') });
 
 	const { loggedIn, user } = await checkLoginOnServer(cookies.get('login') || '');
 	console.log({ loggedIn, user });

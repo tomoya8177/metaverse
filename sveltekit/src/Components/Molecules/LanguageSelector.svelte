@@ -13,7 +13,7 @@
 	on:change={(e) => {
 		//set it to cookie
 		console.log(chosenLanguage);
-		cookies.set('locale', chosenLanguage, { expires: 365 * 10 });
+		cookies.set('locale', chosenLanguage, { expires: 365 * 10, secure: true, sameSite: 'None' });
 		actionHistory.send('changeLanguage', { language: chosenLanguage });
 		location.reload();
 	}}

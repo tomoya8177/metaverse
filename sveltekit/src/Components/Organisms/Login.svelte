@@ -9,7 +9,7 @@
 	import type { Room } from '$lib/frontend/Classes/Room';
 	import { _ } from '$lib/i18n';
 	import { myAlert } from '$lib/frontend/toast';
-	import { unescapeHTML,  nl2br } from 'mymetaverse-helper';
+	import { unescapeHTML, nl2br } from 'mymetaverse-helper';
 	import { actionHistory } from '$lib/frontend/Classes/ActionHistory';
 	export let organization: string = '';
 	export let room: Room | null = null;
@@ -54,7 +54,18 @@
 		});
 
 		if (res.data.result) {
-			cookies.set('login', res.data.login, { expires: 30 });
+			console.log('setting cookie');
+			cookies.set('login', res.data.login, {
+				expires: 30,
+				secure: true,
+				sameSite: 'None'
+			});
+			//check if cookie is set correctly
+			const login = cookies.get('login');
+			if (login !== res.data.login) {
+				myAlert(_('Failed to set cookie'));
+				return;
+			}
 			location.reload();
 		} else {
 			//wrong code
