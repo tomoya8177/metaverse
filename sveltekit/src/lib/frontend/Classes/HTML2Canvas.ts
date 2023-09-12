@@ -4,7 +4,7 @@ export class HTML2Canvas {
 	constructor() {
 		//do nothing
 	}
-	async getJpegBlob(el: HTMLElement, filename: string): Promise<Blob | false> {
+	async getJpegBlobFromElement(el: HTMLElement, filename: string): Promise<Blob | false> {
 		try {
 			console.log({ el });
 			const canvas = await html2canvas(el, {
@@ -12,9 +12,7 @@ export class HTML2Canvas {
 				allowTaint: true,
 				useCORS: true
 			});
-			console.log(canvas);
 			const dataUrl = canvas.toDataURL(filename, 0.9);
-			console.log(dataUrl);
 			const blob = await fetch(dataUrl).then((res) => res.blob());
 			return blob;
 		} catch (err) {
@@ -22,7 +20,7 @@ export class HTML2Canvas {
 			return false;
 		}
 	}
-	async getPNGBlob(el: HTMLElement, filename: string): Promise<Blob | false> {
+	async getPNGBlobFromElement(el: HTMLElement, filename: string): Promise<Blob | false> {
 		try {
 			const canvas = await html2canvas(el, {
 				backgroundColor: null,

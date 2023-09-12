@@ -32,12 +32,9 @@
 		await $UserStore.update();
 		videoChat.sendMessage({
 			key: 'updateProfile',
-			user: { ...$UserStore }
+			user: { ...$UserStore.purifyData() }
 		});
-		if (me) {
-			me.avatarURL = $UserStore.avatarURL;
-			me.nickname = $UserStore.nickname;
-		}
+
 		busy = false;
 		onUpdateDone();
 	};

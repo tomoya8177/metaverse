@@ -36,6 +36,7 @@
 			return;
 		}
 		if (room.mentor) {
+			console.log(room.mentor);
 			room.mentorData = new Mentor(data.mentor);
 			await room.mentorData.init();
 		}

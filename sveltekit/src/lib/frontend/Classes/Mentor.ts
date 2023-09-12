@@ -24,6 +24,11 @@ export class Mentor extends DBObject {
 	el: Entity | null = null;
 	position?: xyz = { x: 0, y: 0, z: 3 };
 	constructor(data: any) {
+		if (typeof data == 'string') {
+			console.trace();
+			console.log('data is string', data);
+			return;
+		}
 		data.table = 'mentors';
 		super(data);
 		this.user = data.user || '';

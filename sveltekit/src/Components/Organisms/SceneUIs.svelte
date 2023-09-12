@@ -32,6 +32,7 @@
 	import { wasdControl } from '$lib/frontend/Classes/WASDControl';
 	import { nippleControl } from '$lib/frontend/Classes/NippleControl';
 	import { Unit } from '$lib/frontend/Classes/Unit';
+	import { ShortType } from 'three';
 	export let organization: Organization;
 	export let room: Room;
 	if (!room.mentor) {
@@ -274,6 +275,13 @@
 						if ($FocusObjectStore.type == 'screen') {
 							PreviewPanelOpen.set(true);
 							return;
+						}
+						if ($FocusObjectStore.shortType == 'video') {
+							const asset = $FocusObjectStore.asset;
+							if (asset instanceof HTMLVideoElement) {
+								asset.requestPictureInPicture();
+								return;
+							}
 						}
 						$FocusObjectStore.inPreviewPane = true;
 						ItemsInPreview.update((itemsInPreview) => {

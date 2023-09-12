@@ -67,8 +67,10 @@ export class VideoChat {
 		if (typeof dataTrackPublished.promise === 'undefined')
 			return alert('not initialized correctly');
 		dataTrackPublished.promise.then(() => {
+			console.trace();
 			if (!this.dataTrack) return alert('not connected to room');
-			this.dataTrack.send(JSON.stringify(message));
+			console.log({ message });
+			this.dataTrack.send(JSON.stringify({ ...message, unescapedData: '' }));
 		});
 	}
 	async createTrack(type: trackType) {

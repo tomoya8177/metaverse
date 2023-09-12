@@ -10,7 +10,7 @@ class APICall {
 	async get(path: string): Promise<any> {
 		return await axios.get(this.endpoint + path).then((res) => res.data);
 	}
-	async getOne(path: string): Promise<object | undefined> {
+	async getOne(path: string): Promise<any> {
 		return await axios.get(this.endpoint + path).then((res) => res.data[0]);
 	}
 	async post(path: string, data: any): Promise<any> {

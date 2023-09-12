@@ -11,6 +11,7 @@
 	import { Mentor } from '$lib/frontend/Classes/Mentor';
 	import { BrandIcons } from '$lib/preset/BrandIcons';
 	import { InputWithLabel } from 'mymetaverseportal-ui-component';
+	import { unescapeHTML } from 'mymetaverse-helper';
 	export let editItem: SharedObject | Event;
 	let rooms: Room[] = [];
 	let mentors: Mentor[] = [];
@@ -38,7 +39,7 @@
 		},
 		...rooms.map((room) => {
 			return {
-				name: `[${_('Room')}] ${room.unescapedData.title}`,
+				name: `[${_('Room')}] ${unescapeHTML(room.title)}`,
 				value: `${$page.url.protocol}//${$page.url.host}/${organization.slug}/${room.slug}`
 			};
 		}),

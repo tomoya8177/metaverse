@@ -70,7 +70,10 @@ class Uploader {
 	}
 	async uploadHTMLAsCanvas(selector: string, filename: string): Promise<File | false> {
 		const html2canvas = new HTML2Canvas();
-		const blob = await html2canvas.getJpegBlob(document.querySelector(selector), filename);
+		const blob = await html2canvas.getJpegBlobFromElement(
+			document.querySelector(selector),
+			filename
+		);
 		if (!blob) {
 			myAlert('Error');
 			return false;
@@ -80,7 +83,10 @@ class Uploader {
 	}
 	async uploadHTMLAsCanvasPNG(selector: string, filename: string): Promise<File | false> {
 		const html2canvas = new HTML2Canvas();
-		const blob = await html2canvas.getPNGBlob(document.querySelector(selector), filename);
+		const blob = await html2canvas.getPNGBlobFromElement(
+			document.querySelector(selector),
+			filename
+		);
 		if (!blob) {
 			myAlert('Error');
 			return false;
