@@ -63,13 +63,13 @@ export const EnvironmentModelPresets: Environment[] = [
 		navMeshURL: '/models/pyramid_navmesh.glb'
 	},
 	{
-		name: _('Conference Room')+"1",
+		name: _('Conference Room') + '1',
 		modelURL: '/models/Room1.glb',
-		navMeshURL: ''
+		navMeshURL: '/models/navmesh1.glb'
 	},
 	{
-		name: _('Conference Room')+"2",
+		name: _('Conference Room') + '2',
 		modelURL: '/models/Room2.glb',
-		navMeshURL: ''
+		navMeshURL: '/models/navmesh1.glb'
 	}
 ];
