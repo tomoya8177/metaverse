@@ -69,7 +69,7 @@ export const EnvironmentModelPresets: Environment[] = [
 	},
 	{
 		name: _('Conference Room')+"2",
-		modelURL: '/models/Room2.glbs',
+		modelURL: '/models/Room2.glb',
 		navMeshURL: ''
 	}
 ];
