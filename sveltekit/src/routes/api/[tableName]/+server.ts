@@ -6,8 +6,9 @@ import { createFiltersFromParams } from '../../../lib/backend/createFiltersFromP
 import { unlink } from 'fs/promises';
 
 export async function GET({ request, params, cookies }) {
-	const isLocalhost = request.headers.get('host')?.includes('localhost');
+	const isLocalhost = request.headers.get('host')?.includes('localhost') || false;
 	const checkResult = await Auth.check(cookies.get('login'));
+	console.log({ checkResult, isLocalhost });
 	if (!checkResult.result && !isLocalhost) {
 		return new Response('not authorized', { status: 401 });
 	}
