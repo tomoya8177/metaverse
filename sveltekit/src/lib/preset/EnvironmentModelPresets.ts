@@ -71,5 +71,10 @@ export const EnvironmentModelPresets: Environment[] = [
 		name: _('Conference Room') + '2',
 		modelURL: '/models/Room2.glb',
 		navMeshURL: '/models/navmesh2.glb'
+	},
+	{
+		name: _('Conference Room') + '3',
+		modelURL: '/models/virteducaconfroomver2.glb',
+		navMeshURL: '/models/auditoriumnavmesh.glb'
 	}
 ];
