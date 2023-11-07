@@ -3,6 +3,7 @@ import type { Login } from '../types/Login';
 import type { User } from '../frontend/Classes/User';
 import type { Student } from '$lib/types/Student';
 import jwt from 'jsonwebtoken';
+import { JWT_SECRET } from '$env/static/private';
 
 const failResponse: loginResponse = {
 	result: false,
@@ -23,7 +24,7 @@ class auth {
 			return failResponse;
 		}
 		try {
-			var decoded = jwt.verify(login, 'shhhhh');
+			var decoded = jwt.verify(login, JWT_SECRET);
 		} catch (err) {
 			return failResponse;
 		}
@@ -47,7 +48,7 @@ class auth {
 		};
 	}
 	async mark(userId: string): Promise<Login> {
-		var token = jwt.sign({ userId: userId }, 'shhhhh');
+		var token = jwt.sign({ userId: userId }, JWT_SECRET);
 		return token;
 	}
 }
