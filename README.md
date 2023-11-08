@@ -13,6 +13,7 @@ simple project that provides a metaverse space with following features on the we
 ## project structure
 
 - sveltekit
+
 master directory that provides both backend and frontend.
 
 - 
