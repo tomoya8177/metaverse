@@ -48,7 +48,7 @@
 		"svelte2tsx": "^0.6.20",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
-		"vite": "^4.4.2",
+		"vite": "^4.4.12",
 		"vitest": "^0.32.2"
 	},
 	"svelte": "./dist/index.js",
